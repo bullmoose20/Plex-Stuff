@@ -43,7 +43,7 @@ Your PLEX folders are growing out of control. You use overlays from PMM or uploa
 1. setup as above
 2. Run with `python plex-bloat-fix.py`
 
-The script will loop through all the shared users on your acount and spit out username and email address.
+The script will loop through all the folders as defined in your .env and then clean it up if you want it to.
 
 In this case, the script found ~7.7 gigabytes it could free up out of 12.8 gigabytes found and hence 60.12% bloat!
 ```
