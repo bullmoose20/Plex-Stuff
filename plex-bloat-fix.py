@@ -296,13 +296,7 @@ for DIR_PATH in DIR_PATH_ARR:
 
     sub_end = time.time()
     stopwatch_sub = sub_end - sub_start
-    pct_bloat = (
-        0
-        if file_size_sub == 0
-        else (
-            (file_size_sub_del + tot_tc_file_size) / (file_size_sub + tot_tc_file_size)
-        )
-    )
+    pct_bloat = 0 if file_size_sub == 0 else ((file_size_sub_del) / (file_size_sub))
     if file_size_sub > 0:
         logging.info(
             f"#######################################################################"
@@ -325,10 +319,10 @@ for DIR_PATH in DIR_PATH_ARR:
     logging.info(f"RENAME Mode:                  {RENAME}")
     logging.info(f"DELETE Mode:                  {DELETE}")
     logging.info(f"TC DELETE Mode:               {TC_DEL}")
-    logging.info(f"Total Pct Plex Bloat:         " + "{:.2%}".format(pct_bloat))
-    logging.info(f"SubTotal File Size:           {format_bytes(file_size_sub)}")
-    logging.info(f"SubTotal File Size Found:     {format_bytes(file_size_sub_del)}")
     logging.info(f"Total TC Size Found:          {format_bytes(tot_tc_file_size)}")
+    logging.info(f"SubTotal Meta File Size Found:{format_bytes(file_size_sub_del)}")
+    logging.info(f"SubTotal Meta File Size:      {format_bytes(file_size_sub)}")
+    logging.info(f"Pct Plex Bloat:               " + "{:.2%}".format(pct_bloat))
     logging.info(
         f"#######################################################################"
     )
@@ -339,7 +333,7 @@ end_all = time.time()
 stopwatch = end_all - start_all
 pct_bloat = (
     0
-    if file_size_tot == 0
+    if file_size_tot + tot_tc_file_size == 0
     else ((file_size_del + tot_tc_file_size) / (file_size_tot + tot_tc_file_size))
 )
 
