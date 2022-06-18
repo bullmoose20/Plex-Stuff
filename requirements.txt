@@ -1,0 +1,3 @@
+PlexAPI
+python-dotenv
+SQLAlchemy
