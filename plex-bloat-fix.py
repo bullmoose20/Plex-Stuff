@@ -5,7 +5,7 @@
 # python-dotenv
 # SQLAlchemy
 
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 from xmlrpc.client import Boolean
 from operator import itemgetter, attrgetter
 from plexapi.server import PlexServer
@@ -53,19 +53,27 @@ load_dotenv()
 
 LOG_FILENAME = "plex-bloat-fix.log"
 
+####################################################################
 # Set up a specific logger with our desired output level
+####################################################################
 my_logger = logging.getLogger("MyLogger")
 my_logger.setLevel(logging.DEBUG)
 
+####################################################################
 # Check if log exists and should therefore be rolled
+####################################################################
 needRoll = os.path.isfile(LOG_FILENAME)
 
+####################################################################
 # Add the log message handler to the logger
+####################################################################
 handler = logging.handlers.RotatingFileHandler(LOG_FILENAME, backupCount=9)
 
 my_logger.addHandler(handler)
 
+####################################################################
 # This is a stale log, so roll it
+####################################################################
 if needRoll:
     # Roll over on application start
     my_logger.handlers[0].doRollover()
@@ -77,7 +85,10 @@ logging.basicConfig(
     level=logging.INFO,
 )
 logging.getLogger().addHandler(logging.StreamHandler())
+
+####################################################################
 # Clear screen
+####################################################################
 os.system("cls||clear")
 
 logging.info(f"#######################################################################")
@@ -108,7 +119,7 @@ PLEX_TOKEN = os.getenv("PLEX_TOKEN")
 SQLCMD = (
     "SELECT user_thumb_url FROM metadata_items WHERE user_thumb_url like 'upload://%';"
 )
-LIBS = ["Movies", "TV Shows", "Playlists", "Collections"]
+LIBS = ["Movies", "TV Shows", "Playlists", "Collections", "Artists", "Albums"]
 
 TMP_DIR = os.path.join(TMP_DIR, "")
 DIR_PATH = os.path.join(DIR_PATH, "")
@@ -187,19 +198,31 @@ else:
 
 logging.info(f"Total TC Size: {format_bytes(tot_tc_file_size)}")
 
+####################################################################
 # Connect to Plexserver
+####################################################################
 ps = PlexServer(PLEX_URL, PLEX_TOKEN, timeout=600)
 
+####################################################################
 # clear the download target dir
+####################################################################
 logging.info(f"Deleting all files in PLEX DB download directory: {TMP_DIR}...")
 files = glob.glob(f"{TMP_DIR}*")
 for f in files:
     os.remove(f)
 
+####################################################################
 # Download DB
+####################################################################
 start = time.time()
 
 logging.info(f"Sending command to download PLEX DB. This will take some time...")
+logging.info(
+    f"To see progress, log into PLEX and goto Settings | Manage | Console and filter on Database"
+)
+logging.info(
+    f"You can also look at the PLEX Dashboard to see the progress of the Database backup..."
+)
 logging.info(f"Hit CTRL-C now if unsure...")
 
 dbpath = ps.downloadDatabases(savepath=TMP_DIR, unpack=True)
@@ -210,24 +233,26 @@ stopwatch = end - start
 
 logging.info(f"Download completed in: {str(stopwatch)} seconds")
 
+####################################################################
 # Find the downloaded PLEX DB
+####################################################################
 for count, f in enumerate(os.listdir(TMP_DIR)):
     split_tup = os.path.splitext(f)
     if split_tup[1] != ".zip":
         db_file = f"{f}"
 
+####################################################################
 # connect to db
+####################################################################
 logging.info(f"Opening database: {TMP_DIR + db_file}")
-
 conn = sqlite3.connect(f"{TMP_DIR + db_file}")
-
 logging.info(f"Opened database successfully")
-
 logging.info(f"Executing {SQLCMD}")
-
 cursor = conn.execute(SQLCMD)
 
+####################################################################
 # Building list of selected uploaded posters
+####################################################################
 logging.info(f"Building list of selected uploaded posters")
 res_sql = []
 for row in cursor:
@@ -236,12 +261,13 @@ for row in cursor:
     # print("ID = ", tmp)
     res_sql.append(tmp)
 
-# print(res_sql)
 logging.info(f"Operation done successfully")
 
 conn.close()
 
+####################################################################
 # Building list of files to compare
+####################################################################
 logging.info(f"Building list of files to compare")
 
 res = []
@@ -336,6 +362,9 @@ pct_bloat = (
     if file_size_tot + tot_tc_file_size == 0
     else ((file_size_del + tot_tc_file_size) / (file_size_tot + tot_tc_file_size))
 )
+####################################################################
+# OVERALL SUMMARY
+####################################################################
 
 logging.info(f"#######################################################################")
 logging.info(f"# OVERALL SUMMARY:                                                    #")
