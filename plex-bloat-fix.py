@@ -5,7 +5,7 @@
 # python-dotenv
 # SQLAlchemy
 
-__version__ = "1.1.0"
+__version__ = "1.1.1"
 from xmlrpc.client import Boolean
 from operator import itemgetter, attrgetter
 from plexapi.server import PlexServer
@@ -182,7 +182,13 @@ if TC_DEL:
     logging.info(f"Working on: {TC_PATH}")
     logging.info(f"Deleting PhotoTranscoder jpg files. This will take some time...")
     files = glob.glob(f"{TC_PATH}/**/*.jpg", recursive=True)
+    files2 = glob.glob(f"{TC_PATH}/**/*.ppm", recursive=True)
     for f in files:
+        logging.info(f"DELETE-----> {os.path.join(TC_PATH, f)}")
+        file_size = os.path.getsize(os.path.join(TC_PATH, f))
+        tot_tc_file_size += file_size
+        os.remove(f)
+    for f in files2:
         logging.info(f"DELETE-----> {os.path.join(TC_PATH, f)}")
         file_size = os.path.getsize(os.path.join(TC_PATH, f))
         tot_tc_file_size += file_size
@@ -191,7 +197,12 @@ else:
     logging.info(f"Working on: {TC_PATH}")
     logging.info(f"Verifying PhotoTranscoder jpg files. This will take some time...")
     files = glob.glob(f"{TC_PATH}/**/*.jpg", recursive=True)
+    files2 = glob.glob(f"{TC_PATH}/**/*.ppm", recursive=True)
     for f in files:
+        logging.info(f"SAFEMODE-----> {os.path.join(TC_PATH, f)}")
+        file_size = os.path.getsize(os.path.join(TC_PATH, f))
+        tot_tc_file_size += file_size
+    for f in files2:
         logging.info(f"SAFEMODE-----> {os.path.join(TC_PATH, f)}")
         file_size = os.path.getsize(os.path.join(TC_PATH, f))
         tot_tc_file_size += file_size
