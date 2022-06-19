@@ -5,7 +5,7 @@
 # python-dotenv
 # SQLAlchemy
 
-__version__ = "1.1.1"
+__version__ = "1.1.2"
 from xmlrpc.client import Boolean
 from operator import itemgetter, attrgetter
 from plexapi.server import PlexServer
@@ -395,6 +395,9 @@ logging.info(
     f"Grand Total File Size:       {format_bytes((file_size_tot + tot_tc_file_size))}"
 )
 logging.info(f"Total Pct Plex Bloat:        " + "{:.2%}".format(pct_bloat))
+logging.info(
+    f"Total space savings:         {format_bytes((file_size_del + tot_tc_file_size))}"
+)
 logging.info(f"#######################################################################")
 
 sys.exit()
