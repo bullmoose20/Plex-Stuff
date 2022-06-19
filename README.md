@@ -61,6 +61,7 @@ Total Meta File Size:        (10.542983120307326, 'gigabytes')
 Grand Total File Size Found: (7.676115181297064, 'gigabytes')
 Grand Total File Size:       (12.767314125783741, 'gigabytes')
 Total Pct Plex Bloat:        60.12%
+Total space savings:         (7.676115181297064, 'gigabytes')
 #######################################################################
 ```
 
