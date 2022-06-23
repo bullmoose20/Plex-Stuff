@@ -14,7 +14,7 @@
 1. Copy `.env.example` to `.env`
 1. Edit .env to suit
 
-All these scripts use the same `.env` and requirements.
+All these PYTHON scripts use the same `.env` and requirements. The Unraid bash scripts will vary in nature
 
 ### `.env` contents
 
@@ -34,6 +34,7 @@ TC_DEL=0                          # set TC_DEL=1 and the script with delete file
 
 ## Scripts:
 1. [plex-bloat-fix.py](#plex-bloat-fix) - removes unneeded image files (Posters/Title Cards) from plex
+2. [plexdance.sh](#plexdance) - Unraid script to automate the full plexdance
 
 ## plex-bloat-fix
 
@@ -65,4 +66,14 @@ Total space savings:         (7.676115181297064, 'gigabytes')
 #######################################################################
 ```
 
+## plexdance
 
+So your plex is hosed... and your DB and metadata is in a real mess... time for the plexdance. https://forums.plex.tv/t/the-plex-dance/197064 Quote: "The purpose of this is to remove all cached metadata and xml data for an item that Plex usually keeps. This helps when you want to “start from scratch” for particular item" My version will do a FULL plexdance on ALL of your libraries
+
+### Usage
+1. setup as above
+2. edit the bash script so that the proper paths are used. I picked a very common structure, but this will depend on your setup
+3. cp the bash script to a location accessible in Unraid terminal
+4. Open Unraid terminal and navigate to the folder that contains the bash script
+5. `chown 755 plexdance.sh` to ensure that you can run the script
+6. Run with `./plexdance.sh`
