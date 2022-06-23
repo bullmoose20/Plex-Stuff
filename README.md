@@ -73,7 +73,9 @@ So your plex is hosed... and your DB and metadata is in a real mess... time for 
 ### Usage
 1. setup as above
 2. edit the bash script so that the proper paths are used. I picked a very common structure, but this will depend on your setup
-3. cp the bash script to a location accessible in Unraid terminal
-4. Open Unraid terminal and navigate to the folder that contains the bash script
-5. `chown 755 plexdance.sh` to ensure that you can run the script
-6. Run with `./plexdance.sh`
+3. edit/comment the docker start and stop lines as needed
+4. cp the bash script to a location accessible in Unraid terminal
+5. Open Unraid terminal and navigate to the folder that contains the bash script
+6. `chown 755 plexdance.sh` to ensure that you can run the script
+7. Run with `./plexdance.sh`
+8. follow prompts closely
