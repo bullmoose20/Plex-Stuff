@@ -5,7 +5,7 @@
 # python-dotenv
 # SQLAlchemy
 
-__version__ = "1.1.2"
+__version__ = "1.2.0"
 from xmlrpc.client import Boolean
 from operator import itemgetter, attrgetter
 from plexapi.server import PlexServer
@@ -94,7 +94,7 @@ os.system("cls||clear")
 logging.info(f"#######################################################################")
 logging.info(f"# Starting plex-bloat-fix.py Ver:{__version__} ")
 logging.info(f"#######################################################################")
-logging.info(f"Log file: {LOG_FILENAME} created...")
+logging.info(f"Log file:           {LOG_FILENAME} created...")
 
 ####################################################################
 # VARS
@@ -107,6 +107,14 @@ RENAME = Boolean(int(0))
 RENAME = Boolean(int(os.getenv("RENAME")))
 DELETE = Boolean(int(0))
 DELETE = Boolean(int(os.getenv("DELETE")))
+EMPTY_TRASH = Boolean(int(0))
+EMPTY_TRASH = Boolean(int(os.getenv("EMPTY_TRASH")))
+CLEAN_BUNDLES = Boolean(int(0))
+CLEAN_BUNDLES = Boolean(int(os.getenv("CLEAN_BUNDLES")))
+OPTIMIZE_DB = Boolean(int(0))
+OPTIMIZE_DB = Boolean(int(os.getenv("OPTIMIZE_DB")))
+SLEEP = 60
+SLEEP = int(os.getenv("SLEEP"))
 TC_PATH = os.getenv("TC_PATH")
 DIR_PATH = os.getenv("DIR_PATH")
 TMP_DIR = os.getenv("TMP_DIR")
@@ -138,31 +146,36 @@ if "PhotoTranscoder" not in TC_PATH and TC_DEL:
     )
     exit()
 
-logging.info(f"UNDO is:     {UNDO}")
-logging.info(f"RENAME is:   {RENAME}")
-logging.info(f"DELETE is:   {DELETE}")
-logging.info(f"DIR_PATH is: {DIR_PATH}")
-logging.info(f"TC_PATH is:  {TC_PATH}")
-logging.info(f"TC_DEL is:   {TC_DEL}")
+logging.info(f"UNDO is:            {UNDO}")
+logging.info(f"RENAME is:          {RENAME}")
+logging.info(f"DELETE is:          {DELETE}")
+logging.info(f"DIR_PATH is:        {DIR_PATH}")
+logging.info(f"TC_PATH is:         {TC_PATH}")
+logging.info(f"TC_DEL is:          {TC_DEL}")
+logging.info(f"SLEEP is:           {SLEEP}")
+logging.info(f"EMPTY_TRASH is:     {UNDO}")
+logging.info(f"CLEAN_BUNDLES is:   {UNDO}")
+logging.info(f"OPTIMIZE_DB is:     {UNDO}")
+
 for p in DIR_PATH_ARR:
-    logging.info(f"LIB is:      {p}")
-logging.info(f"TMP_DIR is:  {TMP_DIR}")
+    logging.info(f"LIB is:             {p}")
+logging.info(f"TMP_DIR is:         {TMP_DIR}")
 
 if RENAME and DELETE:
     logging.info(
-        f"RENAME and DELETE: This will skip the rename and just delete the files. UNDO is NOT possible. I hope you know what you are doing!"
+        f"RENAME and DELETE:  This will skip the rename and just delete the files within the Metadata directories. UNDO is NOT possible. I hope you know what you are doing!"
     )
 elif DELETE:
     logging.info(
-        f"DELETE: This will skip the rename and just delete the files. UNDO is NOT possible. I hope you know what you are doing!"
+        f"DELETE:             This will skip the rename and just delete the files within the Metadata directories. UNDO is NOT possible. I hope you know what you are doing!"
     )
 elif RENAME:
     logging.info(
-        f"RENAME: This will rename the files to .jpg files to simulate a delete and allows you to UNDO if needed"
+        f"RENAME:             This will rename the files within the Metadata directories to .jpg files to simulate a delete and allows you to UNDO if needed"
     )
 else:
     logging.info(
-        f"REPORTONLY: This will report only the files that would be renamed or deleted"
+        f"REPORTONLY:         This will report only the files that would be renamed or deleted within the Metadata directories"
     )
 
 ####################################################################
@@ -238,11 +251,12 @@ logging.info(f"Hit CTRL-C now if unsure...")
 
 dbpath = ps.downloadDatabases(savepath=TMP_DIR, unpack=True)
 # dbpath now contains the name of the zip file, if that's useful
+logging.info(f"dbpath= {dbpath}")
 
 end = time.time()
 stopwatch = end - start
-
 logging.info(f"Download completed in: {str(stopwatch)} seconds")
+
 
 ####################################################################
 # Find the downloaded PLEX DB
@@ -365,6 +379,33 @@ for DIR_PATH in DIR_PATH_ARR:
     )
     file_size_sub_del = 0
     file_size_sub = 0
+
+if EMPTY_TRASH:
+    et = ps.library.emptyTrash()
+    logging.info(f"###################################################################")
+    logging.info(f"# EMPTY_TRASH = {EMPTY_TRASH}")
+    logging.info(f"###################################################################")
+    logging.info(f"et= {et}")
+    logging.info(f"sleeping for {SLEEP}")
+    time.sleep(SLEEP)
+
+if CLEAN_BUNDLES:
+    logging.info(f"###################################################################")
+    logging.info(f"# CLEAN_BUNDLES = {CLEAN_BUNDLES}")
+    logging.info(f"###################################################################")
+    cb = ps.library.cleanBundles()
+    logging.info(f"cb= {cb}")
+    logging.info(f"sleeping for {SLEEP}")
+    time.sleep(SLEEP)
+
+if OPTIMIZE_DB:
+    logging.info(f"###################################################################")
+    logging.info(f"# OPTIMIZE_DB = {OPTIMIZE_DB}")
+    logging.info(f"###################################################################")
+    op = ps.library.optimize()
+    logging.info(f"op= {op}")
+    logging.info(f"sleeping for {SLEEP}")
+    time.sleep(SLEEP)
 
 end_all = time.time()
 stopwatch = end_all - start_all
