@@ -14,7 +14,7 @@
 1. Copy `.env.example` to `.env`
 1. Edit .env to suit
 
-All these PYTHON scripts use the same `.env` and requirements. The Unraid bash scripts will vary in nature
+All these PYTHON scripts use the same `.env` and requirements. The Unraid bash scripts, Windows powershell or Windows cmd scripts, will vary in nature. Read the related section down below for more details. 
 
 ### `.env` contents
 
@@ -39,6 +39,7 @@ OPTIMIZE_DB=0                     # set OPTIMIZE_DB=1 and the script will run th
 ## Scripts:
 1. [plex-bloat-fix.py](#plex-bloat-fix) - removes unneeded image files (Posters/Title Cards) from plex
 2. [plexdance.sh](#plexdance) - Unraid script to automate the full plexdance
+3. [process-tcards.cmd](#process_tcards) - Windows script to create properly sized PLEX titlecards to use with TCM or for other purposes
 
 ## plex-bloat-fix
 
@@ -69,6 +70,10 @@ Total Pct Plex Bloat:        60.12%
 Total space savings:         (7.676115181297064, 'gigabytes')
 #######################################################################
 ```
+### NOTES/TIPS
+1. Ensure you have proper permissions to delete/rename or the script will fail
+2. For performance purposes, its always recommended to run locally so that accessing the files is not done over a network share
+3. If you are using a PLEX container in UNRAID or other, use the hotio plex container... It ROCKS! https://hotio.dev/containers/plex/
 
 ## plexdance
 
@@ -83,3 +88,13 @@ So your plex is hosed... and your DB and metadata is in a real mess... time for 
 6. `chown 755 plexdance.sh` to ensure that you can run the script
 7. Run with `./plexdance.sh`
 8. follow prompts closely
+
+## process-tcards.cmd
+
+This script will use Imagemagick to produce title cards based on a folder that contains the episode titlecards stored as jpg. The end results will be in the `results` subfolder along with the `grayscale` subfolder
+
+### Usage
+1. Install latest windows version of Imagemagick (https://imagemagick.org/script/download.php#windows) 
+2. Create a folder with the jpg files you want to process and place process-tcards.cmd in that same directory
+3. Run process_tcards.cmd
+4. Original files will not be touched and results are stored in `results` subfolder and the `grayscale` subfolder
