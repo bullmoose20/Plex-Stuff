@@ -24,10 +24,14 @@ PLEX_TOKEN=PLEX-TOKEN             # https://support.plex.tv/articles/204059436-f
 DELETE=0                          # DELETE=1 will perform the delete. This is PERMANENT. UNDO will NOT restore. 0 is safemode
 RENAME=0                          # RENAME=1 will perform a rename of the files that would be deleted to append ".jpg". Can be undone by setting UNDO=1
 UNDO=0                            # UNDO=1 will rename all the files that are named with ".jpg" back to no file extension
-TMP_DIR =ath\to\tmp_dir\          # Temporary directory (SHOULD BE AN EMPTY FOLDER) where the plex DB will be downloaded to perform query
+TMP_DIR=path\to\tmp_dir\          # Temporary directory (SHOULD BE AN EMPTY FOLDER) where the plex DB will be downloaded to perform query
 DIR_PATH=path\to\Metadata\        # path to the Metadata directory in PLEX where the Movies and TV Shows subfolders are found. Local for best perf but can be mounted
 TC_PATH=path\to\PhotoTranscoder\  # path to the PhotoTranscoder folder where client thumbnails are stored and rarely if ever get deleted
-TC_DEL=0                          # set TC_DEL=1 and the script with delete files found in the Cache\PhotoTranscoder directory. UNDO will not undo this action. 
+TC_DEL=0                          # set TC_DEL=1 and the script will delete files found in the Cache\PhotoTranscoder directory. UNDO will not undo this action. 
+SLEEP=60                          # set SLEEP=60 to add a 60 second delay between the EMPTY_TRASH, CLEAN_BUNDLES, and OPTIMIZE PLEX operations
+EMPTY_TRASH=0                     # set EMPTY_TRASH=1 and the script will run the EMPTY TRASH operation in PLEX
+CLEAN_BUNDLES=0                   # set CLEAN_BUNDLES=1 and the script will run the CLEAN BUNDLES operation in PLEX
+OPTIMIZE_DB=0                     # set OPTIMIZE_DB=1 and the script will run the OPTIMIZE DB operation in PLEX
 ```
 
 ## Plex scripts:
