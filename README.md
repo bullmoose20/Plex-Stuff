@@ -96,5 +96,5 @@ This script will use Imagemagick to produce title cards based on a folder that c
 ### Usage
 1. Install latest windows version of Imagemagick (https://imagemagick.org/script/download.php#windows) 
 2. Create a folder with the jpg files you want to process and place process-tcards.cmd in that same directory
-3. Run process_tcards.cmd
+3. Run `process-tcards.cmd`
 4. Original files will not be touched and results are stored in `results` subfolder and the `grayscale` subfolder
