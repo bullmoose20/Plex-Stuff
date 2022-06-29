@@ -5,7 +5,7 @@
 # python-dotenv
 # SQLAlchemy
 
-__version__ = "1.2.1"
+__version__ = "1.2.2"
 from xmlrpc.client import Boolean
 from operator import itemgetter, attrgetter
 from plexapi.server import PlexServer
@@ -155,9 +155,9 @@ logging.info(f"DIR_PATH is:        {DIR_PATH}")
 logging.info(f"TC_PATH is:         {TC_PATH}")
 logging.info(f"TC_DEL is:          {TC_DEL}")
 logging.info(f"SLEEP is:           {SLEEP}")
-logging.info(f"EMPTY_TRASH is:     {UNDO}")
-logging.info(f"CLEAN_BUNDLES is:   {UNDO}")
-logging.info(f"OPTIMIZE_DB is:     {UNDO}")
+logging.info(f"EMPTY_TRASH is:     {EMPTY_TRASH}")
+logging.info(f"CLEAN_BUNDLES is:   {CLEAN_BUNDLES}")
+logging.info(f"OPTIMIZE_DB is:     {OPTIMIZE_DB}")
 
 for p in DIR_PATH_ARR:
     logging.info(f"LIB is:             {p}")
