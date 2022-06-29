@@ -10,6 +10,7 @@ mkdir blur
 mkdir soften
 mkdir results
 mkdir grayscale
+mkdir blacktowhite
 
 magick mogrify -resize 3200x1800 -path .\resize *.jpg
 magick mogrify -format png -path .\resize .\resize\*.jpg
@@ -22,3 +23,4 @@ magick mogrify -alpha set -background None -virtual-pixel VerticalTile -channel 
 REM for /F %i in ('dir /b .\blur\*.png') do magick -gravity center .\blur\%i .\soften\%i -composite .\results\%i
 for /F %%i in ('dir /b .\blur\*.png') do magick -gravity center .\blur\%%i .\soften\%%i -composite .\results\%%i
 magick mogrify -colorspace gray -path .\grayscale .\results\*.png
+magick mogrify -fuzz 40% -fill white -opaque black -path .\blacktowhite *.png
