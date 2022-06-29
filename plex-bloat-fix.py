@@ -5,7 +5,7 @@
 # python-dotenv
 # SQLAlchemy
 
-__version__ = "1.2.0"
+__version__ = "1.2.1"
 from xmlrpc.client import Boolean
 from operator import itemgetter, attrgetter
 from plexapi.server import PlexServer
@@ -120,7 +120,9 @@ DIR_PATH = os.getenv("DIR_PATH")
 TMP_DIR = os.getenv("TMP_DIR")
 PLEX_URL = os.getenv("PLEX_URL")
 PLEX_TOKEN = os.getenv("PLEX_TOKEN")
-
+dbpath = ""
+file_size_tot = 0
+file_size_del = 0
 ####################################################################
 # MAIN
 ####################################################################
@@ -186,259 +188,316 @@ if UNDO:
 
 # Start time
 start_all = time.time()
-
-####################################################################
-# Clean PhotoTranscoder Folder
-####################################################################
-tot_tc_file_size = 0
-if TC_DEL:
-    logging.info(f"Working on: {TC_PATH}")
-    logging.info(f"Deleting PhotoTranscoder jpg files. This will take some time...")
-    files = glob.glob(f"{TC_PATH}/**/*.jpg", recursive=True)
-    files2 = glob.glob(f"{TC_PATH}/**/*.ppm", recursive=True)
-    for f in files:
-        logging.info(f"DELETE-----> {os.path.join(TC_PATH, f)}")
-        file_size = os.path.getsize(os.path.join(TC_PATH, f))
-        tot_tc_file_size += file_size
-        os.remove(f)
-    for f in files2:
-        logging.info(f"DELETE-----> {os.path.join(TC_PATH, f)}")
-        file_size = os.path.getsize(os.path.join(TC_PATH, f))
-        tot_tc_file_size += file_size
-        os.remove(f)
-else:
-    logging.info(f"Working on: {TC_PATH}")
-    logging.info(f"Verifying PhotoTranscoder jpg files. This will take some time...")
-    files = glob.glob(f"{TC_PATH}/**/*.jpg", recursive=True)
-    files2 = glob.glob(f"{TC_PATH}/**/*.ppm", recursive=True)
-    for f in files:
-        logging.info(f"SAFEMODE-----> {os.path.join(TC_PATH, f)}")
-        file_size = os.path.getsize(os.path.join(TC_PATH, f))
-        tot_tc_file_size += file_size
-    for f in files2:
-        logging.info(f"SAFEMODE-----> {os.path.join(TC_PATH, f)}")
-        file_size = os.path.getsize(os.path.join(TC_PATH, f))
-        tot_tc_file_size += file_size
-
-logging.info(f"Total TC Size: {format_bytes(tot_tc_file_size)}")
-
-####################################################################
-# Connect to Plexserver
-####################################################################
-ps = PlexServer(PLEX_URL, PLEX_TOKEN, timeout=600)
-
-####################################################################
-# clear the download target dir
-####################################################################
-logging.info(f"Deleting all files in PLEX DB download directory: {TMP_DIR}...")
-files = glob.glob(f"{TMP_DIR}*")
-for f in files:
-    os.remove(f)
-
-####################################################################
-# Download DB
-####################################################################
-start = time.time()
-
-logging.info(f"Sending command to download PLEX DB. This will take some time...")
-logging.info(
-    f"To see progress, log into PLEX and goto Settings | Manage | Console and filter on Database"
-)
-logging.info(
-    f"You can also look at the PLEX Dashboard to see the progress of the Database backup..."
-)
-logging.info(f"Hit CTRL-C now if unsure...")
-
-dbpath = ps.downloadDatabases(savepath=TMP_DIR, unpack=True)
-# dbpath now contains the name of the zip file, if that's useful
-logging.info(f"dbpath= {dbpath}")
-
-end = time.time()
-stopwatch = end - start
-logging.info(f"Download completed in: {str(stopwatch)} seconds")
-
-
-####################################################################
-# Find the downloaded PLEX DB
-####################################################################
-for count, f in enumerate(os.listdir(TMP_DIR)):
-    split_tup = os.path.splitext(f)
-    if split_tup[1] != ".zip":
-        db_file = f"{f}"
-
-####################################################################
-# connect to db
-####################################################################
-logging.info(f"Opening database: {TMP_DIR + db_file}")
-conn = sqlite3.connect(f"{TMP_DIR + db_file}")
-logging.info(f"Opened database successfully")
-logging.info(f"Executing {SQLCMD}")
-cursor = conn.execute(SQLCMD)
-
-####################################################################
-# Building list of selected uploaded posters
-####################################################################
-logging.info(f"Building list of selected uploaded posters")
-res_sql = []
-for row in cursor:
-    p = urlparse(row[0])
-    tmp = p.path.rsplit("/", 1).pop()
-    # print("ID = ", tmp)
-    res_sql.append(tmp)
-
-logging.info(f"Operation done successfully")
-
-conn.close()
-
-####################################################################
-# Building list of files to compare
-####################################################################
-logging.info(f"Building list of files to compare")
-
-res = []
-file_size_tot = 0
-file_size_del = 0
-file_size_sub_del = 0
-file_size_sub = 0
-
-for DIR_PATH in DIR_PATH_ARR:
-    sub_start = time.time()
-    working_on = DIR_PATH
-    logging.info(f"Working on: {DIR_PATH}")
-    for (DIR_PATH, dir_names, file_names) in walk(DIR_PATH):
-        for file in file_names:
-            if "." not in file:
-                file_size = os.path.getsize(os.path.join(DIR_PATH, file))
-                file_size_tot += file_size
-                file_size_sub += file_size
-                if file not in res_sql:
-                    file_size_del += file_size
-                    file_size_sub_del += file_size
-                    if RENAME and DELETE:
-                        logging.info(f"DELETE-----> {os.path.join(DIR_PATH, file)}")
-                        os.remove(os.path.join(DIR_PATH, file))
-                    elif DELETE:
-                        logging.info(f"DELETE-----> {os.path.join(DIR_PATH, file)}")
-                        os.remove(os.path.join(DIR_PATH, file))
-                    elif RENAME:
-                        logging.info(f"RENAME-----> {os.path.join(DIR_PATH, file)}")
-                        os.rename(
-                            os.path.join(DIR_PATH, file),
-                            os.path.join(DIR_PATH, file) + ".jpg",
-                        )
-                    else:
-                        logging.info(f"SAFEMODE-----> {os.path.join(DIR_PATH, file)}")
-            elif ".jpg" in file:
-                file_size = os.path.getsize(os.path.join(DIR_PATH, file))
-                file_size_tot += file_size
-                file_size_sub += file_size
-                file_size_del += file_size
-                file_size_sub_del += file_size
-                if RENAME and DELETE:
-                    logging.info(f"DELETE-----> {os.path.join(DIR_PATH, file)}")
-                    os.remove(os.path.join(DIR_PATH, file))
-                elif DELETE:
-                    logging.info(f"DELETE-----> {os.path.join(DIR_PATH, file)}")
-                    os.remove(os.path.join(DIR_PATH, file))
-                elif RENAME:
-                    logging.info(f"RENAME-----> {os.path.join(DIR_PATH, file)}")
-                else:
-                    logging.info(f"SAFEMODE-----> {os.path.join(DIR_PATH, file)}")
-
-    sub_end = time.time()
-    stopwatch_sub = sub_end - sub_start
-    pct_bloat = 0 if file_size_sub == 0 else ((file_size_sub_del) / (file_size_sub))
-    if file_size_sub > 0:
+try:
+    ####################################################################
+    # Clean PhotoTranscoder Folder
+    ####################################################################
+    tot_tc_file_size = 0
+    if TC_DEL:
+        logging.info(f"Working on: {TC_PATH}")
+        logging.info(f"Deleting PhotoTranscoder jpg files. This will take some time...")
+        files = glob.glob(f"{TC_PATH}/**/*.jpg", recursive=True)
+        files2 = glob.glob(f"{TC_PATH}/**/*.ppm", recursive=True)
+        for f in files:
+            logging.info(f"DELETE-----> {os.path.join(TC_PATH, f)}")
+            file_size = os.path.getsize(os.path.join(TC_PATH, f))
+            tot_tc_file_size += file_size
+            os.remove(f)
+        for f in files2:
+            logging.info(f"DELETE-----> {os.path.join(TC_PATH, f)}")
+            file_size = os.path.getsize(os.path.join(TC_PATH, f))
+            tot_tc_file_size += file_size
+            os.remove(f)
+    else:
+        logging.info(f"Working on: {TC_PATH}")
         logging.info(
-            f"#######################################################################"
+            f"Verifying PhotoTranscoder jpg files. This will take some time..."
         )
-        logging.info(f"# SUBTOTAL SUMMARY: {working_on}")
-        logging.info(
-            f"#######################################################################"
-        )
+        files = glob.glob(f"{TC_PATH}/**/*.jpg", recursive=True)
+        files2 = glob.glob(f"{TC_PATH}/**/*.ppm", recursive=True)
+        for f in files:
+            logging.info(f"SAFEMODE-----> {os.path.join(TC_PATH, f)}")
+            file_size = os.path.getsize(os.path.join(TC_PATH, f))
+            tot_tc_file_size += file_size
+        for f in files2:
+            logging.info(f"SAFEMODE-----> {os.path.join(TC_PATH, f)}")
+            file_size = os.path.getsize(os.path.join(TC_PATH, f))
+            tot_tc_file_size += file_size
+
+    logging.info(f"Total TC Size: {format_bytes(tot_tc_file_size)}")
+
+    ####################################################################
+    # Connect to Plexserver
+    ####################################################################
+    ps = PlexServer(PLEX_URL, PLEX_TOKEN, timeout=600)
+
+    ####################################################################
+    # clear the download target dir
+    ####################################################################
+    logging.info(f"Deleting all files in PLEX DB download directory: {TMP_DIR}...")
+    files = glob.glob(f"{TMP_DIR}*")
+    for f in files:
+        os.remove(f)
+
+    ####################################################################
+    # Download DB
+    ####################################################################
+    start = time.time()
+
+    logging.info(f"Sending command to download PLEX DB. This will take some time...")
+    logging.info(
+        f"To see progress, log into PLEX and goto Settings | Manage | Console and filter on Database"
+    )
+    logging.info(
+        f"You can also look at the PLEX Dashboard to see the progress of the Database backup..."
+    )
+    logging.info(f"Hit CTRL-C now if unsure...")
+
+    dbpath = ps.downloadDatabases(savepath=TMP_DIR, unpack=True)
+    # dbpath now contains the name of the zip file, if that's useful
+    logging.info(f"dbpath= {dbpath}")
+
+    end = time.time()
+    stopwatch = end - start
+    logging.info(f"Download completed in: {str(stopwatch)} seconds")
+
+    ####################################################################
+    # Find the downloaded PLEX DB
+    ####################################################################
+    db_file = ""
+    for count, f in enumerate(os.listdir(TMP_DIR)):
+        split_tup = os.path.splitext(f)
+        if split_tup[1] != ".zip":
+            db_file = f"{f}"
+
+    ####################################################################
+    # connect to db
+    ####################################################################
+    if db_file:
+        logging.info(f"Opening database: {TMP_DIR + db_file}")
+        conn = sqlite3.connect(f"{TMP_DIR + db_file}")
+        logging.info(f"Opened database successfully")
+        logging.info(f"Executing {SQLCMD}")
+        cursor = conn.execute(SQLCMD)
+        BLOAT_RUN = True
     else:
         logging.info(
-            f"#######################################################################"
+            f"ERROR with Extraction of database in this directory: {TMP_DIR} not found"
         )
-        logging.info(f"# NO ACTION TAKEN ON {working_on}")
         logging.info(
-            f"#######################################################################"
+            f"Try to download manually in PLEX and look at logs for any errors"
         )
+        logging.info(
+            f"If the file downloaded is a zip file 22kb in size this indicates a PLEX db issue that needs to be resolved. The script will continue, however nothing will be deleted in the Metadata subdirectories...  "
+        )
+        BLOAT_RUN = False
+        # sys.exit()
 
-    logging.info(f"plex-bloat-fix subtotal time: {str(stopwatch_sub)} seconds")
-    logging.info(f"UNDO Mode:                    {UNDO}")
-    logging.info(f"RENAME Mode:                  {RENAME}")
-    logging.info(f"DELETE Mode:                  {DELETE}")
-    logging.info(f"TC DELETE Mode:               {TC_DEL}")
-    logging.info(f"Total TC Size Found:          {format_bytes(tot_tc_file_size)}")
-    logging.info(f"SubTotal Meta File Size Found:{format_bytes(file_size_sub_del)}")
-    logging.info(f"SubTotal Meta File Size:      {format_bytes(file_size_sub)}")
-    logging.info(f"Pct Plex Bloat:               " + "{:.2%}".format(pct_bloat))
+    ####################################################################
+    # Building list of selected uploaded posters
+    ####################################################################
+    if BLOAT_RUN:
+        logging.info(f"Building list of selected uploaded posters")
+        res_sql = []
+        for row in cursor:
+            p = urlparse(row[0])
+            tmp = p.path.rsplit("/", 1).pop()
+            # print("ID = ", tmp)
+            res_sql.append(tmp)
+
+        logging.info(f"Operation done successfully")
+
+        conn.close()
+
+        ####################################################################
+        # Building list of files to compare
+        ####################################################################
+        logging.info(f"Building list of files to compare")
+
+        res = []
+        file_size_tot = 0
+        file_size_del = 0
+        file_size_sub_del = 0
+        file_size_sub = 0
+
+        for DIR_PATH in DIR_PATH_ARR:
+            sub_start = time.time()
+            working_on = DIR_PATH
+            logging.info(f"Working on: {DIR_PATH}")
+            for (DIR_PATH, dir_names, file_names) in walk(DIR_PATH):
+                for file in file_names:
+                    if "." not in file:
+                        file_size = os.path.getsize(os.path.join(DIR_PATH, file))
+                        file_size_tot += file_size
+                        file_size_sub += file_size
+                        if file not in res_sql:
+                            file_size_del += file_size
+                            file_size_sub_del += file_size
+                            if RENAME and DELETE:
+                                logging.info(
+                                    f"DELETE-----> {os.path.join(DIR_PATH, file)}"
+                                )
+                                os.remove(os.path.join(DIR_PATH, file))
+                            elif DELETE:
+                                logging.info(
+                                    f"DELETE-----> {os.path.join(DIR_PATH, file)}"
+                                )
+                                os.remove(os.path.join(DIR_PATH, file))
+                            elif RENAME:
+                                logging.info(
+                                    f"RENAME-----> {os.path.join(DIR_PATH, file)}"
+                                )
+                                os.rename(
+                                    os.path.join(DIR_PATH, file),
+                                    os.path.join(DIR_PATH, file) + ".jpg",
+                                )
+                            else:
+                                logging.info(
+                                    f"SAFEMODE-----> {os.path.join(DIR_PATH, file)}"
+                                )
+                    elif ".jpg" in file:
+                        file_size = os.path.getsize(os.path.join(DIR_PATH, file))
+                        file_size_tot += file_size
+                        file_size_sub += file_size
+                        file_size_del += file_size
+                        file_size_sub_del += file_size
+                        if RENAME and DELETE:
+                            logging.info(f"DELETE-----> {os.path.join(DIR_PATH, file)}")
+                            os.remove(os.path.join(DIR_PATH, file))
+                        elif DELETE:
+                            logging.info(f"DELETE-----> {os.path.join(DIR_PATH, file)}")
+                            os.remove(os.path.join(DIR_PATH, file))
+                        elif RENAME:
+                            logging.info(f"RENAME-----> {os.path.join(DIR_PATH, file)}")
+                        else:
+                            logging.info(
+                                f"SAFEMODE-----> {os.path.join(DIR_PATH, file)}"
+                            )
+
+            sub_end = time.time()
+            stopwatch_sub = sub_end - sub_start
+            pct_bloat = (
+                0 if file_size_sub == 0 else ((file_size_sub_del) / (file_size_sub))
+            )
+            if file_size_sub > 0:
+                logging.info(
+                    f"#######################################################################"
+                )
+                logging.info(f"# SUBTOTAL SUMMARY: {working_on}")
+                logging.info(
+                    f"#######################################################################"
+                )
+            else:
+                logging.info(
+                    f"#######################################################################"
+                )
+                logging.info(f"# NO ACTION TAKEN ON {working_on}")
+                logging.info(
+                    f"#######################################################################"
+                )
+
+            logging.info(f"plex-bloat-fix subtotal time: {str(stopwatch_sub)} seconds")
+            logging.info(f"UNDO Mode:                    {UNDO}")
+            logging.info(f"RENAME Mode:                  {RENAME}")
+            logging.info(f"DELETE Mode:                  {DELETE}")
+            logging.info(f"TC DELETE Mode:               {TC_DEL}")
+            logging.info(
+                f"Total TC Size Found:          {format_bytes(tot_tc_file_size)}"
+            )
+            logging.info(
+                f"SubTotal Meta File Size Found:{format_bytes(file_size_sub_del)}"
+            )
+            logging.info(f"SubTotal Meta File Size:      {format_bytes(file_size_sub)}")
+            logging.info(f"Pct Plex Bloat:               " + "{:.2%}".format(pct_bloat))
+            logging.info(
+                f"#######################################################################"
+            )
+            file_size_sub_del = 0
+            file_size_sub = 0
+
+    if EMPTY_TRASH:
+        et = ps.library.emptyTrash()
+        logging.info(
+            f"###################################################################"
+        )
+        logging.info(f"# EMPTY_TRASH = {EMPTY_TRASH}")
+        logging.info(
+            f"###################################################################"
+        )
+        logging.info(f"et= {et}")
+        logging.info(f"sleeping for {SLEEP}")
+        time.sleep(SLEEP)
+
+    if CLEAN_BUNDLES:
+        logging.info(
+            f"###################################################################"
+        )
+        logging.info(f"# CLEAN_BUNDLES = {CLEAN_BUNDLES}")
+        logging.info(
+            f"###################################################################"
+        )
+        cb = ps.library.cleanBundles()
+        logging.info(f"cb= {cb}")
+        logging.info(f"sleeping for {SLEEP}")
+        time.sleep(SLEEP)
+
+    if OPTIMIZE_DB:
+        logging.info(
+            f"###################################################################"
+        )
+        logging.info(f"# OPTIMIZE_DB = {OPTIMIZE_DB}")
+        logging.info(
+            f"###################################################################"
+        )
+        op = ps.library.optimize()
+        logging.info(f"op= {op}")
+        logging.info(f"sleeping for {SLEEP}")
+        time.sleep(SLEEP)
+
+    end_all = time.time()
+    stopwatch = end_all - start_all
+    pct_bloat = (
+        0
+        if file_size_tot + tot_tc_file_size == 0
+        else ((file_size_del + tot_tc_file_size) / (file_size_tot + tot_tc_file_size))
+    )
+    ####################################################################
+    # OVERALL SUMMARY
+    ####################################################################
+
     logging.info(
         f"#######################################################################"
     )
-    file_size_sub_del = 0
-    file_size_sub = 0
+    logging.info(
+        f"# OVERALL SUMMARY:                                                    #"
+    )
+    logging.info(
+        f"#######################################################################"
+    )
+    logging.info(f"plex-bloat-fix overall time: {str(stopwatch)} seconds")
+    logging.info(f"UNDO Mode:                   {UNDO}")
+    logging.info(f"RENAME Mode:                 {RENAME}")
+    logging.info(f"DELETE Mode:                 {DELETE}")
+    logging.info(f"TC DELETE Mode:              {TC_DEL}")
+    logging.info(f"Total TC Size Found:         {format_bytes(tot_tc_file_size)}")
+    logging.info(f"Total Meta File Size Found:  {format_bytes(file_size_del)}")
+    logging.info(f"Total Meta File Size:        {format_bytes(file_size_tot)}")
+    logging.info(
+        f"Grand Total File Size Found: {format_bytes((file_size_del + tot_tc_file_size))}"
+    )
+    logging.info(
+        f"Grand Total File Size:       {format_bytes((file_size_tot + tot_tc_file_size))}"
+    )
+    logging.info(f"Total Pct Plex Bloat:        " + "{:.2%}".format(pct_bloat))
+    logging.info(
+        f"Total space savings:         {format_bytes((file_size_del + tot_tc_file_size))}"
+    )
+    logging.info(
+        f"#######################################################################"
+    )
 
-if EMPTY_TRASH:
-    et = ps.library.emptyTrash()
-    logging.info(f"###################################################################")
-    logging.info(f"# EMPTY_TRASH = {EMPTY_TRASH}")
-    logging.info(f"###################################################################")
-    logging.info(f"et= {et}")
-    logging.info(f"sleeping for {SLEEP}")
-    time.sleep(SLEEP)
-
-if CLEAN_BUNDLES:
-    logging.info(f"###################################################################")
-    logging.info(f"# CLEAN_BUNDLES = {CLEAN_BUNDLES}")
-    logging.info(f"###################################################################")
-    cb = ps.library.cleanBundles()
-    logging.info(f"cb= {cb}")
-    logging.info(f"sleeping for {SLEEP}")
-    time.sleep(SLEEP)
-
-if OPTIMIZE_DB:
-    logging.info(f"###################################################################")
-    logging.info(f"# OPTIMIZE_DB = {OPTIMIZE_DB}")
-    logging.info(f"###################################################################")
-    op = ps.library.optimize()
-    logging.info(f"op= {op}")
-    logging.info(f"sleeping for {SLEEP}")
-    time.sleep(SLEEP)
-
-end_all = time.time()
-stopwatch = end_all - start_all
-pct_bloat = (
-    0
-    if file_size_tot + tot_tc_file_size == 0
-    else ((file_size_del + tot_tc_file_size) / (file_size_tot + tot_tc_file_size))
-)
-####################################################################
-# OVERALL SUMMARY
-####################################################################
-
-logging.info(f"#######################################################################")
-logging.info(f"# OVERALL SUMMARY:                                                    #")
-logging.info(f"#######################################################################")
-logging.info(f"plex-bloat-fix overall time: {str(stopwatch)} seconds")
-logging.info(f"UNDO Mode:                   {UNDO}")
-logging.info(f"RENAME Mode:                 {RENAME}")
-logging.info(f"DELETE Mode:                 {DELETE}")
-logging.info(f"TC DELETE Mode:              {TC_DEL}")
-logging.info(f"Total TC Size Found:         {format_bytes(tot_tc_file_size)}")
-logging.info(f"Total Meta File Size Found:  {format_bytes(file_size_del)}")
-logging.info(f"Total Meta File Size:        {format_bytes(file_size_tot)}")
-logging.info(
-    f"Grand Total File Size Found: {format_bytes((file_size_del + tot_tc_file_size))}"
-)
-logging.info(
-    f"Grand Total File Size:       {format_bytes((file_size_tot + tot_tc_file_size))}"
-)
-logging.info(f"Total Pct Plex Bloat:        " + "{:.2%}".format(pct_bloat))
-logging.info(
-    f"Total space savings:         {format_bytes((file_size_del + tot_tc_file_size))}"
-)
-logging.info(f"#######################################################################")
+except:
+    logging.exception(f"Exception raised")
+    raise
 
 sys.exit()
