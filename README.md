@@ -39,7 +39,8 @@ OPTIMIZE_DB=0                     # set OPTIMIZE_DB=1 and the script will run th
 ## Scripts:
 1. [plex-bloat-fix.py](#plex-bloat-fix) - removes unneeded image files (Posters/Title Cards) from plex
 2. [plexdance.sh](#plexdance) - Unraid script to automate the full plexdance
-3. [process-tcards.cmd](#process_tcards) - Windows script to create properly sized PLEX titlecards to use with TCM or for other purposes
+3. [process-tcards.cmd](#process-tcards) - Windows script to create properly sized PLEX titlecards to use with TCM or for other purposes
+4. [pumpanddump.sh](#pumpanddump) - Unraid script to automate the plex db repair when using hotio plex container
 
 ## plex-bloat-fix
 
@@ -91,7 +92,7 @@ So your plex is hosed... and your DB and metadata is in a real mess... time for 
 7. Run with `./plexdance.sh`
 8. follow prompts closely
 
-## process-tcards.cmd
+## process-tcards
 
 This script will use Imagemagick to produce title cards based on a folder that contains the episode titlecards stored as jpg. The end results will be in the `results` subfolder along with the `grayscale` subfolder
 
@@ -100,3 +101,13 @@ This script will use Imagemagick to produce title cards based on a folder that c
 2. Create a folder with the jpg files you want to process and place process-tcards.cmd in that same directory
 3. Run `process-tcards.cmd`
 4. Original files will not be touched and results are stored in `results` subfolder and the `grayscale` subfolder
+
+## pumpanddump
+
+This script will dump your plex db to a file and reimport it which usually repairs your db when you are seeing corruption and unable to download the db via the ui or the plexapi. This script is currently setup to work with the hotio plex container...... It ROCKS! https://hotio.dev/containers/plex/
+
+### Usage
+1. Copy the script into /mnt/user/data/scripts/plex-scripts/pumpanddump folder (or any other unraid scripts folder you use) 
+2. Review the paths in the file like the `sqlplex=` variable (around line 5) and the `docker cp` line (around line 40)
+3. Open a terminal session and navigate to that folder with the script and run: `chmod 755 pumpanddump.sh` to make it executable
+4. Run `./pumpanddump.sh plex` where `plex` is the name of your container
