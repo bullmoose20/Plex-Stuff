@@ -76,7 +76,8 @@ Total space savings:         (7.676115181297064, 'gigabytes')
 2. Do not make changes to posters while this script is running. Same reason as #1 above
 3. Ensure you have proper permissions to delete/rename or the script will fail
 4. For performance purposes, its always recommended to run locally so that accessing the files is not done over a network share
-5. If you are using a PLEX container in UNRAID or other, use the hotio plex container... It ROCKS! https://hotio.dev/containers/plex/
+5. If you are running on UNRAID, use nerdpack to install the latest python package and I suggest the same virtualenv install as explained above.(/mnt/user/data/scripts/plex-scripts/plex-bloat-fix) where the venv is found in /mnt/user/data/scripts/venv). You can then navigate to the location of the plex-bloat-fix.py folder in a terminal and then run `../../venv/bin/python plex-bloat.fix.py`
+6. If you are using a PLEX container in UNRAID or other, use the hotio plex container... It ROCKS! https://hotio.dev/containers/plex/
 
 ## plexdance
 
