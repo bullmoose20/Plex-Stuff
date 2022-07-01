@@ -49,6 +49,7 @@ Your PLEX folders are growing out of control. You use overlays from PMM or uploa
 ### Usage
 1. setup as above
 2. Run with `python plex-bloat-fix.py`
+3. Make sure that you are NOT actively updating posters or title cards with PMM or TCM while running this script. Scheduke this after the last run happens. So TCM, Plex Scheduled Tasks, PMM, THEN schedule or run plex-bloat-fix.py. Example: TCM @ 00:00, PLEX @ 02:00-05:00, and PMM @ 05:00
 
 The script will loop through all the folders as defined in your .env and then clean it up if you want it to.
 
