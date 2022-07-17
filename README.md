@@ -41,6 +41,7 @@ OPTIMIZE_DB=0                     # set OPTIMIZE_DB=1 and the script will run th
 2. [plexdance.sh](#plexdance) - Unraid script to automate the full plexdance
 3. [process-tcards.cmd](#process-tcards) - Windows script to create properly sized PLEX titlecards to use with TCM or for other purposes
 4. [pumpanddump.sh](#pumpanddump) - Unraid script to automate the plex db repair when using hotio plex container
+5. [chk-video-codec.sh](#chk-video-codec) - Unraid script to find and sort files that have been converted to HEVC/H265 and those that have not been
 
 ## plex-bloat-fix
 
@@ -111,3 +112,14 @@ This script will dump your plex db to a file and reimport it which usually repai
 2. Review the paths in the file like the `sqlplex=` variable (around line 5) and the `docker cp` line (around line 40)
 3. Open a terminal session and navigate to that folder with the script and run: `chmod 755 pumpanddump.sh` to make it executable
 4. Run `./pumpanddump.sh plex` where `plex` is the name of your container
+
+## chk-video-codec
+
+This script will go through the current directory and 10 levels down (if needed) to determine which files have been converted to HEVC/H265 and those that have not been.
+
+### Usage
+1. Copy the script into /mnt/user/data/scripts/plex-scripts/chk-video-codec folder (or any other unraid scripts folder you use) 
+2. Review the paths in the file like the `ffprobe_path=` variable
+3. Open a terminal session and navigate to that folder with the script and run: `chmod 755 chk-video-codec.sh` to make it executable
+4. Goto the media folder that you want to scan and run `/mnt/user/data/scripts/plex-scripts/chk-video-codec/chk-video-codec.sh`
+5. 3 log files will be created. Review them to see the results
