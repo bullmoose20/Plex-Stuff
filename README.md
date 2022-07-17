@@ -121,7 +121,7 @@ This script will go through the current directory and 10 levels down (if needed)
 
 ### Usage
 1. Copy the script into /mnt/user/data/scripts/plex-scripts/chk-video-codec folder (or any other unraid scripts folder you use) 
-2. Review the paths in the file like the `ffprobe_path=` variable
+2. Review the paths in the file like the `ffprobe_path=` variable and ensure that you specify the full path to ffprobe which is part of the ffmpeg(http://www.ffmpeg.org/download.html) suite
 3. Open a terminal session and navigate to that folder with the script and run: `chmod 755 chk-video-codec.sh` to make it executable
 4. Goto the media folder that you want to scan and run `/mnt/user/data/scripts/plex-scripts/chk-video-codec/chk-video-codec.sh`
 5. 3 log files will be created. Review them to see the results
