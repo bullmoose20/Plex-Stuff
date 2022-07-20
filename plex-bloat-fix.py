@@ -5,7 +5,7 @@
 # python-dotenv
 # SQLAlchemy
 
-__version__ = "1.2.3"
+__version__ = "1.2.4"
 from xmlrpc.client import Boolean
 from operator import itemgetter, attrgetter
 from plexapi.server import PlexServer
@@ -229,16 +229,10 @@ try:
     if TC_DEL:
         logging.info(f"Working on:         {TC_PATH}")
         logging.info(
-            f"STATUS:             Deleting PhotoTranscoder jpg files. This will take some time..."
+            f"STATUS:             Deleting PhotoTranscoder files. This will take some time..."
         )
-        files = glob.glob(f"{TC_PATH}/**/*.jpg", recursive=True)
-        files2 = glob.glob(f"{TC_PATH}/**/*.ppm", recursive=True)
+        files = glob.glob(f"{TC_PATH}/**/*.*", recursive=True)
         for f in files:
-            logging.info(f"DELETE----->        {os.path.join(TC_PATH, f)}")
-            file_size = os.path.getsize(os.path.join(TC_PATH, f))
-            tot_tc_file_size += file_size
-            os.remove(f)
-        for f in files2:
             logging.info(f"DELETE----->        {os.path.join(TC_PATH, f)}")
             file_size = os.path.getsize(os.path.join(TC_PATH, f))
             tot_tc_file_size += file_size
@@ -246,20 +240,15 @@ try:
     else:
         logging.info(f"Working on:         {TC_PATH}")
         logging.info(
-            f"STATUS:             Verifying PhotoTranscoder jpg files. This will take some time..."
+            f"STATUS:             Verifying PhotoTranscoder files. This will take some time..."
         )
-        files = glob.glob(f"{TC_PATH}/**/*.jpg", recursive=True)
-        files2 = glob.glob(f"{TC_PATH}/**/*.ppm", recursive=True)
+        files = glob.glob(f"{TC_PATH}/**/*.*", recursive=True)
         for f in files:
             logging.info(f"SAFE MODE----->     {os.path.join(TC_PATH, f)}")
             file_size = os.path.getsize(os.path.join(TC_PATH, f))
             tot_tc_file_size += file_size
-        for f in files2:
-            logging.info(f"SAFE MODE----->     {os.path.join(TC_PATH, f)}")
-            file_size = os.path.getsize(os.path.join(TC_PATH, f))
-            tot_tc_file_size += file_size
 
-    logging.info(f"Total TC Size: {format_bytes(tot_tc_file_size)}")
+    logging.info(f"Total TC Size:      {format_bytes(tot_tc_file_size)}")
 
     ####################################################################
     # Connect to Plexserver
