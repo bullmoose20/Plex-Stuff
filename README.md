@@ -110,7 +110,7 @@ This script will use Imagemagick to produce title cards based on a folder that c
 This script will dump your plex db to a file and reimport it which usually repairs your db when you are seeing corruption and unable to download the db via the ui or the plexapi. This script is currently setup to work with the hotio plex container...... It ROCKS! https://hotio.dev/containers/plex/
 
 ### Usage
-1. Copy the script into /mnt/user/data/scripts/plex-scripts/pumpanddump folder (or any other unraid scripts folder you use) 
+1. Copy the script into `/mnt/user/data/scripts/plex-scripts/pumpanddump` folder (or any other unraid scripts folder you use) 
 2. Review the paths in the file like the `sqlplex=` variable (around line 5) and the `docker cp` line (around line 40)
 3. Open a terminal session and navigate to that folder with the script and run: `chmod 755 pumpanddump.sh` to make it executable
 4. Run `./pumpanddump.sh plex` where `plex` is the name of your container
