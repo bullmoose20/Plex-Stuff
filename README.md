@@ -50,7 +50,7 @@ Your PLEX folders are growing out of control. You use overlays from PMM or uploa
 ### Usage
 1. setup as above
 2. Run with `python plex-bloat-fix.py`
-3. Make sure that you are NOT actively updating posters or title cards with PMM or TCM while running this script. Scheduke this after the last run happens. So TCM, Plex Scheduled Tasks, PMM, THEN schedule or run plex-bloat-fix.py. Example: TCM @ 00:00, PLEX @ 02:00-05:00, and PMM @ 05:00
+3. Make sure that you are NOT actively updating posters or title cards with PMM or TCM while running this script. Schedule this after the last run happens. So TCM, Plex Scheduled Tasks, PMM, THEN schedule or run plex-bloat-fix.py. Example: TCM @ 00:00, PLEX @ 02:00-05:00, and PMM @ 05:00
 
 The script will loop through all the folders as defined in your .env and then clean it up if you want it to.
 
@@ -78,7 +78,7 @@ Total space savings:         (7.676115181297064, 'gigabytes')
 2. Do not make changes to posters while this script is running. Same reason as #1 above
 3. Ensure you have proper permissions to delete/rename or the script will fail
 4. For performance purposes, its always recommended to run locally so that accessing the files is not done over a network share
-5. If you are running on UNRAID, use nerdpack to install the latest python package and I suggest the same virtualenv install as explained above.(/mnt/user/data/scripts/plex-scripts/plex-bloat-fix) where the venv is found in /mnt/user/data/scripts/venv). You can then navigate to the location of the plex-bloat-fix.py folder in a terminal and then run `../../venv/bin/python plex-bloat.fix.py`
+5. If you are running on UNRAID, use nerdpack to install the latest python package and I suggest the same virtualenv install as explained above.(`/mnt/user/data/scripts/plex-scripts/plex-bloat-fix`) where the venv is found in `/mnt/user/data/scripts/venv`). You can then navigate to the location of the `plex-bloat-fix.py` folder in a terminal and then run `../../venv/bin/python plex-bloat-fix.py`
 6. If you are using a PLEX container in UNRAID or other, use the hotio plex container... It ROCKS! https://hotio.dev/containers/plex/
 
 ## plexdance
