@@ -5,7 +5,7 @@
 # python-dotenv
 # SQLAlchemy
 
-__version__ = "1.2.2"
+__version__ = "1.2.3"
 from xmlrpc.client import Boolean
 from operator import itemgetter, attrgetter
 from plexapi.server import PlexServer
@@ -133,18 +133,47 @@ LIBS = ["Movies", "TV Shows", "Playlists", "Collections", "Artists", "Albums"]
 
 TMP_DIR = os.path.join(TMP_DIR, "")
 DIR_PATH = os.path.join(DIR_PATH, "")
+TC_PATH = os.path.join(TC_PATH, "")
+
+####################################################################
+# CHECK PATHS
+####################################################################
+path_issue = False
+isdir_TMP_DIR = os.path.isdir(TMP_DIR)
+isdir_DIR_PATH = os.path.isdir(DIR_PATH)
+isdir_TC_PATH = os.path.isdir(TC_PATH)
+
+if not isdir_TMP_DIR:
+    path_issue = True
+    logging.info(f"TMP_DIR Not a directory or accessible: {TMP_DIR}")
+if not isdir_DIR_PATH:
+    path_issue = True
+    logging.info(f"DIR_PATH Not a directory or accessible: {DIR_PATH}")
+if not isdir_TC_PATH:
+    path_issue = True
+    logging.info(f"TC_PATH Not a directory or accessible: {TC_PATH}")
+
+if path_issue:
+    logging.info(
+        f"Path Check:         You have a path issue as logged above. Adjust your .env file accordingly. Aborting now..."
+    )
+    exit()
+else:
+    logging.info(f"Path Check:         Paths in .env are found and accessible")
 
 DIR_PATH_ARR = []
 for lib in LIBS:
     DIR_PATH_ARR.append(os.path.join(DIR_PATH, lib))
 
 if PLEX_URL is None:
-    logging.info("Your .env file is incomplete or missing: PLEX_URL is empty")
+    logging.info(
+        f"Your .env file is incomplete or missing: PLEX_URL is empty. Aborting now..."
+    )
     exit()
 
 if "PhotoTranscoder" not in TC_PATH and TC_DEL:
     logging.info(
-        "Your .env file is incomplete or missing: TC_DIR is missing a critical folder"
+        f"Your .env file is incomplete or missing: TC_PATH is missing a critical folder. Aborting now..."
     )
     exit()
 
@@ -165,19 +194,23 @@ logging.info(f"TMP_DIR is:         {TMP_DIR}")
 
 if RENAME and DELETE:
     logging.info(
-        f"RENAME and DELETE:  This will skip the rename and just delete the files within the Metadata directories. UNDO is NOT possible. I hope you know what you are doing!"
+        f"RENAME and DELETE:  This will skip the rename and just delete the files within the Metadata directories. "
+        f"UNDO is NOT possible. I hope you know what you are doing! "
     )
 elif DELETE:
     logging.info(
-        f"DELETE:             This will skip the rename and just delete the files within the Metadata directories. UNDO is NOT possible. I hope you know what you are doing!"
+        f"DELETE:             This will skip the rename and just delete the files within the Metadata directories. "
+        f"UNDO is NOT possible. I hope you know what you are doing! "
     )
 elif RENAME:
     logging.info(
-        f"RENAME:             This will rename the files within the Metadata directories to .jpg files to simulate a delete and allows you to UNDO if needed"
+        f"RENAME:             This will rename the files within the Metadata directories to .jpg files to simulate a "
+        f"delete and allows you to UNDO if needed "
     )
 else:
     logging.info(
-        f"REPORTONLY:         This will report only the files that would be renamed or deleted within the Metadata directories"
+        f"REPORTONLY:         This will report only the files that would be renamed or deleted within the Metadata "
+        f"directories "
     )
 
 ####################################################################
@@ -194,33 +227,35 @@ try:
     ####################################################################
     tot_tc_file_size = 0
     if TC_DEL:
-        logging.info(f"Working on: {TC_PATH}")
-        logging.info(f"Deleting PhotoTranscoder jpg files. This will take some time...")
-        files = glob.glob(f"{TC_PATH}/**/*.jpg", recursive=True)
-        files2 = glob.glob(f"{TC_PATH}/**/*.ppm", recursive=True)
-        for f in files:
-            logging.info(f"DELETE-----> {os.path.join(TC_PATH, f)}")
-            file_size = os.path.getsize(os.path.join(TC_PATH, f))
-            tot_tc_file_size += file_size
-            os.remove(f)
-        for f in files2:
-            logging.info(f"DELETE-----> {os.path.join(TC_PATH, f)}")
-            file_size = os.path.getsize(os.path.join(TC_PATH, f))
-            tot_tc_file_size += file_size
-            os.remove(f)
-    else:
-        logging.info(f"Working on: {TC_PATH}")
+        logging.info(f"Working on:         {TC_PATH}")
         logging.info(
-            f"Verifying PhotoTranscoder jpg files. This will take some time..."
+            f"STATUS:             Deleting PhotoTranscoder jpg files. This will take some time..."
         )
         files = glob.glob(f"{TC_PATH}/**/*.jpg", recursive=True)
         files2 = glob.glob(f"{TC_PATH}/**/*.ppm", recursive=True)
         for f in files:
-            logging.info(f"SAFEMODE-----> {os.path.join(TC_PATH, f)}")
+            logging.info(f"DELETE----->        {os.path.join(TC_PATH, f)}")
+            file_size = os.path.getsize(os.path.join(TC_PATH, f))
+            tot_tc_file_size += file_size
+            os.remove(f)
+        for f in files2:
+            logging.info(f"DELETE----->        {os.path.join(TC_PATH, f)}")
+            file_size = os.path.getsize(os.path.join(TC_PATH, f))
+            tot_tc_file_size += file_size
+            os.remove(f)
+    else:
+        logging.info(f"Working on:         {TC_PATH}")
+        logging.info(
+            f"STATUS:             Verifying PhotoTranscoder jpg files. This will take some time..."
+        )
+        files = glob.glob(f"{TC_PATH}/**/*.jpg", recursive=True)
+        files2 = glob.glob(f"{TC_PATH}/**/*.ppm", recursive=True)
+        for f in files:
+            logging.info(f"SAFE MODE----->     {os.path.join(TC_PATH, f)}")
             file_size = os.path.getsize(os.path.join(TC_PATH, f))
             tot_tc_file_size += file_size
         for f in files2:
-            logging.info(f"SAFEMODE-----> {os.path.join(TC_PATH, f)}")
+            logging.info(f"SAFE MODE----->     {os.path.join(TC_PATH, f)}")
             file_size = os.path.getsize(os.path.join(TC_PATH, f))
             tot_tc_file_size += file_size
 
@@ -234,7 +269,9 @@ try:
     ####################################################################
     # clear the download target dir
     ####################################################################
-    logging.info(f"Deleting all files in PLEX DB download directory: {TMP_DIR}...")
+    logging.info(
+        f"STATUS:             Deleting all files in PLEX DB download directory: {TMP_DIR}..."
+    )
     files = glob.glob(f"{TMP_DIR}*")
     for f in files:
         os.remove(f)
@@ -244,22 +281,24 @@ try:
     ####################################################################
     start = time.time()
 
-    logging.info(f"Sending command to download PLEX DB. This will take some time...")
     logging.info(
-        f"To see progress, log into PLEX and goto Settings | Manage | Console and filter on Database"
+        f"STATUS:             Sending command to download PLEX DB. This will take some time..."
     )
     logging.info(
-        f"You can also look at the PLEX Dashboard to see the progress of the Database backup..."
+        f"STATUS:             To see progress, log into PLEX and goto Settings | Manage | Console and filter on Database"
     )
-    logging.info(f"Hit CTRL-C now if unsure...")
+    logging.info(
+        f"STATUS:             You can also look at the PLEX Dashboard to see the progress of the Database backup..."
+    )
+    logging.info(f"STATUS:             Hit CTRL-C now if unsure...")
 
     dbpath = ps.downloadDatabases(savepath=TMP_DIR, unpack=True)
     # dbpath now contains the name of the zip file, if that's useful
-    logging.info(f"dbpath= {dbpath}")
+    logging.info(f"STATUS:             dbpath= {dbpath}")
 
     end = time.time()
     stopwatch = end - start
-    logging.info(f"Download completed in: {str(stopwatch)} seconds")
+    logging.info(f"Download completed: {str(stopwatch)} seconds")
 
     ####################################################################
     # Find the downloaded PLEX DB
@@ -274,10 +313,10 @@ try:
     # connect to db
     ####################################################################
     if db_file:
-        logging.info(f"Opening database: {TMP_DIR + db_file}")
+        logging.info(f"Opening database:   {TMP_DIR + db_file}")
         conn = sqlite3.connect(f"{TMP_DIR + db_file}")
-        logging.info(f"Opened database successfully")
-        logging.info(f"Executing {SQLCMD}")
+        logging.info(f"STATUS:             Opened database successfully")
+        logging.info(f"STATUS:             Executing {SQLCMD}")
         cursor = conn.execute(SQLCMD)
         BLOAT_RUN = True
     else:
@@ -288,7 +327,8 @@ try:
             f"Try to download manually in PLEX and look at logs for any errors"
         )
         logging.info(
-            f"If the file downloaded is a zip file 22kb in size this indicates a PLEX db issue that needs to be resolved. The script will continue, however nothing will be deleted in the Metadata subdirectories...  "
+            f"If the file downloaded is a zip file 22kb in size this indicates a PLEX db issue that needs to be "
+            f"resolved. The script will continue, however nothing will be deleted in the Metadata subdirectories... "
         )
         BLOAT_RUN = False
         # sys.exit()
@@ -297,7 +337,7 @@ try:
     # Building list of selected uploaded posters
     ####################################################################
     if BLOAT_RUN:
-        logging.info(f"Building list of selected uploaded posters")
+        logging.info(f"STATUS:             Building list of selected uploaded posters")
         res_sql = []
         for row in cursor:
             p = urlparse(row[0])
@@ -305,14 +345,14 @@ try:
             # print("ID = ", tmp)
             res_sql.append(tmp)
 
-        logging.info(f"Operation done successfully")
+        logging.info(f"STATUS:             Operation done successfully")
 
         conn.close()
 
         ####################################################################
         # Building list of files to compare
         ####################################################################
-        logging.info(f"Building list of files to compare")
+        logging.info(f"STATUS:             Building list of files to compare")
 
         res = []
         file_size_tot = 0
@@ -323,7 +363,7 @@ try:
         for DIR_PATH in DIR_PATH_ARR:
             sub_start = time.time()
             working_on = DIR_PATH
-            logging.info(f"Working on: {DIR_PATH}")
+            logging.info(f"Working on:         {DIR_PATH}")
             for (DIR_PATH, dir_names, file_names) in walk(DIR_PATH):
                 for file in file_names:
                     if "." not in file:
@@ -335,17 +375,17 @@ try:
                             file_size_sub_del += file_size
                             if RENAME and DELETE:
                                 logging.info(
-                                    f"DELETE-----> {os.path.join(DIR_PATH, file)}"
+                                    f"DELETE----->        {os.path.join(DIR_PATH, file)}"
                                 )
                                 os.remove(os.path.join(DIR_PATH, file))
                             elif DELETE:
                                 logging.info(
-                                    f"DELETE-----> {os.path.join(DIR_PATH, file)}"
+                                    f"DELETE----->        {os.path.join(DIR_PATH, file)}"
                                 )
                                 os.remove(os.path.join(DIR_PATH, file))
                             elif RENAME:
                                 logging.info(
-                                    f"RENAME-----> {os.path.join(DIR_PATH, file)}"
+                                    f"RENAME----->        {os.path.join(DIR_PATH, file)}"
                                 )
                                 os.rename(
                                     os.path.join(DIR_PATH, file),
@@ -353,7 +393,7 @@ try:
                                 )
                             else:
                                 logging.info(
-                                    f"SAFEMODE-----> {os.path.join(DIR_PATH, file)}"
+                                    f"SAFE MODE----->     {os.path.join(DIR_PATH, file)}"
                                 )
                     elif ".jpg" in file:
                         file_size = os.path.getsize(os.path.join(DIR_PATH, file))
@@ -362,16 +402,22 @@ try:
                         file_size_del += file_size
                         file_size_sub_del += file_size
                         if RENAME and DELETE:
-                            logging.info(f"DELETE-----> {os.path.join(DIR_PATH, file)}")
+                            logging.info(
+                                f"DELETE----->        {os.path.join(DIR_PATH, file)}"
+                            )
                             os.remove(os.path.join(DIR_PATH, file))
                         elif DELETE:
-                            logging.info(f"DELETE-----> {os.path.join(DIR_PATH, file)}")
+                            logging.info(
+                                f"DELETE----->        {os.path.join(DIR_PATH, file)}"
+                            )
                             os.remove(os.path.join(DIR_PATH, file))
                         elif RENAME:
-                            logging.info(f"RENAME-----> {os.path.join(DIR_PATH, file)}")
+                            logging.info(
+                                f"RENAME----->        {os.path.join(DIR_PATH, file)}"
+                            )
                         else:
                             logging.info(
-                                f"SAFEMODE-----> {os.path.join(DIR_PATH, file)}"
+                                f"SAFE MODE----->     {os.path.join(DIR_PATH, file)}"
                             )
 
             sub_end = time.time()
@@ -424,8 +470,8 @@ try:
         logging.info(
             f"###################################################################"
         )
-        logging.info(f"et= {et}")
-        logging.info(f"sleeping for {SLEEP}")
+        logging.info(f"EMPTY TRASH:        {et}")
+        logging.info(f"STATUS:             sleeping for {SLEEP}")
         time.sleep(SLEEP)
 
     if CLEAN_BUNDLES:
@@ -437,8 +483,8 @@ try:
             f"###################################################################"
         )
         cb = ps.library.cleanBundles()
-        logging.info(f"cb= {cb}")
-        logging.info(f"sleeping for {SLEEP}")
+        logging.info(f"CLEAN BUNDLES:      {cb}")
+        logging.info(f"STATUS:             sleeping for {SLEEP}")
         time.sleep(SLEEP)
 
     if OPTIMIZE_DB:
@@ -450,8 +496,8 @@ try:
             f"###################################################################"
         )
         op = ps.library.optimize()
-        logging.info(f"op= {op}")
-        logging.info(f"sleeping for {SLEEP}")
+        logging.info(f"OPTIMIZE DB:        {op}")
+        logging.info(f"STATUS:             sleeping for {SLEEP}")
         time.sleep(SLEEP)
 
     end_all = time.time()
