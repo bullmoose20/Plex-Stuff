@@ -5,7 +5,7 @@
 # python-dotenv
 # SQLAlchemy
 
-__version__ = "1.2.4"
+__version__ = "1.2.5"
 from xmlrpc.client import Boolean
 from operator import itemgetter, attrgetter
 from plexapi.server import PlexServer
@@ -226,6 +226,7 @@ try:
     # Clean PhotoTranscoder Folder
     ####################################################################
     tot_tc_file_size = 0
+    tot_tc_files = 0
     if TC_DEL:
         logging.info(f"Working on:         {TC_PATH}")
         logging.info(
@@ -236,6 +237,7 @@ try:
             logging.info(f"DELETE----->        {os.path.join(TC_PATH, f)}")
             file_size = os.path.getsize(os.path.join(TC_PATH, f))
             tot_tc_file_size += file_size
+            tot_tc_files += 1
             os.remove(f)
     else:
         logging.info(f"Working on:         {TC_PATH}")
@@ -247,7 +249,8 @@ try:
             logging.info(f"SAFE MODE----->     {os.path.join(TC_PATH, f)}")
             file_size = os.path.getsize(os.path.join(TC_PATH, f))
             tot_tc_file_size += file_size
-
+            tot_tc_files += 1
+    logging.info(f"Total TC Files:     {tot_tc_files}")
     logging.info(f"Total TC Size:      {format_bytes(tot_tc_file_size)}")
 
     ####################################################################
@@ -344,6 +347,10 @@ try:
         logging.info(f"STATUS:             Building list of files to compare")
 
         res = []
+        file_tot = 0
+        file_del = 0
+        file_sub_del = 0
+        file_sub = 0
         file_size_tot = 0
         file_size_del = 0
         file_size_sub_del = 0
@@ -359,9 +366,13 @@ try:
                         file_size = os.path.getsize(os.path.join(DIR_PATH, file))
                         file_size_tot += file_size
                         file_size_sub += file_size
+                        file_tot += 1
+                        file_sub += 1
                         if file not in res_sql:
                             file_size_del += file_size
                             file_size_sub_del += file_size
+                            file_del += 1
+                            file_sub_del += 1
                             if RENAME and DELETE:
                                 logging.info(
                                     f"DELETE----->        {os.path.join(DIR_PATH, file)}"
@@ -390,6 +401,10 @@ try:
                         file_size_sub += file_size
                         file_size_del += file_size
                         file_size_sub_del += file_size
+                        file_tot += 1
+                        file_sub += 1
+                        file_del += 1
+                        file_sub_del += 1
                         if RENAME and DELETE:
                             logging.info(
                                 f"DELETE----->        {os.path.join(DIR_PATH, file)}"
@@ -439,16 +454,21 @@ try:
             logging.info(
                 f"Total TC Size Found:          {format_bytes(tot_tc_file_size)}"
             )
+            logging.info(f"Total TC Files Found:         {format_bytes(tot_tc_files)}")
             logging.info(
                 f"SubTotal Meta File Size Found:{format_bytes(file_size_sub_del)}"
             )
+            logging.info(f"SubTotal Meta Files Found:    {file_sub_del}")
             logging.info(f"SubTotal Meta File Size:      {format_bytes(file_size_sub)}")
+            logging.info(f"SubTotal Meta Files:          {file_sub}")
             logging.info(f"Pct Plex Bloat:               " + "{:.2%}".format(pct_bloat))
             logging.info(
                 f"#######################################################################"
             )
             file_size_sub_del = 0
             file_size_sub = 0
+            file_sub_del = 0
+            file_sub = 0
 
     if EMPTY_TRASH:
         et = ps.library.emptyTrash()
@@ -515,18 +535,24 @@ try:
     logging.info(f"DELETE Mode:                 {DELETE}")
     logging.info(f"TC DELETE Mode:              {TC_DEL}")
     logging.info(f"Total TC Size Found:         {format_bytes(tot_tc_file_size)}")
+    logging.info(f"Total TC Files Found:        {tot_tc_files}")
     logging.info(f"Total Meta File Size Found:  {format_bytes(file_size_del)}")
+    logging.info(f"Total Meta Files Found:      {file_del}")
     logging.info(f"Total Meta File Size:        {format_bytes(file_size_tot)}")
+    logging.info(f"Total Meta Files:            {file_tot}")
     logging.info(
         f"Grand Total File Size Found: {format_bytes((file_size_del + tot_tc_file_size))}"
     )
+    logging.info(f"Grand Total Files Found:     {file_del + tot_tc_files}")
     logging.info(
         f"Grand Total File Size:       {format_bytes((file_size_tot + tot_tc_file_size))}"
     )
+    logging.info(f"Grand Total Files:           {file_tot + tot_tc_files}")
     logging.info(f"Total Pct Plex Bloat:        " + "{:.2%}".format(pct_bloat))
     logging.info(
         f"Total space savings:         {format_bytes((file_size_del + tot_tc_file_size))}"
     )
+    logging.info(f"Total file savings:          {file_del + tot_tc_files}")
     logging.info(
         f"#######################################################################"
     )
