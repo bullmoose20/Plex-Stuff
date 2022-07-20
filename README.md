@@ -12,7 +12,7 @@
 1. Install requirements with `pip install -r requirements.txt` [I'd suggest doing this in a virtual environment]
 1. cd to desired directory
 1. Copy `.env.example` to `.env`
-1. Edit .env to suit
+1. Edit `.env` to suit
 
 All these PYTHON scripts use the same `.env` and requirements. The Unraid bash scripts, Windows powershell or Windows cmd scripts, will vary in nature. Read the related section down below for more details. 
 
