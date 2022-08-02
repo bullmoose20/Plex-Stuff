@@ -52,27 +52,62 @@ Your PLEX folders are growing out of control. You use overlays from PMM or uploa
 2. Run with `python plex-bloat-fix.py`
 3. Make sure that you are NOT actively updating posters or title cards with PMM or TCM while running this script. Schedule this after the last run happens. So TCM, Plex Scheduled Tasks, PMM, THEN schedule or run plex-bloat-fix.py. Example: TCM @ 00:00, PLEX @ 02:00-05:00, and PMM @ 05:00
 
-The script will loop through all the folders as defined in your .env and then clean it up if you want it to.
+The script will loop through all the folders as defined in your `.env` and then clean it up if you want it to.
 
-In this case, the script found ~7.7 gigabytes it could free up out of 12.8 gigabytes found and hence 60.12% bloat!
+In this case, the script found ~ 434 gigabytes it could free up out of ~ 524 gigabytes found and hence 82.78% bloat!
 ```
 #######################################################################
 # OVERALL SUMMARY:                                                    #
 #######################################################################
-plex-bloat-fix overall time: 313.4431965351105 seconds
+plex-bloat-fix overall time: 424.5148277282715 seconds
 UNDO Mode:                   False
-RENAME Mode:                 True
+RENAME Mode:                 False
 DELETE Mode:                 False
 TC DELETE Mode:              False
-Total TC Size Found:         (2.224331005476415, 'gigabytes')
-Total Meta File Size Found:  (5.451784175820649, 'gigabytes')
-Total Meta File Size:        (10.542983120307326, 'gigabytes')
-Grand Total File Size Found: (7.676115181297064, 'gigabytes')
-Grand Total File Size:       (12.767314125783741, 'gigabytes')
-Total Pct Plex Bloat:        60.12%
-Total space savings:         (7.676115181297064, 'gigabytes')
+Total TC Size Found:         (227.2492168089375, 'gigabytes')
+Total TC Files Found:        1197607
+Total Meta File Size Found:  (206.94449690263718, 'gigabytes')
+Total Meta Files Found:      131726
+Total Meta File Size:        (297.28548831585795, 'gigabytes')
+Total Meta Files:            190296
+Grand Total File Size Found: (434.1937137115747, 'gigabytes')
+Grand Total Files Found:     1329333
+Grand Total File Size:       (524.5347051247954, 'gigabytes')
+Grand Total Files:           1387903
+Total Pct Plex Bloat:        82.78%
+Total space savings:         (434.1937137115747, 'gigabytes')
+Total file savings:          1329333
 #######################################################################
 ```
+So what are the recommended settings for when I actually let the script run and do its thing?
+```
+DELETE Mode:                 False
+TC DELETE Mode:              False
+```
+Flip these to true in `.env` by setting them to 1
+
+DELETE will delete this stuff:
+```
+Total Meta File Size Found:  (206.94449690263718, 'gigabytes')
+Total Meta Files Found:      131726
+```
+TC DELETE will delete this stuff:
+```
+Total TC Size Found:         (227.2492168089375, 'gigabytes')
+Total TC Files Found:        1197607
+```
+
+If you want to dry run and examine files:
+```
+RENAME Mode:                 False
+```
+
+Setting ONLY RENAME to true will just rename these files so you can look at them
+```
+Total Meta File Size Found:  (206.94449690263718, 'gigabytes')
+Total Meta Files Found:      131726
+```
+
 ### NOTES/TIPS
 1. If you run PMM, make sure this script runs AFTER PMM run completes. Never during the run. 
 2. Do not make changes to posters while this script is running. Same reason as #1 above
