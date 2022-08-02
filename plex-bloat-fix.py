@@ -14,6 +14,8 @@ from os import walk
 from urllib.parse import urlparse
 from dotenv import load_dotenv
 
+PLEX_DB_NAME = "com.plexapp.plugins.library.db"
+
 ####################################################################
 # FUNCTIONS
 ####################################################################
@@ -33,7 +35,7 @@ def undo_rename():
     logging.info("UNDO Complete")
     end = time.time()
     stopwatch = end - start
-    logging.info(f"UNDO time: {str(stopwatch)} seconds")
+    logging.info(f"UNDO time: {stopwatch_sub:.2f} seconds")
 
     sys.exit()
 
@@ -46,7 +48,7 @@ def format_bytes(size):
     while size > power:
         size /= power
         n += 1
-    return size, power_labels[n] + "bytes"
+    return f"{size:.2f} {power_labels[n]}bytes"
 
 
 load_dotenv()
@@ -99,27 +101,59 @@ logging.info(f"Log file:           {LOG_FILENAME} created...")
 ####################################################################
 # VARS
 ####################################################################
-TC_DEL = Boolean(int(0))
-TC_DEL = Boolean(int(os.getenv("TC_DEL")))
-UNDO = Boolean(int(0))
-UNDO = Boolean(int(os.getenv("UNDO")))
-RENAME = Boolean(int(0))
-RENAME = Boolean(int(os.getenv("RENAME")))
-DELETE = Boolean(int(0))
-DELETE = Boolean(int(os.getenv("DELETE")))
-EMPTY_TRASH = Boolean(int(0))
-EMPTY_TRASH = Boolean(int(os.getenv("EMPTY_TRASH")))
-CLEAN_BUNDLES = Boolean(int(0))
-CLEAN_BUNDLES = Boolean(int(os.getenv("CLEAN_BUNDLES")))
-OPTIMIZE_DB = Boolean(int(0))
-OPTIMIZE_DB = Boolean(int(os.getenv("OPTIMIZE_DB")))
-SLEEP = 60
-SLEEP = int(os.getenv("SLEEP"))
+
+try:
+    TC_DEL = Boolean(int(os.getenv("TC_DEL")))
+except:
+    TC_DEL = False
+
+try:
+    UNDO = Boolean(int(os.getenv("UNDO")))
+except:
+    UNDO = False
+
+try:
+    RENAME = Boolean(int(os.getenv("RENAME")))
+except:
+    RENAME = False
+
+try:
+    DELETE = Boolean(int(os.getenv("DELETE")))
+except:
+    DELETE = False
+
+try:
+    EMPTY_TRASH = Boolean(int(os.getenv("EMPTY_TRASH")))
+except:
+    EMPTY_TRASH = False
+
+try:
+    CLEAN_BUNDLES = Boolean(int(os.getenv("CLEAN_BUNDLES")))
+except:
+    CLEAN_BUNDLES = False
+
+try:
+    OPTIMIZE_DB = Boolean(int(os.getenv("OPTIMIZE_DB")))
+except:
+    OPTIMIZE_DB = False
+
+try:
+    LOG_TC_FILES = Boolean(int(os.getenv("LOG_TC_FILES")))
+except:
+    LOG_TC_FILES = True
+
+try:
+    SLEEP = Boolean(int(os.getenv("SLEEP")))
+except:
+    SLEEP = 60
+
+DB_PATH = os.getenv("DB_PATH")
 TC_PATH = os.getenv("TC_PATH")
 DIR_PATH = os.getenv("DIR_PATH")
 TMP_DIR = os.getenv("TMP_DIR")
 PLEX_URL = os.getenv("PLEX_URL")
 PLEX_TOKEN = os.getenv("PLEX_TOKEN")
+
 dbpath = ""
 file_size_tot = 0
 file_size_del = 0
@@ -143,6 +177,9 @@ isdir_TMP_DIR = os.path.isdir(TMP_DIR)
 isdir_DIR_PATH = os.path.isdir(DIR_PATH)
 isdir_TC_PATH = os.path.isdir(TC_PATH)
 
+local_run = os.path.isdir(DB_PATH)
+# if this is populated and exists, just copy the DB from there since this is a local system.
+
 if not isdir_TMP_DIR:
     path_issue = True
     logging.info(f"TMP_DIR Not a directory or accessible: {TMP_DIR}")
@@ -165,7 +202,7 @@ DIR_PATH_ARR = []
 for lib in LIBS:
     DIR_PATH_ARR.append(os.path.join(DIR_PATH, lib))
 
-if PLEX_URL is None:
+if not local_run and PLEX_URL is None:
     logging.info(
         f"Your .env file is incomplete or missing: PLEX_URL is empty. Aborting now..."
     )
@@ -227,29 +264,22 @@ try:
     ####################################################################
     tot_tc_file_size = 0
     tot_tc_files = 0
-    if TC_DEL:
-        logging.info(f"Working on:         {TC_PATH}")
-        logging.info(
-            f"STATUS:             Deleting PhotoTranscoder files. This will take some time..."
-        )
-        files = glob.glob(f"{TC_PATH}/**/*.*", recursive=True)
-        for f in files:
-            logging.info(f"DELETE----->        {os.path.join(TC_PATH, f)}")
-            file_size = os.path.getsize(os.path.join(TC_PATH, f))
-            tot_tc_file_size += file_size
-            tot_tc_files += 1
+    logging.info(f"Working on:         {TC_PATH}")
+    logging.info(
+        f"STATUS:             Processing PhotoTranscoder files. This will take some time..."
+    )
+    files = glob.glob(f"{TC_PATH}/**/*.*", recursive=True)
+    for f in files:
+        file_size = os.path.getsize(os.path.join(TC_PATH, f))
+        tot_tc_file_size += file_size
+        tot_tc_files += 1
+        if LOG_TC_FILES:
+            if TC_DEL:
+                logging.info(f"DELETE----->        {os.path.join(TC_PATH, f)}")
+            else:
+                logging.info(f"SAFE MODE----->     {os.path.join(TC_PATH, f)}")
+        if TC_DEL:
             os.remove(f)
-    else:
-        logging.info(f"Working on:         {TC_PATH}")
-        logging.info(
-            f"STATUS:             Verifying PhotoTranscoder files. This will take some time..."
-        )
-        files = glob.glob(f"{TC_PATH}/**/*.*", recursive=True)
-        for f in files:
-            logging.info(f"SAFE MODE----->     {os.path.join(TC_PATH, f)}")
-            file_size = os.path.getsize(os.path.join(TC_PATH, f))
-            tot_tc_file_size += file_size
-            tot_tc_files += 1
     logging.info(f"Total TC Files:     {tot_tc_files}")
     logging.info(f"Total TC Size:      {format_bytes(tot_tc_file_size)}")
 
@@ -273,24 +303,25 @@ try:
     ####################################################################
     start = time.time()
 
-    logging.info(
-        f"STATUS:             Sending command to download PLEX DB. This will take some time..."
-    )
-    logging.info(
-        f"STATUS:             To see progress, log into PLEX and goto Settings | Manage | Console and filter on Database"
-    )
-    logging.info(
-        f"STATUS:             You can also look at the PLEX Dashboard to see the progress of the Database backup..."
-    )
-    logging.info(f"STATUS:             Hit CTRL-C now if unsure...")
+    if not local_run:
+        logging.info(f"STATUS:             Sending command to download PLEX DB. This will take some time...\n\
+                    To see progress, log into PLEX and goto Settings | Manage | Console and filter on Database\n\
+                    You can also look at the PLEX Dashboard to see the progress of the Database backup...\n\
+                    Hit CTRL-C now if unsure...")
 
-    dbpath = ps.downloadDatabases(savepath=TMP_DIR, unpack=True)
-    # dbpath now contains the name of the zip file, if that's useful
-    logging.info(f"STATUS:             dbpath= {dbpath}")
+        dbpath = ps.downloadDatabases(savepath=TMP_DIR, unpack=True)
+        # dbpath now contains the name of the zip file, if that's useful
+        logging.info(f"STATUS:             dbpath= {dbpath}")
+    else:
+        # copy database to tmp_dir
+        import shutil
+
+        shutil.copyfile(f"{DB_PATH}/{PLEX_DB_NAME}", f"{TMP_DIR}/{PLEX_DB_NAME}")
+        logging.info(f"STATUS:             dbpath= {TMP_DIR}/{PLEX_DB_NAME}")
 
     end = time.time()
     stopwatch = end - start
-    logging.info(f"Download completed: {str(stopwatch)} seconds")
+    logging.info(f"Download completed: {stopwatch:.2f} seconds")
 
     ####################################################################
     # Find the downloaded PLEX DB
@@ -392,9 +423,8 @@ try:
                                     os.path.join(DIR_PATH, file) + ".jpg",
                                 )
                             else:
-                                logging.info(
-                                    f"SAFE MODE----->     {os.path.join(DIR_PATH, file)}"
-                                )
+                                foo = 0
+                                # logging.info(f"SAFE MODE----->     {os.path.join(DIR_PATH, file)}")
                     elif ".jpg" in file:
                         file_size = os.path.getsize(os.path.join(DIR_PATH, file))
                         file_size_tot += file_size
@@ -446,7 +476,7 @@ try:
                     f"#######################################################################"
                 )
 
-            logging.info(f"plex-bloat-fix subtotal time: {str(stopwatch_sub)} seconds")
+            logging.info(f"plex-bloat-fix subtotal time: {stopwatch_sub:.2f} seconds")
             logging.info(f"UNDO Mode:                    {UNDO}")
             logging.info(f"RENAME Mode:                  {RENAME}")
             logging.info(f"DELETE Mode:                  {DELETE}")
@@ -529,7 +559,7 @@ try:
     logging.info(
         f"#######################################################################"
     )
-    logging.info(f"plex-bloat-fix overall time: {str(stopwatch)} seconds")
+    logging.info(f"plex-bloat-fix overall time: {stopwatch:.2f} seconds")
     logging.info(f"UNDO Mode:                   {UNDO}")
     logging.info(f"RENAME Mode:                 {RENAME}")
     logging.info(f"DELETE Mode:                 {DELETE}")
