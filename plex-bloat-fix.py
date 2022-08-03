@@ -65,7 +65,7 @@ def log_line(header, msg):
     logging.info(f'{header : <{HEADER_WIDTH}}{msg}')
 
 def log_file(header, msg):
-    if LOG_FILES:
+    if LOG_FILE_ACTIONS:
         log_line(header, msg)
 
 def log_error(msg):
@@ -82,17 +82,17 @@ def summary_line(heading, msg):
     logging.info(f'{heading : <{SUMMARY_HEADER_WIDTH}}{msg}')
 
 def undo_rename():
-    logging.info("UNDO starting and this will take time....")
+    log_line("STATUS","UNDO starting and this will take time....")
     start = time.time()
     for DIR_PATH in DIR_PATH_ARR:
         files = glob.glob(f"{DIR_PATH}/**/*.jpg", recursive=True)
         log_line(f"Working on:",f"{DIR_PATH}")
         for f in files:
             tempTuple = os.path.splitext(f)
-            logging.info(f"{f} --> {tempTuple[0]}")
+            log_file("RENAME:",f"{f} --> {tempTuple[0]}")
             os.rename(f, tempTuple[0])
 
-    logging.info("UNDO Complete")
+    log_line("STATUS","UNDO Complete")
     end = time.time()
     stopwatch = end - start
     log_line(f"UNDO time:",f"{stopwatch_sub:.2f} seconds")
@@ -142,7 +142,7 @@ def report_summary(s_data):
         drawLine()
 
 drawLine()
-logging.info(f"# Starting plex-bloat-fix.py Ver:{__version__} ")
+log_line("BEGIN",f"Ver:{__version__} ")
 drawLine()
 log_line(f"Log file:",f"{LOG_FILENAME} created...")
 
@@ -186,9 +186,9 @@ except:
     OPTIMIZE_DB = False
 
 try:
-    LOG_FILES = Boolean(int(os.getenv("LOG_FILES")))
+    LOG_FILE_ACTIONS = Boolean(int(os.getenv("LOG_FILE_ACTIONS")))
 except:
-    LOG_FILES = True
+    LOG_FILE_ACTIONS = True
 
 try:
     SLEEP = Boolean(int(os.getenv("SLEEP")))
@@ -247,7 +247,7 @@ log_line(f"UNDO",f"{UNDO}")
 log_line(f"RENAME",f"{RENAME}")
 log_line(f"DELETE",f"{DELETE}")
 log_line(f"TC_DEL",f"{TC_DEL}")
-log_line(f"LOG_FILES",f"{LOG_FILES}")
+log_line(f"LOG_FILE_ACTIONS",f"{LOG_FILE_ACTIONS}")
 log_line(f"SLEEP",f"{SLEEP}")
 log_line(f"EMPTY_TRASH",f"{EMPTY_TRASH}")
 log_line(f"CLEAN_BUNDLES",f"{CLEAN_BUNDLES}")
@@ -364,18 +364,13 @@ try:
         cursor = conn.execute(SQLCMD)
         BLOAT_RUN = True
     else:
-        logging.info(
-            f"ERROR with Extraction of database in this directory: {TMP_DIR} not found"
+        log_error(
+            f"no extracted database found in: {TMP_DIR}"
         )
-        logging.info(
-            f"Try to download manually in PLEX and look at logs for any errors"
-        )
-        logging.info(
-            f"If the file downloaded is a zip file 22kb in size this indicates a PLEX db issue that needs to be "
-            f"resolved. The script will continue, however nothing will be deleted in the Metadata subdirectories... "
-        )
+        log_line("",f"Try to download manually in PLEX and look at logs for any errors")
+        log_line("",f"If the downloaded file is a 22kb zip file, there maybe PLEX db issue to address.")
+        log_line("",f"PBF will continue, though nothing will be deleted from the Metadata subdirectories.")
         BLOAT_RUN = False
-        # sys.exit()
 
     ####################################################################
     # Building list of selected uploaded posters
@@ -458,7 +453,7 @@ try:
     if EMPTY_TRASH:
         et = ps.library.emptyTrash()
         drawLine()
-        logging.info(f"# EMPTY_TRASH = {EMPTY_TRASH}")
+        log_line(f"# EMPTY_TRASH",f"{EMPTY_TRASH}")
         drawLine()
         log_line(f"EMPTY TRASH:",f"{et}")
         log_line(f"STATUS:",f"sleeping for {SLEEP}")
@@ -466,7 +461,7 @@ try:
 
     if CLEAN_BUNDLES:
         drawLine()
-        logging.info(f"# CLEAN_BUNDLES = {CLEAN_BUNDLES}")
+        log_line(f"# CLEAN_BUNDLES",f"{CLEAN_BUNDLES}")
         drawLine()
         cb = ps.library.cleanBundles()
         log_line(f"CLEAN BUNDLES:",f"{cb}")
@@ -475,7 +470,7 @@ try:
 
     if OPTIMIZE_DB:
         drawLine()
-        logging.info(f"# OPTIMIZE_DB = {OPTIMIZE_DB}")
+        log_line(f"# OPTIMIZE_DB",f"{OPTIMIZE_DB}")
         drawLine()
         op = ps.library.optimize()
         log_line(f"OPTIMIZE DB:",f"{op}")
