@@ -104,9 +104,9 @@ If DB_PATH is pointing to a valid directory:
 ```
 DB_PATH="/opt/plex/Library/Application Support/Plex Media Server/Plug-in Support/Databases"
 ```
-Then the script will *copy* the database file rather than downloading it through the Plex API.  The assumption here is that you are running PBF on the same machine as plex.  This is useful in cases where the DB is too large to download.
+The script will *copy* the database file rather than downloading it through the Plex API.  The assumption here is that you are running PBF on the same machine as plex.  This is useful in cases where the DB is too large to download.
 
-HOWEVER: the script currently does not verify that plex is idle before doing this.  MAKE SURE that Plex is idle before running the script to avoid any databse problems that may be caused by copying the DB out from under PLex while it's be optimixed or the like.  Only use this if you have a backup.
+IMPORTANT: the script currently does not verify that Plex is idle before doing this.  MAKE SURE that Plex is idle before running the script to avoid any database problems that may be caused by copying the DB out from under Plex while it's being optimized or the like.  ONLY use this if you have a backup.
 
 If LOG_FILE_ACTIONS is set to 0:
 ```
