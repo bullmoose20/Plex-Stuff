@@ -336,7 +336,7 @@ try:
 
     end = time.time()
     stopwatch = end - start
-    log_line(f"Download completed:",f"{stopwatch:.2f} seconds")
+    log_line(f"database retrieved:",f"{stopwatch:.2f} seconds")
 
     ####################################################################
     # Find the downloaded PLEX DB

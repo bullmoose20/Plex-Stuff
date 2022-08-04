@@ -57,26 +57,18 @@ The script will loop through all the folders as defined in your `.env` and then 
 In this case, the script found ~ 434 gigabytes it could free up out of ~ 524 gigabytes found and hence 82.78% bloat!
 ```
 #######################################################################
-# OVERALL SUMMARY:                                                    #
+# SUMMARY: Overall
 #######################################################################
-plex-bloat-fix overall time: 424.5148277282715 seconds
-UNDO Mode:                   False
-RENAME Mode:                 False
-DELETE Mode:                 False
-TC DELETE Mode:              False
-Total TC Size Found:         (227.2492168089375, 'gigabytes')
-Total TC Files Found:        1197607
-Total Meta File Size Found:  (206.94449690263718, 'gigabytes')
-Total Meta Files Found:      131726
-Total Meta File Size:        (297.28548831585795, 'gigabytes')
-Total Meta Files:            190296
-Grand Total File Size Found: (434.1937137115747, 'gigabytes')
-Grand Total Files Found:     1329333
-Grand Total File Size:       (524.5347051247954, 'gigabytes')
-Grand Total Files:           1387903
-Total Pct Plex Bloat:        82.78%
-Total space savings:         (434.1937137115747, 'gigabytes')
-Total file savings:          1329333
+Overall elapsed time:                        403.66 seconds
+Overall Metadata to delete:                  206.94 gigabytes
+Overall Metadata files to delete:            131726
+Overall Metadata size:                       297.28 gigabytes
+Overall Metadata files:                      190296
+PhotoTranscoder data to delete:              227.25 gigabytes
+PhotoTranscoder files to delete:             1197607
+Overall data to delete:                      434.19 gigabytes
+Overall files to delete:                     1387903
+Overall Plex bloat factor:                   82.78%
 #######################################################################
 ```
 So what are the recommended settings for when I actually let the script run and do its thing?
@@ -88,13 +80,13 @@ Flip these to true in `.env` by setting them to 1
 
 DELETE will delete this stuff:
 ```
-Total Meta File Size Found:  (206.94449690263718, 'gigabytes')
-Total Meta Files Found:      131726
+Overall Metadata files to delete:            131726
+Overall Metadata size:                       297.28 gigabytes
 ```
 TC DELETE will delete this stuff:
 ```
-Total TC Size Found:         (227.2492168089375, 'gigabytes')
-Total TC Files Found:        1197607
+PhotoTranscoder data to delete:              227.25 gigabytes
+PhotoTranscoder files to delete:             1197607
 ```
 
 If you want to dry run and examine files:
@@ -107,6 +99,21 @@ Setting ONLY RENAME to true will just rename these files so you can look at them
 Total Meta File Size Found:  (206.94449690263718, 'gigabytes')
 Total Meta Files Found:      131726
 ```
+
+If DB_PATH is pointing to a valid directory:
+```
+DB_PATH="/opt/plex/Library/Application Support/Plex Media Server/Plug-in Support/Databases"
+```
+Then the script will *copy* the database file rather than downloading it through the Plex API.  The assumption here is that you are running PBF on the same machine as plex.  This is useful in cases where the DB is too large to download.
+
+HOWEVER: the script currently does not verify that plex is idle before doing this.  MAKE SURE that Plex is idle before running the script to avoid any databse problems that may be caused by copying the DB out from under PLex while it's be optimixed or the like.  Only use this if you have a backup.
+
+If LOG_FILE_ACTIONS is set to 0:
+```
+LOG_FILE_ACTIONS=0
+```
+The script will NOT log any individual file actions.  That list can be quite long, and you may not want to scroll through it to get to the size information you seek.
+
 
 ### NOTES/TIPS
 1. If you run PMM, make sure this script runs AFTER PMM run completes. Never during the run. 
