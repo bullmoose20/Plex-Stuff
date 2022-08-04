@@ -191,7 +191,7 @@ except:
     LOG_FILE_ACTIONS = True
 
 try:
-    SLEEP = Boolean(int(os.getenv("SLEEP")))
+    SLEEP = int(os.getenv("SLEEP"))
 except:
     SLEEP = 60
 
@@ -215,7 +215,7 @@ if not Path(DIR_PATH).is_dir():
 
 TMP_DIR = os.getenv("TMP_DIR")
 # go ahead and create the temp dir if it doesn't already exist
-Path("TMP_DIR").mkdir(parents=True, exist_ok=True)
+Path(TMP_DIR).mkdir(parents=True, exist_ok=True)
 
 if not Path(TMP_DIR).is_dir():
     log_error_and_exit(f"TMP_DIR is not a directory: {TMP_DIR}")
