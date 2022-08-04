@@ -59,6 +59,33 @@ The script will loop through all the folders as defined in your `.env` and then 
 In this case, the script found ~ 434 gigabytes it could free up out of ~ 524 gigabytes found and hence 82.78% bloat!
 ```
 #######################################################################
+# BEGIN             Ver:#.#.# 
+#######################################################################
+Log file:           plex-bloat-fix.log created...
+DB_PATH VALID:      This is a local run which will COPY the database
+UNDO:               False
+RENAME:             False
+DELETE:             False
+TC_DEL:             False
+LOG_FILE_ACTIONS:   False
+SLEEP:              60
+EMPTY_TRASH:        False
+CLEAN_BUNDLES:      False
+OPTIMIZE_DB:        False
+LIB:                /mnt/user/appdata/plex/Metadata/Movies
+LIB:                /mnt/user/appdata/plex/Metadata/TV Shows
+LIB:                /mnt/user/appdata/plex/Metadata/Playlists
+LIB:                /mnt/user/appdata/plex/Metadata/Collections
+LIB:                /mnt/user/appdata/plex/Metadata/Artists
+LIB:                /mnt/user/appdata/plex/Metadata/Albums
+TMP_DIR:            /mnt/user/data/scripts/plex-scripts/plex-bloat-fix/plex_db/
+DIR_PATH:           /mnt/user/appdata/plex/Metadata/
+TC_PATH:            /mnt/user/appdata/plex/Cache/PhotoTranscoder/
+DB_PATH:            /mnt/user/appdata/plex/Plug-in Support/Databases/
+REPORTONLY:         PBF will report files to be deleted without doing so.
+#######################################################################
+
+#######################################################################
 # SUMMARY: Overall
 #######################################################################
 Overall elapsed time:                        403.66 seconds
@@ -75,8 +102,8 @@ Overall Plex bloat factor:                   82.78%
 ```
 So what are the recommended settings for when I actually let the script run and do its thing?
 ```
-DELETE Mode:                 False
-TC DELETE Mode:              False
+DELETE:                 False
+TC_DEL:                 False
 ```
 Flip these to true in `.env` by setting them to 1
 
@@ -93,15 +120,13 @@ PhotoTranscoder files to delete:             1197607
 
 If you want to dry run and examine files:
 ```
-RENAME Mode:                 False
+RENAME:                 False
 ```
-
-Setting ONLY RENAME to true will just rename these files so you can look at them
+Setting ONLY RENAME to true (=1 in `.env`) will just rename these files so you can look at them
 ```
-Total Meta File Size Found:  (206.94449690263718, 'gigabytes')
-Total Meta Files Found:      131726
+Overall Metadata to delete:                  206.94 gigabytes
+Overall Metadata files to delete:            131726
 ```
-
 If DB_PATH is pointing to a valid directory:
 ```
 DB_PATH="/opt/plex/Library/Application Support/Plex Media Server/Plug-in Support/Databases"
