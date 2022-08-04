@@ -80,8 +80,8 @@ Flip these to true in `.env` by setting them to 1
 
 DELETE will delete this stuff:
 ```
+Overall Metadata to delete:                  206.94 gigabytes
 Overall Metadata files to delete:            131726
-Overall Metadata size:                       297.28 gigabytes
 ```
 TC DELETE will delete this stuff:
 ```
