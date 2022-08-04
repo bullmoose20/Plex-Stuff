@@ -122,27 +122,30 @@ def handle_file(f):
 def report_summary(s_data):
 
     SECTION = s_data['name']
-    ACTION = "# SUMMARY" if s_data["meta_size_total"] else "# NO FILES FOUND IN"
+    ACTION = "# SUMMARY" if s_data["meta_size_total"] or s_data["tc_size_delete"] else "# NO FILES FOUND IN"
     drawLine()
     logging.info(f"{ACTION}: {SECTION}")
     drawLine()
  
-    if s_data["meta_size_total"] > 0:
+    if s_data["meta_size_total"] or s_data["tc_size_delete"] > 0:
         summary_line(f"{SECTION} elapsed time:", f"{s_data['stopwatch']:.2f} seconds")
         summary_line(f"{SECTION} Metadata to delete:", f"{format_bytes(s_data['meta_size_delete'])}")
         summary_line(f"{SECTION} Metadata files to delete:", f"{s_data['meta_ct_delete']}")
         summary_line(f"{SECTION} Metadata size:", f"{format_bytes(s_data['meta_size_total'])}")
         summary_line(f"{SECTION} Metadata files:", f"{s_data['meta_ct_total']}")
-        if s_data["grand_total"]:
+        if s_data["name"] == "PhotoTranscoder":
             summary_line(f"PhotoTranscoder data to delete:", f"{format_bytes(s_data['tc_size_delete'])}")
             summary_line(f"PhotoTranscoder files to delete:", f"{s_data['tc_ct_delete']}")
+        if s_data["grand_total"]:
+            summary_line(f"Overall PhotoTranscoder data to delete:", f"{format_bytes(s_data['tc_size_delete'])}")
+            summary_line(f"Overall PhotoTranscoder files to delete:", f"{s_data['tc_ct_delete']}")
             summary_line(f"{SECTION} data to delete:", f"{format_bytes(s_data['tc_size_delete'] + s_data['meta_size_delete'])}")
             summary_line(f"{SECTION} files to delete:", f"{s_data['meta_ct_delete'] + s_data['tc_ct_delete']}")
         summary_line(f"{SECTION} Plex bloat factor:", "{:.2%}".format(s_data['pct_bloat']))
         drawLine()
 
 drawLine()
-log_line("BEGIN",f"Ver:{__version__} ")
+log_line("# BEGIN",f"Ver:{__version__} ")
 drawLine()
 log_line(f"Log file:",f"{LOG_FILENAME} created...")
 
@@ -231,6 +234,11 @@ if PLEX_TOKEN is None:
 dbpath = ""
 file_size_tot = 0
 file_size_del = 0
+file_size_sub = 0
+file_sub = 0
+file_size_sub_del = 0
+file_sub_del = 0
+
 ####################################################################
 # MAIN
 ####################################################################
@@ -243,23 +251,23 @@ DIR_PATH_ARR = []
 for lib in LIBS:
     DIR_PATH_ARR.append(os.path.join(DIR_PATH, lib))
 
-log_line(f"UNDO",f"{UNDO}")
-log_line(f"RENAME",f"{RENAME}")
-log_line(f"DELETE",f"{DELETE}")
-log_line(f"TC_DEL",f"{TC_DEL}")
-log_line(f"LOG_FILE_ACTIONS",f"{LOG_FILE_ACTIONS}")
-log_line(f"SLEEP",f"{SLEEP}")
-log_line(f"EMPTY_TRASH",f"{EMPTY_TRASH}")
-log_line(f"CLEAN_BUNDLES",f"{CLEAN_BUNDLES}")
-log_line(f"OPTIMIZE_DB",f"{OPTIMIZE_DB}")
+log_line(f"UNDO:",f"{UNDO}")
+log_line(f"RENAME:",f"{RENAME}")
+log_line(f"DELETE:",f"{DELETE}")
+log_line(f"TC_DEL:",f"{TC_DEL}")
+log_line(f"LOG_FILE_ACTIONS:",f"{LOG_FILE_ACTIONS}")
+log_line(f"SLEEP:",f"{SLEEP}")
+log_line(f"EMPTY_TRASH:",f"{EMPTY_TRASH}")
+log_line(f"CLEAN_BUNDLES:",f"{CLEAN_BUNDLES}")
+log_line(f"OPTIMIZE_DB:",f"{OPTIMIZE_DB}")
 
 for p in DIR_PATH_ARR:
-    log_line(f"LIB",f"{p}")
+    log_line(f"LIB:",f"{p}")
 
-log_line(f"TMP_DIR",f"{TMP_DIR}")
-log_line(f"DIR_PATH",f"{DIR_PATH}")
-log_line(f"TC_PATH",f"{TC_PATH}")
-log_line(f"DB_PATH",f"{DB_PATH}")
+log_line(f"TMP_DIR:",f"{TMP_DIR}")
+log_line(f"DIR_PATH:",f"{DIR_PATH}")
+log_line(f"TC_PATH:",f"{TC_PATH}")
+log_line(f"DB_PATH:",f"{DB_PATH}")
 
 if RENAME and DELETE:
     log_error_and_exit(f"RENAME and DELETE are both set; this config is ambiguous, please choose one or the other.")
@@ -269,6 +277,8 @@ elif RENAME:
     log_line(f"RENAME:","PBF will rename files within the Metadata directories and CAN BE UNDONE.")
 else:
     log_line(f"REPORTONLY:","PBF will report files to be deleted without doing so.")
+
+drawLine()
 
 ####################################################################
 # UNDO RENAME
@@ -284,6 +294,7 @@ try:
     ####################################################################
     tot_tc_file_size = 0
     tot_tc_files = 0
+    sub_start = time.time()
     log_line("Working on:", TC_PATH)
     log_line("STATUS:","Processing PhotoTranscoder files. This will take some time...")
     files = glob.glob(f"{TC_PATH}/**/*.*", recursive=True)
@@ -296,9 +307,22 @@ try:
             os.remove(f)
         else:
             log_file("SAFE MODE----->", p)
-    log_line("Total TC Files:", tot_tc_files)
-    log_line("Total TC Size:", tot_tc_file_size)
+    sub_end = time.time()
     
+    s_data = {}
+    s_data["name"] = "PhotoTranscoder"
+    s_data["stopwatch"] = sub_end - sub_start
+    s_data["pct_bloat"] = 0 if tot_tc_file_size == 0 else 1
+    s_data["meta_size_total"] = 0
+    s_data["meta_ct_total"] = 0
+    s_data["meta_size_delete"] = 0
+    s_data["meta_ct_delete"] = 0
+    s_data["tc_size_delete"] = tot_tc_file_size
+    s_data["tc_ct_delete"] = tot_tc_files
+    s_data["grand_total"] = False
+
+    report_summary(s_data)
+
     ####################################################################
     # Connect to Plexserver
     ####################################################################
@@ -336,7 +360,11 @@ try:
 
     end = time.time()
     stopwatch = end - start
-    log_line(f"database retrieved:",f"{stopwatch:.2f} seconds")
+    if not local_run:
+        log_line(f"Download completed:",f"{stopwatch:.2f} seconds")
+    else:
+        log_line(f"Copy completed:",f"{stopwatch:.2f} seconds")
+	
 
     ####################################################################
     # Find the downloaded PLEX DB
@@ -384,7 +412,7 @@ try:
             # print("ID = ", tmp)
             res_sql.append(tmp)
 
-        log_line(f"STATUS:",f"pulled {len(res_sql)} upload items from the database")
+        log_line(f"STATUS:",f"Pulled {len(res_sql)} upload items from the database")
 
         conn.close()
 
