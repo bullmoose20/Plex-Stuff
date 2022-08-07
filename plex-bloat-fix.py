@@ -5,12 +5,12 @@
 # python-dotenv
 # SQLAlchemy
 
-__version__ = "1.2.7"
+__version__ = "1.2.8"
 from xmlrpc.client import Boolean
 from operator import itemgetter, attrgetter
 from plexapi.server import PlexServer
 from pathlib import Path
-import os, sys, sqlite3, glob, time, logging, platform, logging.handlers
+import os, sys, sqlite3, glob, time, logging, platform, logging.handlers, shutil
 from os import walk
 from urllib.parse import urlparse
 from dotenv import load_dotenv
@@ -95,7 +95,7 @@ def undo_rename():
     log_line("STATUS","UNDO Complete")
     end = time.time()
     stopwatch = end - start
-    log_line(f"UNDO time:",f"{stopwatch_sub:.2f} seconds")
+    log_line(f"UNDO time:",f"{stopwatch:.2f} seconds")
 
     sys.exit()
 
@@ -126,21 +126,28 @@ def report_summary(s_data):
     drawLine()
     logging.info(f"{ACTION}: {SECTION}")
     drawLine()
- 
+    if TC_DEL:
+        tc_del_txt  = "were deleted"
+    else:
+        tc_del_txt  = "to delete"
+    if DELETE:
+        del_txt  = "were deleted"
+    else:
+        del_txt  = "to delete"
     if s_data["meta_size_total"] or s_data["tc_size_delete"] > 0:
         summary_line(f"{SECTION} elapsed time:", f"{s_data['stopwatch']:.2f} seconds")
-        summary_line(f"{SECTION} Metadata to delete:", f"{format_bytes(s_data['meta_size_delete'])}")
-        summary_line(f"{SECTION} Metadata files to delete:", f"{s_data['meta_ct_delete']}")
+        summary_line(f"{SECTION} Metadata {del_txt}:", f"{format_bytes(s_data['meta_size_delete'])}")
+        summary_line(f"{SECTION} Metadata files {del_txt}:", f"{s_data['meta_ct_delete']}")
         summary_line(f"{SECTION} Metadata size:", f"{format_bytes(s_data['meta_size_total'])}")
         summary_line(f"{SECTION} Metadata files:", f"{s_data['meta_ct_total']}")
         if s_data["name"] == "PhotoTranscoder":
-            summary_line(f"PhotoTranscoder data to delete:", f"{format_bytes(s_data['tc_size_delete'])}")
-            summary_line(f"PhotoTranscoder files to delete:", f"{s_data['tc_ct_delete']}")
+            summary_line(f"PhotoTranscoder data {tc_del_txt}:", f"{format_bytes(s_data['tc_size_delete'])}")
+            summary_line(f"PhotoTranscoder files {tc_del_txt}:", f"{s_data['tc_ct_delete']}")
         if s_data["grand_total"]:
-            summary_line(f"Overall PhotoTranscoder data to delete:", f"{format_bytes(s_data['tc_size_delete'])}")
-            summary_line(f"Overall PhotoTranscoder files to delete:", f"{s_data['tc_ct_delete']}")
-            summary_line(f"{SECTION} data to delete:", f"{format_bytes(s_data['tc_size_delete'] + s_data['meta_size_delete'])}")
-            summary_line(f"{SECTION} files to delete:", f"{s_data['meta_ct_delete'] + s_data['tc_ct_delete']}")
+            summary_line(f"Overall PhotoTranscoder data {tc_del_txt}:", f"{format_bytes(s_data['tc_size_delete'])}")
+            summary_line(f"Overall PhotoTranscoder files {tc_del_txt}:", f"{s_data['tc_ct_delete']}")
+            summary_line(f"{SECTION} data {del_txt}:", f"{format_bytes(s_data['tc_size_delete'] + s_data['meta_size_delete'])}")
+            summary_line(f"{SECTION} files {del_txt}:", f"{s_data['meta_ct_delete'] + s_data['tc_ct_delete']}")
         summary_line(f"{SECTION} Plex bloat factor:", "{:.2%}".format(s_data['pct_bloat']))
         drawLine()
 
@@ -242,9 +249,13 @@ file_sub_del = 0
 ####################################################################
 # MAIN
 ####################################################################
-SQLCMD = (
+SQLCMD1 = (
     "SELECT user_thumb_url FROM metadata_items WHERE user_thumb_url like 'upload://%';"
 )
+SQLCMD2 = (
+    "SELECT user_art_url FROM metadata_items WHERE user_art_url like 'upload://%';"
+)
+
 LIBS = ["Movies", "TV Shows", "Playlists", "Collections", "Artists", "Albums"]
 
 DIR_PATH_ARR = []
@@ -307,6 +318,11 @@ try:
             os.remove(f)
         else:
             log_file("SAFE MODE----->", p)
+    if TC_DEL:
+        sub_folders_list = glob.glob(f"{TC_PATH}/*", recursive=True)
+        for sub_folder in sub_folders_list:
+          shutil.rmtree(sub_folder)
+
     sub_end = time.time()
     
     s_data = {}
@@ -388,8 +404,10 @@ try:
             log_line(f"ERROR:",f"Database cannot be found")
             exit()
 
-        log_line(f"STATUS:",f"Executing {SQLCMD}")
-        cursor = conn.execute(SQLCMD)
+        log_line(f"STATUS:",f"Executing {SQLCMD1}")
+        cursor1 = conn.execute(SQLCMD1)
+        log_line(f"STATUS:",f"Executing {SQLCMD2}")
+        cursor2 = conn.execute(SQLCMD2)
         BLOAT_RUN = True
     else:
         log_error(
@@ -406,7 +424,12 @@ try:
     if BLOAT_RUN:
         log_line(f"STATUS:",f"Building list of selected uploaded posters")
         res_sql = []
-        for row in cursor:
+        for row in cursor1:
+            p = urlparse(row[0])
+            tmp = p.path.rsplit("/", 1).pop()
+            # print("ID = ", tmp)
+            res_sql.append(tmp)
+        for row in cursor2:
             p = urlparse(row[0])
             tmp = p.path.rsplit("/", 1).pop()
             # print("ID = ", tmp)
