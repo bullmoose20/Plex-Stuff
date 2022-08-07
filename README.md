@@ -9,10 +9,12 @@
 ## Setup
 
 1. clone repo
-1. Install requirements with `pip install -r requirements.txt` [I'd suggest doing this in a virtual environment. Great instructions found here - https://metamanager.wiki/en/nightly/home/guides/local.html?highlight=virtualenv#setting-up-a-virtual-environment]
-1. cd to desired directory
-1. Copy `.env.example` to `.env`
-1. Edit `.env` to suit
+2. setup python virtualenv - [I'd suggest doing this in a virtual environment. Great instructions found here - https://metamanager.wiki/en/nightly/home/guides/local.html?highlight=virtualenv#setting-up-a-virtual-environment]
+3. Activate that virtualenv
+4. Install requirements with `pip install -r requirements.txt` into that virtualenv
+5. cd to the directory that you want to run the script in
+6. Copy `.env.example` to `.env` 
+7. Edit `.env` to suit
 
 All these PYTHON scripts use the same `.env` and requirements. The Unraid bash scripts, Windows powershell or Windows cmd scripts, will vary in nature. Read the related section down below for more details. 
 
