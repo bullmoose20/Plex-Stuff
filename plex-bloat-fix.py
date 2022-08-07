@@ -5,7 +5,7 @@
 # python-dotenv
 # SQLAlchemy
 
-__version__ = "1.2.8"
+__version__ = "1.2.9"
 from xmlrpc.client import Boolean
 from operator import itemgetter, attrgetter
 from plexapi.server import PlexServer
@@ -127,11 +127,11 @@ def report_summary(s_data):
     logging.info(f"{ACTION}: {SECTION}")
     drawLine()
     if TC_DEL:
-        tc_del_txt  = "were deleted"
+        tc_del_txt  = "deleted"
     else:
         tc_del_txt  = "to delete"
     if DELETE:
-        del_txt  = "were deleted"
+        del_txt  = "deleted"
     else:
         del_txt  = "to delete"
     if s_data["meta_size_total"] or s_data["tc_size_delete"] > 0:
