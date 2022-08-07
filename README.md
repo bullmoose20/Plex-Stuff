@@ -9,7 +9,7 @@
 ## Setup
 
 1. clone repo
-1. Install requirements with `pip install -r requirements.txt` [I'd suggest doing this in a virtual environment - https://metamanager.wiki/en/nightly/home/guides/local.html?highlight=virtualenv#setting-up-a-virtual-environment]
+1. Install requirements with `pip install -r requirements.txt` [I'd suggest doing this in a virtual environment. Great instructions found here - https://metamanager.wiki/en/nightly/home/guides/local.html?highlight=virtualenv#setting-up-a-virtual-environment]
 1. cd to desired directory
 1. Copy `.env.example` to `.env`
 1. Edit `.env` to suit
@@ -51,7 +51,7 @@ Your PLEX folders are growing out of control. You use overlays from PMM or uploa
 
 ### Usage
 1. setup as above
-2. Run with `python plex-bloat-fix.py`
+2. Run with `python plex-bloat-fix.py` - sometimes (usually when you have not setup the virtualenv for python as recommended above), you need to specify the version of python in the command like `python3.9 plex-bloat-fix.py`
 3. Make sure that you are NOT actively updating posters or title cards with PMM or TCM while running this script. Schedule this after the last run happens. So TCM, Plex Scheduled Tasks, PMM, THEN schedule or run plex-bloat-fix.py. Example: TCM @ 00:00, PLEX @ 02:00-05:00, and PMM @ 05:00
 
 The script will loop through all the folders as defined in your `.env` and then clean it up if you want it to.
