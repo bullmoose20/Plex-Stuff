@@ -9,7 +9,7 @@
 ## Setup
 
 1. clone repo
-1. Install requirements with `pip install -r requirements.txt` [I'd suggest doing this in a virtual environment]
+1. Install requirements with `pip install -r requirements.txt` [I'd suggest doing this in a virtual environment - https://metamanager.wiki/en/nightly/home/guides/local.html?highlight=virtualenv#setting-up-a-virtual-environment]
 1. cd to desired directory
 1. Copy `.env.example` to `.env`
 1. Edit `.env` to suit
