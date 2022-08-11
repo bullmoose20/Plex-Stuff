@@ -35,7 +35,7 @@ SLEEP=60                                        # set SLEEP=60 to add a 60 secon
 EMPTY_TRASH=0                                   # set EMPTY_TRASH=1 and the script will run the EMPTY TRASH operation in PLEX
 CLEAN_BUNDLES=0                                 # set CLEAN_BUNDLES=1 and the script will run the CLEAN BUNDLES operation in PLEX
 OPTIMIZE_DB=0                                   # set OPTIMIZE_DB=1 and the script will run the OPTIMIZE DB operation in PLEX
-LOG_FILE_ACTIONS=0                              # set LOG_FILE_ACTIONS=1 for VERBOSE output
+LOG_FILE_ACTIONS=1                              # set LOG_FILE_ACTIONS=1 for VERBOSE output
 ```
 
 ## Plex scripts:
