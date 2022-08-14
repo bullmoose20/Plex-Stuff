@@ -5,7 +5,7 @@
 # python-dotenv
 # SQLAlchemy
 
-__version__ = "1.2.9"
+__version__ = "1.3.0"
 from xmlrpc.client import Boolean
 from operator import itemgetter, attrgetter
 from plexapi.server import PlexServer
@@ -122,7 +122,7 @@ def handle_file(f):
 def report_summary(s_data):
 
     SECTION = s_data['name']
-    ACTION = "# SUMMARY" if s_data["meta_size_total"] or s_data["tc_size_delete"] else "# NO FILES FOUND IN"
+    ACTION = "# Ver: "+__version__+" SUMMARY" if s_data["meta_size_total"] or s_data["tc_size_delete"] else "# NO FILES FOUND IN"
     drawLine()
     logging.info(f"{ACTION}: {SECTION}")
     drawLine()
