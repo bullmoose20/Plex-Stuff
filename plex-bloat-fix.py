@@ -5,12 +5,13 @@
 # python-dotenv
 # SQLAlchemy
 
-__version__ = "1.3.0"
+__version__ = "1.3.1"
 from xmlrpc.client import Boolean
 from operator import itemgetter, attrgetter
 from plexapi.server import PlexServer
 from pathlib import Path
 import os, sys, sqlite3, glob, time, logging, platform, logging.handlers, shutil
+import urllib.request
 from os import walk
 from urllib.parse import urlparse
 from dotenv import load_dotenv
@@ -61,6 +62,17 @@ logging.getLogger().addHandler(logging.StreamHandler())
 # FUNCTIONS
 ####################################################################
 
+def chk_ver():
+    url = "https://raw.githubusercontent.com/bullmoose20/Plex-Stuff/master/version.txt"
+    file = urllib.request.urlopen(url)
+
+    for line in file:
+        remote_ver = line.decode("utf-8")
+
+    if __version__ != remote_ver:
+        drawLine()
+        log_line("# UPGRADE",f"Current Ver:{__version__} New Ver:{remote_ver} ")
+    
 def log_line(header, msg):
     logging.info(f'{header : <{HEADER_WIDTH}}{msg}')
 
@@ -150,6 +162,9 @@ def report_summary(s_data):
             summary_line(f"{SECTION} files {del_txt}:", f"{s_data['meta_ct_delete'] + s_data['tc_ct_delete']}")
         summary_line(f"{SECTION} Plex bloat factor:", "{:.2%}".format(s_data['pct_bloat']))
         drawLine()
+
+
+chk_ver()
 
 drawLine()
 log_line("# BEGIN",f"Ver:{__version__} ")
