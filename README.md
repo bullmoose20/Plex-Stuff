@@ -54,9 +54,9 @@ DIR_PATH=/opt/plex/Library/Application Support/Plex Media Server/Metadata
 DB_PATH=/opt/plex/Library/Application Support/Plex Media Server/Plug-in Support/Databases
 TC_PATH=/opt/plex/Library/Application Support/Plex Media Server/Cache/PhotoTranscoder
 ```
-If you run `pmm_bloat.py` on that machine, those are correct.
+If you run `plex-bloat-fix.py` on that machine, those are correct.
 
-If you want to run `pmm_bloat.py` on your Windows machine, you need to map those three directories to local locations, then use *those paths* in the env:
+If you want to run `plex-bloat-fix.py` on your Windows machine, you need to map those three directories to local locations, then use *those paths* in the env:
 ```
 DIR_PATH=j:
 DB_PATH=k:
