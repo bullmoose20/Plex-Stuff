@@ -38,6 +38,32 @@ OPTIMIZE_DB=0                                   # set OPTIMIZE_DB=1 and the scri
 LOG_FILE_ACTIONS=1                              # set LOG_FILE_ACTIONS=1 for VERBOSE output
 ```
 
+### Note on paths:
+```
+TMP_DIR=path\to\tmp_dir\
+DIR_PATH=path\to\Metadata\
+TC_PATH=path\to\PhotoTranscoder\
+DB_PATH=path\to\Plex\Plug-in Support\Databases\
+```
+
+These paths are all local to the machine where the script is running.  If your Plex server is a different machine from the one running the script, you will need to mount the relevant folders from the Plex server to this machine, then these paths will get set to the local mount location.
+
+For example, your Plex server is running on a Linux box somewhere.  On your Plex server, the three directories of interest are
+```
+DIR_PATH=/opt/plex/Library/Application Support/Plex Media Server/Metadata
+DB_PATH=/opt/plex/Library/Application Support/Plex Media Server/Plug-in Support/Databases
+TC_PATH=/opt/plex/Library/Application Support/Plex Media Server/Cache/PhotoTranscoder
+```
+If you run `pmm_bloat.py` on that machine, those are correct.
+
+If you want to run `pmm_bloat.py` on your Windows machine, you need to map those three directories to local locations, then use *those paths* in the env:
+```
+DIR_PATH=j:
+DB_PATH=k:
+TC_PATH=l:
+```
+Or however you've mounted those directories.
+
 ## Plex scripts:
 
 ## Scripts:
