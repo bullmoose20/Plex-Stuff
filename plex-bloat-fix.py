@@ -163,6 +163,9 @@ def report_summary(s_data):
         summary_line(f"{SECTION} Plex bloat factor:", "{:.2%}".format(s_data['pct_bloat']))
         drawLine()
 
+if sys.version_info.major != 3:
+    print('This script requires Python 3.  Exiting.')
+    exit()
 
 chk_ver()
 
