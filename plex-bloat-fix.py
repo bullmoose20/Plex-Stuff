@@ -5,7 +5,7 @@
 # python-dotenv
 # SQLAlchemy
 
-__version__ = "1.3.1"
+__version__ = "1.3.2"
 from xmlrpc.client import Boolean
 from operator import itemgetter, attrgetter
 from plexapi.server import PlexServer
