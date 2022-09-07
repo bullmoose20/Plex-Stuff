@@ -23,6 +23,12 @@ SUMMARY_HEADER_WIDTH = 45
 LINE_WIDTH = 71
 SEP_CHAR = '#'
 
+env_is_here = os.path.isfile('.env')
+
+if not env_is_here:
+    print('Configuration file [.env] is not here.  Exiting.')
+    exit()
+
 load_dotenv()
 
 ####################################################################
