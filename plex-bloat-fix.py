@@ -5,7 +5,7 @@
 # python-dotenv
 # SQLAlchemy
 
-__version__ = "1.3.2"
+__version__ = "1.3.3"
 from xmlrpc.client import Boolean
 from operator import itemgetter, attrgetter
 from plexapi.server import PlexServer
@@ -116,6 +116,12 @@ def undo_rename():
     log_line(f"UNDO time:",f"{stopwatch:.2f} seconds")
 
     sys.exit()
+
+def clear_tmp():
+    log_line("STATUS:",f"Deleting all files in PLEX DB download directory: {TMP_DIR}...")
+    files = glob.glob(f"{TMP_DIR}/*")
+    for f in files:
+        os.remove(f)
 
 def format_bytes(size):
     # 2**10 = 1024
@@ -257,9 +263,6 @@ if not Path(TMP_DIR).is_dir():
 if len(os.listdir(TMP_DIR)) > 0:
     log_error_and_exit(f"TMP_DIR is not empty:       {TMP_DIR}")
 
-print(len(os.listdir(nonemptydirectory))) # 1
-print() # 0
-
 PLEX_URL = os.getenv("PLEX_URL")
 if PLEX_URL is None:
     log_error_and_exit("PLEX_URL is not defined.")
@@ -377,10 +380,7 @@ try:
     ####################################################################
     # clear the download target dir
     ####################################################################
-    log_line("STATUS:",f"Deleting all files in PLEX DB download directory: {TMP_DIR}...")
-    files = glob.glob(f"{TMP_DIR}/*")
-    for f in files:
-        os.remove(f)
+    clear_tmp()
 
     ####################################################################
     # Download DB
@@ -468,6 +468,7 @@ try:
         log_line(f"STATUS:",f"Pulled {len(res_sql)} upload items from the database")
 
         conn.close()
+        clear_tmp()
 
         ####################################################################
         # Building list of files to compare
@@ -531,6 +532,7 @@ try:
             file_sub_del = 0
             file_sub = 0
 
+    clear_tmp()
     if EMPTY_TRASH:
         et = ps.library.emptyTrash()
         drawLine()
