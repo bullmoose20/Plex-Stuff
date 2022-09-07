@@ -254,6 +254,12 @@ Path(TMP_DIR).mkdir(parents=True, exist_ok=True)
 if not Path(TMP_DIR).is_dir():
     log_error_and_exit(f"TMP_DIR is not a directory: {TMP_DIR}")
 
+if len(os.listdir(TMP_DIR)) > 0:
+    log_error_and_exit(f"TMP_DIR is not empty:       {TMP_DIR}")
+
+print(len(os.listdir(nonemptydirectory))) # 1
+print() # 0
+
 PLEX_URL = os.getenv("PLEX_URL")
 if PLEX_URL is None:
     log_error_and_exit("PLEX_URL is not defined.")
