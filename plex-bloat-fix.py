@@ -23,6 +23,12 @@ SUMMARY_HEADER_WIDTH = 45
 LINE_WIDTH = 71
 SEP_CHAR = '#'
 
+env_is_here = os.path.isfile('.env')
+
+if not env_is_here:
+    print('Configuration file [.env] is not here.  Exiting.')
+    exit()
+
 load_dotenv()
 
 ####################################################################
@@ -247,6 +253,12 @@ Path(TMP_DIR).mkdir(parents=True, exist_ok=True)
 
 if not Path(TMP_DIR).is_dir():
     log_error_and_exit(f"TMP_DIR is not a directory: {TMP_DIR}")
+
+if len(os.listdir(TMP_DIR)) > 0:
+    log_error_and_exit(f"TMP_DIR is not empty:       {TMP_DIR}")
+
+print(len(os.listdir(nonemptydirectory))) # 1
+print() # 0
 
 PLEX_URL = os.getenv("PLEX_URL")
 if PLEX_URL is None:
