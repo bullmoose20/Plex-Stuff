@@ -118,7 +118,7 @@ def undo_rename():
     sys.exit()
 
 def clear_tmp():
-    log_line("STATUS:",f"Deleting all files in PLEX DB download directory: {TMP_DIR}...")
+    log_line("STATUS:",f"Deleting all files in PLEX DB download directory: {TMP_DIR}")
     files = glob.glob(f"{TMP_DIR}/*")
     for f in files:
         os.remove(f)
