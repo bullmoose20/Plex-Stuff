@@ -24,7 +24,7 @@ All these PYTHON scripts use the same `.env` and requirements. The Unraid bash s
 PLEX_URL=https://plex.domain.tld                # URL for Plex; can be a domain or IP:PORT
 PLEX_TOKEN=PLEX-TOKEN                           # https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/
 NOTIFIARR_ENABLED=0                             # Set to 1 to enable notifiarr
-NOTIFIARR_KEY=NOTIFIARR_KEY                     # Add notifiarr key as per the pass through integration on notifiarr.com
+NOTIFIARR_KEY=NOTIFIARR_KEY                     # Add notifiarr key as per the PASSTHOUGH integration on notifiarr.com
 DISCORD_CHANNEL=DISCORD_CHANNEL                 # Add the discord channel number associated to the channel that you want to send messages to
 DELETE=0                                        # DELETE=1 will perform the delete. This is PERMANENT. UNDO will NOT restore. 0 is safemode
 RENAME=0                                        # RENAME=1 will perform a rename of the files that would be deleted to append ".jpg". Can be undone by setting UNDO=1
@@ -78,7 +78,7 @@ Or however you've mounted those directories.
 
 ## plex-bloat-fix
 
-Your PLEX folders are growing out of control. You use overlays from PMM or upload lots of custom art that you no longer want to use or need to eliminate. You don't want to perform the plex dance if you can avoid it. This script will free up gigs of space....It can also perform some PLEX operations like "empty trash", "clean bundles", and "optimize db". PBF also supports the use of pass through alerts to discord with notifiarr.com
+Your PLEX folders are growing out of control. You use overlays from PMM or upload lots of custom art that you no longer want to use or need to eliminate. You don't want to perform the plex dance if you can avoid it. This script will free up gigs of space....It can also perform some PLEX operations like "empty trash", "clean bundles", and "optimize db". PBF also supports the use of PASSTHROUGH alerts to discord with notifiarr.com
 
 ### Usage
 1. setup as above
