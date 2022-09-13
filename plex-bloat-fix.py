@@ -5,7 +5,7 @@
 # python-dotenv
 # SQLAlchemy
 
-__version__ = "1.3.4"
+__version__ = "1.3.5"
 from xmlrpc.client import Boolean
 from operator import itemgetter, attrgetter
 from plexapi.server import PlexServer
@@ -676,7 +676,8 @@ try:
     s_data["grand_total"] = True
 
     report_summary(s_data)
-    
+    send_notifiarr("INFO", color_g, "PBF complete", "N/A", "N/A", "N/A", "N/A", "INFO", "PBF Plex Bloat Fix has completed")
+
 except:
     logging.exception(f"Exception raised")
     raise
