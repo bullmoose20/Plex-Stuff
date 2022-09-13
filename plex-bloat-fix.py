@@ -5,13 +5,15 @@
 # python-dotenv
 # SQLAlchemy
 
-__version__ = "1.3.3"
+__version__ = "1.3.4"
 from xmlrpc.client import Boolean
 from operator import itemgetter, attrgetter
 from plexapi.server import PlexServer
 from pathlib import Path
 import os, sys, sqlite3, glob, time, logging, platform, logging.handlers, shutil
 import urllib.request
+import json
+import requests
 from os import walk
 from urllib.parse import urlparse
 from dotenv import load_dotenv
@@ -22,6 +24,9 @@ HEADER_WIDTH = 20
 SUMMARY_HEADER_WIDTH = 45
 LINE_WIDTH = 71
 SEP_CHAR = '#'
+color_g = "00ff00"
+color_y = "FFFF00"
+color_r = "FF0000"
 
 env_is_here = os.path.isfile('.env')
 
@@ -67,6 +72,69 @@ logging.getLogger().addHandler(logging.StreamHandler())
 ####################################################################
 # FUNCTIONS
 ####################################################################
+def send_notifiarr (msg_type, color, text_msg, f1_title, f1_msg, f2_title, f2_msg, f3_title, f3_msg):
+  if NOTIFIARR_ENABLED != 1:
+    return
+  base_url = "https://notifiarr.com/api/v1/"
+  dev_url = "https://dev.notifiarr.com/api/v1/"
+  notifiarr_channel = "notification/passthrough/"
+  notifiarr_key = NOTIFIARR_KEY
+  discord_channel = DISCORD_CHANNEL
+  url = base_url+notifiarr_channel+notifiarr_key
+  inline1 = bool(1)
+  inline2 = bool(1)
+  inline3 = bool(0)
+  #print(url)
+  logo = "https://raw.githubusercontent.com/bullmoose20/Plex-Stuff/master/pbf.png"
+
+  json_string = {
+      'notification': {
+          'name': 'PBF: '+msg_type,
+          'event': '0'
+      },
+      'discord': {
+          'color': color,
+          'images': {
+              'thumbnail': logo,
+              'image': ''
+          },
+          'text': {
+              'title': '',
+              'content': '',
+              'description': text_msg,
+              'fields': [
+                  {
+                      'title': f1_title,
+                      'text': f1_msg,
+                      'inline': inline1
+                  },
+                  {
+                      'title': f2_title,
+                      'text': f2_msg,
+                      'inline': inline2
+                  },
+                  {
+                      'title': f3_title,
+                      'text': f3_msg,
+                      'inline': inline3
+                  }
+              ],
+              'footer': ''
+          },
+          'ids': {
+              'channel': discord_channel
+          }
+      }
+  }
+
+
+  # Serializing json
+  json_object = json.dumps(json_string, indent=2)
+  # print(json_object)
+ 
+  r = requests.post(url, json_object)
+  if r.status_code != 200:
+    log_error(f"Status Code: {r.status_code}, Response: {r.json()}")
 
 def chk_ver():
     url = "https://raw.githubusercontent.com/bullmoose20/Plex-Stuff/master/version.txt"
@@ -76,8 +144,8 @@ def chk_ver():
         remote_ver = line.decode("utf-8")
 
     if __version__ != remote_ver:
-        drawLine()
         log_line("# UPGRADE",f"Current Ver:{__version__} New Ver:{remote_ver} ")
+        send_notifiarr("WARNING", color_y, "PBF Upgrade Recommended", "Current Ver:", f"{__version__}", "New Ver:", f"{remote_ver}", "WARNING", "Maybe consider updating your version of plex-bloat-fix")
     
 def log_line(header, msg):
     logging.info(f'{header : <{HEADER_WIDTH}}{msg}')
@@ -164,31 +232,46 @@ def report_summary(s_data):
         summary_line(f"{SECTION} Metadata files {del_txt}:", f"{s_data['meta_ct_delete']}")
         summary_line(f"{SECTION} Metadata size:", f"{format_bytes(s_data['meta_size_total'])}")
         summary_line(f"{SECTION} Metadata files:", f"{s_data['meta_ct_total']}")
+        send_notifiarr("INFO", color_g, "PBF Summary", "Results:", f"{SECTION} elapsed time: "+f"{s_data['stopwatch']:.2f} seconds", f"{SECTION} Metadata size: "+f"{format_bytes(s_data['meta_size_total'])}", f"{SECTION} Metadata {del_txt}: "+f"{format_bytes(s_data['meta_size_delete'])}", f"{SECTION} Metadata files: "+f"{s_data['meta_ct_total']}", f"{SECTION} Metadata files {del_txt}: "+f"{s_data['meta_ct_delete']}")
         if s_data["name"] == "PhotoTranscoder":
             summary_line(f"PhotoTranscoder data {tc_del_txt}:", f"{format_bytes(s_data['tc_size_delete'])}")
             summary_line(f"PhotoTranscoder files {tc_del_txt}:", f"{s_data['tc_ct_delete']}")
+            send_notifiarr("INFO", color_g, "PBF Summary", "Results:", f"{SECTION} elapsed time: "+f"{s_data['stopwatch']:.2f} seconds", "SIZE:", f"PhotoTranscoder data {tc_del_txt}:"+f"{format_bytes(s_data['tc_size_delete'])}", "FILES:", f"PhotoTranscoder files {tc_del_txt}: "+f"{s_data['tc_ct_delete']}")
         if s_data["grand_total"]:
             summary_line(f"Overall PhotoTranscoder data {tc_del_txt}:", f"{format_bytes(s_data['tc_size_delete'])}")
             summary_line(f"Overall PhotoTranscoder files {tc_del_txt}:", f"{s_data['tc_ct_delete']}")
             summary_line(f"{SECTION} data {del_txt}:", f"{format_bytes(s_data['tc_size_delete'] + s_data['meta_size_delete'])}")
             summary_line(f"{SECTION} files {del_txt}:", f"{s_data['meta_ct_delete'] + s_data['tc_ct_delete']}")
+            send_notifiarr("INFO", color_g, "PBF Overall Summary", "Results:", f"{SECTION} elapsed time: "+f"{s_data['stopwatch']:.2f} seconds.\n"+f"{SECTION} Plex bloat factor: "+"{:.2%}".format(s_data['pct_bloat']), f"Overall PhotoTranscoder data {tc_del_txt}: "+f"{format_bytes(s_data['tc_size_delete'])}", f"Overall PhotoTranscoder files {tc_del_txt}: "+f"{s_data['tc_ct_delete']}", f"{SECTION} data {del_txt}: "+f"{format_bytes(s_data['tc_size_delete'] + s_data['meta_size_delete'])}", f"{SECTION} files {del_txt}: "+f"{s_data['meta_ct_delete'] + s_data['tc_ct_delete']}")
         summary_line(f"{SECTION} Plex bloat factor:", "{:.2%}".format(s_data['pct_bloat']))
         drawLine()
+    else:
+        send_notifiarr("INFO", color_g, "PBF Summary", "Results:", f"NO FILES FOUND IN: {SECTION}", "SIZE:", "N/A", "FILES:", "N/A")
 
 if sys.version_info.major != 3:
     print('This script requires Python 3.  Exiting.')
     exit()
 
-chk_ver()
-
 drawLine()
 log_line("# BEGIN",f"Ver:{__version__} ")
 drawLine()
-log_line(f"Log file:",f"{LOG_FILENAME} created...")
 
 ####################################################################
 # VARS
 ####################################################################
+
+try:
+    NOTIFIARR_ENABLED = Boolean(int(os.getenv("NOTIFIARR_ENABLED")))
+except:
+    NOTIFIARR_ENABLED = False
+
+NOTIFIARR_KEY = os.getenv("NOTIFIARR_KEY")
+if NOTIFIARR_ENABLED and NOTIFIARR_KEY is None:
+    log_error_and_exit("NOTIFIARR_KEY is not defined.")
+
+DISCORD_CHANNEL = os.getenv("DISCORD_CHANNEL")
+if NOTIFIARR_ENABLED and DISCORD_CHANNEL is None:
+    log_error_and_exit("DISCORD_CHANNEL is not defined.")
 
 try:
     TC_DEL = Boolean(int(os.getenv("TC_DEL")))
@@ -235,6 +318,11 @@ try:
 except:
     SLEEP = 60
 
+send_notifiarr("INFO", color_g, "PBF started", "N/A", "N/A", "N/A", "N/A", "INFO", "PBF Plex Bloat Fix has started")
+chk_ver()
+drawLine()
+log_line(f"Log file:",f"{LOG_FILENAME} created...")
+
 DB_PATH = os.getenv("DB_PATH")
 local_run = os.path.isdir(DB_PATH)
 
@@ -245,12 +333,15 @@ else:
 
 TC_PATH = os.getenv("TC_PATH")
 if "PhotoTranscoder" not in TC_PATH and TC_DEL:
+    send_notifiarr("ERROR", color_r, "PBF PhotoTranscoder path issue", "Issue:", "PhotoTranscoder not found in path", "Detail:", TC_PATH, "ERROR", "TC_PATH is not a standard PhotoTranscoder directory.")
     log_error_and_exit("TC_PATH is not a standard PhotoTranscoder directory.")
 if not Path(TC_PATH).is_dir():
+    send_notifiarr("ERROR", color_r, "PBF PhotoTranscoder path issue", "Issue:", "TC_PATH is not a directory", "Detail:", TC_PATH, "ERROR", "TC_PATH is not a directory. Update the .env file with a proper directory")
     log_error_and_exit(f"TC_PATH is not a directory: {TC_PATH}")
 
 DIR_PATH = os.getenv("DIR_PATH")
 if not Path(DIR_PATH).is_dir():
+    send_notifiarr("ERROR", color_r, "PBF Metadata path issue", "Issue:", "DIR_PATH is not a directory", "Detail:", DIR_PATH, "ERROR", "DIR_PATH is not a directory. Update the .env file with a proper directory")
     log_error_and_exit(f"DIR_PATH is not a directory: {DIR_PATH}")
 
 TMP_DIR = os.getenv("TMP_DIR")
@@ -258,17 +349,21 @@ TMP_DIR = os.getenv("TMP_DIR")
 Path(TMP_DIR).mkdir(parents=True, exist_ok=True)
 
 if not Path(TMP_DIR).is_dir():
+    send_notifiarr("ERROR", color_r, "PBF temp directory path issue", "Issue:", "TMP_DIR is not a directory", "Detail:", TMP_DIR, "ERROR", "TMP_DIR is not a directory. Update the .env file with a proper directory")
     log_error_and_exit(f"TMP_DIR is not a directory: {TMP_DIR}")
 
 if len(os.listdir(TMP_DIR)) > 0:
+    send_notifiarr("ERROR", color_r, "PBF temp directory not empty", "Issue:", "TMP_DIR is not empty", "Detail:", TMP_DIR, "ERROR", "TMP_DIR is not empty. Navigate to this directory and ensure it is empty")
     log_error_and_exit(f"TMP_DIR is not empty:       {TMP_DIR}")
 
 PLEX_URL = os.getenv("PLEX_URL")
 if PLEX_URL is None:
+    send_notifiarr("ERROR", color_r, "PBF plex url is missing", "Issue:", "PLEX_URL is not defined", "N/A", "N/A", "ERROR", "PLEX_URL is missing. You will need to update the .env with a url to PLEX")
     log_error_and_exit("PLEX_URL is not defined.")
 
 PLEX_TOKEN = os.getenv("PLEX_TOKEN")
 if PLEX_TOKEN is None:
+    send_notifiarr("ERROR", color_r, "PBF plex token is missing", "Issue:", "PLEX_TOKEN is not defined", "N/A", "N/A", "ERROR", "PLEX_TOKEN is missing. You will need to update the .env with the token for PLEX")
     log_error_and_exit("PLEX_TOKEN is not defined.")
 
 dbpath = ""
@@ -314,6 +409,7 @@ log_line(f"TC_PATH:",f"{TC_PATH}")
 log_line(f"DB_PATH:",f"{DB_PATH}")
 
 if RENAME and DELETE:
+    send_notifiarr("ERROR", color_r, "PBF config is ambiguous", "Issue:", "RENAME and DELETE are both set; this config is ambiguous, please choose one or the other.", "N/A", "N/A", "ERROR", "PLEX_TOKEN is missing. You will need to update the .env with the token for PLEX")
     log_error_and_exit(f"RENAME and DELETE are both set; this config is ambiguous, please choose one or the other.")
 elif DELETE:
     log_line(f"DELETE:","PBF will delete files within the Metadata directories WITHOUT UNDO.")
@@ -407,11 +503,12 @@ try:
     end = time.time()
     stopwatch = end - start
     if not local_run:
+        send_notifiarr("INFO", color_g, "PBF Plex DB transfer", "Info:", f"Download completed: "+f"{stopwatch:.2f} seconds", "N/A", "N/A", "N/A", "N/A")
         log_line(f"Download completed:",f"{stopwatch:.2f} seconds")
     else:
+        send_notifiarr("INFO", color_g, "PBF Plex DB transfer", "Info:", f"Copy completed: "+f"{stopwatch:.2f} seconds", "N/A", "N/A", "N/A", "N/A")
         log_line(f"Copy completed:",f"{stopwatch:.2f} seconds")
 	
-
     ####################################################################
     # Find the downloaded PLEX DB
     ####################################################################
@@ -431,8 +528,8 @@ try:
             conn = sqlite3.connect(f"{db_path}")
             log_line(f"STATUS:",f"Opened database successfully")
         else:
-            log_line(f"ERROR:",f"Database cannot be found")
-            exit()
+            send_notifiarr("ERROR", color_r, "PBF Plex DB issue", "Issue:", "Database cannot be found", "N/A", "N/A", "N/A", "N/A")
+            log_error_and_exit(f"ERROR:",f"Database cannot be found")
 
         log_line(f"STATUS:",f"Executing {SQLCMD1}")
         cursor1 = conn.execute(SQLCMD1)
@@ -440,9 +537,8 @@ try:
         cursor2 = conn.execute(SQLCMD2)
         BLOAT_RUN = True
     else:
-        log_error(
-            f"no extracted database found in: {TMP_DIR}"
-        )
+        send_notifiarr("ERROR", color_r, "PBF Plex DB issue", "Issue:", f"No extracted database found in: {TMP_DIR}. Try to download manually in PLEX and look at logs for any errors. If the downloaded file is a 22kb zip file, there maybe PLEX db issue to address. PBF will continue, though nothing will be deleted from the Metadata subdirectories.", "N/A", "N/A", "N/A", "N/A")
+        log_error(f"No extracted database found in: {TMP_DIR}")
         log_line("",f"Try to download manually in PLEX and look at logs for any errors")
         log_line("",f"If the downloaded file is a 22kb zip file, there maybe PLEX db issue to address.")
         log_line("",f"PBF will continue, though nothing will be deleted from the Metadata subdirectories.")
