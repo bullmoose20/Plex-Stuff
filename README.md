@@ -33,6 +33,7 @@ TMP_DIR=path\to\tmp_dir\                        # Temporary directory (SHOULD BE
 DIR_PATH=path\to\Metadata\                      # path to the Metadata directory in PLEX where the Movies and TV Shows subfolders are found. Local for best perf but can be mounted
 TC_PATH=path\to\PhotoTranscoder\                # path to the PhotoTranscoder folder where client thumbnails are stored and rarely if ever get deleted
 DB_PATH=path\to\Plex\Plug-in Support\Databases\ # path to the PLEX db folder
+PREVIEWS_PATH=\path\to\Plex\Media\localhost\     # path to the plex preview thumbnails folder
 TC_DEL=0                                        # set TC_DEL=1 and the script will delete files found in the Cache\PhotoTranscoder directory. UNDO will not undo this action. 
 SLEEP=60                                        # set SLEEP=60 to add a 60 second delay between the EMPTY_TRASH, CLEAN_BUNDLES, and OPTIMIZE PLEX operations
 EMPTY_TRASH=0                                   # set EMPTY_TRASH=1 and the script will run the EMPTY TRASH operation in PLEX
@@ -47,6 +48,7 @@ TMP_DIR=path\to\tmp_dir\
 DIR_PATH=path\to\Metadata\
 TC_PATH=path\to\PhotoTranscoder\
 DB_PATH=path\to\Plex\Plug-in Support\Databases\
+PREVIEWS_PATH=\path\to\Plex\Media\localhost\
 ```
 
 These paths are all local to the machine where the script is running.  If your Plex server is a different machine from the one running the script, you will need to mount the relevant folders from the Plex server to this machine, then these paths will get set to the local mount location.
@@ -56,6 +58,7 @@ For example, your Plex server is running on a Linux box somewhere.  On your Plex
 DIR_PATH=/opt/plex/Library/Application Support/Plex Media Server/Metadata
 DB_PATH=/opt/plex/Library/Application Support/Plex Media Server/Plug-in Support/Databases
 TC_PATH=/opt/plex/Library/Application Support/Plex Media Server/Cache/PhotoTranscoder
+PREVIEWS_PATH=/opt/plex/Library/Application Support/Plex Media Server/Media/localhost
 ```
 If you run `plex-bloat-fix.py` on that machine, those are correct.
 
@@ -71,6 +74,7 @@ Or however you've mounted those directories.
 
 ## Scripts:
 1. [plex-bloat-fix.py](#plex-bloat-fix) - removes unneeded image files (Posters/Title Cards) from plex
+1. [plex-find-missing-previews.py](#plex-find-missing-previews) - finds files which are missing generated preview thumbnails.
 2. [plexdance.sh](#plexdance) - Unraid script to automate the full plexdance
 3. [process-tcards.cmd](#process-tcards) - Windows script to create properly sized PLEX titlecards to use with TCM or for other purposes
 4. [pumpanddump.sh](#pumpanddump) - Unraid script to automate the plex db repair when using hotio plex container
@@ -225,3 +229,14 @@ This script will go through the current directory and 10 levels down (if needed)
 3. Open a terminal session and navigate to that folder with the script and run: `chmod 755 chk-video-codec.sh` to make it executable
 4. Goto the media folder that you want to scan and run `/mnt/user/data/scripts/plex-scripts/chk-video-codec/chk-video-codec.sh`
 5. 3 log files will be created. Review them to see the results
+
+## Find missing previews
+
+This script will go through your libraries and will find items which are missing preview thumbnails. If you find missing items you can try disabling `GenerateBIFKeyframesOnly` in the [plex advanced settings](https://support.plex.tv/articles/201105343-advanced-hidden-server-settings/). Note: this will slow down generating preview thumbnails significantly.
+
+### Usage
+
+1. Copy the script into `/mnt/user/data/scripts/plex-scripts/plex-find-missing-previews` folder (or any other unraid scripts folder you use) 
+2. Review the `PREVIEWS_PATH` environment variable.
+3. Open a terminal session and navigate to that folder with the script and run `python3 plex-fin-missing-previews.py`
+4. Any missing previews will be listed in your terminal.
