@@ -265,18 +265,23 @@ PARAMETERS:
 
 EXAMPLES:
 Create a poster with the Spotify.png logo and random background color with a black border that is 50 px wide. Temp files are deleted because "-clean 1"
+
 `.\create_poster.ps1 -logo .\logos\Spotify.png -clean 1 -border_width 50 -border_color "#000000" -border 1`
 
 Create a poster with the Spotify.png logo and random background color with a white border that is 15 px wide. Temp files are deleted because "-clean 1". Defaults of WHITE and Border width 15 are used
+
 `.\create_poster.ps1 -logo .\logos\Spotify.png -clean 1 -border 1`
 
 Create a poster with the Spotify.png logo and a black background color. Temp files are deleted because "-clean 1".
+
 `.\create_poster.ps1 -logo .\logos\Spotify.png -base "#000000" -clean 1`
 
 Create a poster with the Spotify.png and random background color. Temp files are deleted because "-clean 1".
+
 `.\create_poster.ps1 -logo .\logos\Spotify.png -clean 1`
 
 Create a poster with the Spotify.png and specified background color of "#FB19B9". Temp files are deleted because "-clean 1". border is enabled and width of 20px. Logo is moved up from the center by -750px.
+
 `.\create_poster.ps1 -logo .\logos\Spotify.png -clean 1 -base "#FB19B9" -offset -750 -border_width 20 -border 1`
 
 ![](images/create_poster-example1.png)
