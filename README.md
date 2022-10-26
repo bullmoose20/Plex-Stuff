@@ -77,6 +77,7 @@ Or however you've mounted those directories.
 5. [chk-video-codec.sh](#chk-video-codec) - Unraid script to find and sort files that have been converted to HEVC/H265 and those that have not been
 6. [create_poster.ps1](#create_poster) - Powershell script to create posters/images for PMM/PLEX/EMBY/JELLYFIN/OTHER
 7. [advanced-plex-edits.py](#advanced-plex-edits) - Sets your plex collections to default and then to hide in case your PMM separator blank collections continue to show
+8. [get_missing_people.ps1](#get-missing-people) - Scans your PMM meta* logs to find missing people posters to download and create the bw, rainier, orig, etc. style poster for PMM/PLEX/EMBY/JELLYFIN/OTHER
 
 ## plex-bloat-fix
 
@@ -315,3 +316,30 @@ When you use blank collections in PLEX through PMM, if the separators continue t
 
 ### EXAMPLES
 ![](images/advanced-plex-edits-example1.png)
+
+## get_missing_people
+
+This Powershell script will create posters/images for PMM/PLEX/EMBY/JELLYFIN/OTHER
+
+### DESCRIPTION
+
+In a powershell window and with ImageMagick installed, this will 
+1. create a 2000x3000 colored poster based on $base_color parameter otherwise a random color for base is used and creates base_$base_color.jpg
+2. it will add the gradient in the second line to create a file called gradient_$base_color.jpg
+3. takes the $logo specified and sizes it 1800px (or whatever desired logo_size specified) wide leaving 100 on each side as a buffer of space
+4. if a border is specified, both color and size of border will be applied
+5. if text is desired it will be added to the final result with desired size, color and font
+6. if white-wash is enabled, the colored logo with be made to 100% white
+7. final results are a logo centered and merged to create a 2000x3000 poster with the $base_color color and gradient fade applied and saved as a jpg file (with an optional border of specified width and color and logo offset, as well as text, font, font_color, and font_size )
+ 
+### REQUIREMENTS
+
+Powershell security settings: https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_execution_policies?view=powershell-7.2
+
+### PARAMETERS
+`-metalog_location`          (specify the logo/image png file that you want to have centered and resized)
+
+### EXAMPLES
+Create a poster with the Spotify.png logo and random background color with a black border that is 50 px wide. Temp files are deleted because "-clean 1"
+
+`.\get_missing_people.ps1 -logo .\logos\Spotify.png -clean 1 -border_width 50 -border_color "#000000" -border 1`
