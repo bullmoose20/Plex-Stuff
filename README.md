@@ -338,3 +338,5 @@ Powershell security settings: https://learn.microsoft.com/en-us/powershell/modul
 Run script against the \\NZWHS01\appdata\Plex-Meta-Manager\logs folder
 
 `.\get_missing_people.ps1 -metalog_location \\NZWHS01\appdata\Plex-Meta-Manager\logs`
+
+![](images/get_people_posters-example1.png)
