@@ -75,6 +75,7 @@ Or however you've mounted those directories.
 3. [process-tcards.cmd](#process-tcards) - Windows script to create properly sized PLEX titlecards to use with TCM or for other purposes
 4. [pumpanddump.sh](#pumpanddump) - Unraid script to automate the plex db repair when using hotio plex container
 5. [chk-video-codec.sh](#chk-video-codec) - Unraid script to find and sort files that have been converted to HEVC/H265 and those that have not been
+6. [create_poster.ps1](#create_poster) - Powershell script to create posters/images for PMM/PLEX/EMBY/JELLYFIN/OTHER
 
 ## plex-bloat-fix
 
@@ -225,3 +226,58 @@ This script will go through the current directory and 10 levels down (if needed)
 3. Open a terminal session and navigate to that folder with the script and run: `chmod 755 chk-video-codec.sh` to make it executable
 4. Goto the media folder that you want to scan and run `/mnt/user/data/scripts/plex-scripts/chk-video-codec/chk-video-codec.sh`
 5. 3 log files will be created. Review them to see the results
+
+## create_poster
+
+This script will go through the current directory and 10 levels down (if needed) to determine which files have been converted to HEVC/H265 and those that have not been.
+
+### Usage
+DESCRIPTION: 
+In a powershell window and with ImageMagick installed, this will 
+1 - create a 2000x3000 colored poster based on $base_color parameter otherwise a random color for base is used and creates base_$base_color.jpg
+2 - it will add the gradient in the second line to create a file called gradient_$base_color.jpg
+3 - takes the $logo specified and sizes it 1800px (or whatever desired logo_size specified) wide leaving 100 on each side as a buffer of space
+4 - if a border is specified, both color and size of border will be applied
+5 - if text is desired it will be added to the final result with desired size, color and font
+6 - if white-wash is enabled, the colored logo with be made to 100% white
+7 - final results are a logo centered and merged to create a 2000x3000 poster with the $base_color color and gradient fade applied and saved as a jpg file (with an optional border of specified width and color and logo offset, as well as text, font, font_color, and font_size )
+ 
+REQUIREMENTS:
+Imagemagick must be installed - https://imagemagick.org/script/download.php
+font must be installed on system and visible by Imagemagick. Make sure that you install the ttf font for ALL users as an admin so ImageMagick has access to the font when running (r-click on font Install for ALL Users in Windows)
+Powershell security settings: https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_execution_policies?view=powershell-7.2
+
+PARAMETERS:
+-logo          (specify the logo/image png file that you want to have centered and resized)
+-logo_offset   (+100 will push logo down 100 px from the center. -100 will move the logo up 100px from the center. Value is between -1500 and 1500. DEFAULT=0 or centered. -750 is the midpoint between the center and the top)
+-logo_resize   (1000 will resize the log to fit in the poster.DEFAULT=1800.)
+-base_color    (hex color code for the base background. If omitted a random color will be picked using the "#xxxxxx" format)
+-text          (text that you want to show on the resulting image. use \n to perform a carriage return and enclose text in double quotes.)
+-text_offset   (+100 will push text down 100 px from the center. -100 will move the text up 100px from the center. Value is between -1500 and 1500. DEFAULT=0 or centered. +750 is the midpoint between the center and the bottom)
+-font          (font name that you want to use. magick identify -list font magick -list font)
+-font_color    (hex color code for the font. If omitted, white or #FFFFFF will be used)
+-font_size     (default is 250. pick a font size between 10-500.)
+-border        (default is 0 or $false - boolean value and when set to 1 or $true, it will add the border)
+-border_width  (width in pixels between 1 and 100. DEFAULT=15)
+-border_color  (hex color code for the border color using the "#xxxxxx" format. DEFAULT=#FFFFFF)
+-white_wash    (default is 0 or $false - boolean value and when set to 1 or $true, it will take the logo and make it white)
+-clean         (default is 0 or $false - boolean value and when set to 1 or $true, it will delete the temporary files that are created as part of the script)
+
+EXAMPLES:
+Create a poster with the Spotify.png logo and random background color with a black border that is 50 px wide. Temp files are deleted because "-clean 1"
+`.\create_poster.ps1 -logo .\logos\Spotify.png -clean 1 -border_width 50 -border_color "#000000" -border 1`
+
+Create a poster with the Spotify.png logo and random background color with a white border that is 15 px wide. Temp files are deleted because "-clean 1". Defaults of WHITE and Border width 15 are used
+`.\create_poster.ps1 -logo .\logos\Spotify.png -clean 1 -border 1`
+
+Create a poster with the Spotify.png logo and a black background color. Temp files are deleted because "-clean 1".
+`.\create_poster.ps1 -logo .\logos\Spotify.png -base "#000000" -clean 1`
+
+Create a poster with the Spotify.png and random background color. Temp files are deleted because "-clean 1".
+`.\create_poster.ps1 -logo .\logos\Spotify.png -clean 1`
+
+Create a poster with the Spotify.png and specified background color of "#FB19B9". Temp files are deleted because "-clean 1". border is enabled and width of 20px. Logo is moved up from the center by -750px.
+`.\create_poster.ps1 -logo .\logos\Spotify.png -clean 1 -base "#FB19B9" -offset -750 -border_width 20 -border 1`
+
+![](images/create_poster-example1.png)
+![](images/create_poster-example2.png)
