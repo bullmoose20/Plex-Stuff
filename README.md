@@ -306,7 +306,7 @@ Create a poster with the Spotify.png and specified background color of "#FB19B9"
 
 ## advanced-plex-edits
 
-When you use blank collections in PLEX through PMM, the separators continue to show up. If they do, run this after PMM completes the run to unhide and hide teh collections
+When you use blank collections in PLEX through PMM, if the separators continue to show up in the library tab as shown below, even if you have hide_collections enabled, run this after PMM completes the run to unhide and hide the collections
 
 ### Usage
 1. setup as above
