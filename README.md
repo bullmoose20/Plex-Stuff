@@ -310,5 +310,8 @@ When you use blank collections in PLEX through PMM, the separators continue to s
 
 ### Usage
 1. setup as above
-2. Run with `python advanced-plex-edits.py` - sometimes (usually when you have not setup the virtualenv for python as recommended above), you need to specify the version of python in the command like `python3.9 plex-bloat-fix.py`
-3. Make sure that you are NOT actively updating posters or title cards with PMM or TCM while running this script. Schedule this after the last run happens. So TCM, Plex Scheduled Tasks, PMM, THEN schedule or run plex-bloat-fix.py. Example: TCM @ 00:00, PLEX @ 02:00-05:00, and PMM @ 05:00
+2. Run with `python advanced-plex-edits.py` - sometimes (usually when you have not setup the virtualenv for python as recommended above), you need to specify the version of python in the command like `python3.9 advanced-plex-edits.py`
+3. Make sure that you are NOT actively updating posters or title cards with PMM or TCM while running this script. Schedule this after the last run happens. So TCM, Plex Scheduled Tasks, PMM, THEN schedule or run advanced-plex-edits.py. Example: TCM @ 00:00, PLEX @ 02:00-05:00, and PMM @ 05:00
+
+### EXAMPLES
+![](images/advanced-plex-edits-example1.png)
