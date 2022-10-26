@@ -76,6 +76,7 @@ Or however you've mounted those directories.
 4. [pumpanddump.sh](#pumpanddump) - Unraid script to automate the plex db repair when using hotio plex container
 5. [chk-video-codec.sh](#chk-video-codec) - Unraid script to find and sort files that have been converted to HEVC/H265 and those that have not been
 6. [create_poster.ps1](#create_poster) - Powershell script to create posters/images for PMM/PLEX/EMBY/JELLYFIN/OTHER
+7. [advanced-plex-edits.py](#advanced-plex-edits) - Sets your plex collections to default and then to hide in case your PMM separator blank collections continue to show
 
 ## plex-bloat-fix
 
@@ -302,3 +303,12 @@ Create a poster with the Spotify.png and specified background color of "#FB19B9"
 
 ![](images/create_poster-example1.png)
 ![](images/create_poster-example2.png)
+
+## advanced-plex-edits
+
+When you use blank collections in PLEX through PMM, the separators continue to show up. If they do, run this after PMM completes the run to unhide and hide teh collections
+
+### Usage
+1. setup as above
+2. Run with `python advanced-plex-edits.py` - sometimes (usually when you have not setup the virtualenv for python as recommended above), you need to specify the version of python in the command like `python3.9 plex-bloat-fix.py`
+3. Make sure that you are NOT actively updating posters or title cards with PMM or TCM while running this script. Schedule this after the last run happens. So TCM, Plex Scheduled Tasks, PMM, THEN schedule or run plex-bloat-fix.py. Example: TCM @ 00:00, PLEX @ 02:00-05:00, and PMM @ 05:00
