@@ -36,7 +36,6 @@ if (-not(Test-Path -Path $metalog_location)) {
 #################################
 # collect paths
 #################################
-
 $script_path = $PSScriptRoot
 $scriptName = $MyInvocation.MyCommand.Name
 $scriptLog = Join-Path $script_path -ChildPath "$scriptName.log"
@@ -46,8 +45,10 @@ $outputfile = Join-Path $metalog_location -ChildPath "step1_download_"
 $dds = Join-Path $download_dir ''
 $mls = Join-Path $metalog_location ''
 
-Function WriteToLogFile ($message)
-{
+#################################
+# WriteToLogFile function
+#################################
+Function WriteToLogFile ($message) {
     Add-content $scriptLog -value ((Get-Date).ToString() + " ~ " + $message)
     Write-Host ((Get-Date).ToString() + " ~ " + $message)
 }
