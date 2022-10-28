@@ -52,6 +52,10 @@ if (-not(Test-Path -Path $metalog_location)) {
 $global:Counter1=0
 $global:Counter2=0
 $global:Counter3=0
+$global:Counter4=0
+$global:Counter5=0
+$global:Counter6=0
+$global:Counter7=0
 
 #################################
 # collect paths
@@ -451,6 +455,10 @@ if($flgExit){
 #################################
 Function Image-Check {
 
+  $imageW = magick identify -format "%w" $filepre
+  $imageH = magick identify -format "%h" $filepre
+  $imageRatio = [math]::Round($imageW/$imageH,4)
+
   # Find if image is grayscale
   $theString = magick identify -verbose $filepre | Select-String -Pattern Type: -CaseSensitive
   $found=$theString | Select-String -Pattern 'Gray' -CaseSensitive -SimpleMatch
@@ -473,7 +481,30 @@ Function Image-Check {
    $global:Counter3++
    WriteToLogFile "WARNING                      : WARNING3!~$filepre~$noextension is most likely a HEAD CHOP and should be reviewed and changed for a better headshot!~Headchop values~$string"
   }
+  
+  if ($baseImageRatio -eq $imageRatio) {
+  } else {
+   $global:Counter4++
+   WriteToLogFile "WARNING                      : WARNING4!~$filepre~$noextension Ratio should be $baseImageRatio, however this image is >$imageRatio<"
+  }
 
+  if ($imageW - $baseImageW -gt 0) {
+  } else {
+   $global:Counter5++
+   WriteToLogFile "WARNING                      : WARNING5!~$filepre~$noextension Quality of source could be a problem. Image width should be > $baseImageW, however this image is >$imageW< wide"
+  }
+
+  if ($imageH - $baseImageH -gt 0) {
+  } else {
+   $global:Counter6++
+   WriteToLogFile "WARNING                      : WARNING6!~$filepre~$noextension Quality of source could be a problem. Image height should be > $baseImageH, however this image is >$imageH< high"
+  }
+
+  if ($imageW -eq 2000 -and $imageH -eq 3000) {
+  } else {
+   $global:Counter7++
+   WriteToLogFile "WARNING                      : WARNING7!~$filepre~$noextension File dimensions should be 2000x3000, however this image is >$imageWx$imageH<"
+  }
 
 }
 
@@ -599,12 +630,9 @@ foreach ($filepre in $filespre)
   WriteToLogFile "Separator                    : ###################################################"
   WriteToLogFile "Working on                   : $filepre"
   WriteToLogFile "Name                         : $noextension"
-  $theString = magick identify -verbose $filepre | Select-String -Pattern Geometry: -CaseSensitive
-  $tmp = $theString -replace "  Geometry:","Geometry:"
-  WriteToLogFile "Geometry                     : $tmp"
-  $found=""
-  $found=$theString | Select-String -Pattern '2000x' -CaseSensitive -SimpleMatch
-  if (!$found) {
+  $theString = magick identify -format "%w" $filepre
+  WriteToLogFile "Geometry                     : $theString"
+  if ($theString -ne 2000) {
     WriteToLogFile "Resizing                   : $noextension"
     magick $filepre -resize 2000 $filepre
   }
@@ -691,15 +719,29 @@ WriteToLogFile $string
 $string = "WARNING3 Head Chop Total     : $global:Counter3"
 WriteToLogFile $string
 
-$tot = $global:Counter1 + $global:Counter2 + $global:Counter3
+$string = "WARNING4 Image Ratio Total   : $global:Counter4"
+WriteToLogFile $string
+
+$string = "WARNING5 Quality W Total     : $global:Counter5"
+WriteToLogFile $string
+
+$string = "WARNING6 Quality H Total     : $global:Counter6"
+WriteToLogFile $string
+
+$string = "WARNING7 2000x3000 Total     : $global:Counter7"
+WriteToLogFile $string
+
+$tot = $global:Counter1 + $global:Counter2 + $global:Counter3 + $global:Counter4 + $global:Counter5 + $global:Counter6 + $global:Counter7
+$tot_chks = $filespre.count * 7
 if ($filespre.count -gt 0) {
-   $issues_pct = [math]::Round((($tot / $filespre.count) * 100),2)
+   $issues_pct = [math]::Round((($tot / $tot_chks) * 100),2)
 } else {
    $issues_pct = [math]::Round(0,2)
 }
 $string = "Total files                  : " + ($filespre.count).ToString()
 WriteToLogFile $string 
 WriteToLogFile "Total issues                 : $tot"
+WriteToLogFile "Total checks                 : $tot_chks"
 WriteToLogFile "Percent Issues               : $issues_pct %"
 
 ###################################################
@@ -716,4 +758,3 @@ WriteToLogFile "Percent Issues               : $issues_pct %"
   }
 
 WriteToLogFile "#### END ####"
-exit
