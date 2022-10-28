@@ -78,7 +78,7 @@ Or however you've mounted those directories.
 6. [create_poster.ps1](#create_poster) - Powershell script to create posters/images for PMM/PLEX/EMBY/JELLYFIN/OTHER
 7. [advanced-plex-edits.py](#advanced-plex-edits) - Sets your plex collections to default and then to hide in case your PMM separator blank collections continue to show
 8. [get_missing_people.ps1](#get_missing_people) - Scans your PMM meta* logs to find missing people posters to download and create the bw, rainier, orig, etc. style poster for PMM/PLEX/EMBY/JELLYFIN/OTHER
-9. [create_people_posters.ps1](#create_people_posters) - Scans your PMM meta* logs to find missing people posters and will download and create the bw, rainier, orig, transparent. style poster for PMM/PLEX/EMBY/JELLYFIN/OTHER
+9. [create_people_poster.ps1](#create_people_poster) - Scans your PMM meta* logs to find missing people posters and will download and create the bw, rainier, orig, transparent. style poster for PMM/PLEX/EMBY/JELLYFIN/OTHER
 
 ## plex-bloat-fix
 
@@ -342,7 +342,7 @@ Run script against the \\NZWHS01\appdata\Plex-Meta-Manager\logs folder
 
 ![](images/get_people_posters-example1.png)
 
-## create_people_posters
+## create_people_poster
 
 This Powershell script will find and download people posters/images for PMM/PLEX/EMBY/JELLYFIN/OTHER based on the PMM meta* logs
 
@@ -371,6 +371,6 @@ If PAD not working, then dump transparent images that were 1:1.5 in ratio and re
 ### EXAMPLES
 Run script against the \\NZWHS01\appdata\Plex-Meta-Manager\logs folder
 
-`.\create_people_posters.ps1 -metalog_location \\NZWHS01\appdata\Plex-Meta-Manager\logs`
+`.\create_people_poster.ps1 -metalog_location \\NZWHS01\appdata\Plex-Meta-Manager\logs`
 
-![](images/create_people_posters-example1.png)
+![](images/create_people_poster-example1.png)
