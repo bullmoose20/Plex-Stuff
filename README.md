@@ -78,6 +78,7 @@ Or however you've mounted those directories.
 6. [create_poster.ps1](#create_poster) - Powershell script to create posters/images for PMM/PLEX/EMBY/JELLYFIN/OTHER
 7. [advanced-plex-edits.py](#advanced-plex-edits) - Sets your plex collections to default and then to hide in case your PMM separator blank collections continue to show
 8. [get_missing_people.ps1](#get_missing_people) - Scans your PMM meta* logs to find missing people posters to download and create the bw, rainier, orig, etc. style poster for PMM/PLEX/EMBY/JELLYFIN/OTHER
+9. [create_people_posters.ps1](#create_people_posters) - Scans your PMM meta* logs to find missing people posters and will download and create the bw, rainier, orig, transparent. style poster for PMM/PLEX/EMBY/JELLYFIN/OTHER
 
 ## plex-bloat-fix
 
@@ -340,3 +341,36 @@ Run script against the \\NZWHS01\appdata\Plex-Meta-Manager\logs folder
 `.\get_missing_people.ps1 -metalog_location \\NZWHS01\appdata\Plex-Meta-Manager\logs`
 
 ![](images/get_people_posters-example1.png)
+
+## create_people_posters
+
+This Powershell script will find and download people posters/images for PMM/PLEX/EMBY/JELLYFIN/OTHER based on the PMM meta* logs
+
+### DESCRIPTION
+
+1. In a powershell window this will go through all your meta*.log files created by PMM to find all missing people posters.
+2. It will create 1 .cmd file per meta.log file and run it to download the images locally
+3. It will then scan, remove the background, and produce 4 files all at 2000x3000 in size
+- bw-style
+- rainier-style
+- original-style
+- transparent
+ 
+### REQUIREMENTS
+$metalog_location=is the path to the logs directory for PMM
+
+Powershell security settings: https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_execution_policies?view=powershell-7.2
+
+Power Automate Desktop on a Windows Machine with the flow that will access Adobe Express Online to remove backgrounds in an automated fashion
+
+If PAD not working, then dump transparent images that were 1:1.5 in ratio and resized to 2000x3000 in png format and within the Downloads subdirectory
+
+### PARAMETERS
+`-metalog_location`          (specify the logs folder location for PMM)
+
+### EXAMPLES
+Run script against the \\NZWHS01\appdata\Plex-Meta-Manager\logs folder
+
+`.\create_people_posters.ps1 -metalog_location \\NZWHS01\appdata\Plex-Meta-Manager\logs`
+
+![](images/create_people_posters-example1.png)
