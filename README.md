@@ -5,6 +5,8 @@
 
 1. A system that can run Python3
 1. Python3 installed on that system
+1. Prefereable to also have a system that can run powershell
+1. Preferable to have a system that can also run Power Automate Desktop Flows
 
 ## Setup
 
