@@ -427,4 +427,3 @@ if ($clean) {
     Remove-Item -Path $wf -Force | Out-Null
   }
 }
-exit

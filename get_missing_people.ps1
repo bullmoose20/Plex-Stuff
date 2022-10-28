@@ -114,4 +114,3 @@ ForEach ($item in $inputfile){
   }
 
 WriteToLogFile "#### END ####"
-exit
