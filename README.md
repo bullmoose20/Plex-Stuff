@@ -80,7 +80,8 @@ Or however you've mounted those directories.
 6. [create_poster.ps1](#create_poster) - Powershell script to create posters/images for PMM/PLEX/EMBY/JELLYFIN/OTHER
 7. [advanced-plex-edits.py](#advanced-plex-edits) - Sets your plex collections to default and then to hide in case your PMM separator blank collections continue to show
 8. [get_missing_people.ps1](#get_missing_people) - Scans your PMM meta* logs to find missing people posters to download and create the bw, rainier, orig, etc. style poster for PMM/PLEX/EMBY/JELLYFIN/OTHER
-9. [create_people_poster.ps1](#create_people_poster) - Scans your PMM meta* logs to find missing people posters and will download and create the bw, rainier, orig, transparent. style poster for PMM/PLEX/EMBY/JELLYFIN/OTHER
+9. [image_check.ps1](#image_check) - Scans your transparent images for anomalies like head-chops, backgrounds not removed, and black and white photos instead of a color photo to give you a report so you can go and fix those by uploading new and better options to https://www.themoviedb.org/
+10. [create_people_poster.ps1](#create_people_poster) - Scans your PMM meta* logs to find missing people posters and will download and create the bw, rainier, orig, transparent. style poster for PMM/PLEX/EMBY/JELLYFIN/OTHER. This script was put together by using the image_check and get_missing_people scripts all into 1
 
 ## plex-bloat-fix
 
@@ -343,6 +344,30 @@ Run script against the \\NZWHS01\appdata\Plex-Meta-Manager\logs folder
 `.\get_missing_people.ps1 -metalog_location \\NZWHS01\appdata\Plex-Meta-Manager\logs`
 
 ![](images/get_people_posters-example1.png)
+
+## image_check
+
+This Powershell script will find ...
+
+### DESCRIPTION
+
+1. In a powershell window this will go through all your images in the images folder mentioned to scan and report anomalies
+2. It will create an output log that you can review and fix issues by uploading to https://www.themoviedb.org/ and ensuring that its a primary so that when it gets downloaded, the proper image can be processed by other scripts
+ 
+### REQUIREMENTS
+$images_location=is the path to the directory with the transparent images to verify
+
+Powershell security settings: https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_execution_policies?view=powershell-7.2
+
+### PARAMETERS
+`-images_location`          (specify the images folder location for script to scan and report on)
+
+### EXAMPLES
+Run script against the \\NZWHS01\appdata\Plex-Meta-Manager\logs folder
+
+`.\image_check.ps1 -images_location \\NZWHS01\appdata\Plex-Meta-Manager\logs`
+
+![](images/image_check-example1.png)
 
 ## create_people_poster
 

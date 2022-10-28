@@ -42,7 +42,7 @@ if ($metalog_location -eq "" -or $metalog_location -eq $null) {
 }
 
 if (-not(Test-Path -Path $metalog_location)) {
-  WriteToLogFile "Logs location >$metalog_location< not found. Exiting now..."
+  write-host "Logs location >$metalog_location< not found. Exiting now..." -ForegroundColor Red -BackgroundColor White
   exit
 }
 
