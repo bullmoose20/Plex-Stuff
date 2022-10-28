@@ -347,7 +347,7 @@ Run script against the \\NZWHS01\appdata\Plex-Meta-Manager\logs folder
 
 ## image_check
 
-This Powershell script will find ...
+This Powershell script will scan your transparent images for anomalies like head-chops, backgrounds not removed, and black and white photos instead of a color photo to give you a report so you can go and fix those by uploading new and better options to https://www.themoviedb.org/
 
 ### DESCRIPTION
 
@@ -363,9 +363,9 @@ Powershell security settings: https://learn.microsoft.com/en-us/powershell/modul
 `-images_location`          (specify the images folder location for script to scan and report on)
 
 ### EXAMPLES
-Run script against the \\NZWHS01\appdata\Plex-Meta-Manager\logs folder
+Run script against the c:\temp\people\transparent folder
 
-`.\image_check.ps1 -images_location \\NZWHS01\appdata\Plex-Meta-Manager\logs`
+`.\image_check.ps1 -images_location c:\temp\people\transparent`
 
 ![](images/image_check-example1.png)
 

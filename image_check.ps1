@@ -4,22 +4,15 @@
 # author: bullmoose20
 #
 # DESCRIPTION: 
-# In a powershell window this will go through all your meta*.log files created by PMM to find all missing people posters.
-# It will create 1 .cmd file per meta.log file and run it to download the images locally
-# It will then scan and produce 4 files all at 2000x3000 in size
-# bw-style
-# rainier-style
-# original-style
-# transparent
+# In a powershell window this will go through all your images in the images folder mentioned to scan and report anomalies
+# It will create an output log that you can review and fix issues by uploading to https://www.themoviedb.org/ and ensuring that its a primary so that when it gets downloaded, the proper image can be processed by other scripts
 #
 # REQUIREMENTS:
-# $metalog_location=is the path to the logs directory for PMM
+# $images_location=is the path to the directory with the transparent images to verify
 # Powershell security settings: https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_execution_policies?view=powershell-7.2
-# Windows Machine with Windows Power Automate Desktop to remove backgrounds with Adobe Express online
-# If PAD not working, then dump transparent images that were 1:1.5 in ratio and resized to 2000x3000 in png format and within the Downloads subdirectory
 #
 # PARAMETERS:
-# -images_location          (specify the logs folder location for PMM)
+# -images_location          (specify the images folder location with transparent images for script to scan and report on)
 # 
 # EXAMPLE:
 # .\image_check.ps1 -images_location c:\temp\people\transparent
