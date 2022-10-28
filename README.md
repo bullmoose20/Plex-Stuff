@@ -363,7 +363,7 @@ $metalog_location=is the path to the logs directory for PMM
 
 Powershell security settings: https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_execution_policies?view=powershell-7.2
 
-Power Automate Desktop on a Windows Machine with the flow that will access Adobe Express Online to remove backgrounds in an automated fashion
+Power Automate Desktop on a Windows Machine with the flow that will access Adobe Express Online (https://express.adobe.com/tools/remove-background) to remove backgrounds in an automated fashion
 
 If PAD not working, then dump transparent images that were 1:1.5 in ratio and resized to 2000x3000 in png format and within the Downloads subdirectory
 
