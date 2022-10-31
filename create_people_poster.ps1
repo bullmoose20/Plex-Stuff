@@ -503,7 +503,7 @@ Function Image-Check {
   if ($imageW -eq 2000 -and $imageH -eq 3000) {
   } else {
    $global:Counter7++
-   WriteToLogFile "WARNING                      : WARNING7!~$filepre~$noextension File dimensions should be 2000x3000, however this image is >$imageWx$imageH<"
+   WriteToLogFile "WARNING                      : WARNING7!~$filepre~$noextension File dimensions should be 2000 x 3000, however this image is >$imageW x $imageH<"
   }
 
 }
@@ -519,6 +519,11 @@ WriteToLogFile "#### START ####"
 
 $Stopwatch = [System.Diagnostics.Stopwatch]::new()
 $Stopwatch.Start()
+
+# Image-Check variables
+$baseImageRatio = [math]::Round(1/1.5,4)
+$baseImageW = 399
+$baseImageH = 599
 
 # Create dirs
 New-Item -ItemType Directory -Force -Path $download_dir | Out-Null
