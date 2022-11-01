@@ -13,7 +13,7 @@ PLEX_TOKEN = os.getenv("PLEX_TOKEN")
 if PLEX_TOKEN is None:
     print("PLEX_TOKEN is not defined.")
     
-LIBS = ["Movies", "TV Shows", "TestMovies", "TestTV Shows", "Playlists", "Collections", "Artists", "Albums"]
+LIBS = ["Movies", "TV Shows", "TestMovies", "TestTV Shows"]
 
 for PLEX_LIBRARY in LIBS:
     server = PlexServer(PLEX_URL, PLEX_TOKEN, timeout=600)
@@ -23,7 +23,7 @@ for PLEX_LIBRARY in LIBS:
     i = 0
     for col in all_collections:
         i +=1
-        print(f"Working on {i}/{len(all_collections)}: {col}")
+        print(f"Working on LIB:{PLEX_LIBRARY}(mode=default) {i}/{len(all_collections)}: {col}")
         col.modeUpdate(mode="default")
 
     time.sleep(10)
@@ -31,5 +31,6 @@ for PLEX_LIBRARY in LIBS:
     print(f"Setting {len(all_collections)} collections to hide")
     i = 0
     for col in all_collections:
-        print(f"Working on: {col}")
+        i +=1
+        print(f"Working on LIB:{PLEX_LIBRARY}(mode=hide) {i}/{len(all_collections)}: {col}")
         col.modeUpdate(mode="hide")
