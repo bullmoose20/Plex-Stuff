@@ -335,6 +335,7 @@ $of=Join-Path -Path 'output' -ChildPath "$noextension-$base_color.jpg"
 # Create dirs
 New-Item -ItemType Directory -Force -Path $tmp_path  | Out-Null
 New-Item -ItemType Directory -Force -Path $out_path | Out-Null
+
 # Copy logo to tmp location
 Copy-Item -Path $orig_logo -Destination $logo
 
@@ -374,8 +375,11 @@ write-host "clean         : $clean"
 # creation of image begins
 #################################
 
+#write-host "magick -size 2000x3000 xc:$base_color $bcf"
 magick -size 2000x3000 xc:$base_color $bcf
+#write-host "magick -gravity center $bcf $fade -background None -layers Flatten $gbcf"
 magick -gravity center $bcf $fade -background None -layers Flatten $gbcf
+#write-host "magick $logo -colorspace gray -fill white -colorize 100 $wf"
 magick $logo -colorspace gray -fill white -colorize 100 $wf
 
 $tmplogo=resolve-path $logo
@@ -383,15 +387,21 @@ if ($white_wash) {
   $logo=Join-Path -Path 'tmp' -ChildPath "white_$noextension$extension"
 }
 
-magick $logo -resize $logo_resize PNG32:$rf
-magick composite -gravity center -geometry +0$logo_offset $rf $gbcf $nef
+#write-host "magick $logo -resize $logo_resize PNG32:$rf"
+magick $logo -resize $logo_resize PNG32:$rf 
+#write-host "magick composite -gravity center -geometry +0$logo_offset -colorspace sRGB $rf $gbcf $nef"
+magick composite -gravity center -geometry +0$logo_offset -colorspace sRGB $rf $gbcf $nef
+
 if ($text -eq "" -or $text -eq $null) {
 } else {
+  #write-host "magick $nef -gravity center -background None -layers Flatten `( -font $font -pointsize $font_size -fill $font_color -size 1900x1000 -background none caption:$text -trim -gravity center -extent 1900x1000 `) -gravity center -geometry +0$text_offset -composite $nef"
   magick $nef -gravity center -background None -layers Flatten `( -font $font -pointsize $font_size -fill $font_color -size 1900x1000 -background none caption:"$text" -trim -gravity center -extent 1900x1000 `) -gravity center -geometry +0$text_offset -composite $nef
 }
 
 if ($border) {
+  #write-host "magick $nef -resize $tmp_resize $nef"
   magick $nef -resize $tmp_resize $nef
+  #write-host "magick $nef -bordercolor $border_color -border $tmp_border $nef"
   magick $nef -bordercolor "$border_color" -border $tmp_border $nef
 }
 
