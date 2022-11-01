@@ -389,8 +389,8 @@ if ($white_wash) {
 
 #write-host "magick $logo -resize $logo_resize PNG32:$rf"
 magick $logo -resize $logo_resize PNG32:$rf 
-#write-host "magick composite -gravity center -geometry +0$logo_offset -colorspace sRGB $rf $gbcf $nef"
-magick composite -gravity center -geometry +0$logo_offset -colorspace sRGB $rf $gbcf $nef
+#write-host "magick $gbcf -set colorspace sRGB $rf -gravity center -geometry +0$logo_offset -composite $nef"
+magick $gbcf -set colorspace sRGB $rf -gravity center -geometry +0$logo_offset -composite $nef
 
 if ($text -eq "" -or $text -eq $null) {
 } else {
