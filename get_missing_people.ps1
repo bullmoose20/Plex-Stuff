@@ -74,7 +74,7 @@ ForEach ($item in $inputfile){
 
 # Define search pattern and newvalue
 $pattern = '\[\d\d\d\d-\d\d-\d\d .*\[.*\] *\| Detail: tmdb_person updated poster to \[URL\] (https.*)(\..*g)\n.*\n.*\n.*Finished (.*) Collection'
-$newvalue= "`n`n"+"curl -o "+[char]34+"$dds"+'$3$2'+[char]34+" "+'$1$2'+"`n`n"
+$newvalue= "`n`n"+"powershell -command "+[char]34+"Invoke-WebRequest "+'$1$2'+" -Outfile " + [char]39+"$dds"+'$3$2'+[char]39+[char]34+"`n`n"
 
 ###################################################
 # 1 - Find files in meta.log and download to download_dir
@@ -86,7 +86,7 @@ ForEach ($item in $inputfile){
     WriteToLogFile "Working on: $theOutput"
     WriteToLogFile "Working on: $outputfile$theOutput.cmd"
     Set-Content -Path $outputfile$theOutput.cmd -Value (((Get-Content $item_path -Raw) -replace "`r`n?", "`n") -replace $pattern, $newvalue)
-    $find='curl -o '
+    $find='Invoke-WebRequest '
     $theString = Get-Content $outputfile$theOutput.cmd | Select-String -Pattern $find -CaseSensitive -SimpleMatch
     if ($theString  -eq "" -or $theString -eq $null) {
       Remove-Item $outputfile$theOutput.cmd
