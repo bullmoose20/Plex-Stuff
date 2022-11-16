@@ -15,7 +15,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: plex-bloat-fix
+  IMAGE_NAME: ${{ github.actor }}/pbf
 
 jobs:
   build-and-push-image:
