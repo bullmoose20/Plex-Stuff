@@ -1,4 +1,6 @@
 *.log*
+.env
 
+.direnv/*
 .venv/*
 .vscode/*

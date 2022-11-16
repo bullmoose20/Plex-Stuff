@@ -19,7 +19,7 @@ from urllib.parse import urlparse
 from dotenv import load_dotenv
 
 PLEX_DB_NAME = "com.plexapp.plugins.library.db"
-LOG_FILENAME = "plex-bloat-fix.log"
+LOG_FILENAME = "logs/plex-bloat-fix.log"
 HEADER_WIDTH = 20
 SUMMARY_HEADER_WIDTH = 45
 LINE_WIDTH = 71
@@ -131,7 +131,7 @@ def send_notifiarr (msg_type, color, text_msg, f1_title, f1_msg, f2_title, f2_ms
   # Serializing json
   json_object = json.dumps(json_string, indent=2)
   # print(json_object)
- 
+
   r = requests.post(url, json_object)
   if r.status_code != 200:
     log_error(f"Status Code: {r.status_code}, Response: {r.json()}")
@@ -146,7 +146,7 @@ def chk_ver():
     if __version__ != remote_ver:
         log_line("# UPGRADE",f"Current Ver:{__version__} New Ver:{remote_ver} ")
         send_notifiarr("WARNING", color_y, "PBF Upgrade Recommended", "Current Ver:", f"{__version__}", "New Ver:", f"{remote_ver}", "WARNING", "Maybe consider updating your version of plex-bloat-fix")
-    
+
 def log_line(header, msg):
     logging.info(f'{header : <{HEADER_WIDTH}}{msg}')
 
@@ -453,7 +453,7 @@ try:
           shutil.rmtree(sub_folder)
 
     sub_end = time.time()
-    
+
     s_data = {}
     s_data["name"] = "PhotoTranscoder"
     s_data["stopwatch"] = sub_end - sub_start
@@ -508,7 +508,7 @@ try:
     else:
         send_notifiarr("INFO", color_g, "PBF Plex DB transfer", "Info:", f"Copy completed: "+f"{stopwatch:.2f} seconds", "N/A", "N/A", "N/A", "N/A")
         log_line(f"Copy completed:",f"{stopwatch:.2f} seconds")
-	
+
     ####################################################################
     # Find the downloaded PLEX DB
     ####################################################################
@@ -608,7 +608,7 @@ try:
                 0 if file_size_sub == 0 else ((file_size_sub_del) / (file_size_sub))
             )
 
-            
+
             s_data = {}
             s_data["name"] = p.name
             s_data["stopwatch"] = sub_end - sub_start
@@ -657,8 +657,8 @@ try:
         time.sleep(SLEEP)
 
     end_all = time.time()
-    
-    
+
+
     ####################################################################
     # OVERALL SUMMARY
     ####################################################################
