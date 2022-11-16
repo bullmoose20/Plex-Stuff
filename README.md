@@ -193,6 +193,26 @@ The script will NOT log any individual file actions.  That list can be quite lon
 5. If you are running on UNRAID, use nerdpack to install the latest python package and I suggest the same virtualenv install as explained above.(`/mnt/user/data/scripts/plex-scripts/plex-bloat-fix`) where the venv is found in `/mnt/user/data/scripts/venv`). You can then navigate to the location of the `plex-bloat-fix.py` folder in a terminal and then run `../../venv/bin/python plex-bloat-fix.py`
 6. If you are using a PLEX container in UNRAID or other, use the hotio plex container... It ROCKS! https://hotio.dev/containers/plex/
 
+### Using this script in Docker
+
+Base your `.env` on `.env.docker`, then run in docker like this [changing paths to suit, of course:
+
+```
+docker run --rm -ti \
+    -v "/opt/plex/Library/Application Support/Plex Media Server:/plexdir" \
+    -v /home/YOU/Plex-Stuff/.env:/.env \
+    -v /home/YOU/Plex-Stuff/logs:/logs \
+    ghcr.io/chazlarson/plex-stuff:latest
+```
+
+In this case, I'm assuming that all the plex paths are in the same root, as the env contains:
+
+```
+DIR_PATH=/plexdir/Metadata/
+TC_PATH=/plexdir/Cache/PhotoTranscoder/
+DB_PATH=/plexdir/Plug-in Support/Databases/
+```
+
 ## plexdance
 
 So your plex is hosed... and your DB and metadata is in a real mess... time for the plexdance. https://forums.plex.tv/t/the-plex-dance/197064 Quote: "The purpose of this is to remove all cached metadata and xml data for an item that Plex usually keeps. This helps when you want to “start from scratch” for particular item" My version will do a FULL plexdance on ALL of your libraries
