@@ -85,12 +85,17 @@ Or however you've mounted those directories.
 
 ## plex-bloat-fix
 
-Your PLEX folders are growing out of control. You use overlays from PMM or upload lots of custom art that you no longer want to use or need to eliminate. You don't want to perform the plex dance if you can avoid it. This script will free up gigs of space....It can also perform some PLEX operations like "empty trash", "clean bundles", and "optimize db". PBF also supports the use of PASSTHROUGH alerts to discord with notifiarr.com
+Your PLEX folders are growing out of control. You use overlays from PMM or upload lots of custom art that you no longer want to use or need to eliminate. You don't want to perform the plex dance if you can avoid it. This script will free up gigs of space....It can also perform some PLEX operations like "empty trash", "clean bundles", and "optimize db". PBF also supports the use of PASSTHROUGH alerts to discord with notifiarr.com. 
+
+Red is deleted, Green is kept because it is the actively selected poster. The other two come standard from PLEX when the posters are retrieved so the script will not touch those either:
+
+![2022-11-16_13h02_44](https://user-images.githubusercontent.com/12549033/202258945-da16090c-9523-4412-988f-3827eb33039e.png)
 
 ### Usage
 1. setup as above
-2. Run with `python plex-bloat-fix.py` - sometimes (usually when you have not setup the virtualenv for python as recommended above), you need to specify the version of python in the command like `python3.9 plex-bloat-fix.py`
-3. Make sure that you are NOT actively updating posters or title cards with PMM or TCM while running this script. Schedule this after the last run happens. So TCM, Plex Scheduled Tasks, PMM, THEN schedule or run plex-bloat-fix.py. Example: TCM @ 00:00, PLEX @ 02:00-05:00, and PMM @ 05:00
+2. Activate that virtualenv (NOT IN AN ADMIN PROMPT IN WINDOWS) 
+3. Run with `python plex-bloat-fix.py` - sometimes (usually when you have not setup the virtualenv for python as recommended above), you need to specify the version of python in the command like `python3.9 plex-bloat-fix.py`
+4. Make sure that you are NOT actively updating posters or title cards with PMM or TCM while running this script. Schedule this after the last run happens. So TCM, Plex Scheduled Tasks, PMM, THEN schedule or run plex-bloat-fix.py. Example: TCM @ 00:00, PLEX @ 02:00-05:00, and PMM @ 05:00
 
 The script will loop through all the folders as defined in your `.env` and then clean it up if you want it to.
 
