@@ -1,6 +1,6 @@
 ﻿####################################################
 # get_missing_people.ps1
-# v1.0
+# v1.1
 # author: bullmoose20
 #
 # DESCRIPTION: 
@@ -73,8 +73,18 @@ ForEach ($item in $inputfile){
 }
 
 # Define search pattern and newvalue
+$theString=$null
+$theOutput=$null
+$find=$null
+$item_path=$null
+$pattern=$null
+$newvalue=$null
+$mystring=$null
+$chcp=$null
+$files_to_process=$null
+
 $pattern = '\[\d\d\d\d-\d\d-\d\d .*\[.*\] *\| Detail: tmdb_person updated poster to \[URL\] (https.*)(\..*g)\n.*\n.*\n.*Finished (.*) Collection'
-$newvalue= "`n`n"+"powershell -command "+[char]34+"Invoke-WebRequest "+'$1$2'+" -Outfile " + [char]39+"$dds"+'$3$2'+[char]39+[char]34+"`n`n"
+$newvalue= "`n`n"+"powershell -command "+[char]34+"Invoke-WebRequest "+'$1$2'+" -Outfile "+[char]39+"$dds"+'$3$2'+[char]39+[char]34+"`n`n"
 
 ###################################################
 # 1 - Find files in meta.log and download to download_dir

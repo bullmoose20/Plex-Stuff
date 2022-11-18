@@ -1,6 +1,6 @@
 ﻿####################################################
 # create_people_poster.ps1
-# v1.2
+# v1.3
 # author: bullmoose20
 #
 # DESCRIPTION: 
@@ -97,6 +97,43 @@ $bps = Join-Path $basePath ''
 Function WriteToLogFile ($message) {
    Add-content $scriptLog -value ((Get-Date).ToString() + " ~ " + $message)
    Write-Host ((Get-Date).ToString() + " ~ " + $message)
+}
+
+#################################
+# SortFiles function
+#################################
+Function SortFiles ($folder) {
+   # This is the parent directory for the files and sorted folders
+   $basePath = $folder
+   WriteToLogFile "Sorting Folder               : $basepath "
+
+   # This sets that folder as your CWD (Current working directory)
+   Set-Location $basePath
+
+   # This grabs the *files* underneath the parent directory, ignoring sub directories
+   $files = Get-ChildItem $basePath | Where-Object {$_.PSIsContainer -eq $false}
+
+   # Starts iterating through each file
+   foreach ($file in $files) {
+       # The root folder name
+       $root = "$basePath\"
+       # The first letter as the sub folder name
+       $sub = $file.BaseName.Substring(0,1).ToUpper()
+
+       # Check if the root folder exists, create it if not
+       if (!(Test-Path $root -ErrorAction SilentlyContinue)) {
+           New-Item $root -ItemType Directory | Out-Null
+       }
+
+       # Check if the sub folder exists, create it if not
+       if (!(Test-Path $sub -ErrorAction SilentlyContinue)) {
+           New-Item $sub -ItemType Directory | Out-Null
+       }
+
+       # Move the file to the sub folder
+       WriteToLogFile "Sorting File                 : Moving: $file to subfolder: $sub "
+       Move-Item $file.FullName -Destination $sub -Force
+   }
 }
 
 #################################
@@ -627,8 +664,18 @@ ForEach ($item in $inputfile){
 }
 
 # Define search pattern and newvalue
+$theString=$null
+$theOutput=$null
+$find=$null
+$item_path=$null
+$pattern=$null
+$newvalue=$null
+$mystring=$null
+$chcp=$null
+$files_to_process=$null
+
 $pattern = '\[\d\d\d\d-\d\d-\d\d .*\[.*\] *\| Detail: tmdb_person updated poster to \[URL\] (https.*)(\..*g)\n.*\n.*\n.*Finished (.*) Collection'
-$newvalue= "`n`n"+"powershell -command "+[char]34+"Invoke-WebRequest "+'$1$2'+" -Outfile " + [char]39+"$dds"+'$3$2'+[char]39+[char]34+"`n`n"
+$newvalue= "`n`n"+"powershell -command "+[char]34+"Invoke-WebRequest "+'$1$2'+" -Outfile "+[char]39+"$dds"+'$3$2'+[char]39+[char]34+"`n`n"
 
 ###################################################
 # 1 - Find files in meta.log and download to download_dir
@@ -755,6 +802,15 @@ foreach ($file in $files)
     }
     
 }
+
+#######################
+# SortFiles
+#######################
+SortFiles $tppbws # bw
+SortFiles $tprs   # rainier
+SortFiles $tpos   # original
+SortFiles $tpss   # signature
+SortFiles $nbpcs  # transparent
 
 #######################
 # SUMMARY
