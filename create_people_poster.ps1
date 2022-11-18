@@ -134,6 +134,7 @@ Function SortFiles ($folder) {
        WriteToLogFile "Sorting File                 : Moving: $file to subfolder: $sub "
        Move-Item $file.FullName -Destination $sub -Force
    }
+   Set-Location $script_path
 }
 
 #################################
