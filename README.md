@@ -404,14 +404,18 @@ PAD Flows included in this repo are:
 
 Powershell security settings: https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_execution_policies?view=powershell-7.2
 
-Power Automate Desktop on a Windows Machine with the flow that will access Adobe Express Online (https://express.adobe.com/tools/remove-background) to remove backgrounds in an automated fashion. Download found here ( https://go.microsoft.com/fwlink/?linkid=2102613 ). Ensure that you install the chrome and edge web browser extensions.
+Power Automate Desktop on a Windows Machine with the flow that will access Adobe Express Online ( https://express.adobe.com/tools/remove-background ) to remove backgrounds in an automated fashion. Download found here ( https://go.microsoft.com/fwlink/?linkid=2102613 ). Ensure that you install the chrome and edge web browser extensions.
 
 PAD Installation steps
 1. Install PAD and Extensions
 2. Create a new flow and name it as one of the flows included in this repo (described above)
-3. Open the text file flow and select all the text (ctrl-a) and copy it (ctrl-c)
-4. In the newly created flow, paste the text in the "white" empty area
+![](images/step2.png)
+3. Open the text file flow in a text editor and select all the text (ctrl-a) and copy it (ctrl-c)
+![](images/step3.png)
+4. In the newly created flow, paste (ctrl-v) the text in the "white" empty area
+![](images/step4.png)
 5. You should see all the steps pasted into the GUI
+![](images/step5.png)
 6. Save the flow
 
 ### PARAMETERS
