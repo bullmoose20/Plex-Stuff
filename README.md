@@ -386,23 +386,46 @@ This Powershell script will find and download people posters/images for PMM/PLEX
 - bw-style
 - rainier-style
 - original-style
+- signature-style
 - transparent
  
 ### REQUIREMENTS
-$metalog_location=is the path to the logs directory for PMM
+$metalog_location=   is the directory path to scan the PMM directory logs (meta*.log)
+
+$flowName=           is the PAD Flow name that you want to call for your setup
+
+If your system is missing fonts, you will be prompted to install the ones that are extracted before continuing
+
+PAD Flows included in this repo are:
+- `remove backgrounds chrome-en windows-en`    => Windows OS is in English and Chrome in English
+- `remove backgrounds edge-en windows-en`      => Windows OS is in English and Edge in English
+- `remove backgrounds edge-en windows-fr`      => Windows OS is in French and Edge in English
+- `remove backgrounds edge-fr windows-fr`      => Windows OS is in French and Edge in French
 
 Powershell security settings: https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_execution_policies?view=powershell-7.2
 
-Power Automate Desktop on a Windows Machine with the flow that will access Adobe Express Online (https://express.adobe.com/tools/remove-background) to remove backgrounds in an automated fashion
+Power Automate Desktop on a Windows Machine with the flow that will access Adobe Express Online (https://express.adobe.com/tools/remove-background) to remove backgrounds in an automated fashion. Download found here ( https://go.microsoft.com/fwlink/?linkid=2102613 ). Ensure that you install the chrome and edge web browser extensions.
 
-If PAD not working, then dump transparent images that were 1:1.5 in ratio and resized to 2000x3000 in png format and within the Downloads subdirectory
+PAD Installation steps
+1. Install PAD and Extensions
+2. Create a new flow and name it as one of the flows included in this repo (described above)
+3. Open the text file flow and select all the text (ctrl-a) and copy it (ctrl-c)
+4. In the newly created flow, paste the text in the "white" empty area
+5. You should see all the steps pasted into the GUI
+6. Save the flow
 
 ### PARAMETERS
 `-metalog_location`          (specify the logs folder location for PMM)
 
-### EXAMPLES
-Run script against the \\NZWHS01\appdata\Plex-Meta-Manager\logs folder
+`-flowName`                  (specify the flow name that you want to use)
 
-`.\create_people_poster.ps1 -metalog_location \\NZWHS01\appdata\Plex-Meta-Manager\logs`
+### EXAMPLES
+Run script against the \\NZWHS01\appdata\Plex-Meta-Manager\logs folder on a Windows English machine with Chrome in English
+
+`.\create_people_poster.ps1 -metalog_location \\NZWHS01\appdata\Plex-Meta-Manager\logs -flowname "remove backgrounds chrome-en windows-en"`
+
+Run script against a folder where you copied some meta*.log files from D:\logs on a Windows English machine with Edge in English
+
+`.\create_people_poster.ps1 -metalog_location D:\logs -flowname "remove backgrounds edge-en windows-en"`
 
 ![](images/create_people_poster-example1.png)
