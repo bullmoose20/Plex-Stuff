@@ -1,6 +1,6 @@
 ﻿####################################################
 # create_people_poster.ps1
-# v1.4
+# v1.6
 # author: bullmoose20
 #
 # DESCRIPTION: 
@@ -93,6 +93,8 @@ $targetPath_signature = Join-Path -Path $script_path -ChildPath "signature"
 $nobackPathColor = Join-Path -Path $script_path -ChildPath "transparent"
 $tmpPeoplePath = Join-Path -Path $script_path -ChildPath "tmppeople"
 $basePath = Join-Path -Path $script_path -ChildPath "base"
+$gh_path = $null
+$tmp = $null
 $gh_path = Split-Path -Path $script_path -Qualifier
 $tmp = (get-item $script_path).parent
 $gh_path = Join-Path -Path $gh_path -ChildPath $tmp
@@ -703,7 +705,7 @@ WriteToLogFile "nobackPathColor              : $nobackPathColor"
 WriteToLogFile "tmpPeoplePath                : $tmpPeoplePath"
 WriteToLogFile "basePath                     : $basePath"
 WriteToLogFile "gh_path                      : $gh_path"
-
+exit
 # Remove step*.cmd from previous runs
 Remove-Item $step_del -Include step*.cmd
 
