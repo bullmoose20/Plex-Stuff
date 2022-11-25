@@ -702,7 +702,7 @@ WriteToLogFile "nobackPathColor              : $nobackPathColor"
 WriteToLogFile "tmpPeoplePath                : $tmpPeoplePath"
 WriteToLogFile "basePath                     : $basePath"
 WriteToLogFile "gh_path                      : $gh_path"
-exit
+
 # Remove step*.cmd from previous runs
 Remove-Item $step_del -Include step*.cmd
 
