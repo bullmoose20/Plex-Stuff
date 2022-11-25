@@ -45,7 +45,7 @@ $file5="AAEAAAARAQAABAAQR0RFRmPzZRsAAANgAAACwkdQT1P3ccAhAABSiAAAIB5HU1VCtGsh2AAA
 #################################
 # $metalog_location checks
 #################################
-if ($metalog_location -eq "" -or $metalog_location -eq $null) {
+if ($metalog_location -eq "" -or $null -eq $metalog_location) {
   write-host "Logs location >$metalog_location< not found. Exiting now..." -ForegroundColor Red -BackgroundColor White
   exit
 }
@@ -60,7 +60,7 @@ if (-not(Test-Path -Path $metalog_location)) {
 #################################
 $flgExit = $true
 
-if ($flowName -eq "" -or $flowName -eq $null) {
+if ($flowName -eq "" -or $null -eq $flowName) {
   write-host "PAD flowName >$flowName< is required. Exiting now..." -ForegroundColor Red -BackgroundColor White
   exit
 }
@@ -115,70 +115,70 @@ $bps = Join-Path $basePath ''
 # WriteToLogFile function
 #################################
 Function WriteToLogFile ($message) {
-   Add-content $scriptLog -value ((Get-Date).ToString() + " ~ " + $message)
-   Write-Host ((Get-Date).ToString() + " ~ " + $message)
+  Add-content $scriptLog -value ((Get-Date).ToString() + " ~ " + $message)
+  Write-Host ((Get-Date).ToString() + " ~ " + $message)
 }
 
 #################################
 # SortFiles function
 #################################
 Function SortFiles ($folder) {
-   Set-Location $script_path
-   # This is the parent directory for the files and sorted folders
-   $basePath = $folder
-   WriteToLogFile "Sorting Folder               : $basepath "
+  Set-Location $script_path
+  # This is the parent directory for the files and sorted folders
+  $basePath = $folder
+  WriteToLogFile "Sorting Folder               : $basepath "
 
-   # This sets that folder as your CWD (Current working directory)
-   Set-Location $basePath
+  # This sets that folder as your CWD (Current working directory)
+  Set-Location $basePath
 
-   # This grabs the *files* underneath the parent directory, ignoring sub directories
-   $files = Get-ChildItem $basePath\* -Include *.png, *.jpg | Where-Object {$_.PSIsContainer -eq $false}
- 
-   # Starts iterating through each file
-   foreach ($file in $files) {
-       # The root folder name
-       $root = "$basePath\"
-       # The first letter as the sub folder name
-       $sub = $file.BaseName.Substring(0,1).ToUpper()+"\Images"
+  # This grabs the *files* underneath the parent directory, ignoring sub directories
+  $files = Get-ChildItem $basePath\* -Include *.png, *.jpg | Where-Object {$_.PSIsContainer -eq $false}
 
-       # Check if the root folder exists, create it if not
-       if (!(Test-Path $root -ErrorAction SilentlyContinue)) {
-           New-Item $root -ItemType Directory | Out-Null
-       }
+  # Starts iterating through each file
+  foreach ($file in $files) {
+      # The root folder name
+      $root = "$basePath\"
+      # The first letter as the sub folder name
+      $sub = $file.BaseName.Substring(0,1).ToUpper()+"\Images"
 
-       # Check if the sub folder exists, create it if not
-       if (!(Test-Path $sub -ErrorAction SilentlyContinue)) {
-           New-Item $sub -ItemType Directory | Out-Null
-       }
+      # Check if the root folder exists, create it if not
+      if (!(Test-Path $root -ErrorAction SilentlyContinue)) {
+          New-Item $root -ItemType Directory | Out-Null
+      }
 
-       # Copy the file to the sub folder
-       $fldr = Split-Path -Path $pwd -Leaf
-       $curr_gh = Join-Path -Path $gh_path -ChildPath "$fldr"
-       WriteToLogFile "Copying File                 : Copying: $file to subfolder: $curr_gh "
+      # Check if the sub folder exists, create it if not
+      if (!(Test-Path $sub -ErrorAction SilentlyContinue)) {
+          New-Item $sub -ItemType Directory | Out-Null
+      }
 
-       Copy-Item $file.FullName -Destination $curr_gh -Force
+      # Copy the file to the sub folder
+      $fldr = Split-Path -Path $pwd -Leaf
+      $curr_gh = Join-Path -Path $gh_path -ChildPath "$fldr"
+      WriteToLogFile "Copying File                 : Copying: $file to subfolder: $curr_gh "
+
+      Copy-Item $file.FullName -Destination $curr_gh -Force
       
-       # Move the file to the sub folder
-       WriteToLogFile "Sorting File                 : Moving: $file to subfolder: $sub "
-       Move-Item $file.FullName -Destination $sub -Force
-   }
-   Set-Location $script_path
+      # Move the file to the sub folder
+      WriteToLogFile "Sorting File                 : Moving: $file to subfolder: $sub "
+      Move-Item $file.FullName -Destination $sub -Force
+  }
+  Set-Location $script_path
 }
 
 #################################
 # Get-Width function
 #################################
 Function Get-Width($theName, $theFont, $thePointsize) {
-   WriteToLogFile "theName is                   : $theName"
-   WriteToLogFile "theFont is                   : $theFont"
-   WriteToLogFile "thePointsize is              : $thePointsize"
+  WriteToLogFile "theName is                   : $theName"
+  WriteToLogFile "theFont is                   : $theFont"
+  WriteToLogFile "thePointsize is              : $thePointsize"
 
-   $string = magick -debug annotate  xc: -font $theFont -pointsize $thePointsize -annotate 0 $theName null: 2>&1 | Select-String -Pattern Metrics: -CaseSensitive -SimpleMatch
-   $theArray=$string -Split ";"   
-   $arrWidth=$theArray[1].Split(" ")
-   $theWidth = [int]$arrWidth[2]
-   WriteToLogFile "Name Width is                : $theWidth"
-   $theWidth
+  $string = magick -debug annotate  xc: -font $theFont -pointsize $thePointsize -annotate 0 $theName null: 2>&1 | Select-String -Pattern Metrics: -CaseSensitive -SimpleMatch
+  $theArray=$string -Split ";"   
+  $arrWidth=$theArray[1].Split(" ")
+  $theWidth = [int]$arrWidth[2]
+  WriteToLogFile "Name Width is                : $theWidth"
+  $theWidth
 }
 
 #################################
@@ -487,33 +487,33 @@ $cndPadWindow = New-Object $acdn($cndPadWindowId, $cndPadWindowClassName)
 do{
   Start-Sleep -m 200
   $elmPadWindow = $root.FindFirst($tree::Children, $cndPadWindow)
-}while($elmPadWindow -eq $null)
+}while($null -eq $elmPadWindow)
 
 #
 $cndTab = New-Object $pcdn($uiAuto::AutomationIdProperty, "ProcessesTabControl")
 $elmTab = $elmPadWindow.FindFirst($tree::Subtree, $cndTab)
 
 #
-if($elmTab -ne $null){
+if($null -ne $elmTab){
   $cndTabItem = New-Object $pcdn($uiAuto::AutomationIdProperty, "MyFlowsTab")
   $elmTabItem = $elmTab.FindFirst($tree::Children, $cndTabItem)
-  if($elmTabItem -ne $null){
+  if($null -ne $elmTabItem){
     $selTabItem = $elmTabItem.GetCurrentPattern($selptn)
     $selTabItem.Select()
   }
 }
 
 #
-if($elmPadWindow -ne $null){
+if($null -ne $elmPadWindow){
   $cndDataGrid = New-Object $pcdn($uiAuto::AutomationIdProperty, "MyFlowsListGrid")
   $elmDataGrid = $elmPadWindow.FindFirst($tree::Subtree, $cndDataGrid)
 }
 
 #
-if($elmDataGrid -ne $null){
+if($null -ne $elmDataGrid){
   $icDataGrid = $elmDataGrid.GetCurrentPattern($icptn)
   $elmDataItem = $icDataGrid.FindItemByProperty($null, $uiAuto::NameProperty, $flowName)
-  if($elmDataItem -ne $null){
+  if($null -ne $elmDataItem){
     $siDataItem = $elmDataItem.GetCurrentPattern($siptn)
     $siDataItem.ScrollIntoView()
     $selDataItem = $elmDataItem.GetCurrentPattern($selptn)
@@ -522,10 +522,10 @@ if($elmDataGrid -ne $null){
 }
 
 #
-if($elmDataItem -ne $null){
+if($null -ne $elmDataItem){
   $cndStartButton = New-Object $pcdn($uiAuto::AutomationIdProperty, "StartFlowButton")
   $elmStartButton = $elmDataItem.FindFirst($tree::Subtree, $cndStartButton)
-  if($elmStartButton -ne $null){
+  if($null -ne $elmStartButton){
     $ivkStartButton = $elmStartButton.GetCurrentPattern($iptn)
     $ivkStartButton.Invoke()
   }
@@ -533,7 +533,7 @@ if($elmDataItem -ne $null){
 
 if($flgExit){
   #
-  if($elmStartButton -ne $null){
+  if($null -ne $elmStartButton){
     do{
       Start-Sleep -m 800
     }while($elmStartButton.GetCurrentPropertyValue($uiAuto::IsEnabledProperty) -eq $false)
@@ -558,47 +558,47 @@ Function Test-Image {
   $theString = magick identify -verbose $filepre | Select-String -Pattern Type: -CaseSensitive
   $found=$theString | Select-String -Pattern 'Gray' -CaseSensitive -SimpleMatch
   if ($found) {
-   $global:Counter1++
-   WriteToLogFile "WARNING                      : WARNING1!~$filepre~$noextension is Grayscale! Find a color image for $noextension on TMDB and re-process"
+  $global:Counter1++
+  WriteToLogFile "WARNING                      : WARNING1!~$filepre~$noextension is Grayscale! Find a color image for $noextension on TMDB and re-process"
   }
 
   # Find if background is removed and hence has transparency
   $string = magick $filepre -format "%[opaque]" info:
   $found=$string | Select-String -Pattern 'True' -CaseSensitive -SimpleMatch
   if ($found) {
-   $global:Counter2++
-   WriteToLogFile "WARNING                      : WARNING2!~$filepre~$noextension is NOT Transparent and needs background removed!"
+  $global:Counter2++
+  WriteToLogFile "WARNING                      : WARNING2!~$filepre~$noextension is NOT Transparent and needs background removed!"
   }
 
   # Find if first line is transparent to determine if there is a head chop situation
   $string = magick $filepre -crop x1+0+0 +repage -alpha extract -format %[fx:mean] info:
   if ($string -gt .06) {
-   $global:Counter3++
-   WriteToLogFile "WARNING                      : WARNING3!~$filepre~$noextension is most likely a HEAD CHOP and should be reviewed and changed for a better headshot!~Headchop values~$string"
+  $global:Counter3++
+  WriteToLogFile "WARNING                      : WARNING3!~$filepre~$noextension is most likely a HEAD CHOP and should be reviewed and changed for a better headshot!~Headchop values~$string"
   }
   
   if ($baseImageRatio -eq $imageRatio) {
   } else {
-   $global:Counter4++
-   WriteToLogFile "WARNING                      : WARNING4!~$filepre~$noextension Ratio should be $baseImageRatio, however this image is >$imageRatio<"
+  $global:Counter4++
+  WriteToLogFile "WARNING                      : WARNING4!~$filepre~$noextension Ratio should be $baseImageRatio, however this image is >$imageRatio<"
   }
 
   if ($imageW - $baseImageW -gt 0) {
   } else {
-   $global:Counter5++
-   WriteToLogFile "WARNING                      : WARNING5!~$filepre~$noextension Quality of source could be a problem. Image width should be > $baseImageW, however this image is >$imageW< wide"
+  $global:Counter5++
+  WriteToLogFile "WARNING                      : WARNING5!~$filepre~$noextension Quality of source could be a problem. Image width should be > $baseImageW, however this image is >$imageW< wide"
   }
 
   if ($imageH - $baseImageH -gt 0) {
   } else {
-   $global:Counter6++
-   WriteToLogFile "WARNING                      : WARNING6!~$filepre~$noextension Quality of source could be a problem. Image height should be > $baseImageH, however this image is >$imageH< high"
+  $global:Counter6++
+  WriteToLogFile "WARNING                      : WARNING6!~$filepre~$noextension Quality of source could be a problem. Image height should be > $baseImageH, however this image is >$imageH< high"
   }
 
   if ($imageW -eq 2000 -and $imageH -eq 3000) {
   } else {
-   $global:Counter7++
-   WriteToLogFile "WARNING                      : WARNING7!~$filepre~$noextension File dimensions should be 2000 x 3000, however this image is >$imageW x $imageH<"
+  $global:Counter7++
+  WriteToLogFile "WARNING                      : WARNING7!~$filepre~$noextension File dimensions should be 2000 x 3000, however this image is >$imageW x $imageH<"
   }
 
 }
@@ -669,15 +669,15 @@ Convert-TextToBinary -Text $file3 -OutputPath $bps"@zbase-Signature.png"
 $chkfont1=magick identify -list font | Select-String "Font: Comfortaa-Medium$"
 $chkfont2=magick identify -list font | Select-String "Font: Fuggles-Regular$"
 
-if ($chkfont1 -eq "" -or $chkfont1 -eq $null -or $chkfont2 -eq "" -or $chkfont2 -eq $null) {
-     $font_list=magick identify -list font | Select-String "Font: "
-     $font_list -replace "  Font: ",""> magick_fonts.txt
-     Write-Host "Fonts missing >Comfortaa-Medium< and >Fuggles-Regular< are not installed/found. List of installed fonts that Imagemagick can use listed and exported here: magick_fonts.txt." -ForegroundColor Red -BackgroundColor White
-     write-host $font_list.count "fonts are visible to Imagemagick. Extracting fonts now to $basePath folder..." -ForegroundColor Red -BackgroundColor White
-     Convert-TextToBinary -Text $file4 -OutputPath $bps"Comfortaa-Medium.ttf"
-     Convert-TextToBinary -Text $file5 -OutputPath $bps"Fuggles-Regular.ttf"
-     write-host "Aborting now... Ensure that you Right-Click 'Install for all users' in Windows before retrying..." -ForegroundColor Red -BackgroundColor White
-     exit
+if ($chkfont1 -eq "" -or $null -eq $chkfont1 -or $chkfont2 -eq "" -or $null -eq $chkfont2) {
+    $font_list=magick identify -list font | Select-String "Font: "
+    $font_list -replace "  Font: ",""> magick_fonts.txt
+    Write-Host "Fonts missing >Comfortaa-Medium< and >Fuggles-Regular< are not installed/found. List of installed fonts that Imagemagick can use listed and exported here: magick_fonts.txt." -ForegroundColor Red -BackgroundColor White
+    write-host $font_list.count "fonts are visible to Imagemagick. Extracting fonts now to $basePath folder..." -ForegroundColor Red -BackgroundColor White
+    Convert-TextToBinary -Text $file4 -OutputPath $bps"Comfortaa-Medium.ttf"
+    Convert-TextToBinary -Text $file5 -OutputPath $bps"Fuggles-Regular.ttf"
+    write-host "Aborting now... Ensure that you Right-Click 'Install for all users' in Windows before retrying..." -ForegroundColor Red -BackgroundColor White
+    exit
 }
 
 WriteToLogFile "#######################"
@@ -736,7 +736,7 @@ ForEach ($item in $inputfile){
     Set-Content -Path $outputfile$theOutput.cmd -Value (((Get-Content $item_path -Raw) -replace "`r`n?", "`n") -replace $pattern, $newvalue)
     $find='Invoke-WebRequest '
     $theString = Get-Content $outputfile$theOutput.cmd | Select-String -Pattern $find -CaseSensitive -SimpleMatch
-    if ($theString  -eq "" -or $theString -eq $null) {
+    if ($theString  -eq "" -or $null -eq $theString) {
       Remove-Item $outputfile$theOutput.cmd
     }else{
       $theString > tmp.txt
@@ -804,7 +804,7 @@ foreach ($filepre in $filespre)
   # Before doing anything, copy to another location
   WriteToLogFile "Copying                      : $noextension to $nbpcs"
   Copy-Item -Path $filepre -Destination $nbpcs
- 
+
   # Validate quality of image
   WriteToLogFile "Test-Image                  : $noextension"
   Test-Image
@@ -819,14 +819,14 @@ $files_to_process = $files.Count
 foreach ($file in $files) 
 {
    $percentComplete = $(($Counter / $files.Count) * 100 )
-   $Progress = @{
-       Activity = "Working on: '$($file)'."
-       Status = "Processing $Counter of $($files.Count)"
-       PercentComplete = $([math]::Round($percentComplete, 2))
-   }
-   Write-Progress @Progress -Id 1
-   # Increment the counter. 
-   $Counter++
+  $Progress = @{
+      Activity = "Working on: '$($file)'."
+      Status = "Processing $Counter of $($files.Count)"
+      PercentComplete = $([math]::Round($percentComplete, 2))
+  }
+  Write-Progress @Progress -Id 1
+  # Increment the counter. 
+  $Counter++
 
     $noextension = [System.IO.Path]::GetFileNameWithoutExtension($file.FullName)
     $cleanfilename = $noextension.replace('_ccexpress','')
@@ -903,9 +903,9 @@ WriteToLogFile $string
 $tot = $global:Counter1 + $global:Counter2 + $global:Counter3 + $global:Counter4 + $global:Counter5 + $global:Counter6 + $global:Counter7
 $tot_chks = $filespre.count * 7
 if ($filespre.count -gt 0) {
-   $issues_pct = [math]::Round((($tot / $tot_chks) * 100),2)
+  $issues_pct = [math]::Round((($tot / $tot_chks) * 100),2)
 } else {
-   $issues_pct = [math]::Round(0,2)
+  $issues_pct = [math]::Round(0,2)
 }
 $string = "Total files                  : " + ($filespre.count).ToString()
 WriteToLogFile $string 
