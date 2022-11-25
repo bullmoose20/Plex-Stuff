@@ -1,6 +1,6 @@
 ﻿####################################################
 # create_people_poster.ps1
-# v1.6
+# v1.7
 # author: bullmoose20
 #
 # DESCRIPTION: 
@@ -95,11 +95,24 @@ $tmpPeoplePath = Join-Path -Path $script_path -ChildPath "tmppeople"
 $basePath = Join-Path -Path $script_path -ChildPath "base"
 $gh_path = $null
 $tmp = $null
+write-host "1gh_path: $gh_path"
+write-host "1tmp: $tmp"
 $gh_path = Split-Path -Path $script_path -Qualifier
+write-host "2gh_path: $gh_path"
+write-host "2tmp: $tmp"
 $tmp = (get-item $script_path).parent
+write-host "3gh_path: $gh_path"
+write-host "3tmp: $tmp"
 $gh_path = Join-Path -Path $gh_path -ChildPath $tmp
+write-host "4gh_path: $gh_path"
+write-host "4tmp: $tmp"
 $gh_path = Join-Path -Path $gh_path -ChildPath "Plex-Meta-Manager-Images"
+write-host "5gh_path: $gh_path"
+write-host "5tmp: $tmp"
 $gh_path = Join-Path -Path $gh_path -ChildPath "people"
+write-host "gh_path: $gh_path"
+write-host "tmp: $tmp"
+exit
 
 
 $tls= Join-Path $tmp_local ''
