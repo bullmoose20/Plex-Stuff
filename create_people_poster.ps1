@@ -1,6 +1,6 @@
 ﻿####################################################
 # create_people_poster.ps1
-# v1.3
+# v1.4
 # author: bullmoose20
 #
 # DESCRIPTION: 
@@ -153,9 +153,9 @@ Function SortFiles ($folder) {
        }
 
        # Copy the file to the sub folder
-       WriteToLogFile "Copying File                 : Copying: $file to subfolder: $curr_gh "
        $fldr = Split-Path -Path $pwd -Leaf
        $curr_gh = Join-Path -Path $gh_path -ChildPath "$fldr"
+       WriteToLogFile "Copying File                 : Copying: $file to subfolder: $curr_gh "
 
        Copy-Item $file.FullName -Destination $curr_gh -Force
       
@@ -656,6 +656,7 @@ New-Item -ItemType Directory -Force -Path $targetPath_signature | Out-Null
 New-Item -ItemType Directory -Force -Path $nobackPathColor | Out-Null
 New-Item -ItemType Directory -Force -Path $tmpPeoplePath | Out-Null
 New-Item -ItemType Directory -Force -Path $basePath | Out-Null
+New-Item -ItemType Directory -Force -Path $gh_path | Out-Null
 
 # restore template files
 Convert-TextToBinary -Text $file1 -OutputPath $bps"@zbase-People.jpg"
