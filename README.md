@@ -4,9 +4,10 @@
 ## Requirements
 
 1. A system that can run Python3
-1. Python3 installed on that system
-1. Prefereable to also have a system that can run powershell
-1. Preferable to have a system that can also run Power Automate Desktop Flows
+2. Python3 installed on that system
+3. Prefereable to also have a system that can run powershell
+4. Preferable to have a system that can also run Power Automate Desktop Flows
+5. System that has ImageMagick installed
 
 ## Setup
 
@@ -362,6 +363,8 @@ This Powershell script will scan your transparent images for anomalies like head
 ### REQUIREMENTS
 $images_location=is the path to the directory with the transparent images to verify
 
+Powershell version 7.x or greater: https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows?view=powershell-7.3
+
 Powershell security settings: https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_execution_policies?view=powershell-7.2
 
 ### PARAMETERS
@@ -392,6 +395,12 @@ This Powershell script will find and download people posters/images for PMM/PLEX
 ### REQUIREMENTS
 $metalog_location=   is the directory path to scan the PMM directory logs (meta*.log)
 
+Powershell version 7.x or greater: https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows?view=powershell-7.3
+
+Powershell security settings: https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_execution_policies?view=powershell-7.2
+
+Imagemagick must be installed - https://imagemagick.org/script/download.php
+
 $flowName=           is the PAD Flow name that you want to call for your setup
 
 If your system is missing fonts, you will be prompted to install the ones that are extracted before continuing
@@ -401,8 +410,6 @@ PAD Flows included in this repo are:
 - `remove backgrounds edge-en windows-en`      => Windows OS is in English and Edge in English
 - `remove backgrounds edge-en windows-fr`      => Windows OS is in French and Edge in English
 - `remove backgrounds edge-fr windows-fr`      => Windows OS is in French and Edge in French
-
-Powershell security settings: https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_execution_policies?view=powershell-7.2
 
 Power Automate Desktop on a Windows Machine with the flow that will access Adobe Express Online ( https://express.adobe.com/tools/remove-background ) to remove backgrounds in an automated fashion. Download found here ( https://go.microsoft.com/fwlink/?linkid=2102613 ). Ensure that you install the chrome and edge web browser extensions.
 
