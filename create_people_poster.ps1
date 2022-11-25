@@ -1,6 +1,6 @@
 ﻿####################################################
 # create_people_poster.ps1
-# v1.8
+# v1.9
 # author: bullmoose20
 #
 # DESCRIPTION: 
@@ -8,7 +8,7 @@
 # It will create 1 .cmd file per meta.log file and run it to download the images locally
 # It will then scan and produce 4 files all at 2000x3000 in size
 # bw-style
-# rainier-style
+# Invoke-rainier-style
 # original-style
 # signature-style
 # transparent
@@ -216,9 +216,9 @@ Function Convert-TextToBinary {
 }
 
 #################################
-# pmm-bw-style function
+# Invoke-pmm-bw-style function
 #################################
-Function pmm-bw-style {
+Function Invoke-pmm-bw-style {
     Push-Down $true
     WriteToLogFile "Theme                        : PMM-BW Style Comfortaa-medium"
     $outFilename = $tppbws + $cleanfilename + ".jpg" 
@@ -298,13 +298,12 @@ Function pmm-bw-style {
 }
 
 #################################
-# rainier-style function
+# Invoke-rainier-style function
 #################################
-Function rainier-style {
+Function Invoke-rainier-style {
     Push-Down $true
     WriteToLogFile "Theme                        : Rainier Style Comfortaa-medium"
     $outFilename = $tprs + $cleanfilename + ".jpg" 
-    $myWidth = Get-Width $postertitle "Comfortaa-medium" 183
 
     $postertitle2=$postertitle.Split(" ")
     $numArr=$postertitle2.Count
@@ -424,9 +423,9 @@ Function rainier-style {
   }
 
 #################################
-# pmm-signature-style function
+# Invoke-pmm-signature-style function
 #################################
-Function pmm-signature-style {
+Function Invoke-pmm-signature-style {
     Push-Down $false
     WriteToLogFile "Theme                        : PMM-Signature Style Fuggles-Regular"
     $outFilename = $tpss + $cleanfilename + ".jpg" 
@@ -547,9 +546,9 @@ if($flgExit){
 }
 
 #################################
-# Image-Check function
+# Test-Image function
 #################################
-Function Image-Check {
+Function Test-Image {
 
   $imageW = magick identify -format "%w" $filepre
   $imageH = magick identify -format "%h" $filepre
@@ -641,7 +640,7 @@ WriteToLogFile "#### START ####"
 $Stopwatch = [System.Diagnostics.Stopwatch]::new()
 $Stopwatch.Start()
 
-# Image-Check variables
+# Test-Image variables
 $baseImageRatio = [math]::Round(1/1.5,4)
 $baseImageW = 399
 $baseImageH = 599
@@ -719,7 +718,6 @@ $find=$null
 $item_path=$null
 $pattern=$null
 $newvalue=$null
-$mystring=$null
 $chcp=$null
 $files_to_process=$null
 
@@ -746,7 +744,7 @@ ForEach ($item in $inputfile){
       $theString = $theString.replace(' (Director).','.')
       $theString = $theString.replace(' (Producer).','.')
       $theString = $theString.replace(' (Writer).','.')
-      $theString = $theString | Sort -Unique
+      $theString = $theString | Sort-Object -Unique
       $chcp = "chcp 65001>nul"
       Set-Content -Path $outputfile$theOutput.cmd -Value $chcp
       Add-Content -Path $outputfile$theOutput.cmd -Value $theString
@@ -808,8 +806,8 @@ foreach ($filepre in $filespre)
   Copy-Item -Path $filepre -Destination $nbpcs
  
   # Validate quality of image
-  WriteToLogFile "Image-Check                  : $noextension"
-  Image-Check
+  WriteToLogFile "Test-Image                  : $noextension"
+  Test-Image
   Move-Item -Path $filepre -Destination $tpps -Force
 }
 
@@ -835,9 +833,9 @@ foreach ($file in $files)
     $postertitle = $cleanfilename.ToUpper()
     $postertitle_orig = $cleanfilename
 
-    pmm-bw-style
-    pmm-signature-style
-    rainier-style
+    Invoke-pmm-bw-style
+    Invoke-pmm-signature-style
+    Invoke-rainier-style
 
 # Clean up
     $tmpwrite = "$tpps$noextension"+"_pushed.png"
