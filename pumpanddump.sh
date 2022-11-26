@@ -38,7 +38,7 @@ echo "stopping ${plexdocker}"
 docker stop "${plexdocker}"
 echo "copying plex app"
 docker cp "${plexdocker}":/app/usr/lib/plexmediaserver/ /mnt/user/data/scripts/plex-scripts/pumpanddump/plexsql
-cd "$plexdbpath"
+cd "$plexdbpath" || exit
 echo "backing up database"
 cp com.plexapp.plugins.library.db com.plexapp.plugins.library.db.original
 echo "cleaning/resetting folders"

@@ -5,7 +5,7 @@
 
 1. A system that can run Python3
 2. Python3 installed on that system
-3. Prefereable to also have a system that can run powershell
+3. Preferable to also have a system that can run powershell
 4. Preferable to have a system that can also run Power Automate Desktop Flows
 5. System that has ImageMagick installed
 

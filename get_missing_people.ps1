@@ -23,7 +23,7 @@ param ($metalog_location)
 #################################
 # $metalog_location checks
 #################################
-if ($metalog_location -eq "" -or $metalog_location -eq $null) {
+if ($metalog_location -eq "" -or $null -eq $metalog_location) {
   write-host "Logs location >$metalog_location< not found. Exiting now..." -ForegroundColor Red -BackgroundColor White
   exit
 }
@@ -49,13 +49,12 @@ $mls = Join-Path $metalog_location ''
 # WriteToLogFile function
 #################################
 Function WriteToLogFile ($message) {
-    Add-content $scriptLog -value ((Get-Date).ToString() + " ~ " + $message)
-    Write-Host ((Get-Date).ToString() + " ~ " + $message)
+  Add-content $scriptLog -value ((Get-Date).ToString() + " ~ " + $message)
+  Write-Host ((Get-Date).ToString() + " ~ " + $message)
 }
 
-if(Test-Path $scriptLog)
-{
-    Remove-Item $scriptLog -Force | Out-Null
+if (Test-Path $scriptLog) {
+  Remove-Item $scriptLog -Force | Out-Null
 }
 
 WriteToLogFile "#### START ####"
@@ -67,46 +66,46 @@ New-Item -ItemType Directory -Force -Path $download_dir | Out-Null
 Remove-Item $step_del -Include step*.cmd
 
 # Gather all the meta* files
-$inputFile= Get-ChildItem -Path $metalog_location -Name 'meta*' -File
-ForEach ($item in $inputfile){
-    WriteToLogFile "Found: $item"
+$inputFile = Get-ChildItem -Path $metalog_location -Name 'meta*' -File
+ForEach ($item in $inputfile) {
+  WriteToLogFile "Found: $item"
 }
 
 # Define search pattern and newvalue
-$theString=$null
-$theOutput=$null
-$find=$null
-$item_path=$null
-$pattern=$null
-$newvalue=$null
-$mystring=$null
-$chcp=$null
-$files_to_process=$null
+$theString = $null
+$theOutput = $null
+$find = $null
+$item_path = $null
+$pattern = $null
+$newvalue = $null
+$chcp = $null
+$files_to_process = $null
 
 $pattern = '\[\d\d\d\d-\d\d-\d\d .*\[.*\] *\| Detail: tmdb_person updated poster to \[URL\] (https.*)(\..*g)\n.*\n.*\n.*Finished (.*) Collection'
-$newvalue= "`n`n"+"powershell -command "+[char]34+"Invoke-WebRequest "+'$1$2'+" -Outfile "+[char]39+"$dds"+'$3$2'+[char]39+[char]34+"`n`n"
+$newvalue = "`n`n" + "powershell -command " + [char]34 + "Invoke-WebRequest " + '$1$2' + " -Outfile " + [char]39 + "$dds" + '$3$2' + [char]39 + [char]34 + "`n`n"
 
 ###################################################
 # 1 - Find files in meta.log and download to download_dir
 ###################################################
-ForEach ($item in $inputfile){
+ForEach ($item in $inputfile) {
   $item_path = Join-Path $metalog_location -ChildPath "$item"
   if (Test-Path -Path $item_path -PathType Leaf) {
-    $theOutput = $item.replace("$mls","")
+    $theOutput = $item.replace("$mls", "")
     WriteToLogFile "Working on: $theOutput"
     WriteToLogFile "Working on: $outputfile$theOutput.cmd"
     Set-Content -Path $outputfile$theOutput.cmd -Value (((Get-Content $item_path -Raw) -replace "`r`n?", "`n") -replace $pattern, $newvalue)
-    $find='Invoke-WebRequest '
+    $find = 'Invoke-WebRequest '
     $theString = Get-Content $outputfile$theOutput.cmd | Select-String -Pattern $find -CaseSensitive -SimpleMatch
-    if ($theString  -eq "" -or $theString -eq $null) {
+    if ($theString -eq "" -or $null -eq $theString) {
       Remove-Item $outputfile$theOutput.cmd
-    }else{
+    }
+    else {
       $theString > tmp.txt
       $theString = Get-Content tmp.txt
-      $theString = $theString.replace(' (Director).','.')
-      $theString = $theString.replace(' (Producer).','.')
-      $theString = $theString.replace(' (Writer).','.')
-      $theString = $theString | Sort -Unique
+      $theString = $theString.replace(' (Director).', '.')
+      $theString = $theString.replace(' (Producer).', '.')
+      $theString = $theString.replace(' (Writer).', '.')
+      $theString = $theString | Sort-Object -Unique
       $chcp = "chcp 65001>nul"
       Set-Content -Path $outputfile$theOutput.cmd -Value $chcp
       Add-Content -Path $outputfile$theOutput.cmd -Value $theString
@@ -119,8 +118,8 @@ ForEach ($item in $inputfile){
 ###################################################
 # CLEANUP
 ###################################################
-  if (Test-Path tmp.txt) {
-    Remove-Item -Path tmp.txt -Force | Out-Null
-  }
+if (Test-Path tmp.txt) {
+  Remove-Item -Path tmp.txt -Force | Out-Null
+}
 
 WriteToLogFile "#### END ####"
