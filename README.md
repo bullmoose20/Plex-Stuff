@@ -272,6 +272,8 @@ Powershell security settings: https://learn.microsoft.com/en-us/powershell/modul
 
 `-base_color`    (hex color code for the base background. If omitted a random color will be picked using the "#xxxxxx" format)
 
+`-gradient`      (0=none, 1=center-out-fade, 2=bottom-up-fade, 3=top-down-fade, 4=bottom-top-fade, default=1)
+
 `-text`          (text that you want to show on the resulting image. use \n to perform a carriage return and enclose text in double quotes.)
 
 `-text_offset`   (+100 will push text down 100 px from the center. -100 will move the text up 100px from the center. Value is between -1500 and 1500. DEFAULT=0 or centered. +750 is the midpoint between the center and the bottom)
@@ -316,6 +318,7 @@ Create a poster with the Spotify.png and specified background color of "#FB19B9"
 
 ![](images/create_poster-example1.png)
 ![](images/create_poster-example2.png)
+![](images/create_poster-example3.png)
 
 ## advanced-plex-edits
 
