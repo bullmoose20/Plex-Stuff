@@ -8,13 +8,14 @@
 # It will create 1 .cmd file per meta.log file and run it to download the images locally
 # It will then scan and produce 4 files all at 2000x3000 in size
 # bw-style
-# Invoke-rainier-style
+# rainier-style
 # original-style
 # signature-style
 # transparent
 #
 # REQUIREMENTS:
 # $metalog_location=is the path to the logs directory for PMM
+# Imagemagick must be installed - https://imagemagick.org/script/download.php
 # Powershell security settings: https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_execution_policies?view=powershell-7.2
 # Windows Machine with Windows Power Automate Desktop to remove backgrounds with Adobe Express online
 # If PAD not working, then dump transparent images that were 1:1.5 in ratio and resized to 2000x3000 in png format and within the Downloads subdirectory
@@ -29,7 +30,7 @@
 param ($metalog_location, $flowName)
 
 #################################
-# 3 files to be extracted for poster creation
+# 5 files to be extracted for poster creation
 # file1=@zbase-People.jpg
 # file2=@zbase-People-Clear2.png
 # file3=@zbase-Signature.png
@@ -46,12 +47,12 @@ $file5 = "AAEAAAARAQAABAAQR0RFRmPzZRsAAANgAAACwkdQT1P3ccAhAABSiAAAIB5HU1VCtGsh2A
 # $metalog_location checks
 #################################
 if ($metalog_location -eq "" -or $null -eq $metalog_location) {
-  write-host "Logs location >$metalog_location< not found. Exiting now..." -ForegroundColor Red -BackgroundColor White
+  Write-Host "Logs location >$metalog_location< not found. Exiting now..." -ForegroundColor Red -BackgroundColor White
   exit
 }
 
 if (-not(Test-Path -Path $metalog_location)) {
-  write-host "Logs location >$metalog_location< not found. Exiting now..." -ForegroundColor Red -BackgroundColor White
+  Write-Host "Logs location >$metalog_location< not found. Exiting now..." -ForegroundColor Red -BackgroundColor White
   exit
 }
 
@@ -61,7 +62,7 @@ if (-not(Test-Path -Path $metalog_location)) {
 $flgExit = $true
 
 if ($flowName -eq "" -or $null -eq $flowName) {
-  write-host "PAD flowName >$flowName< is required. Exiting now..." -ForegroundColor Red -BackgroundColor White
+  Write-Host "PAD flowName >$flowName< is required. Exiting now..." -ForegroundColor Red -BackgroundColor White
   exit
 }
 
@@ -75,6 +76,7 @@ $global:Counter4 = 0
 $global:Counter5 = 0
 $global:Counter6 = 0
 $global:Counter7 = 0
+$global:magick = $null
 
 #################################
 # collect paths
@@ -117,6 +119,14 @@ $bps = Join-Path $basePath ''
 Function WriteToLogFile ($message) {
   Add-content $scriptLog -value ((Get-Date).ToString() + " ~ " + $message)
   Write-Host ((Get-Date).ToString() + " ~ " + $message)
+}
+
+#################################
+# check ImageMagick function
+#################################
+function Test-ImageMagick {
+  $global:magick = $global:magick
+  $global:magick = magick -version | select-string "Version:"
 }
 
 #################################
@@ -657,6 +667,16 @@ WriteToLogFile "#### START ####"
 $Stopwatch = [System.Diagnostics.Stopwatch]::new()
 $Stopwatch.Start()
 
+Test-ImageMagick
+$test = $global:magick
+if ($null -eq $test) {
+  WriteToLogFile "Imagemagick                  : Imagemagick is NOT installed. Aborting.... Imagemagick must be installed - https://imagemagick.org/script/download.php"
+  exit
+}
+else {
+  WriteToLogFile "Imagemagick                  : Imagemagick is installed. $global:magick"
+}
+
 # Test-Image variables
 $baseImageRatio = [math]::Round(1 / 1.5, 4)
 $baseImageW = 399
@@ -690,10 +710,10 @@ if ($chkfont1 -eq "" -or $null -eq $chkfont1 -or $chkfont2 -eq "" -or $null -eq 
   $font_list = magick identify -list font | Select-String "Font: "
   $font_list -replace "  Font: ", ""> magick_fonts.txt
   Write-Host "Fonts missing >Comfortaa-Medium< and >Fuggles-Regular< are not installed/found. List of installed fonts that Imagemagick can use listed and exported here: magick_fonts.txt." -ForegroundColor Red -BackgroundColor White
-  write-host $font_list.count "fonts are visible to Imagemagick. Extracting fonts now to $basePath folder..." -ForegroundColor Red -BackgroundColor White
+  Write-Host $font_list.count "fonts are visible to Imagemagick. Extracting fonts now to $basePath folder..." -ForegroundColor Red -BackgroundColor White
   Convert-TextToBinary -Text $file4 -OutputPath $bps"Comfortaa-Medium.ttf"
   Convert-TextToBinary -Text $file5 -OutputPath $bps"Fuggles-Regular.ttf"
-  write-host "Aborting now... Ensure that you Right-Click 'Install for all users' in Windows before retrying..." -ForegroundColor Red -BackgroundColor White
+  Write-Host "Aborting now... Ensure that you Right-Click 'Install for all users' in Windows before retrying..." -ForegroundColor Red -BackgroundColor White
   exit
 }
 

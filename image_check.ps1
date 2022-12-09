@@ -1,6 +1,6 @@
 ﻿####################################################
 # image_check.ps1
-# v1.0
+# v1.2
 # author: bullmoose20
 #
 # DESCRIPTION: 
@@ -9,6 +9,7 @@
 #
 # REQUIREMENTS:
 # $images_location=is the path to the directory with the transparent images to verify
+# Imagemagick must be installed - https://imagemagick.org/script/download.php
 # Powershell security settings: https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_execution_policies?view=powershell-7.2
 #
 # PARAMETERS:
@@ -32,6 +33,7 @@ if (-not(Test-Path -Path $images_location)) {
   write-host "Images location >$images_location< not found. Exiting now..." -ForegroundColor Red -BackgroundColor White
   exit
 }
+
 #################################
 # GLOBAL VARS
 #################################
@@ -42,6 +44,7 @@ $global:Counter4 = 0
 $global:Counter5 = 0
 $global:Counter6 = 0
 $global:Counter7 = 0
+$global:magick = $null
 
 #################################
 # collect paths
@@ -59,6 +62,14 @@ $ils = Join-Path $images_location ''
 Function WriteToLogFile ($message) {
   Add-content $scriptLog -value ((Get-Date).ToString() + " ~ " + $message)
   Write-Host ((Get-Date).ToString() + " ~ " + $message)
+}
+
+#################################
+# check ImageMagick function
+#################################
+function Test-ImageMagick {
+  $global:magick = $global:magick
+  $global:magick = magick -version | select-string "Version:"
 }
 
 #################################
@@ -134,6 +145,16 @@ WriteToLogFile "#### START ####"
 
 $Stopwatch = [System.Diagnostics.Stopwatch]::new()
 $Stopwatch.Start()
+
+Test-ImageMagick
+$test = $global:magick
+if ($null -eq $test) {
+  WriteToLogFile "Imagemagick                  : Imagemagick is NOT installed. Aborting.... Imagemagick must be installed - https://imagemagick.org/script/download.php"
+  exit
+}
+else {
+  WriteToLogFile "Imagemagick                  : Imagemagick is installed. $global:magick"
+}
 
 # Image-Check variables
 $baseImageRatio = [math]::Round(1 / 1.5, 4)
