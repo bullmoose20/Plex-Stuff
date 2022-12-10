@@ -205,15 +205,15 @@ switch ($gradient) {
 }
 
 $fade0 = resolve-path $fade0
-Write-Host "Fade0 path    : $fade0"
+# Write-Host "Fade0 path    : $fade0"
 $fade1 = resolve-path $fade1
-Write-Host "Fade1 path    : $fade1"
+# Write-Host "Fade1 path    : $fade1"
 $fade2 = resolve-path $fade2
-Write-Host "Fade2 path    : $fade2"
+# Write-Host "Fade2 path    : $fade2"
 $fade3 = resolve-path $fade3
-Write-Host "Fade3 path    : $fade3"
+# Write-Host "Fade3 path    : $fade3"
 $fade4 = resolve-path $fade4
-Write-Host "Fade4 path    : $fade4"
+# Write-Host "Fade4 path    : $fade4"
 Write-Host "Fade selected : $fade"
 
 #################################
@@ -573,7 +573,11 @@ if (Test-Path $of) {
   Write-Host "File saved to : $of"
 }
 Write-Host "ran cmd       :" $myinvocation.Line
-Write-Host "playback cmd  : .\create_poster.ps1 -logo ""$orig_logo"" -logo_offset $logo_offset -logo_resize $logo_resize -text ""$text"" -text_offset $text_offset -font ""$font"" -font_size $font_size -font_color ""$font_color"" -border"$"$border -border_width $border_width -border_color ""$border_color"" -out_name ""$out_name"" -base_color ""$base_color"" -gradient $fadenum -clean "$"$clean -white_wash "$"$white_wash"
+$border_bit = [int][bool]::Parse($border)
+$clean_bit = [int][bool]::Parse($clean)
+$white_wash_bit = [int][bool]::Parse($white_wash)
+Write-Host "playback cmd  : .\create_poster.ps1 -logo ""$orig_logo"" -logo_offset $logo_offset -logo_resize $logo_resize -text ""$text"" -text_offset $text_offset -font ""$font"" -font_size $font_size -font_color ""$font_color"" -border $border_bit -border_width $border_width -border_color ""$border_color"" -out_name ""$out_name"" -base_color ""$base_color"" -gradient $fadenum -clean $clean_bit -white_wash $white_wash_bit"
+Add-Content -Path playback.txt -Value ".\create_poster.ps1 -logo ""$orig_logo"" -logo_offset $logo_offset -logo_resize $logo_resize -text ""$text"" -text_offset $text_offset -font ""$font"" -font_size $font_size -font_color ""$font_color"" -border $border_bit -border_width $border_width -border_color ""$border_color"" -out_name ""$out_name"" -base_color ""$base_color"" -gradient $fadenum -clean $clean_bit -white_wash $white_wash_bit"
 Write-Host ""
 #################################
 # clean
