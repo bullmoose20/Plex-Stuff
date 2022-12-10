@@ -32,12 +32,13 @@
 # -border        (default is 0 or $false - boolean value and when set to 1 or $true, it will add the border)
 # -border_width  (width in pixels between 1 and 100. DEFAULT=15)
 # -border_color  (hex color code for the border color using the "#xxxxxx" format. DEFAULT=#FFFFFF)
+# -out_name      (the name without an extension that you want the final image to have, otherwise it will use the logo name to autofill this)
 # -white_wash    (default is 0 or $false - boolean value and when set to 1 or $true, it will take the logo and make it white)
 # -clean         (default is 0 or $false - boolean value and when set to 1 or $true, it will delete the temporary files that are created as part of the script)
 #
 ####################################################
 
-param ($logo, $logo_offset, $logo_resize, $base_color, $gradient, $text, $text_offset, $font, $font_color, $font_size, [bool]$border, $border_width, $border_color, [bool]$white_wash, [bool]$clean)
+param ($logo, $logo_offset, $logo_resize, $base_color, $gradient, $text, $text_offset, $font, $font_color, $font_size, $out_name, [bool]$border, $border_width, $border_color, [bool]$white_wash, [bool]$clean)
 
 #################################
 # GLOBAL VARS
@@ -60,11 +61,11 @@ function Test-ImageMagick {
 Test-ImageMagick
 $test = $global:magick
 if ($null -eq $test) {
-  Write-Host "Imagemagick                  : Imagemagick is NOT installed. Aborting.... Imagemagick must be installed - https://imagemagick.org/script/download.php"
+  Write-Host "Imagemagick   : Imagemagick is NOT installed. Aborting.... Imagemagick must be installed - https://imagemagick.org/script/download.php"
   exit
 }
 else {
-  Write-Host "Imagemagick                  : Imagemagick is installed. $global:magick"
+  Write-Host "Imagemagick   : Imagemagick is installed. $global:magick"
 }
 
 #################################
@@ -177,12 +178,30 @@ if (-not(Test-Path -Path $fade4 -PathType Leaf)) {
 }
 
 switch ($gradient) {
-  0 { $fade = resolve-path $fade0 }
-  1 { $fade = resolve-path $fade1 }
-  2 { $fade = resolve-path $fade2 }
-  3 { $fade = resolve-path $fade3 }
-  4 { $fade = resolve-path $fade4 }
-  Default { $fade = resolve-path $fade1 }
+  0 {
+    $fade = resolve-path $fade0 
+    $fadenum = 0
+  }
+  1 {
+    $fade = resolve-path $fade1 
+    $fadenum = 1
+  }
+  2 {
+    $fade = resolve-path $fade2
+    $fadenum = 2 
+  }
+  3 {
+    $fade = resolve-path $fade3 
+    $fadenum = 3
+  }
+  4 {
+    $fade = resolve-path $fade4 
+    $fadenum = 4
+  }
+  Default {
+    $fade = resolve-path $fade1
+    $fadenum = 1 
+  }
 }
 
 $fade0 = resolve-path $fade0
@@ -539,12 +558,23 @@ if ($border) {
 #################################
 # move final result from tmp to ..\
 #################################
+if ($out_name -eq "" -or $null -eq $out_name) {
+  # empty $out_name
+  Write-Host "out_name      : $out_name"
+}
+else {
+  Write-Host "out_name      : $out_name"
+  $of = $of
+  $of = Join-Path -Path 'output' -ChildPath "$out_name.jpg"
+}
+
 Move-Item -Path $nef -Destination $of -Force | Out-Null
 if (Test-Path $of) {
-  Write-Host "File saved to: $of"
+  Write-Host "File saved to : $of"
 }
+Write-Host "ran cmd       :" $myinvocation.Line
+Write-Host "playback cmd  : .\create_poster.ps1 -logo ""$orig_logo"" -logo_offset $logo_offset -logo_resize $logo_resize -text ""$text"" -text_offset $text_offset -font ""$font"" -font_size $font_size -font_color ""$font_color"" -border"$"$border -border_width $border_width -border_color ""$border_color"" -out_name ""$out_name"" -base_color ""$base_color"" -gradient $fadenum -clean "$"$clean -white_wash "$"$white_wash"
 Write-Host ""
-
 #################################
 # clean
 #################################
