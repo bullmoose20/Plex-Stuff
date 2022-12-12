@@ -1,6 +1,6 @@
 ﻿####################################################
 # create_poster.ps1
-# v1.2
+# v1.3
 # author: bullmoose20
 #
 # DESCRIPTION: 
@@ -49,6 +49,7 @@ $global:magick = $null
 # VALIDATE params and set default params
 ###########################################
 $script_path = $PSScriptRoot
+Write-Host "****************************"
 Write-Host "Script path   : $script_path"
 
 #################################
@@ -518,7 +519,23 @@ if ($border) {
 }
 Write-Host "input logo    : $noextension$extension"
 Write-Host "output file   : $noextension.jpg"
+if ($out_name -eq "" -or $null -eq $out_name) {
+  # empty $out_name
+  Write-Host "out_name      : $out_name"
+}
+else {
+  Write-Host "out_name      : $out_name"
+  $of = $of
+  $of = Join-Path -Path 'output' -ChildPath "$out_name.jpg"
+}
+Write-Host "Save path     : $of"
 Write-Host "clean         : $clean"
+Write-Host "ran cmd       :"$myinvocation.Line
+$border_bit = [int][bool]::Parse($border)
+$clean_bit = [int][bool]::Parse($clean)
+$white_wash_bit = [int][bool]::Parse($white_wash)
+Write-Host "playback cmd  : .\create_poster.ps1 -logo ""$orig_logo"" -logo_offset $logo_offset -logo_resize $logo_resize -text ""$text"" -text_offset $text_offset -font ""$font"" -font_size $font_size -font_color ""$font_color"" -border $border_bit -border_width $border_width -border_color ""$border_color"" -out_name ""$out_name"" -base_color ""$base_color"" -gradient $fadenum -clean $clean_bit -white_wash $white_wash_bit"
+Add-Content -Path playback.txt -Value ".\create_poster.ps1 -logo ""$orig_logo"" -logo_offset $logo_offset -logo_resize $logo_resize -text ""$text"" -text_offset $text_offset -font ""$font"" -font_size $font_size -font_color ""$font_color"" -border $border_bit -border_width $border_width -border_color ""$border_color"" -out_name ""$out_name"" -base_color ""$base_color"" -gradient $fadenum -clean $clean_bit -white_wash $white_wash_bit"
 
 #################################
 # creation of image begins
@@ -558,26 +575,10 @@ if ($border) {
 #################################
 # move final result from tmp to ..\
 #################################
-if ($out_name -eq "" -or $null -eq $out_name) {
-  # empty $out_name
-  Write-Host "out_name      : $out_name"
-}
-else {
-  Write-Host "out_name      : $out_name"
-  $of = $of
-  $of = Join-Path -Path 'output' -ChildPath "$out_name.jpg"
-}
-
 Move-Item -Path $nef -Destination $of -Force | Out-Null
 if (Test-Path $of) {
   Write-Host "File saved to : $of"
 }
-Write-Host "ran cmd       :" $myinvocation.Line
-$border_bit = [int][bool]::Parse($border)
-$clean_bit = [int][bool]::Parse($clean)
-$white_wash_bit = [int][bool]::Parse($white_wash)
-Write-Host "playback cmd  : .\create_poster.ps1 -logo ""$orig_logo"" -logo_offset $logo_offset -logo_resize $logo_resize -text ""$text"" -text_offset $text_offset -font ""$font"" -font_size $font_size -font_color ""$font_color"" -border $border_bit -border_width $border_width -border_color ""$border_color"" -out_name ""$out_name"" -base_color ""$base_color"" -gradient $fadenum -clean $clean_bit -white_wash $white_wash_bit"
-Add-Content -Path playback.txt -Value ".\create_poster.ps1 -logo ""$orig_logo"" -logo_offset $logo_offset -logo_resize $logo_resize -text ""$text"" -text_offset $text_offset -font ""$font"" -font_size $font_size -font_color ""$font_color"" -border $border_bit -border_width $border_width -border_color ""$border_color"" -out_name ""$out_name"" -base_color ""$base_color"" -gradient $fadenum -clean $clean_bit -white_wash $white_wash_bit"
 Write-Host ""
 #################################
 # clean
