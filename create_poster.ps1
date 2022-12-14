@@ -1,6 +1,6 @@
 ﻿####################################################
 # create_poster.ps1
-# v1.3
+# v1.4
 # author: bullmoose20
 #
 # DESCRIPTION: 
@@ -19,26 +19,28 @@
 # Powershell security settings: https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_execution_policies?view=powershell-7.2
 #
 # PARAMETERS:
-# -logo          (specify the logo/image png file that you want to have centered and resized)
-# -logo_offset   (+100 will push logo down 100 px from the center. -100 will move the logo up 100px from the center. Value is between -1500 and 1500. DEFAULT=0 or centered. -750 is the midpoint between the center and the top)
-# -logo_resize   (1000 will resize the log to fit in the poster.DEFAULT=1800.)
-# -base_color    (hex color code for the base background. If omitted a random color will be picked using the "#xxxxxx" format)
-# -gradient      (0=none, 1=center-out-fade, 2=bottom-up-fade, 3=top-down-fade, 4=bottom-top-fade, default=1)
-# -text          (text that you want to show on the resulting image. use \n to perform a carriage return and enclose text in double quotes.)
-# -text_offset   (+100 will push text down 100 px from the center. -100 will move the text up 100px from the center. Value is between -1500 and 1500. DEFAULT=0 or centered. +750 is the midpoint between the center and the bottom)
-# -font          (font name that you want to use. magick identify -list font magick -list font)
-# -font_color    (hex color code for the font. If omitted, white or #FFFFFF will be used)
-# -font_size     (default is 250. pick a font size between 10-500.)
-# -border        (default is 0 or $false - boolean value and when set to 1 or $true, it will add the border)
-# -border_width  (width in pixels between 1 and 100. DEFAULT=15)
-# -border_color  (hex color code for the border color using the "#xxxxxx" format. DEFAULT=#FFFFFF)
-# -out_name      (the name without an extension that you want the final image to have, otherwise it will use the logo name to autofill this)
-# -white_wash    (default is 0 or $false - boolean value and when set to 1 or $true, it will take the logo and make it white)
-# -clean         (default is 0 or $false - boolean value and when set to 1 or $true, it will delete the temporary files that are created as part of the script)
+# -logo                (specify the logo/image png file that you want to have centered and resized)
+# -logo_offset         (+100 will push logo down 100 px from the center. -100 will move the logo up 100px from the center. Value is between -1500 and 1500. DEFAULT=0 or centered. -750 is the midpoint between the center and the top)
+# -logo_resize         (1000 will resize the log to fit in the poster.DEFAULT=1800.)
+# -base_color          (hex color code for the base background. If omitted a random color will be picked using the "#xxxxxx" format)
+# -gradient            (0=none, 1=center-out-fade, 2=bottom-up-fade, 3=top-down-fade, 4=bottom-top-fade, default=1)
+# -text                (text that you want to show on the resulting image. use \n to perform a carriage return and enclose text in double quotes.)
+# -text_offset         (+100 will push text down 100 px from the center. -100 will move the text up 100px from the center. Value is between -1500 and 1500. DEFAULT=0 or centered. +750 is the midpoint between the center and the bottom)
+# -font                (font name that you want to use. magick identify -list font magick -list font)
+# -font_color          (hex color code for the font. If omitted, white or #FFFFFF will be used)
+# -font_size           (default is 250. pick a font size between 10-500.)
+# -border              (default is 0 or $false - boolean value and when set to 1 or $true, it will add the border)
+# -border_width        (width in pixels between 1 and 100. DEFAULT=15)
+# -border_color        (hex color code for the border color using the "#xxxxxx" format. DEFAULT=#FFFFFF)
+# -avg_color           (default is 0 or $false - boolean value and when set to 1 or $true, it will take the avg_color_image and calculate the average color in hex to use as a base_color if no base_color is specified)
+# -avg_color_image     (specify the logo/image png file that you want to have this script calculate color average)
+# -out_name            (the name without an extension that you want the final image to have, otherwise it will use the logo name to autofill this)
+# -white_wash          (default is 0 or $false - boolean value and when set to 1 or $true, it will take the logo and make it white)
+# -clean               (default is 0 or $false - boolean value and when set to 1 or $true, it will delete the temporary files that are created as part of the script)
 #
 ####################################################
 
-param ($logo, $logo_offset, $logo_resize, $base_color, $gradient, $text, $text_offset, $font, $font_color, $font_size, $out_name, [bool]$border, $border_width, $border_color, [bool]$white_wash, [bool]$clean)
+param ($logo, $logo_offset, $logo_resize, $base_color, $gradient, $text, $text_offset, $font, $font_color, $font_size, $out_name, [bool]$avg_color, $avg_color_image, [bool]$border, $border_width, $border_color, [bool]$white_wash, [bool]$clean)
 
 #################################
 # GLOBAL VARS
@@ -180,40 +182,40 @@ if (-not(Test-Path -Path $fade4 -PathType Leaf)) {
 
 switch ($gradient) {
   0 {
-    $fade = resolve-path $fade0 
+    $fade = Resolve-Path $fade0 
     $fadenum = 0
   }
   1 {
-    $fade = resolve-path $fade1 
+    $fade = Resolve-Path $fade1 
     $fadenum = 1
   }
   2 {
-    $fade = resolve-path $fade2
+    $fade = Resolve-Path $fade2
     $fadenum = 2 
   }
   3 {
-    $fade = resolve-path $fade3 
+    $fade = Resolve-Path $fade3 
     $fadenum = 3
   }
   4 {
-    $fade = resolve-path $fade4 
+    $fade = Resolve-Path $fade4 
     $fadenum = 4
   }
   Default {
-    $fade = resolve-path $fade1
+    $fade = Resolve-Path $fade1
     $fadenum = 1 
   }
 }
 
-$fade0 = resolve-path $fade0
+$fade0 = Resolve-Path $fade0
 # Write-Host "Fade0 path    : $fade0"
-$fade1 = resolve-path $fade1
+$fade1 = Resolve-Path $fade1
 # Write-Host "Fade1 path    : $fade1"
-$fade2 = resolve-path $fade2
+$fade2 = Resolve-Path $fade2
 # Write-Host "Fade2 path    : $fade2"
-$fade3 = resolve-path $fade3
+$fade3 = Resolve-Path $fade3
 # Write-Host "Fade3 path    : $fade3"
-$fade4 = resolve-path $fade4
+$fade4 = Resolve-Path $fade4
 # Write-Host "Fade4 path    : $fade4"
 Write-Host "Fade selected : $fade"
 
@@ -224,6 +226,41 @@ Write-Host "Fade selected : $fade"
 if ($base_color -eq "" -or $null -eq $base_color) {
   $base_color = ("#{0:X6}" -f (Get-Random -Maximum 0xFFFFFF))
 }
+
+if ($avg_color_image -eq "" -or $null -eq $avg_color_image) {
+  if (Test-Path .\transparent.png) {
+  }
+  else {
+    magick -size 1x1 xc:none transparent.png
+  }
+  $avg_color_image = "transparent.png"
+}
+
+if ($avg_color) {
+  if (-not(Test-Path -Path $avg_color_image -PathType Leaf)) {
+    Write-Host "Image for avg_color_image >$avg_color_image< not found. Exiting now..." -ForegroundColor Red -BackgroundColor White
+    exit
+  }
+  else { 
+    $avg_color_image = Resolve-Path $avg_color_image
+  }
+}
+else {
+  $avg_color_image = ""
+}
+
+if ($avg_color -and $base_color -ne "") {
+  $avg_color = $False
+}
+
+if ($avg_color -eq "" -or $null -eq $avg_color) {
+}
+else {
+  $avg_color = $avg_color
+  $my_avg = magick $avg_color_image -resize 1x1 txt:-
+  $my_avg = $my_avg -split "(#[a-zA-Z0-9]{6})"
+  $base_color = $my_avg[2]
+}  
 
 if ($base_color.StartsWith('#', 'CurrentCultureIgnoreCase')) {
 }
@@ -500,6 +537,11 @@ $tmp_border = "$border_width" + "x" + "$border_width"
 Write-Host "base color    : $base_color"
 Write-Host "logo offset   : $logo_offset"
 Write-Host "logo resize   : $logo_resize"
+if ($avg_color) {
+  Write-Host "avg color     : $avg_color"
+  Write-Host "avg color img : $avg_color_image"
+  Write-Host "my avg        : $base_color"
+}
 Write-Host "white-wash    : $white_wash"
 if ($text -eq "" -or $null -eq $text) {
 }
@@ -534,8 +576,10 @@ Write-Host "ran cmd       :"$myinvocation.Line
 $border_bit = [int][bool]::Parse($border)
 $clean_bit = [int][bool]::Parse($clean)
 $white_wash_bit = [int][bool]::Parse($white_wash)
-Write-Host "playback cmd  : .\create_poster.ps1 -logo ""$orig_logo"" -logo_offset $logo_offset -logo_resize $logo_resize -text ""$text"" -text_offset $text_offset -font ""$font"" -font_size $font_size -font_color ""$font_color"" -border $border_bit -border_width $border_width -border_color ""$border_color"" -out_name ""$out_name"" -base_color ""$base_color"" -gradient $fadenum -clean $clean_bit -white_wash $white_wash_bit"
-Add-Content -Path playback.txt -Value ".\create_poster.ps1 -logo ""$orig_logo"" -logo_offset $logo_offset -logo_resize $logo_resize -text ""$text"" -text_offset $text_offset -font ""$font"" -font_size $font_size -font_color ""$font_color"" -border $border_bit -border_width $border_width -border_color ""$border_color"" -out_name ""$out_name"" -base_color ""$base_color"" -gradient $fadenum -clean $clean_bit -white_wash $white_wash_bit"
+$avg_color_bit = [int][bool]::Parse($avg_color)
+$base_color = $base_color.ToUpper()
+Write-Host "playback cmd  : .\create_poster.ps1 -logo ""$orig_logo"" -logo_offset $logo_offset -logo_resize $logo_resize -text ""$text"" -text_offset $text_offset -font ""$font"" -font_size $font_size -font_color ""$font_color"" -border $border_bit -border_width $border_width -border_color ""$border_color"" -avg_color_image ""$avg_color_image"" -out_name ""$out_name"" -base_color ""$base_color"" -gradient $fadenum -clean $clean_bit -avg_color $avg_color_bit -white_wash $white_wash_bit"
+Add-Content -Path playback.txt -Value ".\create_poster.ps1 -logo ""$orig_logo"" -logo_offset $logo_offset -logo_resize $logo_resize -text ""$text"" -text_offset $text_offset -font ""$font"" -font_size $font_size -font_color ""$font_color"" -border $border_bit -border_width $border_width -border_color ""$border_color"" -avg_color_image ""$avg_color_image"" -out_name ""$out_name"" -base_color ""$base_color"" -gradient $fadenum -clean $clean_bit -avg_color $avg_color_bit -white_wash $white_wash_bit"
 
 #################################
 # creation of image begins
@@ -548,7 +592,7 @@ magick -gravity center $bcf $fade -background None -layers Flatten $gbcf
 #Write-Host "magick $logo -colorspace gray -fill white -colorize 100 $wf"
 magick $logo -colorspace gray -fill white -colorize 100 $wf
 
-$tmplogo = resolve-path $logo
+$tmplogo = Resolve-Path $logo
 if ($white_wash) {
   $logo = Join-Path -Path 'tmp' -ChildPath "white_$noextension$extension"
 }
