@@ -83,7 +83,8 @@ Or however you've mounted those directories.
 8. [get_missing_people.ps1](#get_missing_people) - Scans your PMM meta* logs to find missing people posters to download and create the bw, rainier, orig, etc. style poster for PMM/PLEX/EMBY/JELLYFIN/OTHER
 9. [image_check.ps1](#image_check) - Scans your transparent images for anomalies like head-chops, backgrounds not removed, and black and white photos instead of a color photo to give you a report so you can go and fix those by uploading new and better options to https://www.themoviedb.org/
 10. [create_people_poster.ps1](#create_people_poster) - Scans your PMM meta* logs to find missing people posters and will download and create the bw, rainier, orig, transparent. style poster for PMM/PLEX/EMBY/JELLYFIN/OTHER. This script was put together by using the image_check, get_missing_people, and Power Automate Desktop Flow (remove background) all into 1
-
+11. [PAD Flows](#pad_flows) - Various PAD flows for RPA stuff for PLEX, PMM, Other
+    1.  [Convert Error: No TMDb ID Found for IMDb ID:](#Convert_Error_No_TMDb_ID_Found_for_IMDb_ID) - PAD flow to deal with Convert Errors in your meta.log file from PMM
 ## plex-bloat-fix
 
 Your PLEX folders are growing out of control. You use overlays from PMM or upload lots of custom art that you no longer want to use or need to eliminate. You don't want to perform the plex dance if you can avoid it. This script will free up gigs of space....It can also perform some PLEX operations like "empty trash", "clean bundles", and "optimize db". PBF also supports the use of PASSTHROUGH alerts to discord with notifiarr.com. 
@@ -411,13 +412,13 @@ $flowName=           is the PAD Flow name that you want to call for your setup
 If your system is missing fonts, you will be prompted to install the ones that are extracted before continuing
 
 PAD Flows included in this repo are:
-- `remove backgrounds chrome-en windows-en`    => Windows OS is in English and Chrome in English
-- `remove backgrounds edge-en windows-en`      => Windows OS is in English and Edge in English
-- `remove backgrounds edge-en windows-fr`      => Windows OS is in French and Edge in English
-- `remove backgrounds edge-fr windows-fr`      => Windows OS is in French and Edge in French
+- `remove backgrounds chrome-en windows-en`     => Windows OS is in English and Chrome in English
+- `remove backgrounds edge-en windows-en`       => Windows OS is in English and Edge in English
+- `remove backgrounds edge-en windows-fr`       => Windows OS is in French and Edge in English
+- `remove backgrounds edge-fr windows-fr`       => Windows OS is in French and Edge in French
 
 Power Automate Desktop on a Windows Machine with the flow that will access Adobe Express Online ( https://express.adobe.com/tools/remove-background ) to remove backgrounds in an automated fashion. Download found here ( https://go.microsoft.com/fwlink/?linkid=2102613 ). Ensure that you install the chrome and edge web browser extensions.
-
+## pad_flows_install
 PAD Installation steps
 1. Install PAD and Extensions
 2. Create a new flow and name it as one of the flows included in this repo (described above)
@@ -445,3 +446,26 @@ Run script against a folder where you copied some meta*.log files from D:\logs o
 `.\create_people_poster.ps1 -metalog_location D:\logs -flowname "remove backgrounds edge-en windows-en"`
 
 ![](images/create_people_poster-example1.png)
+
+## pad_flows
+PAD Flows
+## Convert_Error_No_TMDb_ID_Found_for_IMDb_ID
+- `Convert Error- No TMDb ID Found for IMDb ID` => Windows OS is in English and Edge in English
+- See [PAD Flows Install](#pad_flows_install)
+- Before starting. ensure that you have a tmdb account and that you logged in so that the cached credentials will work before trying this....
+![](images/Convert_Error-_No_TMDb_ID_Found_for_IMDb_ID.png)
+`ctrl-a` is used to ensure that the flow waits until you find/click on the actual episode in TMDB (See image)
+1. 2 browsers will open to assist you to link the missing ids
+   1. 1st browser stays on the found IMDB page
+   2. 2nd is the one you use to navigate to find the episode on tmdb after a google search is done for you by the flow
+2. Once you hit `ctrl-a`, automation fully takes over and will process the addition if it determines that one is needed. It will then close both browsers down and go to the next imdb id that was missing and reported from the selected meta.log
+3. Logging is enabled and found in the same directory that you chose for the meta.log in the early steps in the flow. 
+   1. `tmdbupdater.log` which is the full status of steps completed by the flow
+   2. `tmdbupdater-progress.log` contains your progress. 
+   3. `tmdbconvert.log` is a stripped down version of the meta.log
+
+Error checking is enabled and does the following:
+ - if you hit `ctrl-a` and you are not on tmdb, this usually means that you cannot find the episode on tmdb and hence you want to "skip" it
+ - if you hit `ctrl-a` and the imdb external id field is already populated (it happens as the community updates these things), it will log and skip it
+ - if you hit `ctrl-a` and you get an error upon save, then that is logged and continues. if its a success, that is logged and continues
+ - if you hit `ctrl-a` and you are somehow in tmdb in another language or the episode and its show is not in tmdb in ENGLISH, then the script will try to add the english translation and continue to try again to add the id in the subsequent iteration (This has not been tested because I have not encountered this yet but I know it happens because of the other flow I have used in the past)
