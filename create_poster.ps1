@@ -1,6 +1,6 @@
 ﻿####################################################
 # create_poster.ps1
-# v1.4
+# v1.5
 # author: bullmoose20
 #
 # DESCRIPTION: 
@@ -34,13 +34,15 @@
 # -border_color        (hex color code for the border color using the "#xxxxxx" format. DEFAULT=#FFFFFF)
 # -avg_color           (default is 0 or $false - boolean value and when set to 1 or $true, it will take the avg_color_image and calculate the average color in hex to use as a base_color if no base_color is specified)
 # -avg_color_image     (specify the logo/image png file that you want to have this script calculate color average)
+# -dom_color           (default is 0 or $false - boolean value and when set to 1 or $true, it will take the dom_color_image and calculate the dominant color in hex to use as a border_color if no border_color is specified)
+# -dom_color_image     (specify the logo/image png file that you want to have this script calculate dominant color)
 # -out_name            (the name without an extension that you want the final image to have, otherwise it will use the logo name to autofill this)
 # -white_wash          (default is 0 or $false - boolean value and when set to 1 or $true, it will take the logo and make it white)
 # -clean               (default is 0 or $false - boolean value and when set to 1 or $true, it will delete the temporary files that are created as part of the script)
 #
 ####################################################
 
-param ($logo, $logo_offset, $logo_resize, $base_color, $gradient, $text, $text_offset, $font, $font_color, $font_size, $out_name, [bool]$avg_color, $avg_color_image, [bool]$border, $border_width, $border_color, [bool]$white_wash, [bool]$clean)
+param ($logo, $logo_offset, $logo_resize, $base_color, $gradient, $text, $text_offset, $font, $font_color, $font_size, $out_name, [bool]$avg_color, $avg_color_image, [bool]$dom_color, $dom_color_image, [bool]$border, $border_width, $border_color, [bool]$white_wash, [bool]$clean)
 
 #################################
 # GLOBAL VARS
@@ -223,6 +225,7 @@ Write-Host "Fade selected : $fade"
 # $base_color checks
 #################################
 
+$orig_base = $base_color
 if ($base_color -eq "" -or $null -eq $base_color) {
   $base_color = ("#{0:X6}" -f (Get-Random -Maximum 0xFFFFFF))
 }
@@ -249,15 +252,23 @@ else {
   $avg_color_image = ""
 }
 
-if ($avg_color -and $base_color -ne "") {
+if ($avg_color) {
+  if ($orig_base -ne "") {
   $avg_color = $False
+  }
 }
+
+#################################
+# dom_color check (TO BE ADDED IN FUTURE)
+#################################
+# magick ..\..\HDR10plus_Logo_Color_2018_top.png +dither -colors 5 -define histogram:unique-colors=true -alpha off -format "%f\n%c\n" histogram:info: | Sort-Object -Descending | Select-String '(#[a-zA-Z0-9]{6})'
 
 if ($avg_color -eq "" -or $null -eq $avg_color) {
 }
 else {
   $avg_color = $avg_color
-  $my_avg = magick $avg_color_image -resize 1x1 txt:-
+  # using a modulate adds Hsl "brightness" of 120%, so a 20% brighter image
+  $my_avg = magick $avg_color_image -resize 1x1 -modulate 120 txt:-
   $my_avg = $my_avg -split "(#[a-zA-Z0-9]{6})"
   $base_color = $my_avg[2]
 }  
