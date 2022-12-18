@@ -44,6 +44,7 @@ File.WriteText File: $'''%SelectedFile.Directory%\\%logfile%.log''' TextToWrite:
 SET ctr TO 0
 LOOP FOREACH CurrentItem IN ListDifference
     Variables.IncreaseVariable Value: ctr IncrementValue: 1
+    DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> LoopStart
     Text.Trim Text: CurrentItem TrimOption: Text.TrimOption.Both TrimmedText=> TrimmedText
     DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
     File.WriteText File: $'''%SelectedFile.Directory%\\%logfile%.log''' TextToWrite: $'''%CurrentDateTime% - INF - ###################################
@@ -181,7 +182,19 @@ LOOP FOREACH CurrentItem IN ListDifference
     LABEL close_browsers
     DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
     Variables.AddItemToList Item: TrimmedText List: FileContents_Progress
-    File.WriteText File: $'''%SelectedFile.Directory%\\%logfile%.log''' TextToWrite: $'''%CurrentDateTime% - INF - ###################################''' AppendNewLine: True IfFileExists: File.IfFileExists.Append Encoding: File.FileEncoding.Unicode
+    DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> LoopEnd
+    DateTime.Subtract FromDate: LoopEnd SubstractDate: LoopStart TimeUnit: DateTime.DifferenceTimeUnit.Seconds TimeDifference=> TimeDifference
+    SET eta_sec TO (ListDifference.Count - ctr) * TimeDifference
+    SET eta_min TO ((ListDifference.Count - ctr) * TimeDifference) / 60
+    SET eta_hrs TO ((ListDifference.Count - ctr) * TimeDifference) / 3600
+    Variables.TruncateNumber.RoundNumber Number: eta_sec DecimalPlaces: 2 Result=> TruncatedValue
+    Variables.TruncateNumber.RoundNumber Number: eta_min DecimalPlaces: 2 Result=> TruncatedValue
+    Variables.TruncateNumber.RoundNumber Number: eta_hrs DecimalPlaces: 2 Result=> TruncatedValue
+    File.WriteText File: $'''%SelectedFile.Directory%\\%logfile%.log''' TextToWrite: $'''%CurrentDateTime% - INF - Seconds to process: %TimeDifference%
+%CurrentDateTime% - INF - Estimated seconds left: %eta_sec%
+%CurrentDateTime% - INF - Estimated minutes left: %eta_min%
+%CurrentDateTime% - INF - Estimated hours left  : %eta_hrs%
+%CurrentDateTime% - INF - ###################################''' AppendNewLine: True IfFileExists: File.IfFileExists.Append Encoding: File.FileEncoding.Unicode
     File.WriteText File: $'''%SelectedFile.Directory%\\%logfile%-progress.log''' TextToWrite: TrimmedText AppendNewLine: True IfFileExists: File.IfFileExists.Append Encoding: File.FileEncoding.Unicode
     GOTO close_browser_end
     IF IsNotEmpty(TMDb_Browser) THEN
