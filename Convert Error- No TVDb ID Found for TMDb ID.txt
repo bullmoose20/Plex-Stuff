@@ -1,4 +1,5 @@
 SET logfile TO $'''tvdbupdater'''
+SET mySearch TO $'''Convert Error: No TVDb ID Found for TMDb ID:'''
 Display.SelectFileDialog.SelectFile Title: $'''Pick Input File (meta.log)''' FileFilter: $'''*.log;*.txt;*.*''' IsTopMost: False CheckIfFileExists: False SelectedFile=> SelectedFile ButtonPressed=> ButtonPressed
 WebAutomation.LaunchEdge.LaunchEdge Url: $'''https://www.themoviedb.org/''' WindowState: WebAutomation.BrowserWindowState.Normal ClearCache: False ClearCookies: False WaitForPageToLoadTimeout: 60 Timeout: 60 BrowserInstance=> TMDb_Browser
 WebAutomation.LaunchEdge.LaunchEdge Url: $'''https://thetvdb.com/''' WindowState: WebAutomation.BrowserWindowState.Normal ClearCache: False ClearCookies: False WaitForPageToLoadTimeout: 60 Timeout: 60 BrowserInstance=> TVDb_Browser
@@ -15,7 +16,8 @@ Variables.RemoveDuplicateItemsFromList List: FileContents_Progress IgnoreCase: T
 Scripting.RunPowershellScript Script: $'''$myVar = \"%SelectedFile%\"
 $myPath = \"%SelectedFile.Directory%\"
 $myLog = \"%logfile%\"
-Get-Content \"$myVar\" | Select-String \'Convert Error: No $myLog-\' | Sort-Object -Unique | Out-File -FilePath \"$myPath\\$myLog-convert.log\" -width 3000
+$mySearch = \"%mySearch%\"
+Get-Content \"$myVar\" | Select-String $mySearch | Sort-Object -Unique | Out-File -FilePath \"$myPath\\$myLog-convert.log\" -width 3000
 (Get-Content \"$myPath\\$myLog-convert.log\") | Where-Object { $_.trim() -ne \"\" } | Out-File -FilePath \"$myPath\\$myLog-convert.log\"
 
 if (Test-Path \"$myPath\\$myLog-convert2.log\") {
