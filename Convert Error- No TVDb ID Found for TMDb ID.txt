@@ -37,10 +37,13 @@ DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAn
 Variables.SubtractLists FirstList: FileContents SecondList: FileContents_Progress OutputList=> ListDifference
 File.WriteText File: $'''%SelectedFile.Directory%\\tvdbupdater.log''' TextToWrite: $'''%CurrentDateTime% - INF - Lines to process %FileContents.Count% items''' AppendNewLine: True IfFileExists: File.IfFileExists.Append Encoding: File.FileEncoding.Unicode
 File.WriteText File: $'''%SelectedFile.Directory%\\tvdbupdater.log''' TextToWrite: $'''%CurrentDateTime% - INF - Starting to process %FileContents.Count% \'Convert Error: No TVDb ID Found for TMDb ID:\' items''' AppendNewLine: True IfFileExists: File.IfFileExists.Append Encoding: File.FileEncoding.Unicode
+SET ctr TO 0
 LOOP FOREACH CurrentItem IN ListDifference
+    Variables.IncreaseVariable Value: ctr IncrementValue: 1
     Text.Trim Text: CurrentItem TrimOption: Text.TrimOption.Both TrimmedText=> TrimmedText
     DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
     File.WriteText File: $'''%SelectedFile.Directory%\\tvdbupdater.log''' TextToWrite: $'''%CurrentDateTime% - INF - ###################################
+%CurrentDateTime% - INF - Item %ctr% of %ListDifference.Count%
 %CurrentDateTime% - INF - Starting to process \'Convert Error: No TVDb ID Found for TMDb ID:\' %TrimmedText%''' AppendNewLine: True IfFileExists: File.IfFileExists.Append Encoding: File.FileEncoding.Unicode
     IF Contains(FileContents_Progress, TrimmedText, True) THEN
         DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
@@ -139,8 +142,11 @@ LOOP FOREACH CurrentItem IN ListDifference
     Text.SplitText.SplitWithDelimiter Text: innertext CustomDelimiter: $'''#''' IsRegEx: False Result=> TextList
     Variables.RemoveItemFromList.RemoveItemFromListByIndex ItemIndex: 0 List: TextList
     WebAutomation.PopulateTextField.PopulateTextField BrowserInstance: TMDb_Browser Control: appmask['Recording']['input 2'] Text: TextList Mode: WebAutomation.PopulateTextMode.Replace EmulateTyping: False UnfocusAfterPopulate: False WaitForPageToLoadTimeout: 60
-    WebAutomation.PressButton.PressButton BrowserInstance: TMDb_Browser Control: appmask['Web Page \'h ... uage=en-US\' 3']['Input submit \'submit\''] WaitForPageToLoadTimeout: 60
     SET SaveResult TO $'''null()'''
+    SET innertext_7 TO $'''null()'''
+    SET innertext_8 TO $'''null()'''
+    SET href TO $'''null()'''
+    WebAutomation.PressButton.PressButton BrowserInstance: TMDb_Browser Control: appmask['Web Page \'h ... uage=en-US\' 3']['Input submit \'submit\''] WaitForPageToLoadTimeout: 60
     WebAutomation.GetDetailsOfElement BrowserInstance: TMDb_Browser Control: appmask['Web Page \'h ... uage=en-US\'']['Heading 2 \'Success\''] AttributeName: $'''innertext''' AttributeValue=> innertext_7
     ON ERROR
 

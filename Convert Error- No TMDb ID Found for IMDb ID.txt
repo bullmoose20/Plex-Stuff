@@ -37,10 +37,13 @@ DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAn
 Variables.SubtractLists FirstList: FileContents SecondList: FileContents_Progress OutputList=> ListDifference
 File.WriteText File: $'''%SelectedFile.Directory%\\tmdbupdater.log''' TextToWrite: $'''%CurrentDateTime% - INF - Lines to process %FileContents.Count% items''' AppendNewLine: True IfFileExists: File.IfFileExists.Append Encoding: File.FileEncoding.Unicode
 File.WriteText File: $'''%SelectedFile.Directory%\\tmdbupdater.log''' TextToWrite: $'''%CurrentDateTime% - INF - Starting to process %FileContents.Count% \'Convert Error: No TMDb ID Found for IMDb ID:\' items''' AppendNewLine: True IfFileExists: File.IfFileExists.Append Encoding: File.FileEncoding.Unicode
+SET ctr TO 0
 LOOP FOREACH CurrentItem IN ListDifference
+    Variables.IncreaseVariable Value: ctr IncrementValue: 1
     Text.Trim Text: CurrentItem TrimOption: Text.TrimOption.Both TrimmedText=> TrimmedText
     DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
     File.WriteText File: $'''%SelectedFile.Directory%\\tmdbupdater.log''' TextToWrite: $'''%CurrentDateTime% - INF - ###################################
+%CurrentDateTime% - INF - Item %ctr% of %ListDifference.Count%
 %CurrentDateTime% - INF - Starting to process \'Convert Error: No TMDb ID Found for IMDb ID:\' %TrimmedText%''' AppendNewLine: True IfFileExists: File.IfFileExists.Append Encoding: File.FileEncoding.Unicode
     IF Contains(FileContents_Progress, TrimmedText, True) THEN
         DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
@@ -49,14 +52,12 @@ LOOP FOREACH CurrentItem IN ListDifference
     END
     LABEL language_button_clicked
     WebAutomation.GoToWebPage.GoToWebPage BrowserInstance: IMDb_Browser Url: $'''https://www.imdb.com/title/%TrimmedText%/''' WaitForPageToLoadTimeout: 60
-    DISABLE WebAutomation.LaunchEdge.LaunchEdge Url: $'''https://www.imdb.com/title/%TrimmedText%/''' WindowState: WebAutomation.BrowserWindowState.Maximized ClearCache: False ClearCookies: False WaitForPageToLoadTimeout: 60 Timeout: 60 BrowserInstance=> IMDb_Browser
     WebAutomation.ExtractData.ExtractHandPickedValues BrowserInstance: IMDb_Browser ExtractionParameters: {[$'''html > body > div:eq(1) > main > div > section:eq(0) > section > div:eq(2) > section > section > div:eq(0) a''', $'''Own Text''', $'''''', $'''Value #1'''], [$'''html > body > div:eq(1) > main > div > section:eq(0) > section > div:eq(2) > section > section > div:eq(2) div:eq(0) > h1''', $'''Own Text''', $'''''', $'''Value #2'''] } TimeoutInSeconds: 60 ExtractedData=> OutputData
     DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
     File.WriteText File: $'''%SelectedFile.Directory%\\tmdbupdater.log''' TextToWrite: $'''%CurrentDateTime% - INF - Found: %OutputData%''' AppendNewLine: True IfFileExists: File.IfFileExists.Append Encoding: File.FileEncoding.Unicode
     DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
     File.WriteText File: $'''%SelectedFile.Directory%\\tmdbupdater.log''' TextToWrite: $'''%CurrentDateTime% - INF - Navigating to  : https://www.google.com/search?q=site:themoviedb.org/tv %OutputData%''' AppendNewLine: True IfFileExists: File.IfFileExists.Append Encoding: File.FileEncoding.Unicode
     WebAutomation.GoToWebPage.GoToWebPage BrowserInstance: TMDb_Browser Url: $'''https://www.google.com/search?q=site:themoviedb.org/tv %OutputData%''' WaitForPageToLoadTimeout: 60
-    DISABLE WebAutomation.LaunchEdge.LaunchEdge Url: $'''https://www.google.com/search?q=site:themoviedb.org/tv %OutputData%''' WindowState: WebAutomation.BrowserWindowState.Maximized ClearCache: False ClearCookies: False WaitForPageToLoadTimeout: 60 Timeout: 60 BrowserInstance=> TMDb_Browser
     MouseAndKeyboard.WaitForShortcutKey.WaitForShortcutKey InputKeys: ['Ctrl+A'] IndexOfShortcutKeyPressed=> IndexOfShortcutKeyPressed
     DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
     File.WriteText File: $'''%SelectedFile.Directory%\\tmdbupdater.log''' TextToWrite: $'''%CurrentDateTime% - INF - Hotkey pressed''' AppendNewLine: True IfFileExists: File.IfFileExists.Append Encoding: File.FileEncoding.Unicode
@@ -108,14 +109,11 @@ LOOP FOREACH CurrentItem IN ListDifference
     END
     IF Contains(innertext_4, $'''create translation''', True) THEN
         DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
-        WebAutomation.LaunchEdge.AttachToEdgeByUrl TabUrl: $'''https://www.themoviedb.org/translate/tv/''' AttachTimeout: 10 BrowserInstance=> TMDb_Browser
         WebAutomation.PressButton.PressButton BrowserInstance: TMDb_Browser Control: appmask['Recording']['button'] WaitForPageToLoadTimeout: 60
         SET innertext_4 TO $'''null()'''
-        File.WriteText File: $'''%SelectedFile.Directory%\\tmdbupdater.log''' TextToWrite: $'''%CurrentDateTime% - ERR - Not Translated to English for IMDb ID: %TrimmedText%''' AppendNewLine: True IfFileExists: File.IfFileExists.Append Encoding: File.FileEncoding.Unicode
-        SET innertext_4 TO $'''null()'''
+        File.WriteText File: $'''%SelectedFile.Directory%\\tmdbupdater.log''' TextToWrite: $'''%CurrentDateTime% - INF - Not Translated to English for IMDb ID: %TrimmedText%''' AppendNewLine: True IfFileExists: File.IfFileExists.Append Encoding: File.FileEncoding.Unicode
         GOTO language_button_clicked
     END
-    DISABLE WebAutomation.LaunchEdge.AttachToEdgeByUrl TabUrl: WebPageProperty AttachTimeout: 10 BrowserInstance=> Browser3
     WebAutomation.GetDetailsOfElement BrowserInstance: TMDb_Browser Control: appmask['Web Page \'h ... uage=en-US\'']['Input text \'imdb_id\''] AttributeName: $'''innertext''' AttributeValue=> innertext_5
     ON ERROR
 
@@ -126,7 +124,6 @@ LOOP FOREACH CurrentItem IN ListDifference
         SET innertext_5 TO $'''\'\''''
         GOTO close_browsers
     END
-    DISABLE WebAutomation.LaunchEdge.AttachToEdgeByUrl TabUrl: $'''https://www.themoviedb.org/tv/''' AttachTimeout: 10 BrowserInstance=> Browser3
     WebAutomation.GetDetailsOfElement BrowserInstance: TMDb_Browser Control: appmask['Recording']['h2'] AttributeName: $'''innertext''' AttributeValue=> innertext_6
     ON ERROR
 
@@ -137,9 +134,12 @@ LOOP FOREACH CurrentItem IN ListDifference
         SET innertext_6 TO $'''\'\''''
         GOTO close_browsers
     END
+    SET SaveResult TO $'''null()'''
+    SET innertext_7 TO $'''null()'''
+    SET innertext_8 TO $'''null()'''
+    SET href TO $'''null()'''
     WebAutomation.PopulateTextField.PopulateTextFieldUsePhysicalKeyboard BrowserInstance: TMDb_Browser Control: appmask['Web Page \'h ... ternal_ids\'']['Input text \'imdb_id\''] Text: TrimmedText Mode: WebAutomation.PopulateTextMode.Replace UnfocusAfterPopulate: False WaitForPageToLoadTimeout: 60
     WebAutomation.PressButton.PressButton BrowserInstance: TMDb_Browser Control: appmask['Web Page \'h ... ternal_ids\'']['Input submit \'submit\''] WaitForPageToLoadTimeout: 60
-    SET SaveResult TO $'''null()'''
     WebAutomation.GetDetailsOfElement BrowserInstance: TMDb_Browser Control: appmask['Web Page \'h ... uage=en-US\'']['Heading 2 \'Success\''] AttributeName: $'''innertext''' AttributeValue=> innertext_7
     ON ERROR
 
