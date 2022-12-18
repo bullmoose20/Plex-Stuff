@@ -56,12 +56,16 @@ LOOP FOREACH CurrentItem IN ListDifference
     END
     LABEL language_button_clicked
     WebAutomation.GoToWebPage.GoToWebPage BrowserInstance: IMDb_Browser Url: $'''https://www.imdb.com/title/%TrimmedText%/''' WaitForPageToLoadTimeout: 60
+    ON ERROR REPEAT 1 TIMES WAIT 2
+    END
     WebAutomation.ExtractData.ExtractHandPickedValues BrowserInstance: IMDb_Browser ExtractionParameters: {[$'''html > body > div:eq(1) > main > div > section:eq(0) > section > div:eq(2) > section > section > div:eq(0) a''', $'''Own Text''', $'''''', $'''Value #1'''], [$'''html > body > div:eq(1) > main > div > section:eq(0) > section > div:eq(2) > section > section > div:eq(2) div:eq(0) > h1''', $'''Own Text''', $'''''', $'''Value #2'''] } TimeoutInSeconds: 60 ExtractedData=> OutputData
     DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
     File.WriteText File: $'''%SelectedFile.Directory%\\%logfile%.log''' TextToWrite: $'''%CurrentDateTime% - INF - Found: %OutputData%''' AppendNewLine: True IfFileExists: File.IfFileExists.Append Encoding: File.FileEncoding.Unicode
     DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
     File.WriteText File: $'''%SelectedFile.Directory%\\%logfile%.log''' TextToWrite: $'''%CurrentDateTime% - INF - Navigating to  : https://www.google.com/search?q=site:themoviedb.org/tv %OutputData%''' AppendNewLine: True IfFileExists: File.IfFileExists.Append Encoding: File.FileEncoding.Unicode
     WebAutomation.GoToWebPage.GoToWebPage BrowserInstance: TMDb_Browser Url: $'''https://www.google.com/search?q=site:themoviedb.org/tv %OutputData%''' WaitForPageToLoadTimeout: 60
+    ON ERROR REPEAT 1 TIMES WAIT 2
+    END
     MouseAndKeyboard.WaitForShortcutKey.WaitForShortcutKey InputKeys: ['Ctrl+A'] IndexOfShortcutKeyPressed=> IndexOfShortcutKeyPressed
     DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
     File.WriteText File: $'''%SelectedFile.Directory%\\%logfile%.log''' TextToWrite: $'''%CurrentDateTime% - INF - Hotkey pressed''' AppendNewLine: True IfFileExists: File.IfFileExists.Append Encoding: File.FileEncoding.Unicode
@@ -70,6 +74,8 @@ LOOP FOREACH CurrentItem IN ListDifference
     File.WriteText File: $'''%SelectedFile.Directory%\\%logfile%.log''' TextToWrite: $'''%CurrentDateTime% - INF - Clicked on     : %WebPageProperty%''' AppendNewLine: True IfFileExists: File.IfFileExists.Append Encoding: File.FileEncoding.Unicode
     File.WriteText File: $'''%SelectedFile.Directory%\\%logfile%.log''' TextToWrite: $'''%CurrentDateTime% - INF - Navigating to  : %WebPageProperty%/edit?active_nav_item=external_ids&language=en-US''' AppendNewLine: True IfFileExists: File.IfFileExists.Append Encoding: File.FileEncoding.Unicode
     WebAutomation.GoToWebPage.GoToWebPage BrowserInstance: TMDb_Browser Url: $'''%WebPageProperty%/edit?active_nav_item=external_ids&language=en-US''' WaitForPageToLoadTimeout: 60
+    ON ERROR REPEAT 1 TIMES WAIT 2
+    END
     WebAutomation.GetDetailsOfWebPage BrowserInstance: TMDb_Browser DetailsType: WebAutomation.DetailsType.URLAddress Details=> WebPageProperty2
     DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
     LABEL retry_login_lang

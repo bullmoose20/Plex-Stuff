@@ -56,6 +56,8 @@ LOOP FOREACH CurrentItem IN ListDifference
     END
     LABEL language_button_clicked
     WebAutomation.GoToWebPage.GoToWebPage BrowserInstance: TMDb_Browser Url: $'''https://www.themoviedb.org/tv/%TrimmedText%/edit?active_nav_item=external_ids&language=en-US''' WaitForPageToLoadTimeout: 60
+    ON ERROR REPEAT 1 TIMES WAIT 2
+    END
     DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
     File.WriteText File: $'''%SelectedFile.Directory%\\%logfile%.log''' TextToWrite: $'''%CurrentDateTime% - INF - Navigating to  : https://www.themoviedb.org/tv/%TrimmedText%/edit?active_nav_item=external_ids&language=en-US''' AppendNewLine: True IfFileExists: File.IfFileExists.Append Encoding: File.FileEncoding.Unicode
     WebAutomation.GetDetailsOfWebPage BrowserInstance: TMDb_Browser DetailsType: WebAutomation.DetailsType.URLAddress Details=> WebPageProperty2
@@ -128,6 +130,8 @@ LOOP FOREACH CurrentItem IN ListDifference
     END
     WebAutomation.GetDetailsOfElement BrowserInstance: TMDb_Browser Control: appmask['Recording']['a'] AttributeName: $'''innertext''' AttributeValue=> innertext_2
     WebAutomation.GoToWebPage.GoToWebPage BrowserInstance: TVDb_Browser Url: $'''https://thetvdb.com/search?query=%innertext_2%&menu[type]=series''' WaitForPageToLoadTimeout: 60
+    ON ERROR REPEAT 1 TIMES WAIT 2
+    END
     DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
     File.WriteText File: $'''%SelectedFile.Directory%\\%logfile%.log''' TextToWrite: $'''%CurrentDateTime% - INF - Navigating to  : https://thetvdb.com/search?query=%innertext_2%&menu[type]=series''' AppendNewLine: True IfFileExists: File.IfFileExists.Append Encoding: File.FileEncoding.Unicode
     WebAutomation.GetDetailsOfElement BrowserInstance: TVDb_Browser Control: appmask['Recording']['p'] AttributeName: $'''innertext''' AttributeValue=> innertext_3
