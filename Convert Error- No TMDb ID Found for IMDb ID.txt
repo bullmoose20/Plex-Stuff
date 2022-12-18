@@ -1,3 +1,4 @@
+SET logfile TO $'''tmdbupdater'''
 Display.SelectFileDialog.SelectFile Title: $'''Pick Input File (meta.log)''' FileFilter: $'''*.log;*.txt;*.*''' IsTopMost: False CheckIfFileExists: False SelectedFile=> SelectedFile ButtonPressed=> ButtonPressed
 WebAutomation.LaunchEdge.LaunchEdge Url: $'''https://www.themoviedb.org/''' WindowState: WebAutomation.BrowserWindowState.Normal ClearCache: False ClearCookies: False WaitForPageToLoadTimeout: 60 Timeout: 60 BrowserInstance=> TMDb_Browser
 WebAutomation.LaunchEdge.LaunchEdge Url: $'''https://www.imdb.com/''' WindowState: WebAutomation.BrowserWindowState.Normal ClearCache: False ClearCookies: False WaitForPageToLoadTimeout: 60 Timeout: 60 BrowserInstance=> IMDb_Browser
@@ -13,30 +14,31 @@ END
 Variables.RemoveDuplicateItemsFromList List: FileContents_Progress IgnoreCase: True
 Scripting.RunPowershellScript Script: $'''$myVar = \"%SelectedFile%\"
 $myPath = \"%SelectedFile.Directory%\"
-Get-Content \"$myVar\" | Select-String \'Convert Error: No TMDb ID Found for IMDb ID\' | Sort-Object -Unique | Out-File -FilePath \"$myPath\\tmdbconvert.log\" -width 3000
-(Get-Content \"$myPath\\tmdbconvert.log\") | Where-Object { $_.trim() -ne \"\" } | Out-File -FilePath \"$myPath\\tmdbconvert.log\"
+$myLog = \"%logfile%\"
+Get-Content \"$myVar\" | Select-String \'Convert Error: No $myLog-\' | Sort-Object -Unique | Out-File -FilePath \"$myPath\\$myLog-convert.log\" -width 3000
+(Get-Content \"$myPath\\$myLog-convert.log\") | Where-Object { $_.trim() -ne \"\" } | Out-File -FilePath \"$myPath\\$myLog-convert.log\"
 
-if (Test-Path \"$myPath\\tmdbconvert2.log\") {
-    Remove-Item -Path \"$myPath\\tmdbconvert2.log\" -Force | Out-Null
+if (Test-Path \"$myPath\\$myLog-convert2.log\") {
+    Remove-Item -Path \"$myPath\\$myLog-convert2.log\" -Force | Out-Null
 }
 
-foreach ($line in [System.IO.File]::ReadLines(\"$myPath\\tmdbconvert.log\")) {
+foreach ($line in [System.IO.File]::ReadLines(\"$myPath\\$myLog-convert.log\")) {
     $arr = $line.Split(\"|\")
     $arr2 = $arr[1].Split(\":\")
-    $arr2[2].trim() | Out-File -FilePath \"$myPath\\tmdbconvert2.log\" -Append
+    $arr2[2].trim() | Out-File -FilePath \"$myPath\\$myLog-convert2.log\" -Append
 }
-(Get-Content \"$myPath\\tmdbconvert2.log\") | Sort-Object -Unique | Out-File -FilePath \"$myPath\\tmdbconvert2.log\"
-Remove-Item -Path \"$myPath\\tmdbconvert.log\"
-Move-Item -Path \"$myPath\\tmdbconvert2.log\" -Destination \"$myPath\\tmdbconvert.log\"
+(Get-Content \"$myPath\\$myLog-convert2.log\") | Sort-Object -Unique | Out-File -FilePath \"$myPath\\$myLog-convert2.log\"
+Remove-Item -Path \"$myPath\\$myLog-convert.log\"
+Move-Item -Path \"$myPath\\$myLog-convert2.log\" -Destination \"$myPath\\$myLog-convert.log\"
 ''' ScriptOutput=> PowershellOutput ScriptError=> ScriptError
 DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
-File.ReadTextFromFile.ReadTextAsList File: $'''%SelectedFile.Directory%\\tmdbconvert.log''' Encoding: File.TextFileEncoding.UTF8 Contents=> FileContents
+File.ReadTextFromFile.ReadTextAsList File: $'''%SelectedFile.Directory%\\%logfile%-convert.log''' Encoding: File.TextFileEncoding.UTF8 Contents=> FileContents
 File.WriteText File: $'''%SelectedFile.Directory%\\tmdbupdater.log''' TextToWrite: $'''%CurrentDateTime% - INF - Lines to process %FileContents.Count% items''' AppendNewLine: True IfFileExists: File.IfFileExists.Append Encoding: File.FileEncoding.Unicode
+File.WriteText File: $'''%SelectedFile.Directory%\\tmdbupdater.log''' TextToWrite: $'''%CurrentDateTime% - INF - Lines processed %FileContents_progress.Count% items''' AppendNewLine: True IfFileExists: File.IfFileExists.Append Encoding: File.FileEncoding.Unicode
 Variables.RemoveDuplicateItemsFromList List: FileContents IgnoreCase: True
 DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
 Variables.SubtractLists FirstList: FileContents SecondList: FileContents_Progress OutputList=> ListDifference
-File.WriteText File: $'''%SelectedFile.Directory%\\tmdbupdater.log''' TextToWrite: $'''%CurrentDateTime% - INF - Lines to process %FileContents.Count% items''' AppendNewLine: True IfFileExists: File.IfFileExists.Append Encoding: File.FileEncoding.Unicode
-File.WriteText File: $'''%SelectedFile.Directory%\\tmdbupdater.log''' TextToWrite: $'''%CurrentDateTime% - INF - Starting to process %FileContents.Count% \'Convert Error: No TMDb ID Found for IMDb ID:\' items''' AppendNewLine: True IfFileExists: File.IfFileExists.Append Encoding: File.FileEncoding.Unicode
+File.WriteText File: $'''%SelectedFile.Directory%\\tmdbupdater.log''' TextToWrite: $'''%CurrentDateTime% - INF - Starting to process %ListDifference.Count% \'Convert Error: No TMDb ID Found for IMDb ID:\' items''' AppendNewLine: True IfFileExists: File.IfFileExists.Append Encoding: File.FileEncoding.Unicode
 SET ctr TO 0
 LOOP FOREACH CurrentItem IN ListDifference
     Variables.IncreaseVariable Value: ctr IncrementValue: 1
