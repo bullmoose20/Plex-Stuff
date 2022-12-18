@@ -85,6 +85,20 @@ Or however you've mounted those directories.
 10. [create_people_poster.ps1](#create_people_poster) - Scans your PMM meta* logs to find missing people posters and will download and create the bw, rainier, orig, transparent. style poster for PMM/PLEX/EMBY/JELLYFIN/OTHER. This script was put together by using the image_check, get_missing_people, and Power Automate Desktop Flow (remove background) all into 1
 11. [PAD Flows](#pad_flows) - Various PAD flows for RPA stuff for PLEX, PMM, Other
     1.  [Convert Error: No TMDb ID Found for IMDb ID:](#Convert_Error_No_TMDb_ID_Found_for_IMDb_ID) - PAD flow to deal with Convert Errors in your meta.log file from PMM
+    1.  [Convert Error: No TVDb ID Found for TMDb ID:](#Convert_Error_No_TVDb_ID_Found_for_TMDb_ID) - PAD flow to deal with Convert Errors in your meta.log file from PMM
+
+Here are the possible PMM errors/warnings found in the meta.log in relation to these auto/semi-auto PAD flows
+```
+Convert Error: No TMDb ID Found for IMDb ID:
+Convert Error: No TVDb ID Found for TMDb ID:
+Convert Error: No TVDb ID or IMDb ID found for AniDB ID:
+Convert Error: AniDB ID not found for AniList ID:
+Convert Error: AniDB ID not found for MyAnimeList ID:
+Convert Error: No IMDb ID Found for TMDb ID:
+Convert Error: No TMDb ID Found for TVDb ID:
+Convert Error: No IMDb ID Found for TVDb ID:
+Convert Error: No TVDb ID Found for IMDb ID:
+```
 ## plex-bloat-fix
 
 Your PLEX folders are growing out of control. You use overlays from PMM or upload lots of custom art that you no longer want to use or need to eliminate. You don't want to perform the plex dance if you can avoid it. This script will free up gigs of space....It can also perform some PLEX operations like "empty trash", "clean bundles", and "optimize db". PBF also supports the use of PASSTHROUGH alerts to discord with notifiarr.com. 
@@ -469,3 +483,8 @@ Error checking is enabled and does the following:
  - if you hit `ctrl-a` and the imdb external id field is already populated (it happens as the community updates these things), it will log and skip it
  - if you hit `ctrl-a` and you get an error upon save, then that is logged and continues. if its a success, that is logged and continues
  - if you hit `ctrl-a` and you are somehow in tmdb in another language or the episode and its show is not in tmdb in ENGLISH, then the script will try to add the english translation and continue to try again to add the id in the subsequent iteration (This has not been tested because I have not encountered this yet but I know it happens because of the other flow I have used in the past)
+
+## Convert_Error_No_TVDb_ID_Found_for_TMDb_ID
+- `Convert Error- No TVDb ID Found for TMDb ID` => Windows OS is in English and Edge in English
+- See [PAD Flows Install](#pad_flows_install)
+- Before starting. ensure that you have a tmdb account and that you logged in so that the cached credentials will work before trying this....
