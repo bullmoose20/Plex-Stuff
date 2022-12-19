@@ -183,13 +183,13 @@ LOOP FOREACH CurrentItem IN ListDifference
     SET eta_sec TO (ListDifference.Count - ctr) * TimeDifference
     SET eta_min TO ((ListDifference.Count - ctr) * TimeDifference) / 60
     SET eta_hrs TO ((ListDifference.Count - ctr) * TimeDifference) / 3600
-    Variables.TruncateNumber.RoundNumber Number: eta_sec DecimalPlaces: 2 Result=> TruncatedValue
-    Variables.TruncateNumber.RoundNumber Number: eta_min DecimalPlaces: 2 Result=> TruncatedValue
-    Variables.TruncateNumber.RoundNumber Number: eta_hrs DecimalPlaces: 2 Result=> TruncatedValue
+    Variables.TruncateNumber.RoundNumber Number: eta_sec DecimalPlaces: 2 Result=> eta_sec_rnd
+    Variables.TruncateNumber.RoundNumber Number: eta_min DecimalPlaces: 2 Result=> eta_min_rnd
+    Variables.TruncateNumber.RoundNumber Number: eta_hrs DecimalPlaces: 2 Result=> eta_hrs_rnd
     File.WriteText File: $'''%SelectedFile.Directory%\\%logfile%.log''' TextToWrite: $'''%CurrentDateTime% - INF - Seconds to process: %TimeDifference%
-%CurrentDateTime% - INF - Estimated seconds left: %eta_sec%
-%CurrentDateTime% - INF - Estimated minutes left: %eta_min%
-%CurrentDateTime% - INF - Estimated hours left  : %eta_hrs%
+%CurrentDateTime% - INF - Estimated seconds left: %eta_sec_rnd%
+%CurrentDateTime% - INF - Estimated minutes left: %eta_min_rnd%
+%CurrentDateTime% - INF - Estimated hours left  : %eta_hrs_rnd%
 %CurrentDateTime% - INF - ###################################''' AppendNewLine: True IfFileExists: File.IfFileExists.Append Encoding: File.FileEncoding.Unicode
     File.WriteText File: $'''%SelectedFile.Directory%\\%logfile%.log''' TextToWrite: $'''%CurrentDateTime% - INF - ###################################''' AppendNewLine: True IfFileExists: File.IfFileExists.Append Encoding: File.FileEncoding.Unicode
     File.WriteText File: $'''%SelectedFile.Directory%\\%logfile%-progress.log''' TextToWrite: TrimmedText AppendNewLine: True IfFileExists: File.IfFileExists.Append Encoding: File.FileEncoding.Unicode
