@@ -91,7 +91,7 @@ LOOP FOREACH CurrentItem IN ListDifference
     WebAutomation.ExtractData.ExtractHandPickedValues BrowserInstance: TMDb_Browser ExtractionParameters: {[$'''html > body > div:eq(0) > header > div:eq(0) > div > div:eq(1) > ul > li:eq(2) a''', $'''Own Text''', $'''''', $'''Value #1'''], [$'''html > body > div:eq(0) > header > div:eq(0) > div > div:eq(1) > ul > li:eq(1) div''', $'''Own Text''', $'''''', $'''Value #2'''] } TimeoutInSeconds: 60 ExtractedData=> OutputData_2
     SET LoginStatus TO OutputData_2[0][0]
     SET TMDB_Lang TO OutputData_2[0][1]
-    WebAutomation.GetDetailsOfElement BrowserInstance: TMDb_Browser Control: appmask['Recording']['button'] AttributeName: $'''innertext''' AttributeValue=> innertext_4
+    WebAutomation.GetDetailsOfElement BrowserInstance: TMDb_Browser Control: appmask['Recording']['button'] AttributeName: $'''innertext''' AttributeValue=> translate_button_text
     ON ERROR
 
     END
@@ -118,48 +118,48 @@ LOOP FOREACH CurrentItem IN ListDifference
         Display.ShowMessageDialog.ShowMessage Title: $'''Login to TMDB''' Message: $'''You must be logged in to TMDB. Login and then click on OK''' Icon: Display.Icon.ErrorIcon Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: True ButtonPressed=> ButtonPressed2
         GOTO retry_login_lang
     END
-    IF Contains(innertext_4, $'''create translation''', True) THEN
+    IF Contains(translate_button_text, $'''create translation''', True) THEN
         DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
         WebAutomation.PressButton.PressButton BrowserInstance: TMDb_Browser Control: appmask['Recording']['button'] WaitForPageToLoadTimeout: 60
-        SET innertext_4 TO $'''null()'''
+        SET translate_button_text TO $'''null()'''
         File.WriteText File: $'''%SelectedFile.Directory%\\%logfile%.log''' TextToWrite: $'''%CurrentDateTime% - INF - Not Translated to English for IMDb ID: %TrimmedText%''' AppendNewLine: True IfFileExists: File.IfFileExists.Append Encoding: File.FileEncoding.Unicode
         GOTO language_button_clicked
     END
-    WebAutomation.GetDetailsOfElement BrowserInstance: TMDb_Browser Control: appmask['Web Page \'h ... uage=en-US\'']['Input text \'imdb_id\''] AttributeName: $'''innertext''' AttributeValue=> innertext_5
+    WebAutomation.GetDetailsOfElement BrowserInstance: TMDb_Browser Control: appmask['Web Page \'h ... uage=en-US\'']['Input text \'imdb_id\''] AttributeName: $'''innertext''' AttributeValue=> IMDb_ID
     ON ERROR
 
     END
-    IF IsNotEmpty(innertext_5) THEN
+    IF IsNotEmpty(IMDb_ID) THEN
         DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
         File.WriteText File: $'''%SelectedFile.Directory%\\%logfile%.log''' TextToWrite: $'''%CurrentDateTime% - SKP - IMDb ID exists for: %TrimmedText% - %OutputData%''' AppendNewLine: True IfFileExists: File.IfFileExists.Append Encoding: File.FileEncoding.Unicode
-        SET innertext_5 TO $'''\'\''''
+        SET IMDb_ID TO $'''null()'''
         GOTO close_browsers
     END
-    WebAutomation.GetDetailsOfElement BrowserInstance: TMDb_Browser Control: appmask['Recording']['h2'] AttributeName: $'''innertext''' AttributeValue=> innertext_6
+    WebAutomation.GetDetailsOfElement BrowserInstance: TMDb_Browser Control: appmask['Recording']['h2'] AttributeName: $'''innertext''' AttributeValue=> TMDb_search_results
     ON ERROR
 
     END
-    IF Contains(innertext_6, $'''Oops!''', True) THEN
+    IF Contains(TMDb_search_results, $'''Oops!''', True) THEN
         DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
         File.WriteText File: $'''%SelectedFile.Directory%\\%logfile%.log''' TextToWrite: $'''%CurrentDateTime% - ERR - Page not found for TMDb ID: %TrimmedText%''' AppendNewLine: True IfFileExists: File.IfFileExists.Append Encoding: File.FileEncoding.Unicode
-        SET innertext_6 TO $'''\'\''''
+        SET TMDb_search_results TO $'''null()'''
         GOTO close_browsers
     END
     SET SaveResult TO $'''null()'''
-    SET innertext_7 TO $'''null()'''
-    SET innertext_8 TO $'''null()'''
+    SET TMDb_save_results TO $'''null()'''
+    SET TMDb_save_results_details TO $'''null()'''
     SET href TO $'''null()'''
     WebAutomation.PopulateTextField.PopulateTextFieldUsePhysicalKeyboard BrowserInstance: TMDb_Browser Control: appmask['Web Page \'h ... ternal_ids\'']['Input text \'imdb_id\''] Text: TrimmedText Mode: WebAutomation.PopulateTextMode.Replace UnfocusAfterPopulate: False WaitForPageToLoadTimeout: 60
     WebAutomation.PressButton.PressButton BrowserInstance: TMDb_Browser Control: appmask['Web Page \'h ... ternal_ids\'']['Input submit \'submit\''] WaitForPageToLoadTimeout: 60
-    WebAutomation.GetDetailsOfElement BrowserInstance: TMDb_Browser Control: appmask['Web Page \'h ... uage=en-US\'']['Heading 2 \'Success\''] AttributeName: $'''innertext''' AttributeValue=> innertext_7
+    WebAutomation.GetDetailsOfElement BrowserInstance: TMDb_Browser Control: appmask['Web Page \'h ... uage=en-US\'']['Heading 2 \'Success\''] AttributeName: $'''innertext''' AttributeValue=> TMDb_save_results
     ON ERROR
 
     END
-    WebAutomation.GetDetailsOfElement BrowserInstance: TMDb_Browser Control: appmask['Recording']['span'] AttributeName: $'''innertext''' AttributeValue=> innertext_7
+    WebAutomation.GetDetailsOfElement BrowserInstance: TMDb_Browser Control: appmask['Recording']['span'] AttributeName: $'''innertext''' AttributeValue=> TMDb_save_results
     ON ERROR
 
     END
-    WebAutomation.GetDetailsOfElement BrowserInstance: TMDb_Browser Control: appmask['Web Page \'h ... uage=en-US\' 4']['List item \' ... mentsGreen\''] AttributeName: $'''innertext''' AttributeValue=> innertext_8
+    WebAutomation.GetDetailsOfElement BrowserInstance: TMDb_Browser Control: appmask['Web Page \'h ... uage=en-US\' 4']['List item \' ... mentsGreen\''] AttributeName: $'''innertext''' AttributeValue=> TMDb_save_results_details
     ON ERROR
 
     END
@@ -167,7 +167,7 @@ LOOP FOREACH CurrentItem IN ListDifference
     ON ERROR
 
     END
-    SET SaveResult TO $'''%innertext_7%, %innertext_8.Trimmed%, %href%'''
+    SET SaveResult TO $'''%TMDb_save_results%, %TMDb_save_results_details.Trimmed%, %href%'''
     DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
     IF Contains(SaveResult, $'''Validation Errors''', True) THEN
         File.WriteText File: $'''%SelectedFile.Directory%\\%logfile%.log''' TextToWrite: $'''%CurrentDateTime% - ERR - %SaveResult.Trimmed% for TMDb ID: %TrimmedText%''' AppendNewLine: True IfFileExists: File.IfFileExists.Append Encoding: File.FileEncoding.Unicode
