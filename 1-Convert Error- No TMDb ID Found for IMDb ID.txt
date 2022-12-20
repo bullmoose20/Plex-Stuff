@@ -1,15 +1,22 @@
 SET logfile TO $'''tmdbupdater'''
 SET mySearch TO $'''Convert Error: No TVDb ID Found for TMDb ID:'''
 Display.SelectFileDialog.SelectFile Title: $'''Pick Input File (meta.log)''' FileFilter: $'''*.log;*.txt;*.*''' IsTopMost: False CheckIfFileExists: False SelectedFile=> SelectedFile ButtonPressed=> ButtonPressed
+DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
+IF IsEmpty(SelectedFile) THEN
+    Display.ShowMessageDialog.ShowMessageWithTimeout Title: $'''CANCEL BUTTON''' Message: $'''You hit the cancel button.
+Exiting now...''' Icon: Display.Icon.ErrorIcon Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: True Timeout: 3 ButtonPressed=> ButtonPressed3
+    GOTO end_flow
+ELSE
+    File.WriteText File: $'''%SelectedFile.Directory%\\%logfile%.log''' TextToWrite: $'''%CurrentDateTime% - INF - ###################################
+%CurrentDateTime% - INF - ###################################
+%CurrentDateTime% - INF - ###################################
+%CurrentDateTime% - INF - STARTING NOW
+%CurrentDateTime% - INF - Selected file: %SelectedFile%''' AppendNewLine: True IfFileExists: File.IfFileExists.Append Encoding: File.FileEncoding.Unicode
+END
 WebAutomation.LaunchEdge.LaunchEdge Url: $'''https://www.themoviedb.org/''' WindowState: WebAutomation.BrowserWindowState.Normal ClearCache: False ClearCookies: False WaitForPageToLoadTimeout: 60 Timeout: 60 BrowserInstance=> TMDb_Browser
 WebAutomation.LaunchEdge.LaunchEdge Url: $'''https://www.imdb.com/''' WindowState: WebAutomation.BrowserWindowState.Normal ClearCache: False ClearCookies: False WaitForPageToLoadTimeout: 60 Timeout: 60 BrowserInstance=> IMDb_Browser
 MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: TMDb_Browser TextToSend: $'''{LWin}{Left}{Escape}''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
 MouseAndKeyboard.SendKeys.FocusAndSendKeysByInstanceOrHandle WindowInstance: IMDb_Browser TextToSend: $'''{LWin}{Right}{Escape}''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: False
-DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
-File.WriteText File: $'''%SelectedFile.Directory%\\%logfile%.log''' TextToWrite: $'''%CurrentDateTime% - INF - ###################################
-%CurrentDateTime% - INF - ###################################
-%CurrentDateTime% - INF - ###################################
-%CurrentDateTime% - INF - STARTING NOW''' AppendNewLine: True IfFileExists: File.IfFileExists.Append Encoding: File.FileEncoding.Unicode
 File.ReadTextFromFile.ReadTextAsList File: SelectedFile Encoding: File.TextFileEncoding.UTF8 Contents=> FileContents
 File.ReadTextFromFile.ReadTextAsList File: $'''%SelectedFile.Directory%\\%logfile%-progress.log''' Encoding: File.TextFileEncoding.UTF8 Contents=> FileContents_Progress
 ON ERROR
@@ -217,6 +224,7 @@ File.WriteText File: $'''%SelectedFile.Directory%\\%logfile%.log''' TextToWrite:
 %CurrentDateTime% - INF - ###################################
 %CurrentDateTime% - INF - ###################################
 %CurrentDateTime% - INF - ###################################''' AppendNewLine: True IfFileExists: File.IfFileExists.Append Encoding: File.FileEncoding.Unicode
+LABEL end_flow
 
 # [ControlRepository][PowerAutomateDesktop]
 
