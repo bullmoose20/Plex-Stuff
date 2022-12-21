@@ -43,13 +43,13 @@ foreach ($line in [System.IO.File]::ReadLines(\"$myPath\\$myLog-convert.log\")) 
 Remove-Item -Path \"$myPath\\$myLog-convert.log\"
 Move-Item -Path \"$myPath\\$myLog-convert2.log\" -Destination \"$myPath\\$myLog-convert.log\"
 ''' ScriptOutput=> PowershellOutput ScriptError=> ScriptError
-DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
 File.ReadTextFromFile.ReadTextAsList File: $'''%SelectedFile.Directory%\\%logfile%-convert.log''' Encoding: File.TextFileEncoding.UTF8 Contents=> FileContents
+DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
 File.WriteText File: $'''%SelectedFile.Directory%\\%logfile%.log''' TextToWrite: $'''%CurrentDateTime% - INF - Lines to process %FileContents.Count% items''' AppendNewLine: True IfFileExists: File.IfFileExists.Append Encoding: File.FileEncoding.Unicode
 File.WriteText File: $'''%SelectedFile.Directory%\\%logfile%.log''' TextToWrite: $'''%CurrentDateTime% - INF - Lines processed %FileContents_progress.Count% items''' AppendNewLine: True IfFileExists: File.IfFileExists.Append Encoding: File.FileEncoding.Unicode
 Variables.RemoveDuplicateItemsFromList List: FileContents IgnoreCase: True
-DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
 Variables.SubtractLists FirstList: FileContents SecondList: FileContents_Progress OutputList=> ListDifference
+DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
 File.WriteText File: $'''%SelectedFile.Directory%\\%logfile%.log''' TextToWrite: $'''%CurrentDateTime% - INF - Starting to process %ListDifference.Count% \'%mySearch%\' items''' AppendNewLine: True IfFileExists: File.IfFileExists.Append Encoding: File.FileEncoding.Unicode
 SET ctr TO 0
 LOOP FOREACH CurrentItem IN ListDifference
@@ -88,11 +88,11 @@ LOOP FOREACH CurrentItem IN ListDifference
     ON ERROR REPEAT 1 TIMES WAIT 2
     END
     WebAutomation.GetDetailsOfWebPage BrowserInstance: TMDb_Browser DetailsType: WebAutomation.DetailsType.URLAddress Details=> WebPageProperty2
-    DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
     LABEL retry_login_lang
     SET LoginStatus TO $'''null()'''
     SET TMDB_Lang TO $'''null()'''
     SET TMDB_perms TO $'''null()'''
+    DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
     File.WriteText File: $'''%SelectedFile.Directory%\\%logfile%.log''' TextToWrite: $'''%CurrentDateTime% - INF - Actual Web Page: %WebPageProperty2%''' AppendNewLine: True IfFileExists: File.IfFileExists.Append Encoding: File.FileEncoding.Unicode
     WebAutomation.GetDetailsOfElement BrowserInstance: TMDb_Browser Control: appmask['Web Page \'h ... uage=en-US\' 2']['Heading 2 \'You don\'t have permission to access this page\''] AttributeName: $'''innertext''' AttributeValue=> TMDB_perms
     ON ERROR
@@ -129,9 +129,9 @@ LOOP FOREACH CurrentItem IN ListDifference
         GOTO retry_login_lang
     END
     IF Contains(translate_button_text, $'''create translation''', True) THEN
-        DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
         WebAutomation.PressButton.PressButton BrowserInstance: TMDb_Browser Control: appmask['Recording']['button'] WaitForPageToLoadTimeout: 60
         SET translate_button_text TO $'''null()'''
+        DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
         File.WriteText File: $'''%SelectedFile.Directory%\\%logfile%.log''' TextToWrite: $'''%CurrentDateTime% - INF - Not Translated to English for IMDb ID: %TrimmedText%''' AppendNewLine: True IfFileExists: File.IfFileExists.Append Encoding: File.FileEncoding.Unicode
         GOTO language_button_clicked
     END
@@ -196,6 +196,7 @@ LOOP FOREACH CurrentItem IN ListDifference
     Variables.TruncateNumber.RoundNumber Number: eta_sec DecimalPlaces: 2 Result=> eta_sec_rnd
     Variables.TruncateNumber.RoundNumber Number: eta_min DecimalPlaces: 2 Result=> eta_min_rnd
     Variables.TruncateNumber.RoundNumber Number: eta_hrs DecimalPlaces: 2 Result=> eta_hrs_rnd
+    DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
     File.WriteText File: $'''%SelectedFile.Directory%\\%logfile%.log''' TextToWrite: $'''%CurrentDateTime% - INF - Seconds to process: %TimeDifference%
 %CurrentDateTime% - INF - Estimated seconds left: %eta_sec_rnd%
 %CurrentDateTime% - INF - Estimated minutes left: %eta_min_rnd%
