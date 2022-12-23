@@ -1,6 +1,7 @@
 SET logfile TO $'''tmdbupdater'''
 SET mySearch TO $'''Convert Error: No TVDb ID Found for TMDb ID:'''
 Display.SelectFileDialog.SelectFile Title: $'''Pick Input File (meta.log)''' FileFilter: $'''*.log;*.txt;*.*''' IsTopMost: False CheckIfFileExists: False SelectedFile=> SelectedFile ButtonPressed=> ButtonPressed
+DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> OverallStartTime
 DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
 IF IsEmpty(SelectedFile) THEN
     Display.ShowMessageDialog.ShowMessageWithTimeout Title: $'''CANCEL BUTTON''' Message: $'''You hit the cancel button.
@@ -60,16 +61,18 @@ LOOP FOREACH CurrentItem IN ListDifference
     File.WriteText File: $'''%SelectedFile.Directory%\\%logfile%.log''' TextToWrite: $'''%CurrentDateTime% - INF - ###################################
 %CurrentDateTime% - INF - Item %ctr% of %ListDifference.Count%
 %CurrentDateTime% - INF - Starting to process \'%mySearch%\' %TrimmedText%''' AppendNewLine: True IfFileExists: File.IfFileExists.Append Encoding: File.FileEncoding.Unicode
-    IF Contains(FileContents_Progress, TrimmedText, True) THEN
-        DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
-        File.WriteText File: $'''%SelectedFile.Directory%\\%logfile%.log''' TextToWrite: $'''%CurrentDateTime% - SKP - IMDb ID already processed : %TrimmedText%''' AppendNewLine: True IfFileExists: File.IfFileExists.Append Encoding: File.FileEncoding.Unicode
-        GOTO end_for
-    END
+    DISABLE IF Contains(FileContents_Progress, TrimmedText, True) THEN
+        DISABLE DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
+        DISABLE File.WriteText File: $'''%SelectedFile.Directory%\\%logfile%.log''' TextToWrite: $'''%CurrentDateTime% - SKP - IMDb ID already processed : %TrimmedText%''' AppendNewLine: True IfFileExists: File.IfFileExists.Append Encoding: File.FileEncoding.Unicode
+        DISABLE GOTO end_for
+    DISABLE END
     LABEL language_button_clicked
     WebAutomation.GoToWebPage.GoToWebPage BrowserInstance: IMDb_Browser Url: $'''https://www.imdb.com/title/%TrimmedText%/''' WaitForPageToLoadTimeout: 60
     ON ERROR REPEAT 1 TIMES WAIT 2
     END
     WebAutomation.ExtractData.ExtractHandPickedValues BrowserInstance: IMDb_Browser ExtractionParameters: {[$'''html > body > div:eq(1) > main > div > section:eq(0) > section > div:eq(2) > section > section > div:eq(0) a''', $'''Own Text''', $'''''', $'''Value #1'''], [$'''html > body > div:eq(1) > main > div > section:eq(0) > section > div:eq(2) > section > section > div:eq(2) div:eq(0) > h1''', $'''Own Text''', $'''''', $'''Value #2'''] } TimeoutInSeconds: 60 ExtractedData=> OutputData
+    ON ERROR REPEAT 1 TIMES WAIT 2
+    END
     DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
     File.WriteText File: $'''%SelectedFile.Directory%\\%logfile%.log''' TextToWrite: $'''%CurrentDateTime% - INF - Found: %OutputData%''' AppendNewLine: True IfFileExists: File.IfFileExists.Append Encoding: File.FileEncoding.Unicode
     DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
@@ -110,23 +113,41 @@ LOOP FOREACH CurrentItem IN ListDifference
         File.WriteText File: $'''%SelectedFile.Directory%\\%logfile%.log''' TextToWrite: $'''%CurrentDateTime% - SKP - Not on TMDB site: %WebPageProperty2%''' AppendNewLine: True IfFileExists: File.IfFileExists.Append Encoding: File.FileEncoding.Unicode
         GOTO close_browsers
     END
-    IF NotContains(TMDB_Lang, $'''en''', True) THEN
-        DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
-        File.WriteText File: $'''%SelectedFile.Directory%\\%logfile%.log''' TextToWrite: $'''%CurrentDateTime% - SKP - Not on TMDB site: %WebPageProperty2%''' AppendNewLine: True IfFileExists: File.IfFileExists.Append Encoding: File.FileEncoding.Unicode
-        Display.ShowMessageDialog.ShowMessage Title: $'''TMDB Language''' Message: $'''Switch to EN on TMDB when using this flow''' Icon: Display.Icon.ErrorIcon Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: True ButtonPressed=> ButtonPressed2
-        GOTO retry_login_lang
+    IF logged_inTE = 1 THEN
+    ELSE
+        IF NotContains(TMDB_Lang, $'''en''', True) THEN
+            SET logged_inTE TO 0
+            DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
+            File.WriteText File: $'''%SelectedFile.Directory%\\%logfile%.log''' TextToWrite: $'''%CurrentDateTime% - SKP - Not on EN TMDB site: %WebPageProperty2%''' AppendNewLine: True IfFileExists: File.IfFileExists.Append Encoding: File.FileEncoding.Unicode
+            Display.ShowMessageDialog.ShowMessage Title: $'''TMDB Language''' Message: $'''Switch to EN on TMDB when using this flow''' Icon: Display.Icon.ErrorIcon Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: True ButtonPressed=> ButtonPressed2
+            GOTO retry_login_lang
+        ELSE
+            SET logged_inTE TO 1
+        END
     END
-    IF Contains(TMDB_perms, $'''don\'t have permission''', True) THEN
-        DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
-        File.WriteText File: $'''%SelectedFile.Directory%\\%logfile%.log''' TextToWrite: $'''%CurrentDateTime% - ERR - Not on logged in to TMDB site''' AppendNewLine: True IfFileExists: File.IfFileExists.Append Encoding: File.FileEncoding.Unicode
-        Display.ShowMessageDialog.ShowMessage Title: $'''Login to TMDB''' Message: $'''You must be logged in to TMDB. Login and then click on OK''' Icon: Display.Icon.ErrorIcon Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: True ButtonPressed=> ButtonPressed2
-        GOTO retry_login_lang
+    IF logged_inTP = 1 THEN
+    ELSE
+        IF Contains(TMDB_perms, $'''don\'t have permission''', True) THEN
+            SET logged_inTP TO 0
+            DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
+            File.WriteText File: $'''%SelectedFile.Directory%\\%logfile%.log''' TextToWrite: $'''%CurrentDateTime% - ERR - Not on logged in to TMDB site''' AppendNewLine: True IfFileExists: File.IfFileExists.Append Encoding: File.FileEncoding.Unicode
+            Display.ShowMessageDialog.ShowMessage Title: $'''Login to TMDB''' Message: $'''You must be logged in to TMDB. Login and then click on OK''' Icon: Display.Icon.ErrorIcon Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: True ButtonPressed=> ButtonPressed2
+            GOTO retry_login_lang
+        ELSE
+            SET logged_inTP TO 1
+        END
     END
-    IF Contains(LoginStatus, $'''Login''', True) THEN
-        DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
-        File.WriteText File: $'''%SelectedFile.Directory%\\%logfile%.log''' TextToWrite: $'''%CurrentDateTime% - ERR - Not on logged in to TMDB site''' AppendNewLine: True IfFileExists: File.IfFileExists.Append Encoding: File.FileEncoding.Unicode
-        Display.ShowMessageDialog.ShowMessage Title: $'''Login to TMDB''' Message: $'''You must be logged in to TMDB. Login and then click on OK''' Icon: Display.Icon.ErrorIcon Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: True ButtonPressed=> ButtonPressed2
-        GOTO retry_login_lang
+    IF logged_inT = 1 THEN
+    ELSE
+        IF Contains(LoginStatus, $'''Login''', True) THEN
+            SET logged_inT TO 0
+            DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
+            File.WriteText File: $'''%SelectedFile.Directory%\\%logfile%.log''' TextToWrite: $'''%CurrentDateTime% - ERR - Not on logged in to TMDB site''' AppendNewLine: True IfFileExists: File.IfFileExists.Append Encoding: File.FileEncoding.Unicode
+            Display.ShowMessageDialog.ShowMessage Title: $'''Login to TMDB''' Message: $'''You must be logged in to TMDB. Login and then click on OK''' Icon: Display.Icon.ErrorIcon Buttons: Display.Buttons.OK DefaultButton: Display.DefaultButton.Button1 IsTopMost: True ButtonPressed=> ButtonPressed2
+            GOTO retry_login_lang
+        ELSE
+            SET logged_inT TO 1
+        END
     END
     IF Contains(translate_button_text, $'''create translation''', True) THEN
         WebAutomation.PressButton.PressButton BrowserInstance: TMDb_Browser Control: appmask['Recording']['button'] WaitForPageToLoadTimeout: 60
@@ -202,7 +223,6 @@ LOOP FOREACH CurrentItem IN ListDifference
 %CurrentDateTime% - INF - Estimated minutes left: %eta_min_rnd%
 %CurrentDateTime% - INF - Estimated hours left  : %eta_hrs_rnd%
 %CurrentDateTime% - INF - ###################################''' AppendNewLine: True IfFileExists: File.IfFileExists.Append Encoding: File.FileEncoding.Unicode
-    File.WriteText File: $'''%SelectedFile.Directory%\\%logfile%.log''' TextToWrite: $'''%CurrentDateTime% - INF - ###################################''' AppendNewLine: True IfFileExists: File.IfFileExists.Append Encoding: File.FileEncoding.Unicode
     File.WriteText File: $'''%SelectedFile.Directory%\\%logfile%-progress.log''' TextToWrite: TrimmedText AppendNewLine: True IfFileExists: File.IfFileExists.Append Encoding: File.FileEncoding.Unicode
     GOTO close_browser_end
     IF IsNotEmpty(IMDb_Browser) THEN
@@ -220,6 +240,30 @@ LOOP FOREACH CurrentItem IN ListDifference
     LABEL close_browser_end
     LABEL end_for
 END
+CALL close_browsers
+DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> OverallEndTime
+DateTime.Subtract FromDate: OverallEndTime SubstractDate: OverallStartTime TimeUnit: DateTime.DifferenceTimeUnit.Seconds TimeDifference=> tot_sec
+SET tot_min TO (tot_sec) / 60
+SET tot_hrs TO (tot_sec) / 3600
+IF ListDifference.Count <> 0 THEN
+    SET avg_sec TO tot_sec / (ListDifference.Count)
+    SET avg_min TO tot_min / (ListDifference.Count)
+    SET avg_hrs TO tot_hrs / (ListDifference.Count)
+END
+Variables.TruncateNumber.RoundNumber Number: tot_sec DecimalPlaces: 2 Result=> tot_sec_rnd
+Variables.TruncateNumber.RoundNumber Number: tot_min DecimalPlaces: 2 Result=> tot_min_rnd
+Variables.TruncateNumber.RoundNumber Number: tot_hrs DecimalPlaces: 2 Result=> tot_hrs_rnd
+Variables.TruncateNumber.RoundNumber Number: avg_sec DecimalPlaces: 2 Result=> avg_sec_rnd
+Variables.TruncateNumber.RoundNumber Number: avg_min DecimalPlaces: 2 Result=> avg_min_rnd
+Variables.TruncateNumber.RoundNumber Number: avg_hrs DecimalPlaces: 2 Result=> avg_hrs_rnd
+DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
+File.WriteText File: $'''%SelectedFile.Directory%\\%logfile%.log''' TextToWrite: $'''%CurrentDateTime% - INF - Items processed: %ListDifference.Count%
+%CurrentDateTime% - INF - Seconds to process: %tot_sec_rnd%
+%CurrentDateTime% - INF - Minutes to process: %tot_min_rnd%
+%CurrentDateTime% - INF - Hours to process: %tot_hrs_rnd%
+%CurrentDateTime% - INF - Seconds per item: %avg_sec_rnd%
+%CurrentDateTime% - INF - Minutes per item: %avg_min_rnd%
+%CurrentDateTime% - INF - Hours per item: %avg_hrs_rnd%''' AppendNewLine: True IfFileExists: File.IfFileExists.Append Encoding: File.FileEncoding.Unicode
 DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
 File.WriteText File: $'''%SelectedFile.Directory%\\%logfile%.log''' TextToWrite: $'''%CurrentDateTime% - INF - DONE PROCESSING
 %CurrentDateTime% - INF - ###################################
