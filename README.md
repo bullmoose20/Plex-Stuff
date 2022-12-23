@@ -86,6 +86,7 @@ Or however you've mounted those directories.
 11. [PAD Flows](#pad_flows) - Various PAD flows for RPA stuff for PLEX, PMM, Other
     1.  [Convert Error: No TMDb ID Found for IMDb ID:](#Convert_Error_No_TMDb_ID_Found_for_IMDb_ID) - PAD flow to deal with Convert Errors in your meta.log file from PMM
     1.  [Convert Error: No TVDb ID Found for TMDb ID:](#Convert_Error_No_TVDb_ID_Found_for_TMDb_ID) - PAD flow to deal with Convert Errors in your meta.log file from PMM
+    1.  [Convert Error: No TVDb ID or IMDb ID found for AniDB ID](#Convert_Error_No_TVDb_ID_or_IMDb_ID_found_for_AniDB_ID) - PAD flow to deal with Convert Errors in your meta.log file from PMM
 
 Here are the possible PMM errors/warnings found in the meta.log in relation to these auto/semi-auto PAD flows
 ```
@@ -488,3 +489,15 @@ Error checking is enabled and does the following:
 - `Convert Error- No TVDb ID Found for TMDb ID` => Windows OS is in English and Edge in English
 - See [PAD Flows Install](#pad_flows_install)
 - Before starting. ensure that you have a tmdb account and that you logged in so that the cached credentials will work before trying this....
+
+##Convert_Error_No_TVDb_ID_or_IMDb_ID_found_for_AniDB_ID
+- `Convert Error- No TVDb ID or IMDb ID found for AniDB ID` => Windows OS is in English and Edge in English
+- See [PAD Flows Install](#pad_flows_install)
+- Before starting. ensure that you have a tmdb and anidb account and that you logged in so that the cached credentials will work before trying this....
+- AniDb does TMDb and IMDb  as well as MAL links 
+TMDb tv has IMDb and TVDb external links 
+TMDb movies has IMDb external link
+The PAD flow I built launches 6 browsers to six different sites and attempts to give you a summary of what it finds… it launches AniDb, MAL, AniList, TVDb, IMDb, and TMDb. Then it tries to match up as much as possible and gives you a summary of what it finds.
+
+You then decide where to make your fixes based on the summary and the pages the script finds for you. You hit save on the sites that you have updated and then you hit `ctrl-s` to have it continue to attempt finding the next ID that was not matched from PMM 
+So far, this is as far as I got so it’s far from perfect, and still pretty manual, but effective.
