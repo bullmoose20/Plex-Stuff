@@ -170,12 +170,6 @@ LOOP FOREACH CurrentItem IN ListDifference
     ON ERROR
 
     END
-    IF Contains(TMDb_search_results, $'''Oops!''', True) THEN
-        DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
-        File.WriteText File: $'''%SelectedFile.Directory%\\%logfile%.log''' TextToWrite: $'''%CurrentDateTime% - ERR - Page not found for TMDb ID: %TrimmedText%''' AppendNewLine: True IfFileExists: File.IfFileExists.Append Encoding: File.FileEncoding.Unicode
-        SET TMDb_search_results TO $'''null()'''
-        GOTO close_browsers
-    END
     SET SaveResult TO $'''null()'''
     SET TMDb_save_results TO $'''null()'''
     SET TMDb_save_results_details TO $'''null()'''
