@@ -1,13 +1,13 @@
 ﻿####################################################
 # create_poster.ps1
-# v1.5
+# v1.6
 # author: bullmoose20
 #
 # DESCRIPTION: 
 # In a powershell window and with ImageMagick installed, this will 
 # 1 - create a 2000x3000 colored poster based on $base_color parameter otherwise a random color for base is used and creates base_$base_color.jpg
 # 2 - it will add the gradient in the second line to create a file called gradient_$base_color.jpg
-# 3 - takes the $logo specified and sizes it 1800px (or whatever desired logo_size specified) wide leaving 100 on each side as a buffer of space
+# 3 - takes the $logo specified and sizes it 2000px (or whatever desired logo_size specified) wide leaving 100 on each side as a buffer of space
 # 4 - if a border is specified, both color and size of border will be applied
 # 5 - if text is desired it will be added to the final result with desired size, color and font
 # 6 - if white-wash is enabled, the colored logo with be made to 100% white
@@ -21,7 +21,7 @@
 # PARAMETERS:
 # -logo                (specify the logo/image png file that you want to have centered and resized)
 # -logo_offset         (+100 will push logo down 100 px from the center. -100 will move the logo up 100px from the center. Value is between -1500 and 1500. DEFAULT=0 or centered. -750 is the midpoint between the center and the top)
-# -logo_resize         (1000 will resize the log to fit in the poster.DEFAULT=1800.)
+# -logo_resize         (1000 will resize the log to fit in the poster.DEFAULT=2000.)
 # -base_color          (hex color code for the base background. If omitted a random color will be picked using the "#xxxxxx" format)
 # -gradient            (0=none, 1=center-out-fade, 2=bottom-up-fade, 3=top-down-fade, 4=bottom-top-fade, default=1)
 # -text                (text that you want to show on the resulting image. use \n to perform a carriage return and enclose text in double quotes.)
@@ -72,6 +72,8 @@ if ($null -eq $test) {
 else {
   Write-Host "Imagemagick   : Imagemagick is installed. $global:magick"
 }
+
+$random_name = ("{0:X6}" -f (Get-Random -Maximum 0xFFFFFF))
 
 #################################
 # $logo checks
@@ -470,13 +472,13 @@ else {
 #################################
 
 if ($logo_resize -eq "" -or $null -eq $logo_resize) {
-  $logo_resize = "1800"
+  $logo_resize = "2000"
 }
 
-if ($logo_resize -In 1..1800) {
+if ($logo_resize -In 1..2000) {
 }
 else {
-  Write-Host "Logo resize parameter is>$logo_resize<which is NOT between 1 and 1800. Exiting now..." -ForegroundColor Red -BackgroundColor White
+  Write-Host "Logo resize parameter is>$logo_resize<which is NOT between 1 and 2000. Exiting now..." -ForegroundColor Red -BackgroundColor White
   exit
 }
 
@@ -515,18 +517,20 @@ else {
 #################################
 $noextension = (Get-Item $logo).BaseName
 $extension = [System.IO.Path]::GetExtension($logo)
-
+$noextension_fade = (Get-Item $fade).BaseName
+$extension_fade = [System.IO.Path]::GetExtension($fade)
 #################################
 # collect paths
 #################################
 $tmp_path = Join-Path -Path $script_path -ChildPath "tmp"
 $out_path = Join-Path -Path $script_path -ChildPath "output"
-$logo = Join-Path -Path 'tmp' -ChildPath "$noextension$extension"
-$bcf = Join-Path -Path 'tmp' -ChildPath "base_$base_color.jpg"
-$gbcf = Join-Path -Path 'tmp' -ChildPath "gradient_$base_color.jpg"
-$wf = Join-Path -Path 'tmp' -ChildPath "white_$noextension$extension"
-$rf = Join-Path -Path 'tmp' -ChildPath "resized_$noextension$extension"
-$nef = Join-Path -Path 'tmp' -ChildPath "$noextension.jpg"
+$logo = Join-Path -Path 'tmp' -ChildPath $random_name"_$noextension$extension"
+$ff = Join-Path -Path 'tmp' -ChildPath $random_name"_$noextension_fade$extension_fade"
+$bcf = Join-Path -Path 'tmp' -ChildPath $random_name"_base_$base_color.jpg"
+$gbcf = Join-Path -Path 'tmp' -ChildPath $random_name"_gradient_$base_color.jpg"
+$wf = Join-Path -Path 'tmp' -ChildPath $random_name"_white_$noextension$extension"
+$rf = Join-Path -Path 'tmp' -ChildPath $random_name"_resized_$noextension$extension"
+$nef = Join-Path -Path 'tmp' -ChildPath $random_name"_$noextension.jpg"
 $of = Join-Path -Path 'output' -ChildPath "$noextension-$base_color.jpg"
 
 # Create dirs
@@ -535,6 +539,9 @@ New-Item -ItemType Directory -Force -Path $out_path | Out-Null
 
 # Copy logo to tmp location
 Copy-Item -Path $orig_logo -Destination $logo
+
+# Copy selected fade to tmp location
+Copy-Item -Path $fade -Destination $ff
 
 #################################
 # output information about run
@@ -571,6 +578,7 @@ if ($border) {
   Write-Host "resize height : $myheight"
 }
 Write-Host "input logo    : $noextension$extension"
+Write-Host "tmp input logo: $logo"
 Write-Host "output file   : $noextension.jpg"
 if ($out_name -eq "" -or $null -eq $out_name) {
   # empty $out_name
@@ -582,6 +590,14 @@ else {
   $of = Join-Path -Path 'output' -ChildPath "$out_name.jpg"
 }
 Write-Host "Save path     : $of"
+Write-Host "logo          : $logo"
+Write-Host "ff            : $ff"
+Write-Host "bcf           : $bcf"
+Write-Host "gbcf          : $gbcf"
+Write-Host "wf            : $wf"
+Write-Host "rf            : $rf"
+Write-Host "nef           : $nef"
+Write-Host "of            : $of"
 Write-Host "clean         : $clean"
 Write-Host "ran cmd       :"$myinvocation.Line
 $border_bit = [int][bool]::Parse($border)
@@ -599,13 +615,13 @@ Add-Content -Path playback.txt -Value ".\create_poster.ps1 -logo ""$orig_logo"" 
 #Write-Host "magick -size 2000x3000 xc:$base_color $bcf"
 magick -size 2000x3000 xc:$base_color $bcf
 #Write-Host "magick -gravity center $bcf $fade -background None -layers Flatten $gbcf"
-magick -gravity center $bcf $fade -background None -layers Flatten $gbcf
+magick -gravity center $bcf $ff -background None -layers Flatten $gbcf
 #Write-Host "magick $logo -colorspace gray -fill white -colorize 100 $wf"
 magick $logo -colorspace gray -fill white -colorize 100 $wf
 
 $tmplogo = Resolve-Path $logo
 if ($white_wash) {
-  $logo = Join-Path -Path 'tmp' -ChildPath "white_$noextension$extension"
+  $logo = Join-Path -Path 'tmp' -ChildPath $random_name"_white_$noextension$extension"
 }
 
 #Write-Host "magick $logo -resize $logo_resize PNG32:$rf"
@@ -653,6 +669,9 @@ if ($clean) {
   }
   if (Test-Path $rf) {
     Remove-Item -Path $rf -Force | Out-Null
+  }
+  if (Test-Path $ff) {
+    Remove-Item -Path $ff -Force | Out-Null
   }
   if (Test-Path $wf) {
     Remove-Item -Path $wf -Force | Out-Null
