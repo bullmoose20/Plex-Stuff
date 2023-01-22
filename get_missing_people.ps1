@@ -1,6 +1,6 @@
 ﻿####################################################
 # get_missing_people.ps1
-# v1.1
+# v1.2
 # author: bullmoose20
 #
 # DESCRIPTION: 
@@ -81,8 +81,9 @@ $newvalue = $null
 $chcp = $null
 $files_to_process = $null
 
-$pattern = '\[\d\d\d\d-\d\d-\d\d .*\[.*\] *\| Detail: tmdb_person updated poster to \[URL\] (https.*)(\..*g)\n.*\n.*\n.*Finished (.*) Collection'
+$pattern = '\[\d\d\d\d-\d\d-\d\d .*\[.*\] *\| Detail: tmdb_person updated poster to \[URL\] (https.*)(\..*g) *\|\n.*\n.*\n.*Finished (.*) Collection'
 $newvalue = "`n`n" + "powershell -command " + [char]34 + "Invoke-WebRequest " + '$1$2' + " -Outfile " + [char]39 + "$dds" + '$3$2' + [char]39 + [char]34 + "`n`n"
+
 
 ###################################################
 # 1 - Find files in meta.log and download to download_dir
@@ -98,6 +99,7 @@ ForEach ($item in $inputfile) {
     $theString = Get-Content $outputfile$theOutput.cmd | Select-String -Pattern $find -CaseSensitive -SimpleMatch
     if ($theString -eq "" -or $null -eq $theString) {
       Remove-Item $outputfile$theOutput.cmd
+      WriteToLogFile "0 items found..."  
     }
     else {
       $theString > tmp.txt

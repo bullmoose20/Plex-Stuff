@@ -1,6 +1,6 @@
 ﻿####################################################
 # create_people_poster.ps1
-# v1.9
+# v2.0
 # author: bullmoose20
 #
 # DESCRIPTION: 
@@ -16,15 +16,17 @@
 # REQUIREMENTS:
 # $metalog_location=is the path to the logs directory for PMM
 # Imagemagick must be installed - https://imagemagick.org/script/download.php
+# Powershell 7.x
 # Powershell security settings: https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_execution_policies?view=powershell-7.2
 # Windows Machine with Windows Power Automate Desktop to remove backgrounds with Adobe Express online
 # If PAD not working, then dump transparent images that were 1:1.5 in ratio and resized to 2000x3000 in png format and within the Downloads subdirectory
 #
 # PARAMETERS:
 # -metalog_location          (specify the logs folder location for PMM)
+# -flowName                  (specify a PAD flow name)
 # 
 # EXAMPLE:
-# .\create_people_poster.ps1 -metalog_location \\NZWHS01\appdata\Plex-Meta-Manager\logs
+# .\create_people_poster.ps1 -metalog_location \\NZWHS01\appdata\Plex-Meta-Manager\logs -flowName "remove backgrounds chrome-en windows-en"
 ####################################################
 
 param ($metalog_location, $flowName)
@@ -112,7 +114,6 @@ $nbpcs = Join-Path $nobackPathColor ''
 $tpps = Join-Path $tmpPeoplePath ''
 $bps = Join-Path $basePath ''
 
-
 #################################
 # WriteToLogFile function
 #################################
@@ -124,7 +125,7 @@ Function WriteToLogFile ($message) {
 #################################
 # check ImageMagick function
 #################################
-function Test-ImageMagick {
+Function Test-ImageMagick {
   $global:magick = $global:magick
   $global:magick = magick -version | select-string "Version:"
 }
@@ -758,7 +759,7 @@ $newvalue = $null
 $chcp = $null
 $files_to_process = $null
 
-$pattern = '\[\d\d\d\d-\d\d-\d\d .*\[.*\] *\| Detail: tmdb_person updated poster to \[URL\] (https.*)(\..*g)\n.*\n.*\n.*Finished (.*) Collection'
+$pattern = '\[\d\d\d\d-\d\d-\d\d .*\[.*\] *\| Detail: tmdb_person updated poster to \[URL\] (https.*)(\..*g) *\|\n.*\n.*\n.*Finished (.*) Collection'
 $newvalue = "`n`n" + "powershell -command " + [char]34 + "Invoke-WebRequest " + '$1$2' + " -Outfile " + [char]39 + "$dds" + '$3$2' + [char]39 + [char]34 + "`n`n"
 
 ###################################################
@@ -775,6 +776,7 @@ ForEach ($item in $inputfile) {
     $theString = Get-Content $outputfile$theOutput.cmd | Select-String -Pattern $find -CaseSensitive -SimpleMatch
     if ($theString -eq "" -or $null -eq $theString) {
       Remove-Item $outputfile$theOutput.cmd
+      WriteToLogFile "0 items found..."  
     }
     else {
       $theString > tmp.txt
