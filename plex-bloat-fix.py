@@ -25,6 +25,7 @@ import requests
 from os import walk
 from urllib.parse import urlparse
 from dotenv import load_dotenv
+from time import sleep
 
 PLEX_DB_NAME = "com.plexapp.plugins.library.db"
 Path("logs").mkdir(parents=True, exist_ok=True)
@@ -155,11 +156,39 @@ def chk_ver():
 
     if __version__ != remote_ver:
         log_line(
-            "# UPGRADE", f"Current Ver:{__version__} New Ver:{remote_ver} ")
+            "# UPGRADE:", f"Current Ver:{__version__} New Ver:{remote_ver} ")
         send_notifiarr("WARNING", color_y, "PBF Upgrade Recommended", "Current Ver:", f"{__version__}", "New Ver:",
                        f"{remote_ver}", "WARNING", "Maybe consider updating your version of plex-bloat-fix")
 
-
+def check_url(url, max_retries=5, backoff_factor=0.1):
+    """Check if a URL responds and return True or False.
+    Args:
+        url (str): The URL to check.
+        max_retries (int): The maximum number of retries. Must be between 1 and 50.
+        backoff_factor (float): The backoff factor to use between retries. Must be between 0 and 3.
+    Returns:
+        bool: True if the URL responds, False otherwise.
+    """
+    # Validate max_retries
+    if not 1 <= max_retries <= 50:
+        raise ValueError("max_retries must be between 1 and 50")
+    # Validate backoff_factor
+    if not 0 <= backoff_factor <= 3:
+        raise ValueError("backoff_factor must be between 0 and 3")
+    for retry in range(max_retries):
+        try:
+            log_line(f"STATUS:", f"Trying URL: {url} {retry + 1}/{max_retries}")
+            response = requests.get(url)
+            response.raise_for_status()
+            return True
+        except requests.exceptions.RequestException:
+            if retry == max_retries - 1:
+                return False
+            backoff_time = backoff_factor * (2 ** retry)
+            log_line(f"STATUS:", f"Backing off for {backoff_time} seconds")
+            sleep(backoff_time)
+            
+                        
 def log_line(header, msg):
     logging.info(f'{header : <{HEADER_WIDTH}}{msg}')
 
@@ -187,7 +216,7 @@ def summary_line(heading, msg):
 
 
 def undo_rename():
-    log_line("STATUS", "UNDO starting and this will take time....")
+    log_line("STATUS:", "UNDO starting and this will take time....")
     start = time.time()
     for DIR_PATH in DIR_PATH_ARR:
         files = glob.glob(f"{DIR_PATH}/**/*.jpg", recursive=True)
@@ -197,7 +226,7 @@ def undo_rename():
             log_file("RENAME:", f"{f} --> {tempTuple[0]}")
             os.rename(f, tempTuple[0])
 
-    log_line("STATUS", "UNDO Complete")
+    log_line("STATUS:", "UNDO Complete")
     end = time.time()
     stopwatch = end - start
     log_line(f"UNDO time:", f"{stopwatch:.2f} seconds")
@@ -314,7 +343,7 @@ if sys.version_info.major != 3:
     exit()
 
 drawLine()
-log_line("# BEGIN", f"Ver:{__version__} ")
+log_line("# BEGIN:", f"Ver:{__version__} ")
 drawLine()
 
 ####################################################################
@@ -574,8 +603,13 @@ try:
     ####################################################################
     # Connect to Plexserver
     ####################################################################
-    ps = PlexServer(PLEX_URL, PLEX_TOKEN, timeout=600)
-
+    ps = None
+    check_url(PLEX_URL, 10, .5)
+    try:
+        plex = ps = PlexServer(PLEX_URL, PLEX_TOKEN, timeout=600)
+    except:
+        log_line(f"ERROR:", f"PlexServer: {PLEX_URL} is down so some plexapi calls will be skipped/missed")
+        
     ####################################################################
     # clear the download target dir
     ####################################################################
@@ -742,32 +776,33 @@ try:
 
     clear_tmp()
 
-    if EMPTY_TRASH:
-        et = ps.library.emptyTrash()
-        drawLine()
-        log_line(f"# EMPTY_TRASH", f"{EMPTY_TRASH}")
-        drawLine()
-        log_line(f"EMPTY TRASH:", f"{et}")
-        log_line(f"STATUS:", f"sleeping for {SLEEP}")
-        time.sleep(SLEEP)
+    if plex is not None:
+        if EMPTY_TRASH:
+            et = ps.library.emptyTrash()
+            drawLine()
+            log_line(f"# EMPTY_TRASH:", f"{EMPTY_TRASH}")
+            drawLine()
+            log_line(f"EMPTY TRASH:", f"{et}")
+            log_line(f"STATUS:", f"sleeping for {SLEEP}")
+            time.sleep(SLEEP)
 
-    if CLEAN_BUNDLES:
-        drawLine()
-        log_line(f"# CLEAN_BUNDLES", f"{CLEAN_BUNDLES}")
-        drawLine()
-        cb = ps.library.cleanBundles()
-        log_line(f"CLEAN BUNDLES:", f"{cb}")
-        log_line(f"STATUS:", f"sleeping for {SLEEP}")
-        time.sleep(SLEEP)
+        if CLEAN_BUNDLES:
+            drawLine()
+            log_line(f"# CLEAN_BUNDLES:", f"{CLEAN_BUNDLES}")
+            drawLine()
+            cb = ps.library.cleanBundles()
+            log_line(f"CLEAN BUNDLES:", f"{cb}")
+            log_line(f"STATUS:", f"sleeping for {SLEEP}")
+            time.sleep(SLEEP)
 
-    if OPTIMIZE_DB:
-        drawLine()
-        log_line(f"# OPTIMIZE_DB", f"{OPTIMIZE_DB}")
-        drawLine()
-        op = ps.library.optimize()
-        log_line(f"OPTIMIZE DB:", f"{op}")
-        log_line(f"STATUS:", f"sleeping for {SLEEP}")
-        time.sleep(SLEEP)
+        if OPTIMIZE_DB:
+            drawLine()
+            log_line(f"# OPTIMIZE_DB:", f"{OPTIMIZE_DB}")
+            drawLine()
+            op = ps.library.optimize()
+            log_line(f"OPTIMIZE DB:", f"{op}")
+            log_line(f"STATUS:", f"sleeping for {SLEEP}")
+            time.sleep(SLEEP)
 
     end_all = time.time()
 
