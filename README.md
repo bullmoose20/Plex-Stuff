@@ -114,7 +114,7 @@ Red is deleted, Green is kept because it is the actively selected poster. The ot
 1. setup as above
 2. Activate that virtualenv (NOT IN AN ADMIN PROMPT IN WINDOWS) 
 3. IMPORTANT! Due to a recent change that PLEX made (circa Jan 2023), you SHOULD restart plex before running this script. Restarting allows for all temp SQLite files to be written to the promary plex db ensuring that we know exactly which posters have been selected and should be preserved.
-   1. if you are using plex in docker, create a script that will perform a docker restart, sleep for about 30 seconds, and then run this script)
+   1. if you are using plex in docker, create a script that will perform a docker restart, sleep for about 30 seconds, and then run this script. pbf.sh is an example bash script
 4. Run with `python plex-bloat-fix.py` - sometimes (usually when you have not setup the virtualenv for python as recommended above), you need to specify the version of python in the command like `python3.9 plex-bloat-fix.py`
 5. Make sure that you are NOT actively updating posters or title cards with PMM or TCM while running this script. Schedule this after the last run happens. So TCM, Plex Scheduled Tasks, PMM, THEN schedule or run plex-bloat-fix.py. Example: TCM @ 00:00, PLEX @ 02:00-05:00, and PMM @ 05:00
 

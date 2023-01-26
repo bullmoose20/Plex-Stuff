@@ -1,3 +1,4 @@
+#!/bin/bash
 echo "Restarting plex"
 docker restart plex
 echo "Sleeping 30 seconds"
