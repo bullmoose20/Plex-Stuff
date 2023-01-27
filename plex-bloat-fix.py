@@ -4,7 +4,7 @@
 # PlexAPI
 # python-dotenv
 
-__version__ = "1.3.6"
+__version__ = "1.3.7"
 
 from xmlrpc.client import Boolean
 from operator import itemgetter, attrgetter
@@ -160,7 +160,8 @@ def chk_ver():
         send_notifiarr("WARNING", color_y, "PBF Upgrade Recommended", "Current Ver:", f"{__version__}", "New Ver:",
                        f"{remote_ver}", "WARNING", "Maybe consider updating your version of plex-bloat-fix")
 
-def check_url(url, max_retries=5, backoff_factor=0.1):
+
+def check_url(url, max_retries=10, backoff_factor=0.5):
     """Check if a URL responds and return True or False.
     Args:
         url (str): The URL to check.
@@ -170,14 +171,15 @@ def check_url(url, max_retries=5, backoff_factor=0.1):
         bool: True if the URL responds, False otherwise.
     """
     # Validate max_retries
-    if not 1 <= max_retries <= 50:
-        raise ValueError("max_retries must be between 1 and 50")
+    if not 0 <= max_retries <= 50:
+        raise ValueError("max_retries must be between 0 and 50")
     # Validate backoff_factor
     if not 0 <= backoff_factor <= 3:
         raise ValueError("backoff_factor must be between 0 and 3")
     for retry in range(max_retries):
         try:
-            log_line(f"STATUS:", f"Trying URL: {url} {retry + 1}/{max_retries}")
+            log_line(
+                f"STATUS:", f"Trying URL: {url} {retry + 1}/{max_retries}")
             response = requests.get(url)
             response.raise_for_status()
             return True
@@ -187,8 +189,8 @@ def check_url(url, max_retries=5, backoff_factor=0.1):
             backoff_time = backoff_factor * (2 ** retry)
             log_line(f"STATUS:", f"Backing off for {backoff_time} seconds")
             sleep(backoff_time)
-            
-                        
+
+
 def log_line(header, msg):
     logging.info(f'{header : <{HEADER_WIDTH}}{msg}')
 
@@ -407,6 +409,11 @@ try:
     SLEEP = int(os.getenv("SLEEP"))
 except:
     SLEEP = 60
+    
+try:
+    PLEX_URL_RETRIES = int(os.getenv("PLEX_URL_RETRIES"))
+except:
+    PLEX_URL_RETRIES = 10
 
 try:
     OVERRIDE_PLEX_RUNNING_WARNING = Boolean(
@@ -520,6 +527,7 @@ log_line(f"DELETE:", f"{DELETE}")
 log_line(f"TC_DEL:", f"{TC_DEL}")
 log_line(f"LOG_FILE_ACTIONS:", f"{LOG_FILE_ACTIONS}")
 log_line(f"SLEEP:", f"{SLEEP}")
+log_line(f"PLEX_URL_RETRIES:", f"{PLEX_URL_RETRIES}")
 log_line(f"EMPTY_TRASH:", f"{EMPTY_TRASH}")
 log_line(f"CLEAN_BUNDLES:", f"{CLEAN_BUNDLES}")
 log_line(f"OPTIMIZE_DB:", f"{OPTIMIZE_DB}")
@@ -604,12 +612,13 @@ try:
     # Connect to Plexserver
     ####################################################################
     ps = None
-    check_url(PLEX_URL, 10, .5)
+    check_url(PLEX_URL, PLEX_URL_RETRIES, .5)
     try:
-        plex = ps = PlexServer(PLEX_URL, PLEX_TOKEN, timeout=600)
+        ps = PlexServer(PLEX_URL, PLEX_TOKEN, timeout=600)
     except:
-        log_line(f"ERROR:", f"PlexServer: {PLEX_URL} is down so some plexapi calls will be skipped/missed")
-        
+        log_line(
+            f"WARNING:", f"PlexServer: {PLEX_URL} is down so some plexapi calls will be skipped/missed")
+
     ####################################################################
     # clear the download target dir
     ####################################################################
@@ -776,7 +785,7 @@ try:
 
     clear_tmp()
 
-    if plex is not None:
+    if ps is not None:
         if EMPTY_TRASH:
             et = ps.library.emptyTrash()
             drawLine()
