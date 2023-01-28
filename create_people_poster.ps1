@@ -1,6 +1,6 @@
 ﻿####################################################
 # create_people_poster.ps1
-# v2.0
+# v2.1
 # author: bullmoose20
 #
 # DESCRIPTION: 
@@ -118,8 +118,16 @@ $bps = Join-Path $basePath ''
 # WriteToLogFile function
 #################################
 Function WriteToLogFile ($message) {
-  Add-content $scriptLog -value ((Get-Date).ToString() + " ~ " + $message)
+  Add-Content $scriptLog -value ((Get-Date).ToString() + " ~ " + $message)
   Write-Host ((Get-Date).ToString() + " ~ " + $message)
+}
+
+#################################
+# Append to log file function
+#################################
+function Write-Log {
+  param([string]$logstring)
+  Add-Content $scriptLog -value $logstring
 }
 
 #################################
@@ -739,6 +747,9 @@ WriteToLogFile "nobackPathColor              : $nobackPathColor"
 WriteToLogFile "tmpPeoplePath                : $tmpPeoplePath"
 WriteToLogFile "basePath                     : $basePath"
 WriteToLogFile "gh_path                      : $gh_path"
+WriteToLogFile "dds file for PAD Flow        : $tmp_local\dds.txt"
+WriteToLogFile "tpos file for PAD Flow       : $tmp_local\tpos.txt"
+WriteToLogFile "flowName file for PAD Flow   : $tmp_local\flowName.txt"
 
 # Remove step*.cmd from previous runs
 Remove-Item $step_del -Include step*.cmd
@@ -805,12 +816,45 @@ else {
   magick mogrify -resize 2000x3000! $dds*.jpg
 }
 
-WriteToLogFile "Removing backgrounds         : PAD flow >remove backgrounds< "
+WriteToLogFile "Removing backgrounds         : PAD flow >$flowName< "
 
 # send path location to files that PAD flow can access and read
+WriteToLogFile "dds.txt                      : >$dds< was added to >$tmp_local\dds.txt<"
+WriteToLogFile "tpos.txt                     : >$targetPath_orig< was added to >$tmp_local\tpos.txt<"
+WriteToLogFile "flowName.txt                 : >$flowName< was added to >$tmp_local\flowName.txt<"
+
 $dds > $tls"dds.txt"
 $targetPath_orig > $tls"tpos.txt"
+$flowName > $tls"flowName.txt"
+
+WriteToLogFile "PAD Flow START               : >$flowName< starting."
 run_PAD -flowName $flowName -flgExit $flgExit
+WriteToLogFile "PAD Flow END                 : >$flowName< ended."
+WriteToLogFile "Concatenation START          : Concatenation of PAD Flow logs starting."
+
+#######################
+# Concatenate the files for PAD Flow into this script's logs
+#######################
+if (Test-Path $tls"dds.txt") {
+  $logContent = Get-Content $tls"dds.txt"
+  Write-Log $logContent
+}
+
+if (Test-Path $tls"tpos.txt") {
+  $logContent =  Get-Content $tls"tpos.txt"
+  Write-Log $logContent
+}
+
+if (Test-Path $tls"flowName.txt") {
+  $logContent = Get-Content $tls"flowName.txt"
+  Write-Log $logContent
+}
+
+if (Test-Path $tls"\"$flowName".log") {
+  $logContent = Get-Content $tls"\"$flowName".log" -Raw
+  Write-Log $logContent
+}
+WriteToLogFile "Concatenation END            : Concatenation of PAD Flow logs complete."
 
 ###################################################
 # 3 Process resize and grayscale based on files found in download_dir
@@ -960,10 +1004,16 @@ if (Test-Path tmp.txt) {
   Remove-Item -Path tmp.txt -Force | Out-Null
 }
 if (Test-Path $tls"dds.txt") {
-  Remove-Item -Path $tls"dds.txt" -Force | Out-Null
+  # Remove-Item -Path $tls"dds.txt" -Force | Out-Null
 }
 if (Test-Path $tls"tpos.txt") {
-  Remove-Item -Path $tls"tpos.txt" -Force | Out-Null
+  # Remove-Item -Path $tls"tpos.txt" -Force | Out-Null
+}
+if (Test-Path $tls"flowName.txt") {
+  # Remove-Item -Path $tls"flowName.txt" -Force | Out-Null
+}
+if (Test-Path $tls"\"$flowName".log") {
+  # Remove-Item -Path $tls"\"$flowName".log" -Force | Out-Null
 }
 
 WriteToLogFile "#### END ####"
