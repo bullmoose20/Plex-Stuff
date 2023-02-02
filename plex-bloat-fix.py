@@ -4,7 +4,7 @@
 # PlexAPI
 # python-dotenv
 
-__version__ = "1.3.7"
+__version__ = "1.3.7a"
 
 from xmlrpc.client import Boolean
 from operator import itemgetter, attrgetter
@@ -442,12 +442,12 @@ if local_run:
     if db_tmp01.is_file() or db_tmp02.is_file():
         send_notifiarr("WARNING", color_y, "Plex is running", "Issue:", "Plex is running", "Detail:", "WARNING", "WARNING",
                        "At least one of the SQLite temp files is next to the Plex DB; this indicates Plex is still running and the DB cannot be safely copied. If you recently restarted plex as part of this run, you should be fine.")
-        log_line(f"WARNING:", f"At least one of the SQLite temp files is next to the Plex DB; this indicates Plex is still running and the DB cannot be safely copied. If you recently restarted plex as part of this run, you should be fine.")
+        log_line(f"WARNING:", f"At least one of the SQLite temp files is next to the Plex DB; this typically indicates Plex is still running and the DB cannot be safely copied. If you recently restarted plex as part of this run, you should be fine.")
         if OVERRIDE_PLEX_RUNNING_WARNING:
             log_line(
                 f"WARNING:", f"You've overridden the 'Plex is running' warning.")
         else:
-            log_error_and_exit(f"Plex is running, exiting")
+            log_error_and_exit(f"The Plex database appears to be open for writing [which typically means Plex is running]; continuing carries a risk of data loss.  If you wish to override this, set OVERRIDE_PLEX_RUNNING_WARNING to True in the .env; exiting now.")
 else:
     log_line("DB_PATH INVALID:",
              "This is a remote run which will DOWNLOAD the database")
