@@ -4,7 +4,7 @@
 # PlexAPI
 # python-dotenv
 
-__version__ = "1.3.7a"
+__version__ = "1.3.8"
 
 from xmlrpc.client import Boolean
 from operator import itemgetter, attrgetter
@@ -447,7 +447,7 @@ if local_run:
             log_line(
                 f"WARNING:", f"You've overridden the 'Plex is running' warning.")
         else:
-            log_error_and_exit(f"The Plex database appears to be open for writing [which typically means Plex is running]; continuing carries a risk of data loss.  If you wish to override this, set OVERRIDE_PLEX_RUNNING_WARNING to True in the .env; exiting now.")
+            log_error_and_exit(f"The Plex database appears to be open for writing [which typically means Plex is running]; continuing carries a risk of data loss.  If you wish to override this, set OVERRIDE_PLEX_RUNNING_WARNING to 1 in the .env; exiting now.")
 else:
     log_line("DB_PATH INVALID:",
              "This is a remote run which will DOWNLOAD the database")
