@@ -1,3 +1,8 @@
+# requirements
+# load_dotenv
+# plexapi
+# tqdm
+
 import os
 import argparse
 import logging
@@ -32,8 +37,10 @@ def check_plexapi_status():
     return True
 
 
-def check_library_exists(plex, libraries):
+def check_library_exists(plex, libraries=None):
     all_libraries = [lib.title for lib in plex.library.sections()]
+    if libraries is None:
+        return True
     for library in libraries:
         if library not in all_libraries:
             print(f"Error: Library '{library}' does not exist. Available libraries: {', '.join(all_libraries)}")
@@ -53,27 +60,30 @@ def get_overlay_items(label, libraries=None, troubleshoot=False):
                     season_labels = season.labels
                     if label in [l.tag for l in season_labels]:
                         overlay_items.append(season)
+                        logging.info("FOUND: '{} - Season {}' with label '{}' in library '{}'".format(show.title, season.seasonNumber, label, library.title))
                 episodes = [e for s in seasons for e in s.episodes()]
                 for episode in episodes:
                     episode_labels = episode.labels
                     if label in [l.tag for l in episode_labels]:
                         overlay_items.append(episode)
+                        logging.info("FOUND: '{} - Season {} Episode {}' with label '{}' in library '{}'".format(show.title, episode.seasonNumber, episode.index, label, library.title))
             elif hasattr(item, 'labels'):
                 labels = item.labels
                 if label in [l.tag for l in labels]:
                     overlay_items.append(item)
+                    logging.info("FOUND: '{}' with label '{}' in library '{}'".format(item.title, label, library.title))
                 elif troubleshoot:
-                    logging.debug('Item "{}" does not have label "{}" (labels: {})'.format(item.title, label, labels))
-                    print('Item "{}" does not have label "{}" (labels: {})'.format(item.title, label, labels))
+                    logging.info('MISSING: Item "{}" does not have label "{}" (labels: {}) in library "{}"'.format(item.title, label, labels, library.title))
+                    print('MISSING: Item "{}" does not have label "{}" (labels: {}) in library "{}"'.format(item.title, label, labels, library.title))
             elif troubleshoot:
-                logging.debug('Item "{}" does not have any labels'.format(item.title))
-                print('Item "{}" does not have any labels'.format(item.title))
+                logging.info('MISSING: Item "{}" does not have any labels in library "{}"'.format(item.title, library.title))
+                print('MISSING: Item "{}" does not have any labels in library "{}"'.format(item.title, library.title))
     return overlay_items
 
 
 def summary_report(overlay_items, label):
-    logging.info("Found {} items with the label '{}'".format(len(overlay_items), label))
-    print('Found {} items with the label "{}"'.format(len(overlay_items), label))
+    logging.info("FOUND: {} items with the label '{}'".format(len(overlay_items), label))
+    print('FOUND: {} items with the label "{}"'.format(len(overlay_items), label))
     for item in overlay_items:
         logging.info('-' * 50)
         logging.info('Title: {}'.format(item.title))
