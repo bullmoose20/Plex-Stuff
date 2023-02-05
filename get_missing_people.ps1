@@ -1,6 +1,6 @@
 ﻿####################################################
 # get_missing_people.ps1
-# v1.2
+# v1.3
 # author: bullmoose20
 #
 # DESCRIPTION: 
@@ -82,7 +82,7 @@ $chcp = $null
 $files_to_process = $null
 
 $pattern = '\[\d\d\d\d-\d\d-\d\d .*\[.*\] *\| Detail: tmdb_person updated poster to \[URL\] (https.*)(\..*g) *\|\n.*\n.*\n.*Finished (.*) Collection'
-$newvalue = "`n`n" + "powershell -command " + [char]34 + "Invoke-WebRequest " + '$1$2' + " -Outfile " + [char]39 + "$dds" + '$3$2' + [char]39 + [char]34 + "`n`n"
+$newvalue = "`n`n" + "powershell -command " + [char]34 + "Invoke-WebRequest " + '$1$2' + " -Outfile " + [char]92 + [char]34 + "$dds" + '$3$2' + [char]92 + [char]34 + "`n`n"
 
 
 ###################################################
