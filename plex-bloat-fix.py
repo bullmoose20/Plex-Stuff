@@ -4,7 +4,7 @@
 # PlexAPI
 # python-dotenv
 
-__version__ = "1.3.8"
+__version__ = "1.3.9"
 
 from xmlrpc.client import Boolean
 from operator import itemgetter, attrgetter
@@ -162,33 +162,25 @@ def chk_ver():
 
 
 def check_url(url, max_retries=10, backoff_factor=0.5):
-    """Check if a URL responds and return True or False.
-    Args:
-        url (str): The URL to check.
-        max_retries (int): The maximum number of retries. Must be between 1 and 50.
-        backoff_factor (float): The backoff factor to use between retries. Must be between 0 and 3.
-    Returns:
-        bool: True if the URL responds, False otherwise.
-    """
     # Validate max_retries
     if not 0 <= max_retries <= 50:
         raise ValueError("max_retries must be between 0 and 50")
     # Validate backoff_factor
     if not 0 <= backoff_factor <= 3:
         raise ValueError("backoff_factor must be between 0 and 3")
+
     for retry in range(max_retries):
+        log_line(f"STATUS:", f"Trying URL: {url} {retry + 1}/{max_retries}")
         try:
-            log_line(
-                f"STATUS:", f"Trying URL: {url} {retry + 1}/{max_retries}")
-            response = requests.get(url)
-            response.raise_for_status()
-            return True
-        except requests.exceptions.RequestException:
-            if retry == max_retries - 1:
-                return False
-            backoff_time = backoff_factor * (2 ** retry)
-            log_line(f"STATUS:", f"Backing off for {backoff_time} seconds")
-            sleep(backoff_time)
+          ps = PlexServer(PLEX_URL, PLEX_TOKEN, timeout=15)
+          break
+        except:
+          if retry == max_retries - 1:
+              log_line(
+                  f"WARNING:", f"PlexServer: {PLEX_URL} is down so some plexapi calls will be skipped/missed")
+          backoff_time = backoff_factor * (2 ** retry)
+          log_line(f"STATUS:", f"Backing off for {backoff_time} seconds")
+          sleep(backoff_time)
 
 
 def log_line(header, msg):
@@ -612,6 +604,7 @@ try:
     # Connect to Plexserver
     ####################################################################
     ps = None
+    log_line(f"STATUS:", f"Checking if {PLEX_URL} is up. It will be checked {PLEX_URL_RETRIES} times with a backoff of .5 seconds")
     check_url(PLEX_URL, PLEX_URL_RETRIES, .5)
     try:
         ps = PlexServer(PLEX_URL, PLEX_TOKEN, timeout=600)
