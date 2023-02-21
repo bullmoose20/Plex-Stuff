@@ -1,6 +1,6 @@
 ﻿####################################################
 # create_poster.ps1
-# v1.6
+# v1.7
 # author: bullmoose20
 #
 # DESCRIPTION: 
@@ -72,6 +72,9 @@ if ($null -eq $test) {
 else {
   Write-Host "Imagemagick   : Imagemagick is installed. $global:magick"
 }
+$tmp = $null
+$tmp = $PSVersionTable.PSVersion.ToString()
+Write-Host "Powershell Ver: $tmp"
 
 $random_name = ("{0:X6}" -f (Get-Random -Maximum 0xFFFFFF))
 
