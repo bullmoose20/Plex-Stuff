@@ -6,7 +6,12 @@ echo "Stopping containers..."
 
 docker stop tdarr
 docker stop tdarr_node
-containers=("prowlarr" "radarr" "sonarr" "lidarr" "sabnzbd" "qbittorrent")
+docker stop PIC
+docker stop POR
+docker stop TitleCardMaker
+docker stop Plex-Meta-Manager
+
+containers=("prowlarr" "radarr" "sonarr" "lidarr" "sabnzbd" "qbittorrent", "tautulli")
 
 for container in "${containers[@]}"
 do
@@ -39,7 +44,7 @@ do
 done
 
 echo "tv and movies returned to original location."
-echo "1 - Go scan both libraries again (may be done automatically by PLEX)"
+echo "1 - Go scan libraries again (may be done automatically by PLEX)"
 echo "2 - Wait for all activities to complete!!!"
 read -p "Press enter to continue to restart all your containers that were stopped"
 
