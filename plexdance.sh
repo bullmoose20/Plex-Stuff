@@ -2,17 +2,18 @@
 
 echo "This script will perform the PLEX Dance. Hit ctrl-c to cancel"
 read -p "Press Enter to continue"
-echo "Stopping containers..."
+echo "Stopping containers that will NOT be restarted..."
 
-docker stop tdarr
-docker stop tdarr_node
-docker stop PIC
-docker stop POR
-docker stop TitleCardMaker
-docker stop Plex-Meta-Manager
+containers_stop=("tdarr" "tdarr_node" "PIC" "POR" "TitleCardMaker" "Plex-Meta-Manager")
+for container in "${containers_stop[@]}"
+do
+  docker stop "$container"
+done
 
-containers=("prowlarr" "radarr" "sonarr" "lidarr" "sabnzbd" "qbittorrent", "tautulli")
+echo "Containers stopped"
+echo "Stopping containers that will be restarted after plexdance completes..."
 
+containers=("prowlarr" "radarr" "sonarr" "lidarr" "sabnzbd" "qbittorrent", "tautulli", "wrapperr" "PlexTraktSync")
 for container in "${containers[@]}"
 do
   docker stop "$container"
