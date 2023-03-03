@@ -1,5 +1,5 @@
 #!/bin/bash
-# Original code written by the crew at ZenDRIVE and good to share because `This is the way` https://www.youtube.com/watch?v=1iSz5cuCXdY
+# Original code written by the crew at [REDACTED] and good to share because `This is the way` https://www.youtube.com/watch?v=1iSz5cuCXdY
 # Sharing as is... you will need to tweak this as I have never run it and I am on Unraid running hotio plex container
 
 sqplex="/mnt/user/data/scripts/plex-scripts/pumpanddump/plexsql/plexmediaserver/Plex Media Server"
