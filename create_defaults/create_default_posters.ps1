@@ -2911,6 +2911,14 @@ $base45 = "@zbase-Sundance.png"
 $base46 = "@zbase-Venice.png"
 $base47 = "@zbase-winner.png"
 
+$fade1 = "@bottom-top-fade.png"
+$fade2 = "@bottom-up-fade.png"
+$fade3 = "@center-out-fade.png"
+$fade4 = "@none.png"
+$fade5 = "@top-down-fade.png"
+
+$trans1 = "transparent.png"
+
 $expectedChecksum_sep1 = "AB8DBC5FCE661BDFC643F9697EEC1463CD2CDE90E4594B232A6B92C272DE0561"
 $expectedChecksum_sep2 = "9570B1E86BEC71CAED6DDFD6D2F18023A7C5D408B6A6D5B50C045672D4310772"
 $expectedChecksum_sep3 = "89951DFC6338ABC64444635F6F2835472418BF779A1EB5C342078AF0B8365F80"
@@ -2984,6 +2992,14 @@ $expectedChecksum_base44 = "6097877450E63890250F03A47B8EB935DEE5BB2205B541F1AB4F
 $expectedChecksum_base45 = "0925F59D38BA4213B917BCA0FDD70C9E9EE13115471713ED1F67D5856E44C662"
 $expectedChecksum_base46 = "1DD63AD69190BD7DA0E858BBB8DF9B1D6C5BAC4D566185487CF8623DE1BFDE21"
 $expectedChecksum_base47 = "19893DD5E4D8F5F50CD8639C2B87A35B54962B7383A415091237289448EBC3CF"
+
+$expectedChecksum_fade1 = "79D93B7455A694820A4DF4B27B4418EA0063AF59400ED778FC66F83648DAA110"
+$expectedChecksum_fade2 = "7ED182E395A08B4035B687E6F0661029EF938F8027923EC9434EBCBC5D144CFD"
+$expectedChecksum_fade3 = "6D36359197363DDC092FDAA8AA4590838B01B8A22C3BF4B6DED76D65BC85A87C"
+$expectedChecksum_fade4 = "5E89879184510E91E477D41C61BD86A0E9209E9ECC17909A7B0EE20427950CBC"
+$expectedChecksum_fade5 = "CBBF0B235A893410E02977419C89EE6AD97DF253CBAEE382E01D088D2CCE6B39"
+
+$expectedChecksum_trans1 = "2DE20B0B33D9DA71D23A02237ED30C3EAA65F18A5142D8289C2D7328EAC71460"
 
 $failFlag = $false
 
@@ -3061,13 +3077,21 @@ Verify-FileChecksum -Path $script_path\@base\$base45 -ExpectedChecksum $expected
 Verify-FileChecksum -Path $script_path\@base\$base46 -ExpectedChecksum $expectedChecksum_base46
 Verify-FileChecksum -Path $script_path\@base\$base47 -ExpectedChecksum $expectedChecksum_base47
 
+Verify-FileChecksum -Path $script_path\fades\$fade1 -ExpectedChecksum $expectedChecksum_fade1
+Verify-FileChecksum -Path $script_path\fades\$fade2 -ExpectedChecksum $expectedChecksum_fade2
+Verify-FileChecksum -Path $script_path\fades\$fade3 -ExpectedChecksum $expectedChecksum_fade3
+Verify-FileChecksum -Path $script_path\fades\$fade4 -ExpectedChecksum $expectedChecksum_fade4
+Verify-FileChecksum -Path $script_path\fades\$fade5 -ExpectedChecksum $expectedChecksum_fade5
+
+Verify-FileChecksum -Path $script_path\$trans1 -ExpectedChecksum $expectedChecksum_trans1
+
 if ($failFlag) {
     WriteToLogFile "Checksums                    : At least one checksum verification failed. Aborting..."
     exit
 } else {
     WriteToLogFile "Checksums                    : All checksum verifications succeeded."
 }
-exit
+
 #################################
 # Determine parameters passed from command line
 #################################
