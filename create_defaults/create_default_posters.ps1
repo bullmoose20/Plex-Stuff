@@ -234,23 +234,28 @@ function Verify-FileChecksum {
         [string]$Path,
 
         [Parameter(Mandatory = $true)]
-        [string]$ExpectedChecksum
+        [string]$ExpectedChecksum,
+
+        [Parameter(Mandatory = $true)]
+        [ref]$failFlag
     )
 
     $actualChecksum = Get-FileHash $Path -Algorithm SHA256 | Select-Object -ExpandProperty Hash
 
     $status = if ($actualChecksum -eq $ExpectedChecksum) {
         "Success"
-    } else {
-        $FailFlag.Value = $true
+    }
+    else {
+        $failFlag.Value = $true
         "Failed"
     }
 
     $output = [PSCustomObject]@{
-        Path = $Path
+        Path             = $Path
         ExpectedChecksum = $ExpectedChecksum
-        ActualChecksum = $actualChecksum
-        Status = $status
+        ActualChecksum   = $actualChecksum
+        Status           = $status
+        failFlag         = $failFlag
     }
 
     # Write-Output "Checksum verification $($output.Status) for file $($output.Path). Expected checksum: $($output.ExpectedChecksum), actual checksum: $($output.ActualChecksum)."
@@ -327,7 +332,8 @@ function Get-TranslatedValue {
             $Line = $_.Trim()
             if ($Line -match "^(.+):\s+(.+)$") {
                 $TranslationDictionary[$Matches[1]] = $Matches[2]
-            } elseif ($Line -match "^(.+):$") {
+            }
+            elseif ($Line -match "^(.+):$") {
                 $TranslationDictionary[$Matches[1]] = $Matches[1]
             }
         }
@@ -2328,6 +2334,18 @@ Function CreateStudio {
     Move-Item -Path output-orig -Destination output
 }
 
+function Remove-TextBetweenDelimiters {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$InputString
+    )
+
+    $outputString = $InputString -replace '<<.*?>>', ''
+
+    return $outputString
+}
+
 ################################################################################
 # Function: CreateSubtitleLanguage
 # Description:  Creates Subtitle Language
@@ -2339,7 +2357,8 @@ Function CreateSubtitleLanguage {
     Move-Item -Path output -Destination output-orig
     $arr = @()
     $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"OTHER\nSUBTITLES`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"other`" -base_color `"#FF2000`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue "subtitle_language_name" -CaseSensitivity Upper)
+    $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue "subtitle_language_name" -CaseSensitivity Upper) + (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue "ABKHAZIAN" -CaseSensitivity Upper) 
+    write-host $myvar
     $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"$myvar`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"ab-test`" -base_color `"#88F678`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"ABKHAZIAN\nSUBTITLES`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"ab`" -base_color `"#88F678`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     # $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"AFAR\nSUBTITLES`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"aa`" -base_color `"#612A1C`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
@@ -2417,6 +2436,9 @@ Function CreateSubtitleLanguage {
     # $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"INUPIAQ\nSUBTITLES`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"ik`" -base_color `"#ECF371`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     # $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"IRISH\nSUBTITLES`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"ga`" -base_color `"#FB7078`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     # $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"ITALIAN\nSUBTITLES`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"it`" -base_color `"#95B5DF`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
+    $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue "subtitle_language_name" -CaseSensitivity Upper) + (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue "JAPANESE" -CaseSensitivity Upper) 
+    $myvar = Remove-TextBetweenDelimiters -InputString $myvar
+    write-host $myvar
     $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"JAPANESE\nSUBTITLES`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"ja`" -base_color `"#5D776B`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"$myvar`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"ja-test`" -base_color `"#5D776B`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     # $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"JAVANESE\nSUBTITLES`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"jv`" -base_color `"#5014C5`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
@@ -3002,96 +3024,100 @@ $expectedChecksum_fade3 = "6D36359197363DDC092FDAA8AA4590838B01B8A22C3BF4B6DED76
 $expectedChecksum_fade4 = "5E89879184510E91E477D41C61BD86A0E9209E9ECC17909A7B0EE20427950CBC"
 $expectedChecksum_fade5 = "CBBF0B235A893410E02977419C89EE6AD97DF253CBAEE382E01D088D2CCE6B39"
 
-$expectedChecksum_trans1 = "2DE20B0B33D9DA71D23A02237ED30C3EAA65F18A5142D8289C2D7328EAC71460"
+$expectedChecksum_trans1 = "64A0A1D637FF0687CCBCAECA31B8E6B7235002B1EE8528E7A60BE6A7D636F1FC"
 
-$failFlag = $false
+$failFlag = [ref] $false
+Write-Output "Begin: " $failFlag.Value
 
-Verify-FileChecksum -Path $script_path\@base\$sep1 -ExpectedChecksum $expectedChecksum_sep1
-Verify-FileChecksum -Path $script_path\@base\$sep2 -ExpectedChecksum $expectedChecksum_sep2
-Verify-FileChecksum -Path $script_path\@base\$sep3 -ExpectedChecksum $expectedChecksum_sep3
-Verify-FileChecksum -Path $script_path\@base\$sep4 -ExpectedChecksum $expectedChecksum_sep4
-Verify-FileChecksum -Path $script_path\@base\$sep5 -ExpectedChecksum $expectedChecksum_sep5
-Verify-FileChecksum -Path $script_path\@base\$sep6 -ExpectedChecksum $expectedChecksum_sep6
-Verify-FileChecksum -Path $script_path\@base\$sep7 -ExpectedChecksum $expectedChecksum_sep7
+Verify-FileChecksum -Path $script_path\@base\$sep1 -ExpectedChecksum $expectedChecksum_sep1 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\@base\$sep2 -ExpectedChecksum $expectedChecksum_sep2 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\@base\$sep3 -ExpectedChecksum $expectedChecksum_sep3 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\@base\$sep4 -ExpectedChecksum $expectedChecksum_sep4 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\@base\$sep5 -ExpectedChecksum $expectedChecksum_sep5 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\@base\$sep6 -ExpectedChecksum $expectedChecksum_sep6 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\@base\$sep7 -ExpectedChecksum $expectedChecksum_sep7 -failFlag $failFlag
 
-Verify-FileChecksum -Path $script_path\fonts\$ttf1 -ExpectedChecksum $expectedChecksum_ttf1
-Verify-FileChecksum -Path $script_path\fonts\$ttf2 -ExpectedChecksum $expectedChecksum_ttf2
-Verify-FileChecksum -Path $script_path\fonts\$ttf3 -ExpectedChecksum $expectedChecksum_ttf3
-Verify-FileChecksum -Path $script_path\fonts\$ttf4 -ExpectedChecksum $expectedChecksum_ttf4
-Verify-FileChecksum -Path $script_path\fonts\$ttf5 -ExpectedChecksum $expectedChecksum_ttf5
-Verify-FileChecksum -Path $script_path\fonts\$ttf6 -ExpectedChecksum $expectedChecksum_ttf6
-Verify-FileChecksum -Path $script_path\fonts\$ttf7 -ExpectedChecksum $expectedChecksum_ttf7
-Verify-FileChecksum -Path $script_path\fonts\$ttf8 -ExpectedChecksum $expectedChecksum_ttf8
-Verify-FileChecksum -Path $script_path\fonts\$ttf9 -ExpectedChecksum $expectedChecksum_ttf9
-Verify-FileChecksum -Path $script_path\fonts\$ttf10 -ExpectedChecksum $expectedChecksum_ttf10
-Verify-FileChecksum -Path $script_path\fonts\$ttf11 -ExpectedChecksum $expectedChecksum_ttf11
-Verify-FileChecksum -Path $script_path\fonts\$ttf12 -ExpectedChecksum $expectedChecksum_ttf12
-Verify-FileChecksum -Path $script_path\fonts\$ttf13 -ExpectedChecksum $expectedChecksum_ttf13
-Verify-FileChecksum -Path $script_path\fonts\$ttf14 -ExpectedChecksum $expectedChecksum_ttf14
-Verify-FileChecksum -Path $script_path\fonts\$ttf15 -ExpectedChecksum $expectedChecksum_ttf15
-Verify-FileChecksum -Path $script_path\fonts\$ttf16 -ExpectedChecksum $expectedChecksum_ttf16
-Verify-FileChecksum -Path $script_path\fonts\$ttf17 -ExpectedChecksum $expectedChecksum_ttf17
+Verify-FileChecksum -Path $script_path\fonts\$ttf1 -ExpectedChecksum $expectedChecksum_ttf1 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\fonts\$ttf2 -ExpectedChecksum $expectedChecksum_ttf2 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\fonts\$ttf3 -ExpectedChecksum $expectedChecksum_ttf3 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\fonts\$ttf4 -ExpectedChecksum $expectedChecksum_ttf4 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\fonts\$ttf5 -ExpectedChecksum $expectedChecksum_ttf5 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\fonts\$ttf6 -ExpectedChecksum $expectedChecksum_ttf6 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\fonts\$ttf7 -ExpectedChecksum $expectedChecksum_ttf7 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\fonts\$ttf8 -ExpectedChecksum $expectedChecksum_ttf8 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\fonts\$ttf9 -ExpectedChecksum $expectedChecksum_ttf9 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\fonts\$ttf10 -ExpectedChecksum $expectedChecksum_ttf10 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\fonts\$ttf11 -ExpectedChecksum $expectedChecksum_ttf11 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\fonts\$ttf12 -ExpectedChecksum $expectedChecksum_ttf12 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\fonts\$ttf13 -ExpectedChecksum $expectedChecksum_ttf13 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\fonts\$ttf14 -ExpectedChecksum $expectedChecksum_ttf14 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\fonts\$ttf15 -ExpectedChecksum $expectedChecksum_ttf15 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\fonts\$ttf16 -ExpectedChecksum $expectedChecksum_ttf16 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\fonts\$ttf17 -ExpectedChecksum $expectedChecksum_ttf17 -failFlag $failFlag
 
-Verify-FileChecksum -Path $script_path\@base\$base1 -ExpectedChecksum $expectedChecksum_base1
-Verify-FileChecksum -Path $script_path\@base\$base2 -ExpectedChecksum $expectedChecksum_base2
-Verify-FileChecksum -Path $script_path\@base\$base3 -ExpectedChecksum $expectedChecksum_base3
-Verify-FileChecksum -Path $script_path\@base\$base4 -ExpectedChecksum $expectedChecksum_base4
-Verify-FileChecksum -Path $script_path\@base\$base5 -ExpectedChecksum $expectedChecksum_base5
-Verify-FileChecksum -Path $script_path\@base\$base6 -ExpectedChecksum $expectedChecksum_base6
-Verify-FileChecksum -Path $script_path\@base\$base7 -ExpectedChecksum $expectedChecksum_base7
-Verify-FileChecksum -Path $script_path\@base\$base8 -ExpectedChecksum $expectedChecksum_base8
-Verify-FileChecksum -Path $script_path\@base\$base9 -ExpectedChecksum $expectedChecksum_base9
-Verify-FileChecksum -Path $script_path\@base\$base10 -ExpectedChecksum $expectedChecksum_base10
-Verify-FileChecksum -Path $script_path\@base\$base11 -ExpectedChecksum $expectedChecksum_base11
-Verify-FileChecksum -Path $script_path\@base\$base12 -ExpectedChecksum $expectedChecksum_base12
-Verify-FileChecksum -Path $script_path\@base\$base13 -ExpectedChecksum $expectedChecksum_base13
-Verify-FileChecksum -Path $script_path\@base\$base14 -ExpectedChecksum $expectedChecksum_base14
-Verify-FileChecksum -Path $script_path\@base\$base15 -ExpectedChecksum $expectedChecksum_base15
-Verify-FileChecksum -Path $script_path\@base\$base16 -ExpectedChecksum $expectedChecksum_base16
-Verify-FileChecksum -Path $script_path\@base\$base17 -ExpectedChecksum $expectedChecksum_base17
-Verify-FileChecksum -Path $script_path\@base\$base18 -ExpectedChecksum $expectedChecksum_base18
-Verify-FileChecksum -Path $script_path\@base\$base19 -ExpectedChecksum $expectedChecksum_base19
-Verify-FileChecksum -Path $script_path\@base\$base20 -ExpectedChecksum $expectedChecksum_base20
-Verify-FileChecksum -Path $script_path\@base\$base21 -ExpectedChecksum $expectedChecksum_base21
-Verify-FileChecksum -Path $script_path\@base\$base22 -ExpectedChecksum $expectedChecksum_base22
-Verify-FileChecksum -Path $script_path\@base\$base23 -ExpectedChecksum $expectedChecksum_base23
-Verify-FileChecksum -Path $script_path\@base\$base24 -ExpectedChecksum $expectedChecksum_base24
-Verify-FileChecksum -Path $script_path\@base\$base25 -ExpectedChecksum $expectedChecksum_base25
-Verify-FileChecksum -Path $script_path\@base\$base26 -ExpectedChecksum $expectedChecksum_base26
-Verify-FileChecksum -Path $script_path\@base\$base27 -ExpectedChecksum $expectedChecksum_base27
-Verify-FileChecksum -Path $script_path\@base\$base28 -ExpectedChecksum $expectedChecksum_base28
-Verify-FileChecksum -Path $script_path\@base\$base29 -ExpectedChecksum $expectedChecksum_base29
-Verify-FileChecksum -Path $script_path\@base\$base30 -ExpectedChecksum $expectedChecksum_base30
-Verify-FileChecksum -Path $script_path\@base\$base31 -ExpectedChecksum $expectedChecksum_base31
-Verify-FileChecksum -Path $script_path\@base\$base32 -ExpectedChecksum $expectedChecksum_base32
-Verify-FileChecksum -Path $script_path\@base\$base33 -ExpectedChecksum $expectedChecksum_base33
-Verify-FileChecksum -Path $script_path\@base\$base34 -ExpectedChecksum $expectedChecksum_base34
-Verify-FileChecksum -Path $script_path\@base\$base35 -ExpectedChecksum $expectedChecksum_base35
-Verify-FileChecksum -Path $script_path\@base\$base36 -ExpectedChecksum $expectedChecksum_base36
-Verify-FileChecksum -Path $script_path\@base\$base37 -ExpectedChecksum $expectedChecksum_base37
-Verify-FileChecksum -Path $script_path\@base\$base38 -ExpectedChecksum $expectedChecksum_base38
-Verify-FileChecksum -Path $script_path\@base\$base39 -ExpectedChecksum $expectedChecksum_base39
-Verify-FileChecksum -Path $script_path\@base\$base40 -ExpectedChecksum $expectedChecksum_base40
-Verify-FileChecksum -Path $script_path\@base\$base41 -ExpectedChecksum $expectedChecksum_base41
-Verify-FileChecksum -Path $script_path\@base\$base42 -ExpectedChecksum $expectedChecksum_base42
-Verify-FileChecksum -Path $script_path\@base\$base43 -ExpectedChecksum $expectedChecksum_base43
-Verify-FileChecksum -Path $script_path\@base\$base44 -ExpectedChecksum $expectedChecksum_base44
-Verify-FileChecksum -Path $script_path\@base\$base45 -ExpectedChecksum $expectedChecksum_base45
-Verify-FileChecksum -Path $script_path\@base\$base46 -ExpectedChecksum $expectedChecksum_base46
-Verify-FileChecksum -Path $script_path\@base\$base47 -ExpectedChecksum $expectedChecksum_base47
+Verify-FileChecksum -Path $script_path\@base\$base1 -ExpectedChecksum $expectedChecksum_base1 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\@base\$base2 -ExpectedChecksum $expectedChecksum_base2 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\@base\$base3 -ExpectedChecksum $expectedChecksum_base3 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\@base\$base4 -ExpectedChecksum $expectedChecksum_base4 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\@base\$base5 -ExpectedChecksum $expectedChecksum_base5 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\@base\$base6 -ExpectedChecksum $expectedChecksum_base6 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\@base\$base7 -ExpectedChecksum $expectedChecksum_base7 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\@base\$base8 -ExpectedChecksum $expectedChecksum_base8 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\@base\$base9 -ExpectedChecksum $expectedChecksum_base9 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\@base\$base10 -ExpectedChecksum $expectedChecksum_base10 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\@base\$base11 -ExpectedChecksum $expectedChecksum_base11 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\@base\$base12 -ExpectedChecksum $expectedChecksum_base12 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\@base\$base13 -ExpectedChecksum $expectedChecksum_base13 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\@base\$base14 -ExpectedChecksum $expectedChecksum_base14 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\@base\$base15 -ExpectedChecksum $expectedChecksum_base15 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\@base\$base16 -ExpectedChecksum $expectedChecksum_base16 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\@base\$base17 -ExpectedChecksum $expectedChecksum_base17 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\@base\$base18 -ExpectedChecksum $expectedChecksum_base18 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\@base\$base19 -ExpectedChecksum $expectedChecksum_base19 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\@base\$base20 -ExpectedChecksum $expectedChecksum_base20 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\@base\$base21 -ExpectedChecksum $expectedChecksum_base21 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\@base\$base22 -ExpectedChecksum $expectedChecksum_base22 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\@base\$base23 -ExpectedChecksum $expectedChecksum_base23 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\@base\$base24 -ExpectedChecksum $expectedChecksum_base24 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\@base\$base25 -ExpectedChecksum $expectedChecksum_base25 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\@base\$base26 -ExpectedChecksum $expectedChecksum_base26 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\@base\$base27 -ExpectedChecksum $expectedChecksum_base27 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\@base\$base28 -ExpectedChecksum $expectedChecksum_base28 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\@base\$base29 -ExpectedChecksum $expectedChecksum_base29 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\@base\$base30 -ExpectedChecksum $expectedChecksum_base30 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\@base\$base31 -ExpectedChecksum $expectedChecksum_base31 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\@base\$base32 -ExpectedChecksum $expectedChecksum_base32 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\@base\$base33 -ExpectedChecksum $expectedChecksum_base33 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\@base\$base34 -ExpectedChecksum $expectedChecksum_base34 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\@base\$base35 -ExpectedChecksum $expectedChecksum_base35 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\@base\$base36 -ExpectedChecksum $expectedChecksum_base36 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\@base\$base37 -ExpectedChecksum $expectedChecksum_base37 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\@base\$base38 -ExpectedChecksum $expectedChecksum_base38 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\@base\$base39 -ExpectedChecksum $expectedChecksum_base39 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\@base\$base40 -ExpectedChecksum $expectedChecksum_base40 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\@base\$base41 -ExpectedChecksum $expectedChecksum_base41 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\@base\$base42 -ExpectedChecksum $expectedChecksum_base42 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\@base\$base43 -ExpectedChecksum $expectedChecksum_base43 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\@base\$base44 -ExpectedChecksum $expectedChecksum_base44 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\@base\$base45 -ExpectedChecksum $expectedChecksum_base45 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\@base\$base46 -ExpectedChecksum $expectedChecksum_base46 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\@base\$base47 -ExpectedChecksum $expectedChecksum_base47 -failFlag $failFlag
 
-Verify-FileChecksum -Path $script_path\fades\$fade1 -ExpectedChecksum $expectedChecksum_fade1
-Verify-FileChecksum -Path $script_path\fades\$fade2 -ExpectedChecksum $expectedChecksum_fade2
-Verify-FileChecksum -Path $script_path\fades\$fade3 -ExpectedChecksum $expectedChecksum_fade3
-Verify-FileChecksum -Path $script_path\fades\$fade4 -ExpectedChecksum $expectedChecksum_fade4
-Verify-FileChecksum -Path $script_path\fades\$fade5 -ExpectedChecksum $expectedChecksum_fade5
+Verify-FileChecksum -Path $script_path\fades\$fade1 -ExpectedChecksum $expectedChecksum_fade1 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\fades\$fade2 -ExpectedChecksum $expectedChecksum_fade2 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\fades\$fade3 -ExpectedChecksum $expectedChecksum_fade3 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\fades\$fade4 -ExpectedChecksum $expectedChecksum_fade4 -failFlag $failFlag
+Verify-FileChecksum -Path $script_path\fades\$fade5 -ExpectedChecksum $expectedChecksum_fade5 -failFlag $failFlag
 
-Verify-FileChecksum -Path $script_path\$trans1 -ExpectedChecksum $expectedChecksum_trans1
+Verify-FileChecksum -Path $script_path\$trans1 -ExpectedChecksum $expectedChecksum_trans1 -failFlag $failFlag
 
-if ($failFlag) {
+Write-Output "End:" $failFlag.Value
+
+if ($failFlag.Value) {
     WriteToLogFile "Checksums                    : At least one checksum verification failed. Aborting..."
     exit
-} else {
+}
+else {
     WriteToLogFile "Checksums                    : All checksum verifications succeeded."
 }
 
@@ -3106,7 +3132,7 @@ foreach ($param in $args) {
         "AudioLanguages" { CreateAudioLanguage }
         "Award" { CreateAwards }
         "Awards" { CreateAwards }
-        "Based" { CreateBased    }
+        "Based" { CreateBased }
         "Chart" { CreateChart }
         "Charts" { CreateChart }
         "ContentRating" { CreateContentRating }
