@@ -271,7 +271,7 @@ function Download-TranslationFile {
     $GitHubRepository = "https://raw.githubusercontent.com/meisnate12/Plex-Meta-Manager/master/defaults/translations"
     $TranslationFile = "$LanguageCode.yml"
     $TranslationFileUrl = "$GitHubRepository/$TranslationFile"
-    $TranslationFilePath = "$env:TEMP\$TranslationFile"
+    $TranslationFilePath = Join-Path $script_path -ChildPath "$LanguageCode.yml"
   
     try {
         $response = Invoke-WebRequest -Uri $TranslationFileUrl -Method Head
