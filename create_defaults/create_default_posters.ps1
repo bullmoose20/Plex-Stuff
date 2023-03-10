@@ -2334,14 +2334,17 @@ Function CreateStudio {
     Move-Item -Path output-orig -Destination output
 }
 
-function Remove-TextBetweenDelimiters {
+function Replace-TextBetweenDelimiters {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true)]
-        [string]$InputString
+        [string]$InputString,
+
+        [Parameter(Mandatory = $true)]
+        [string]$ReplacementString
     )
 
-    $outputString = $InputString -replace '<<.*?>>', ''
+    $outputString = $InputString -replace '<<.*?>>', $ReplacementString
 
     return $outputString
 }
@@ -2356,9 +2359,9 @@ Function CreateSubtitleLanguage {
     # Find-Path `"$script_path\subtitle_language`"
     Move-Item -Path output -Destination output-orig
     $arr = @()
-    $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"OTHER\nSUBTITLES`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"other`" -base_color `"#FF2000`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue "subtitle_language_name" -CaseSensitivity Upper) + (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue "ABKHAZIAN" -CaseSensitivity Upper) 
-    write-host $myvar
+    # $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"OTHER\nSUBTITLES`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"other`" -base_color `"#FF2000`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
+    $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue "subtitle_language_name" -CaseSensitivity Upper) 
+    $myvar = Replace-TextBetweenDelimiters -InputString $myvar -ReplacementString (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue "ABKHAZIAN" -CaseSensitivity Upper)
     $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"$myvar`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"ab-test`" -base_color `"#88F678`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"ABKHAZIAN\nSUBTITLES`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"ab`" -base_color `"#88F678`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     # $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"AFAR\nSUBTITLES`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"aa`" -base_color `"#612A1C`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
@@ -2436,9 +2439,8 @@ Function CreateSubtitleLanguage {
     # $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"INUPIAQ\nSUBTITLES`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"ik`" -base_color `"#ECF371`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     # $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"IRISH\nSUBTITLES`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"ga`" -base_color `"#FB7078`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     # $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"ITALIAN\nSUBTITLES`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"it`" -base_color `"#95B5DF`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue "subtitle_language_name" -CaseSensitivity Upper) + (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue "JAPANESE" -CaseSensitivity Upper) 
-    $myvar = Remove-TextBetweenDelimiters -InputString $myvar
-    write-host $myvar
+    $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue "subtitle_language_name" -CaseSensitivity Upper)
+    $myvar = Replace-TextBetweenDelimiters -InputString $myvar -ReplacementString (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue "JAPANESE" -CaseSensitivity Upper)
     $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"JAPANESE\nSUBTITLES`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"ja`" -base_color `"#5D776B`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"$myvar`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"ja-test`" -base_color `"#5D776B`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     # $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"JAVANESE\nSUBTITLES`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"jv`" -base_color `"#5014C5`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
