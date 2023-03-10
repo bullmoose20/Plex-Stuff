@@ -33,6 +33,7 @@
 #################################
 $global:font_flag = $null
 $global:magick = $null
+# $global:WidthCache = @{}
 
 #################################
 # collect paths
@@ -40,6 +41,7 @@ $global:magick = $null
 $script_path = $PSScriptRoot
 $scriptName = $MyInvocation.MyCommand.Name
 $scriptLog = Join-Path $script_path -ChildPath "$scriptName.log"
+$cacheFilePath = Join-Path $script_path -ChildPath "cache.csv"
 
 ################################################################################
 # Function: Remove-Folders
@@ -389,6 +391,136 @@ function Get-TranslatedValue {
     }
 }
 
+################################################################################
+# Function: Get-Width
+# Description: gets the width of a string based on a font and pointsize
+################################################################################
+Function Get-Width($theName, $theFont, $thePointsize) {
+    WriteToLogFile "theName is                   : $theName"
+    WriteToLogFile "theFont is                   : $theFont"
+    WriteToLogFile "thePointsize is              : $thePointsize"
+  
+    $string = magick -debug annotate  xc: -font $theFont -pointsize $thePointsize -annotate 0 $theName null: 2>&1 | Select-String -Pattern Metrics: -CaseSensitive -SimpleMatch
+    $theArray = $string -Split ";"   
+    $arrWidth = $theArray[1].Split(" ")
+    $theWidth = [int]$arrWidth[2]
+    WriteToLogFile "Name Width is                : $theWidth"
+    $theWidth
+}
+
+$global:WidthCache = @{}
+
+################################################################################
+# Function: Export-WidthCache
+# Description: Exports to CSV cache
+################################################################################
+function Export-WidthCache {
+    param (
+        [string] $cacheFilePath
+    )
+    $global:WidthCache.GetEnumerator() | Select-Object Text,Font,PointSize,Width |
+        Export-Csv -Path $cacheFilePath -NoTypeInformation
+}
+
+################################################################################
+# Function: Import-WidthCache
+# Description: Imports from CSV cache
+################################################################################
+function Import-WidthCache {
+    param (
+        [string] $cacheFilePath
+    )
+    if (Test-Path $cacheFilePath) {
+        $cache = Import-Csv -Path $cacheFilePath | ForEach-Object {
+            [pscustomobject] @{
+                Text      = $_.Text
+                Font      = $_.Font
+                PointSize = [int] $_.PointSize
+                Width     = [double] $_.Width
+            }
+        }
+        if ($cache.Count -gt 0) {
+            $global:WidthCache = @{}
+            $cache | ForEach-Object {
+                $global:WidthCache["$($_.Text) $($_.Font) $($_.PointSize)"] = [double]$_.Width
+            }
+            WriteToLogFile "Import-WidthCache: Import-WidthCache completed"
+        }
+        else {
+            $global:WidthCache = @{}
+            WriteToLogFile "Import-WidthCache: $cacheFilePath is empty"
+        }
+    }
+    else {
+        WriteToLogFile "Import-WidthCache: $cacheFilePath not found"
+        $global:WidthCache = @{}
+    }
+}
+
+################################################################################
+# Function: Get-WidthCached
+# Description: Gets the width cache
+################################################################################
+Function Get-WidthCached($text, $font, $pointSize) {
+    foreach ($cacheItem in $global:WidthCache.GetEnumerator()) {
+        if ($cacheItem.Value.Text -eq $text -and $cacheItem.Value.Font -eq $font -and $cacheItem.Value.PointSize -eq $pointSize) {
+            return $cacheItem.Value.Width
+        }
+    }
+    
+    $width = Get-Width $text $font $pointSize
+    $cacheItem = [pscustomobject] @{
+        Text      = $text
+        Font      = $font
+        PointSize = $pointSize
+        Width     = $width
+    }
+    $global:WidthCache["$text $font $pointSize"] = $cacheItem
+    
+    return $width
+}
+
+################################################################################
+# Function: Get-OptimalFontSize
+# Description: Gets the optimal size for a phrase
+################################################################################
+Function Get-OptimalFontSize($theName, $theFont, $theMaxWidth, $initialPointSize) {
+    $words = $theName -split '\s'
+    $numSpaces = $words.Count - 1
+    $numLines = $numSpaces + 1
+    $text = $words -join "\n"  # Replace spaces with line breaks
+    $maxPointSize = $initialPointSize
+    $minPointSize = 1
+    $width = Get-WidthCached $text $theFont $maxPointSize * $numLines
+    
+    if ($width -le $theMaxWidth) {
+        WriteToLogFile "optimalFontSize              : Optimal font size for '$theName' with font '$theFont' and maximum width '$theMaxWidth' is '$minPointSize'."
+        return $maxPointSize
+    }
+    
+    while ($maxPointSize - $minPointSize -gt 1) {
+        $pointSize = [int]($minPointSize + ($maxPointSize - $minPointSize) / 2)
+        
+        if ($WidthCache.ContainsKey("$text $theFont $pointSize")) {
+            $width = $WidthCache["$text $theFont $pointSize"]
+        }
+        else {
+            $width = Get-Width $text $theFont $pointSize * $numLines
+            $WidthCache["$text $theFont $pointSize"] = $width
+        }
+        
+        if ($width -gt $theMaxWidth) {
+            $maxPointSize = $pointSize
+        }
+        else {
+            $minPointSize = $pointSize
+        }
+    }
+    
+    WriteToLogFile "optimalFontSize              : Optimal font size for '$theName' with font '$theFont' and maximum width '$theMaxWidth' is '$minPointSize'."
+    return $minPointSize
+}
+  
 ################################################################################
 # Function: EncodeIt
 # Description:  base64 string encode
@@ -2364,16 +2496,22 @@ Function CreateSubtitleLanguage {
     Write-Host `"Creating Subtitle Language`"
     Set-Location $script_path
     # Find-Path `"$script_path\subtitle_language`"
+    $theFont = "ComfortAa-Medium"
+    $theMaxWidth = 1800
+    $initialPointSize = 250
+
     Move-Item -Path output -Destination output-orig
     $arr = @()
     $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue "subtitle_language_name" -CaseSensitivity Upper) 
     $myvar = Replace-TextBetweenDelimiters -InputString $myvar -ReplacementString (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue "OTHER" -CaseSensitivity Upper)
+    $optimalFontSize = Get-OptimalFontSize $myvar $theFont $theMaxWidth $initialPointSize
     $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"OTHER\nSUBTITLES`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"other`" -base_color `"#FF2000`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"$myvar`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"other-test`" -base_color `"#FF2000`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    
+    $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$myvar`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"other-test`" -base_color `"#FF2000`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
+
     $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue "subtitle_language_name" -CaseSensitivity Upper) 
     $myvar = Replace-TextBetweenDelimiters -InputString $myvar -ReplacementString (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue "ABKHAZIAN" -CaseSensitivity Upper)
-    $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"$myvar`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"ab-test`" -base_color `"#88F678`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
+    $optimalFontSize = Get-OptimalFontSize $myvar $theFont $theMaxWidth $initialPointSize
+    $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$myvar`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"ab-test`" -base_color `"#88F678`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"ABKHAZIAN\nSUBTITLES`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"ab`" -base_color `"#88F678`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     
     # $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"AFAR\nSUBTITLES`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"aa`" -base_color `"#612A1C`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
@@ -2413,18 +2551,22 @@ Function CreateSubtitleLanguage {
 
     $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue "subtitle_language_name" -CaseSensitivity Upper) 
     $myvar = Replace-TextBetweenDelimiters -InputString $myvar -ReplacementString (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue "CROATIAN" -CaseSensitivity Upper)
-    $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"$myvar`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"hr-test`" -base_color `"#AB48D3`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
+    $optimalFontSize = Get-OptimalFontSize $myvar $theFont $theMaxWidth $initialPointSize
+    $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$myvar`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"hr-test`" -base_color `"#AB48D3`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"CROATIAN\nSUBTITLES`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"hr`" -base_color `"#AB48D3`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
 
     $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue "subtitle_language_name" -CaseSensitivity Upper) 
     $myvar = Replace-TextBetweenDelimiters -InputString $myvar -ReplacementString (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue "CZECH" -CaseSensitivity Upper)
-    $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"$myvar`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"cs-test`" -base_color `"#7804BB`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
+    $optimalFontSize = Get-OptimalFontSize $myvar $theFont $theMaxWidth $initialPointSize
+    $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$myvar`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"cs-test`" -base_color `"#7804BB`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"CZECH\nSUBTITLES`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"cs`" -base_color `"#7804BB`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
 
     $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue "subtitle_language_name" -CaseSensitivity Upper) 
     $myvar = Replace-TextBetweenDelimiters -InputString $myvar -ReplacementString (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue "DANISH" -CaseSensitivity Upper)
-    $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"$myvar`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"da-test`" -base_color `"#87A5BE`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
+    $optimalFontSize = Get-OptimalFontSize $myvar $theFont $theMaxWidth $initialPointSize
+    $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$myvar`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"da-test`" -base_color `"#87A5BE`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"DANISH\nSUBTITLES`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"da`" -base_color `"#87A5BE`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
+
     # $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"DIVEHI\nSUBTITLES`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"dv`" -base_color `"#FA57EC`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     # $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"DUTCH\nSUBTITLES`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"nl`" -base_color `"#74352E`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     # $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"DZONGKHA\nSUBTITLES`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"dz`" -base_color `"#F7C931`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
@@ -2463,10 +2605,13 @@ Function CreateSubtitleLanguage {
     # $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"INUPIAQ\nSUBTITLES`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"ik`" -base_color `"#ECF371`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     # $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"IRISH\nSUBTITLES`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"ga`" -base_color `"#FB7078`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     # $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"ITALIAN\nSUBTITLES`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"it`" -base_color `"#95B5DF`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
+
     $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue "subtitle_language_name" -CaseSensitivity Upper)
     $myvar = Replace-TextBetweenDelimiters -InputString $myvar -ReplacementString (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue "JAPANESE" -CaseSensitivity Upper)
+    $optimalFontSize = Get-OptimalFontSize $myvar $theFont $theMaxWidth $initialPointSize
     $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"JAPANESE\nSUBTITLES`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"ja`" -base_color `"#5D776B`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"$myvar`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"ja-test`" -base_color `"#5D776B`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
+    $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$myvar`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"ja-test`" -base_color `"#5D776B`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
+
     # $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"JAVANESE\nSUBTITLES`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"jv`" -base_color `"#5014C5`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     # $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"KALAALLISUT\nSUBTITLES`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"kl`" -base_color `"#050CF3`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     # $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"KANNADA\nSUBTITLES`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"kn`" -base_color `"#440B43`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
@@ -2573,7 +2718,11 @@ Function CreateSubtitleLanguage {
     # $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"YIDDISH\nSUBTITLES`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"yi`" -base_color `"#111D14`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     # $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"YORUBA\nSUBTITLES`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"yo`" -base_color `"#E815FF`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     # $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"ZHUANG\nSUBTITLES`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"za`" -base_color `"#C62A89`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
+    $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue "subtitle_language_name" -CaseSensitivity Upper)
+    $myvar = Replace-TextBetweenDelimiters -InputString $myvar -ReplacementString (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue "ZULU" -CaseSensitivity Upper)
+    $optimalFontSize = Get-OptimalFontSize $myvar $theFont $theMaxWidth $initialPointSize
     $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"ZULU\nSUBTITLES`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"zu`" -base_color `"#0049F8`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
+    $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$myvar`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"zu-test`" -base_color `"#0049F8`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     LaunchScripts -ScriptPaths $arr
     Move-Item -Path output -Destination subtitle_language
     Move-Item -Path output-orig -Destination output
@@ -3147,6 +3296,7 @@ if ($failFlag.Value) {
 else {
     WriteToLogFile "Checksums                    : All checksum verifications succeeded."
 }
+Import-WidthCache -cacheFilePath $cacheFilePath
 
 #################################
 # Determine parameters passed from command line
@@ -3223,10 +3373,16 @@ if (!$args) {
 }
 
 #######################
-# Run secondary powershell that uses create_poster.ps1 wrapper of ImageMagick
+# Export cache
 #######################
 Set-Location $script_path
-# & "$script_path\default_part2.ps1"
+
+write-host $global:WidthCache
+write-host $cacheFilePath 
+WriteToLogFile "cacheFilePath                : $cacheFilePath"
+WriteToLogFile "global:WidthCache            : $global:WidthCache"
+
+Export-WidthCache -cacheFilePath $cacheFilePath
 
 #######################
 # Move folders to $script_path\defaults
