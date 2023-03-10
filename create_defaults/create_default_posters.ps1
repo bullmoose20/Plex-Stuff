@@ -64,6 +64,7 @@ Function Remove-Folders {
     Remove-Item -Path $script_path\streaming -Force -Recurse -ErrorAction SilentlyContinue
     Remove-Item -Path $script_path\studio -Force -Recurse -ErrorAction SilentlyContinue
     Remove-Item -Path $script_path\subtitle_language -Force -Recurse -ErrorAction SilentlyContinue
+    Remove-Item -Path $script_path\translations -Force -Recurse -ErrorAction SilentlyContinue
     Remove-Item -Path $script_path\universe -Force -Recurse -ErrorAction SilentlyContinue
     Remove-Item -Path $script_path\year -Force -Recurse -ErrorAction SilentlyContinue
 }
@@ -276,7 +277,9 @@ function Download-TranslationFile {
     $GitHubRepository = "https://raw.githubusercontent.com/meisnate12/Plex-Meta-Manager/master/defaults/translations"
     $TranslationFile = "$LanguageCode.yml"
     $TranslationFileUrl = "$GitHubRepository/$TranslationFile"
-    $TranslationFilePath = Join-Path $script_path -ChildPath "$LanguageCode.yml"
+    $TranslationFilePath = Join-Path $script_path -ChildPath "@translations"
+    Find-Path $TranslationFilePath
+    $TranslationFilePath = Join-Path $TranslationFilePath -ChildPath "$LanguageCode.yml"
   
     try {
         $response = Invoke-WebRequest -Uri $TranslationFileUrl -Method Head
@@ -296,6 +299,25 @@ function Download-TranslationFile {
     }
   
     Write-Output "Translation file downloaded to $TranslationFilePath"
+}
+
+################################################################################
+# Function: Replace-TextBetweenDelimiters
+# Description: replaces <<something>> with a string
+################################################################################
+function Replace-TextBetweenDelimiters {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$InputString,
+
+        [Parameter(Mandatory = $true)]
+        [string]$ReplacementString
+    )
+
+    $outputString = $InputString -replace '<<.*?>>', $ReplacementString
+
+    return $outputString
 }
 
 ################################################################################
@@ -2334,21 +2356,6 @@ Function CreateStudio {
     Move-Item -Path output-orig -Destination output
 }
 
-function Replace-TextBetweenDelimiters {
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory = $true)]
-        [string]$InputString,
-
-        [Parameter(Mandatory = $true)]
-        [string]$ReplacementString
-    )
-
-    $outputString = $InputString -replace '<<.*?>>', $ReplacementString
-
-    return $outputString
-}
-
 ################################################################################
 # Function: CreateSubtitleLanguage
 # Description:  Creates Subtitle Language
@@ -2359,11 +2366,16 @@ Function CreateSubtitleLanguage {
     # Find-Path `"$script_path\subtitle_language`"
     Move-Item -Path output -Destination output-orig
     $arr = @()
-    # $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"OTHER\nSUBTITLES`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"other`" -base_color `"#FF2000`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
+    $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue "subtitle_language_name" -CaseSensitivity Upper) 
+    $myvar = Replace-TextBetweenDelimiters -InputString $myvar -ReplacementString (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue "OTHER" -CaseSensitivity Upper)
+    $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"OTHER\nSUBTITLES`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"other`" -base_color `"#FF2000`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
+    $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"$myvar`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"other-test`" -base_color `"#FF2000`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
+    
     $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue "subtitle_language_name" -CaseSensitivity Upper) 
     $myvar = Replace-TextBetweenDelimiters -InputString $myvar -ReplacementString (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue "ABKHAZIAN" -CaseSensitivity Upper)
     $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"$myvar`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"ab-test`" -base_color `"#88F678`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"ABKHAZIAN\nSUBTITLES`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"ab`" -base_color `"#88F678`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
+    
     # $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"AFAR\nSUBTITLES`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"aa`" -base_color `"#612A1C`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     # $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"AFRIKAANS\nSUBTITLES`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"af`" -base_color `"#60EC40`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     # $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"AKAN\nSUBTITLES`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"ak`" -base_color `"#021FBC`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
@@ -2398,9 +2410,21 @@ Function CreateSubtitleLanguage {
     # $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"CORNISH\nSUBTITLES`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"kw`" -base_color `"#55137D`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     # $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"CORSICAN\nSUBTITLES`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"co`" -base_color `"#C605DC`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     # $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"CREE\nSUBTITLES`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"cr`" -base_color `"#75D7F3`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    # $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"CROATIAN\nSUBTITLES`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"hr`" -base_color `"#AB48D3`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    # $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"CZECH\nSUBTITLES`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"cs`" -base_color `"#7804BB`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    # $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"DANISH\nSUBTITLES`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"da`" -base_color `"#87A5BE`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
+
+    $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue "subtitle_language_name" -CaseSensitivity Upper) 
+    $myvar = Replace-TextBetweenDelimiters -InputString $myvar -ReplacementString (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue "CROATIAN" -CaseSensitivity Upper)
+    $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"$myvar`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"hr-test`" -base_color `"#AB48D3`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
+    $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"CROATIAN\nSUBTITLES`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"hr`" -base_color `"#AB48D3`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
+
+    $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue "subtitle_language_name" -CaseSensitivity Upper) 
+    $myvar = Replace-TextBetweenDelimiters -InputString $myvar -ReplacementString (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue "CZECH" -CaseSensitivity Upper)
+    $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"$myvar`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"cs-test`" -base_color `"#7804BB`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
+    $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"CZECH\nSUBTITLES`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"cs`" -base_color `"#7804BB`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
+
+    $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue "subtitle_language_name" -CaseSensitivity Upper) 
+    $myvar = Replace-TextBetweenDelimiters -InputString $myvar -ReplacementString (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue "DANISH" -CaseSensitivity Upper)
+    $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"$myvar`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"da-test`" -base_color `"#87A5BE`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
+    $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"DANISH\nSUBTITLES`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"da`" -base_color `"#87A5BE`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     # $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"DIVEHI\nSUBTITLES`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"dv`" -base_color `"#FA57EC`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     # $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"DUTCH\nSUBTITLES`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"nl`" -base_color `"#74352E`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     # $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"DZONGKHA\nSUBTITLES`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"dz`" -base_color `"#F7C931`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
@@ -2825,7 +2849,8 @@ if ([string]::IsNullOrWhiteSpace($LanguageCode)) {
 }
 
 Download-TranslationFile -LanguageCode $LanguageCode
-$TranslationFilePath = Join-Path $script_path -ChildPath "$LanguageCode.yml"
+$TranslationFilePath = Join-Path $script_path -ChildPath "@translations"
+$TranslationFilePath = Join-Path $TranslationFilePath -ChildPath "$LanguageCode.yml"
 
 WriteToLogFile "#### START ####"
 WriteToLogFile "Script Path                  : $script_path"
