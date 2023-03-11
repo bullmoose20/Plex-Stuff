@@ -368,6 +368,8 @@ function Get-TranslatedValue {
 
         if ($null -eq $TranslatedValue) {
             Write-Output "TRANSLATION NOT FOUND"
+            WriteToLogFile "EnglishValue                 : $EnglishValue"
+            WriteToLogFile "TranslatedValue              : $TranslatedValue"
             return
         }
         
@@ -384,6 +386,8 @@ function Get-TranslatedValue {
         }
 
         Write-Output $TranslatedValue
+        WriteToLogFile "EnglishValue                 : $EnglishValue"
+        WriteToLogFile "TranslatedValue              : $TranslatedValue"
     }
     catch {
         Write-Error "Error: Value not found in dictionary."
@@ -486,40 +490,40 @@ Function Get-WidthCached($text, $font, $pointSize) {
 ################################################################################
 Function Get-OptimalFontSize($theName, $theFont, $theMaxWidth, $initialPointSize) {
     $words = $theName -split '\s'
-    $numSpaces = $words.Count - 1
-    $numLines = $numSpaces + 1
-    $text = $words -join "\n"  # Replace spaces with line breaks
-    $maxPointSize = $initialPointSize
-    $minPointSize = 1
-    $width = Get-WidthCached $text $theFont $maxPointSize * $numLines
-    
-    if ($width -le $theMaxWidth) {
-        WriteToLogFile "optimalFontSize              : Optimal font size for '$theName' with font '$theFont' and maximum width '$theMaxWidth' is '$minPointSize'."
-        return $maxPointSize
+    $minOptimalPointSize = $initialPointSize
+
+    foreach ($word in $words) {
+        $optimalPointSize = $initialPointSize
+        $currentWidth = Get-WidthCached $word $theFont $optimalPointSize
+        
+        if ($currentWidth -gt $theMaxWidth) {
+            $minPointSize = 1
+            $maxPointSize = $optimalPointSize
+            while ($maxPointSize - $minPointSize -gt 1) {
+                $pointSize = [int]($minPointSize + ($maxPointSize - $minPointSize) / 2)
+                
+                $width = Get-WidthCached $word $theFont $pointSize
+                
+                if ($width -gt $theMaxWidth) {
+                    $maxPointSize = $pointSize
+                }
+                else {
+                    $minPointSize = $pointSize
+                }
+            }
+            
+            $optimalPointSize = $minPointSize
+        }
+        
+        if ($optimalPointSize -lt $minOptimalPointSize) {
+            $minOptimalPointSize = $optimalPointSize
+        }
     }
     
-    while ($maxPointSize - $minPointSize -gt 1) {
-        $pointSize = [int]($minPointSize + ($maxPointSize - $minPointSize) / 2)
-        
-        if ($WidthCache.ContainsKey("$text $theFont $pointSize")) {
-            $width = $WidthCache["$text $theFont $pointSize"]
-        }
-        else {
-            $width = Get-Width $text $theFont $pointSize * $numLines
-            $WidthCache["$text $theFont $pointSize"] = $width
-        }
-        
-        if ($width -gt $theMaxWidth) {
-            $maxPointSize = $pointSize
-        }
-        else {
-            $minPointSize = $pointSize
-        }
-    }
-    
-    WriteToLogFile "optimalFontSize              : Optimal font size for '$theName' with font '$theFont' and maximum width '$theMaxWidth' is '$minPointSize'."
-    return $minPointSize
+    WriteToLogFile "optimalFontSize              : Optimal font size for '$theName' with font '$theFont' and maximum width '$theMaxWidth' is '$minOptimalPointSize'."
+    return $minOptimalPointSize
 }
+
   
 ################################################################################
 # Function: EncodeIt
@@ -2528,6 +2532,8 @@ Function CreateSubtitleLanguage {
 
     $myArray = @(
         'Name| out_name| base_color| other_setting',
+        'A| short| #88F678| NA',
+        'THISISALONGONE| long| #88F678| NA',
         'ABKHAZIAN| ab| #88F678| NA',
         'AFAR| aa| #612A1C| NA',
         'AFRIKAANS| af| #60EC40| NA',
@@ -2715,7 +2721,6 @@ Function CreateSubtitleLanguage {
         'ZULU| zu| #0049F8| NA'
     ) | ConvertFrom-Csv -Delimiter '|'
     
-
     $arr = @()
     foreach ($item in $myArray) {
         # write-host $($item.Name)
@@ -3000,6 +3005,8 @@ if ([string]::IsNullOrWhiteSpace($LanguageCode)) {
 }
 
 Download-TranslationFile -LanguageCode $LanguageCode
+# Read-Host -Prompt "Press any key to continue..."
+
 $TranslationFilePath = Join-Path $script_path -ChildPath "@translations"
 $TranslationFilePath = Join-Path $TranslationFilePath -ChildPath "$LanguageCode.yml"
 
