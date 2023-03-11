@@ -369,7 +369,7 @@ function Get-TranslatedValue {
         if ($null -eq $TranslatedValue) {
             Write-Output "TRANSLATION NOT FOUND"
             WriteToLogFile "EnglishValue                 : $EnglishValue"
-            WriteToLogFile "TranslatedValue              : $TranslatedValue"
+            WriteToLogFile "TranslatedValue              : ${EnglishValue}: TRANSLATION NOT FOUND"
             return
         }
         
@@ -719,8 +719,6 @@ Function CreateAudioLanguage {
 
     $myArray = @(
         'Name| out_name| base_color| other_setting',
-        'A| short| #88F678| NA',
-        'THISISALONGONE| long| #88F678| NA',
         'ABKHAZIAN| ab| #88F678| NA',
         'AFAR| aa| #612A1C| NA',
         'AFRIKAANS| af| #60EC40| NA',
@@ -2530,8 +2528,6 @@ Function CreateSubtitleLanguage {
 
     $myArray = @(
         'Name| out_name| base_color| other_setting',
-        'A| short| #88F678| NA',
-        'THISISALONGONE| long| #88F678| NA',
         'ABKHAZIAN| ab| #88F678| NA',
         'AFAR| aa| #612A1C| NA',
         'AFRIKAANS| af| #60EC40| NA',
