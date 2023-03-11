@@ -368,8 +368,7 @@ function Get-TranslatedValue {
 
         if ($null -eq $TranslatedValue) {
             Write-Output "TRANSLATION NOT FOUND"
-            WriteToLogFile "EnglishValue                 : $EnglishValue"
-            WriteToLogFile "TranslatedValue              : ${EnglishValue}: TRANSLATION NOT FOUND"
+            WriteToLogFile "TranslatedValue  ERROR       : ${EnglishValue}: TRANSLATION NOT FOUND in $TranslationFilePath"
             return
         }
         
@@ -386,8 +385,7 @@ function Get-TranslatedValue {
         }
 
         Write-Output $TranslatedValue
-        WriteToLogFile "EnglishValue                 : $EnglishValue"
-        WriteToLogFile "TranslatedValue              : $TranslatedValue"
+        WriteToLogFile "TranslatedValue              : ${EnglishValue}: $TranslatedValue in $TranslationFilePath"
     }
     catch {
         Write-Error "Error: Value not found in dictionary."
