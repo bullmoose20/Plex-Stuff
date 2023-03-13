@@ -48,28 +48,17 @@ $cacheFilePath = Join-Path $script_path -ChildPath "cache.csv"
 # Description: Removes folders to start fresh run
 ################################################################################
 Function Remove-Folders {
-    Remove-Item -Path $script_path\audio_language -Force -Recurse -ErrorAction SilentlyContinue
-    Remove-Item -Path $script_path\award -Force -Recurse -ErrorAction SilentlyContinue
-    Remove-Item -Path $script_path\based -Force -Recurse -ErrorAction SilentlyContinue
-    Remove-Item -Path $script_path\chart -Force -Recurse -ErrorAction SilentlyContinue
-    Remove-Item -Path $script_path\content_rating -Force -Recurse -ErrorAction SilentlyContinue
-    Remove-Item -Path $script_path\country -Force -Recurse -ErrorAction SilentlyContinue
-    Remove-Item -Path $script_path\decade -Force -Recurse -ErrorAction SilentlyContinue
-    Remove-Item -Path $script_path\defaults -Force -Recurse -ErrorAction SilentlyContinue
-    Remove-Item -Path $script_path\franchise -Force -Recurse -ErrorAction SilentlyContinue
-    Remove-Item -Path $script_path\genre -Force -Recurse -ErrorAction SilentlyContinue
-    Remove-Item -Path $script_path\network -Force -Recurse -ErrorAction SilentlyContinue
-    Remove-Item -Path $script_path\playlist -Force -Recurse -ErrorAction SilentlyContinue
-    Remove-Item -Path $script_path\resolution -Force -Recurse -ErrorAction SilentlyContinue
-    Remove-Item -Path $script_path\seasonal -Force -Recurse -ErrorAction SilentlyContinue
-    Remove-Item -Path $script_path\separators -Force -Recurse -ErrorAction SilentlyContinue
-    Remove-Item -Path $script_path\streaming -Force -Recurse -ErrorAction SilentlyContinue
-    Remove-Item -Path $script_path\studio -Force -Recurse -ErrorAction SilentlyContinue
-    Remove-Item -Path $script_path\subtitle_language -Force -Recurse -ErrorAction SilentlyContinue
-    Remove-Item -Path $script_path\translations -Force -Recurse -ErrorAction SilentlyContinue
-    Remove-Item -Path $script_path\universe -Force -Recurse -ErrorAction SilentlyContinue
-    Remove-Item -Path $script_path\year -Force -Recurse -ErrorAction SilentlyContinue
+    $folders = "audio_language", "award", "based", "chart", "content_rating", "country",
+    "decade", "defaults", "franchise", "genre", "network", "playlist", "resolution",
+    "seasonal", "separators", "streaming", "studio", "subtitle_language",
+    "translations", "universe", "year"
+    
+    foreach ($folder in $folders) {
+        $path = Join-Path $script_path $folder
+        Remove-Item $path -Force -Recurse -ErrorAction SilentlyContinue
+    }
 }
+
 
 ################################################################################
 # Function: Test-ImageMagick
@@ -112,13 +101,14 @@ Function Find-Fonts ($theFont, $theFile, $theType) {
     $global:font_flag = $global:font_flag 
     if ($chkfont1 -eq "" -or $null -eq $chkfont1) {
         $font_list = magick identify -list font | Select-String "Font: "
-        $font_list -replace "  Font: ", ""> magick_fonts.txt
-        Write-Host "Fonts missing >"$theFont"< not installed/found. List of installed fonts that Imagemagick can use listed and exported here: magick_fonts.txt." -ForegroundColor Red -BackgroundColor White
+        $font_list -replace "  Font: ", "" | Out-File -FilePath (Join-Path $script_path "magick_fonts.txt")
+        Write-Host "Fonts missing >"$theFont"< not installed/found. List of installed fonts that Imagemagick can use listed and exported here: $(Join-Path $script_path "magick_fonts.txt")." -ForegroundColor Red -BackgroundColor White
         Write-Host $font_list.count "fonts are visible to Imagemagick." -ForegroundColor Red -BackgroundColor White
         WriteToLogFile "Fonts missing                : $theFont"
-        WriteToLogFile "Fonts missing                : List of installed fonts that Imagemagick can use listed and exported here: magick_fonts.txt."
-        WriteToLogFile "Creating file                : $script_path\fonts\$theFont.$theType"
-        Convert-TextToBinary -Text $theFile -OutputPath $script_path\fonts\$theFont.$theType
+        WriteToLogFile "Fonts missing                : List of installed fonts that Imagemagick can use listed and exported here: $(Join-Path $script_path "magick_fonts.txt")."
+        $fontFilePath = Join-Path $script_path "fonts" "$theFont.$theType"
+        WriteToLogFile "Creating file                : $fontFilePath"
+        Convert-TextToBinary -Text $theFile -OutputPath $fontFilePath
         $global:font_flag = 1
     }
 }
@@ -176,54 +166,31 @@ Function Convert-TextToBinary {
 # Description: Ensures the paths to the awards are all there
 ################################################################################
 Function Find-Path-Awards {
-    Find-Path "$script_path\award"
-    Find-Path "$script_path\award\bafta"
-    Find-Path "$script_path\award\berlinale"
-    Find-Path "$script_path\award\cannes"
-    Find-Path "$script_path\award\cesar"
-    Find-Path "$script_path\award\choice"
-    Find-Path "$script_path\award\emmys"
-    Find-Path "$script_path\award\golden"
-    Find-Path "$script_path\award\oscars"
-    Find-Path "$script_path\award\spirit"
-    Find-Path "$script_path\award\sundance"
-    Find-Path "$script_path\award\venice"
+    $awards = @(
+        "bafta",
+        "berlinale",
+        "cannes",
+        "cesar",
+        "choice",
+        "emmys",
+        "golden",
+        "oscars",
+        "spirit",
+        "sundance",
+        "venice"
+    )
 
-    Find-Path "$script_path\award\bafta\winner"
-    Find-Path "$script_path\award\berlinale\winner"
-    Find-Path "$script_path\award\cannes\winner"
-    Find-Path "$script_path\award\cesar\winner"
-    Find-Path "$script_path\award\choice\winner"
-    Find-Path "$script_path\award\emmys\winner"
-    Find-Path "$script_path\award\golden\winner"
-    Find-Path "$script_path\award\oscars\winner"
-    Find-Path "$script_path\award\spirit\winner"
-    Find-Path "$script_path\award\sundance\winner"
-    Find-Path "$script_path\award\venice\winner"
+    $awards | ForEach-Object {
+        $awardPath = Join-Path $script_path "award\$_"
+        Find-Path $awardPath
 
-    Find-Path "$script_path\award\bafta\best"
-    Find-Path "$script_path\award\berlinale\best"
-    Find-Path "$script_path\award\cannes\best"
-    Find-Path "$script_path\award\cesar\best"
-    Find-Path "$script_path\award\choice\best"
-    Find-Path "$script_path\award\emmys\best"
-    Find-Path "$script_path\award\golden\best"
-    Find-Path "$script_path\award\oscars\best"
-    Find-Path "$script_path\award\spirit\best"
-    Find-Path "$script_path\award\sundance\best"
-    Find-Path "$script_path\award\venice\best"
+        $subDirectories = @("winner", "best", "nomination")
 
-    Find-Path "$script_path\award\bafta\nomination"
-    Find-Path "$script_path\award\berlinale\nomination"
-    Find-Path "$script_path\award\cannes\nomination"
-    Find-Path "$script_path\award\cesar\nomination"
-    Find-Path "$script_path\award\choice\nomination"
-    Find-Path "$script_path\award\emmys\nomination"
-    Find-Path "$script_path\award\golden\nomination"
-    Find-Path "$script_path\award\oscars\nomination"
-    Find-Path "$script_path\award\spirit\nomination"
-    Find-Path "$script_path\award\sundance\nomination"
-    Find-Path "$script_path\award\venice\nomination"
+        $subDirectories | ForEach-Object {
+            $subDirectoryPath = Join-Path $awardPath $_
+            Find-Path $subDirectoryPath
+        }
+    }
 }
 
 ################################################################################
@@ -279,9 +246,10 @@ function Download-TranslationFile {
     $GitHubRepository = "https://raw.githubusercontent.com/meisnate12/Plex-Meta-Manager/master/defaults/translations"
     $TranslationFile = "$LanguageCode.yml"
     $TranslationFileUrl = "$GitHubRepository/$TranslationFile"
-    $TranslationFilePath = Join-Path $script_path -ChildPath "@translations"
-    Find-Path $TranslationFilePath
-    $TranslationFilePath = Join-Path $TranslationFilePath -ChildPath "$LanguageCode.yml"
+    $TranslationsPath = Join-Path $script_path "@translations"
+    $TranslationFilePath = Join-Path $TranslationsPath $LanguageCode
+
+    Find-Path $TranslationsPath
   
     try {
         $response = Invoke-WebRequest -Uri $TranslationFileUrl -Method Head
@@ -358,7 +326,19 @@ function Get-TranslatedValue {
                 $TranslationDictionary[$Matches[1]] = $Matches[2]
             }
             elseif ($Line -match "^(.+):$") {
-                $TranslationDictionary[$Matches[1]] = $Matches[1]
+                if ($TranslationFilePath.EndsWith("default.yml")) {
+                    $TranslationDictionary[$Matches[1]] = $Matches[1]
+                }
+            }
+        }
+
+        if ($TranslationFilePath.EndsWith("default.yml")) {
+            # Loop through the file again to add the commented key-value pairs
+            Get-Content $TranslationFilePath | ForEach-Object {
+                $Line = $_.Trim()
+                if ($Line -match "^#\s*(.+):\s+(.+)$") {
+                    $TranslationDictionary[$Matches[1]] = $Matches[2]
+                }
             }
         }
 
@@ -420,8 +400,8 @@ function Export-WidthCache {
     param (
         [string] $cacheFilePath
     )
-    $global:WidthCache.GetEnumerator() | Select-Object Text,Font,PointSize,Width |
-        Export-Csv -Path $cacheFilePath -NoTypeInformation
+    $global:WidthCache.GetEnumerator() | Select-Object Text, Font, PointSize, Width | 
+    Export-Csv -Path $cacheFilePath -NoTypeInformation
 }
 
 ################################################################################
@@ -594,28 +574,44 @@ Function LaunchScripts {
 # Function: MoveFiles
 # Description: Moves Folder and Files to final location
 ################################################################################
-Function MoveFiles {
-    Move-Item -Path $script_path\audio_language -Destination $script_path\defaults -Force -ErrorAction SilentlyContinue
-    Move-Item -Path $script_path\award -Destination $script_path\defaults -Force -ErrorAction SilentlyContinue
-    Move-Item -Path $script_path\based -Destination $script_path\defaults -Force -ErrorAction SilentlyContinue
-    Move-Item -Path $script_path\chart -Destination $script_path\defaults -Force -ErrorAction SilentlyContinue
-    Move-Item -Path $script_path\content_rating -Destination $script_path\defaults -Force -ErrorAction SilentlyContinue
-    Move-Item -Path $script_path\country -Destination $script_path\defaults -Force -ErrorAction SilentlyContinue
-    Move-Item -Path $script_path\decade -Destination $script_path\defaults -Force -ErrorAction SilentlyContinue
-    Move-Item -Path $script_path\franchise -Destination $script_path\defaults -Force -ErrorAction SilentlyContinue
-    Move-Item -Path $script_path\genre -Destination $script_path\defaults -Force -ErrorAction SilentlyContinue
-    Move-Item -Path $script_path\network -Destination $script_path\defaults -Force -ErrorAction SilentlyContinue
-    Move-Item -Path $script_path\resolution -Destination $script_path\defaults -Force -ErrorAction SilentlyContinue
-    Move-Item -Path $script_path\playlist -Destination $script_path\defaults -Force -ErrorAction SilentlyContinue
-    Move-Item -Path $script_path\seasonal -Destination $script_path\defaults -Force -ErrorAction SilentlyContinue
-    Move-Item -Path $script_path\separators -Destination $script_path\defaults -Force -ErrorAction SilentlyContinue
-    Move-Item -Path $script_path\streaming -Destination $script_path\defaults -Force -ErrorAction SilentlyContinue
-    Move-Item -Path $script_path\studio -Destination $script_path\defaults -Force -ErrorAction SilentlyContinue
-    Move-Item -Path $script_path\subtitle_language -Destination $script_path\defaults -Force -ErrorAction SilentlyContinue
-    Move-Item -Path $script_path\universe -Destination $script_path\defaults -Force -ErrorAction SilentlyContinue
-    Move-Item -Path $script_path\year -Destination $script_path\defaults -Force -ErrorAction SilentlyContinue
-    Move-Item -Path $script_path\collectionless.jpg -Destination $script_path\defaults -Force -ErrorAction SilentlyContinue
+function MoveFiles {
+    $defaultsPath = Join-Path $script_path -ChildPath "defaults"
+
+    $foldersToMove = @(
+        "audio_language"
+        "award"
+        "based"
+        "chart"
+        "content_rating"
+        "country"
+        "decade"
+        "franchise"
+        "genre"
+        "network"
+        "resolution"
+        "playlist"
+        "seasonal"
+        "separators"
+        "streaming"
+        "studio"
+        "subtitle_language"
+        "universe"
+        "year"
+    )
+
+    $filesToMove = @(
+        "collectionless.jpg"
+    )
+
+    foreach ($folder in $foldersToMove) {
+        Move-Item -Path (Join-Path $script_path -ChildPath $folder) -Destination $defaultsPath -Force -ErrorAction SilentlyContinue
+    }
+
+    foreach ($file in $filesToMove) {
+        Move-Item -Path (Join-Path $script_path -ChildPath $file) -Destination $defaultsPath -Force -ErrorAction SilentlyContinue
+    }
 }
+
 ################################################################################
 # Function: ConvertSeparators
 # Description: Creates the Separator posters
@@ -912,7 +908,7 @@ Function CreateAudioLanguage {
         $myvar = Replace-TextBetweenDelimiters -InputString $myvar1 -ReplacementString (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
         $optimalFontSize = Get-OptimalFontSize $myvar $theFont $theMaxWidth $initialPointSize
         $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$myvar`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-        }
+    }
 
     LaunchScripts -ScriptPaths $arr
     Move-Item -Path output -Destination audio_language
@@ -1312,12 +1308,37 @@ Function CreateBased {
     Write-Host `"Creating Based Posters`"
     Set-Location $script_path
     # Find-Path `"$script_path\based`"
+    $theFont = "ComfortAa-Medium"
+    $theMaxWidth = 1800
+    $initialPointSize = 250
+    $myvar1 = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue "audio_language_name" -CaseSensitivity Upper) 
+
     Move-Item -Path output -Destination output-orig
+
+    $myArray = @(
+        'Name| out_name| base_color| other_setting',
+        'BASED ON A BOOK| Book| #131CA1| NA',
+        'BASED ON A COMIC| Comic| #7856EF| NA',
+        'BASED ON A TRUE STORY| True Story| #BC0638| NA',
+        'BASED ON A VIDEO GAME| Video Game| #38CC66| NA'
+    ) | ConvertFrom-Csv -Delimiter '|'
+    
     $arr = @()
-    $arr += ".\create_poster.ps1 -logo `"`" -logo_offset +0 -logo_resize 1800 -text `"BASED ON A BOOK`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Book`" -base_color `"#131CA1`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"`" -logo_offset +0 -logo_resize 1800 -text `"BASED ON A COMIC`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Comic`" -base_color `"#7856EF`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"`" -logo_offset +0 -logo_resize 1800 -text `"BASED ON A TRUE STORY`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"True Story`" -base_color `"#BC0638`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"`" -logo_offset +0 -logo_resize 1800 -text `"BASED ON A VIDEO GAME`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Video Game`" -base_color `"#38CC66`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
+    foreach ($item in $myArray) {
+        # write-host $($item.Name)
+        # write-host $($item.out_name)
+        # write-host $($item.base_color)
+        $myvar = Replace-TextBetweenDelimiters -InputString $myvar1 -ReplacementString (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
+        $optimalFontSize = Get-OptimalFontSize $myvar $theFont $theMaxWidth $initialPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$myvar`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
+    }
+
+
+    # $arr = @()
+    # $arr += ".\create_poster.ps1 -logo `"`" -logo_offset +0 -logo_resize 1800 -text `"BASED ON A BOOK`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Book`" -base_color `"#131CA1`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
+    # $arr += ".\create_poster.ps1 -logo `"`" -logo_offset +0 -logo_resize 1800 -text `"BASED ON A COMIC`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Comic`" -base_color `"#7856EF`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
+    # $arr += ".\create_poster.ps1 -logo `"`" -logo_offset +0 -logo_resize 1800 -text `"BASED ON A TRUE STORY`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"True Story`" -base_color `"#BC0638`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
+    # $arr += ".\create_poster.ps1 -logo `"`" -logo_offset +0 -logo_resize 1800 -text `"BASED ON A VIDEO GAME`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Video Game`" -base_color `"#38CC66`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
     LaunchScripts -ScriptPaths $arr
     Move-Item -Path output -Destination based
     Move-Item -Path output-orig -Destination output
@@ -1659,22 +1680,37 @@ Function CreateCountry {
 # Description:  Creates Decade
 ################################################################################
 Function CreateDecade {
+    # Define paths
+    $decade_path = Join-Path $script_path "decade"
+    $best_path = Join-Path $decade_path "best"
+    $logo_path = Join-Path $script_path "transparent.png"
+    $output_path = Join-Path $script_path "output"
+    $base_path = Join-Path $script_path "@base"
+    $base_decade_path = Join-Path $base_path "@zbase-decade.png"
+    $base_best_path = Join-Path $base_path "@zbase-best.png"
+    $create_poster_path = Join-Path $script_path "create_poster.ps1"
+
+    # Create directories
+    New-Item -ItemType Directory -Force -Path $decade_path
+    New-Item -ItemType Directory -Force -Path $best_path
+    New-Item -ItemType Directory -Force -Path $output_path
+
     Write-Host "Creating Decade"
     Set-Location $script_path
-    Find-Path "$script_path\decade"
-    Find-Path "$script_path\decade\best"
+    Find-Path $decade_path
+    Find-Path $best_path
     WriteToLogFile "ImageMagick Commands for     : Decades"
     WriteToLogFile "ImageMagick Commands for     : Decades-Best"
-    .\create_poster.ps1 -logo "$script_path\transparent.png" -logo_offset +0 -logo_resize 1800 -text "OTHER\nDECADES" -text_offset +0 -font "ComfortAa-Medium" -font_size 250 -font_color "#FFFFFF" -border 0 -border_width 15 -border_color "#FFFFFF" -avg_color_image "" -out_name "other" -base_color "#FF2000" -gradient 1 -avg_color 0 -clean 1 -white_wash 1
-    Move-Item output\other.jpg -Destination decade
+    & $create_poster_path -logo $logo_path -logo_offset +0 -logo_resize 1800 -text "OTHER\nDECADES" -text_offset +0 -font "ComfortAa-Medium" -font_size 250 -font_color "#FFFFFF" -border 0 -border_width 15 -border_color "#FFFFFF" -avg_color_image "" -out_name "other" -base_color "#FF2000" -gradient 1 -avg_color 0 -clean 1 -white_wash 1
+    Move-Item (Join-Path $output_path "other.jpg") -Destination $decade_path
         
     for ($i = 1880; $i -lt 2030; $i += 10) {
-        Convert-Decades $script_path\@base\@zbase-decade.png $script_path\@base\@zbase-best.png $i "$script_path\decade\best"
+        Convert-Decades $base_decade_path $base_best_path $i $best_path
     }
     
     WriteToLogFile "ImageMagick Commands for     : Decades"
     for ($i = 1880; $i -lt 2030; $i += 10) {
-        Convert-Decades $script_path\@base\@zbase-decade.png $script_path\@base\@zbase-decade.png $i "$script_path\decade"
+        Convert-Decades $base_decade_path $base_decade_path $i $decade_path
     }
 }
 
@@ -2144,246 +2180,68 @@ Function CreateSeasonal {
 Function CreateSeparators {
     Write-Host "Creating Separators"
     WriteToLogFile "ImageMagick Commands for     : Separators"
-    WriteToLogFile "ImageMagick Commands for     : Separators-blue"
     Set-Location $script_path
-    Find-Path "$script_path\separators"
-    Find-Path "$script_path\separators\blue"
-    Find-Path "$script_path\separators\gray"
-    Find-Path "$script_path\separators\green"
-    Find-Path "$script_path\separators\orig"
-    Find-Path "$script_path\separators\purple"
-    Find-Path "$script_path\separators\red"
-    Find-Path "$script_path\separators\stb"
+    Move-Item -Path output -Destination output-orig
+    Find-Path "$script_path\output"
+    $colors = @('blue', 'gray', 'red', 'purple', 'green', 'orig', 'stb')
+    foreach ($color in $colors) {
+        Find-Path "$script_path\output\$color"
+    }
 
     .\create_poster.ps1 -logo "$script_path\logos_chart\Plex.png" -logo_offset -500 -logo_resize 1500 -text "COLLECTIONLESS" -text_offset +850 -font "ComfortAa-Medium" -font_size 195 -font_color "#FFFFFF" -border 0 -border_width 15 -border_color "#FFFFFF" -avg_color_image "" -out_name "collectionless" -base_color "#DC9924" -gradient 1 -avg_color 0 -clean 1 -white_wash 1
     Move-Item -Path $script_path\output\collectionless.jpg -Destination $script_path\collectionless.jpg
 
-    Convert-Separators $script_path\@base\blue.png Comfortaa-medium 195 (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue "collectionless_name" -CaseSensitivity Upper) $script_path\separators\blue\collectionless-it.jpg
-    Convert-Separators $script_path\@base\blue.png Comfortaa-medium 195 "COLLECTIONLESS\nCOLLECTIONS" $script_path\separators\blue\collectionless.jpg
-    Convert-Separators $script_path\@base\blue.png Comfortaa-medium 203 "ACTOR\nCOLLECTIONS" $script_path\separators\blue\actor.jpg
-    Convert-Separators $script_path\@base\blue.png Comfortaa-medium 203 "AUDIO\nLANGUAGE\nCOLLECTIONS" $script_path\separators\blue\audio_language.jpg
-    Convert-Separators $script_path\@base\blue.png Comfortaa-medium 203 "AWARD\nCOLLECTIONS" $script_path\separators\blue\award.jpg
-    Convert-Separators $script_path\@base\blue.png Comfortaa-medium 203 "CHART\nCOLLECTIONS" $script_path\separators\blue\chart.jpg
-    Convert-Separators $script_path\@base\blue.png Comfortaa-medium 203 "CONTENT\nRATINGS\nCOLLECTIONS" $script_path\separators\blue\content_rating.jpg
-    Convert-Separators $script_path\@base\blue.png Comfortaa-medium 203 "COUNTRY\nCOLLECTIONS" $script_path\separators\blue\country.jpg
-    Convert-Separators $script_path\@base\blue.png Comfortaa-medium 203 "DECADE\nCOLLECTIONS" $script_path\separators\blue\decade.jpg
-    Convert-Separators $script_path\@base\blue.png Comfortaa-medium 203 "DIRECTOR\nCOLLECTIONS" $script_path\separators\blue\director.jpg
-    Convert-Separators $script_path\@base\blue.png Comfortaa-medium 203 "FRANCHISE\nCOLLECTIONS" $script_path\separators\blue\franchise.jpg
-    Convert-Separators $script_path\@base\blue.png Comfortaa-medium 203 "GENRE\nCOLLECTIONS" $script_path\separators\blue\genre.jpg
-    Convert-Separators $script_path\@base\blue.png Comfortaa-medium 203 "KIDS NETWORK\nCOLLECTIONS" $script_path\separators\blue\network_kids.jpg
-    Convert-Separators $script_path\@base\blue.png Comfortaa-medium 203 "MOVIE CHART\nCOLLECTIONS" $script_path\separators\blue\movie_chart.jpg
-    Convert-Separators $script_path\@base\blue.png Comfortaa-medium 203 "NETWORK\nCOLLECTIONS" $script_path\separators\blue\network.jpg
-    Convert-Separators $script_path\@base\blue.png Comfortaa-medium 203 "PERSONAL\nCOLLECTIONS" $script_path\separators\blue\personal.jpg
-    Convert-Separators $script_path\@base\blue.png Comfortaa-medium 203 "PRODUCER\nCOLLECTIONS" $script_path\separators\blue\producer.jpg
-    Convert-Separators $script_path\@base\blue.png Comfortaa-medium 203 "RESOLUTION\nCOLLECTIONS" $script_path\separators\blue\resolution.jpg
-    Convert-Separators $script_path\@base\blue.png Comfortaa-medium 203 "SEASONAL\nCOLLECTIONS" $script_path\separators\blue\seasonal.jpg
-    Convert-Separators $script_path\@base\blue.png Comfortaa-medium 203 "STREAMING\nCOLLECTIONS" $script_path\separators\blue\streaming.jpg
-    Convert-Separators $script_path\@base\blue.png Comfortaa-medium 203 "STUDIO\nANIMATION\nCOLLECTIONS" $script_path\separators\blue\studio_animation.jpg
-    Convert-Separators $script_path\@base\blue.png Comfortaa-medium 203 "STUDIO\nCOLLECTIONS" $script_path\separators\blue\studio.jpg
-    Convert-Separators $script_path\@base\blue.png Comfortaa-medium 203 "SUBTITLE\nCOLLECTIONS" $script_path\separators\blue\subtitle_language.jpg
-    Convert-Separators $script_path\@base\blue.png Comfortaa-medium 203 "TV CHART\nCOLLECTIONS" $script_path\separators\blue\tv_chart.jpg
-    Convert-Separators $script_path\@base\blue.png Comfortaa-medium 203 "UK NETWORK\nCOLLECTIONS" $script_path\separators\blue\network_uk.jpg
-    Convert-Separators $script_path\@base\blue.png Comfortaa-medium 203 "UK STREAMING\nCOLLECTIONS" $script_path\separators\blue\streaming_uk.jpg
-    Convert-Separators $script_path\@base\blue.png Comfortaa-medium 203 "UNIVERSE\nCOLLECTIONS" $script_path\separators\blue\universe.jpg
-    Convert-Separators $script_path\@base\blue.png Comfortaa-medium 203 "US NETWORK\nCOLLECTIONS" $script_path\separators\blue\network_us.jpg
-    Convert-Separators $script_path\@base\blue.png Comfortaa-medium 203 "US STREAMING\nCOLLECTIONS" $script_path\separators\blue\streaming_us.jpg
-    Convert-Separators $script_path\@base\blue.png Comfortaa-medium 203 "WRITER\nCOLLECTIONS" $script_path\separators\blue\writer.jpg
-    Convert-Separators $script_path\@base\blue.png Comfortaa-medium 203 "YEAR\nCOLLECTIONS" $script_path\separators\blue\year.jpg
-    Convert-Separators $script_path\@base\blue.png Comfortaa-medium 203 "BASED ON...\nCOLLECTIONS" $script_path\separators\blue\based.jpg
-    WriteToLogFile "ImageMagick Commands for     : Separators-gray"
-    Convert-Separators $script_path\@base\gray.png Comfortaa-medium 195 "COLLECTIONLESS\nCOLLECTIONS" $script_path\separators\gray\collectionless.jpg
-    Convert-Separators $script_path\@base\gray.png Comfortaa-medium 203 "ACTOR\nCOLLECTIONS" $script_path\separators\gray\actor.jpg
-    Convert-Separators $script_path\@base\gray.png Comfortaa-medium 203 "AUDIO\nLANGUAGE\nCOLLECTIONS" $script_path\separators\gray\audio_language.jpg
-    Convert-Separators $script_path\@base\gray.png Comfortaa-medium 203 "AWARD\nCOLLECTIONS" $script_path\separators\gray\award.jpg
-    Convert-Separators $script_path\@base\gray.png Comfortaa-medium 203 "CHART\nCOLLECTIONS" $script_path\separators\gray\chart.jpg
-    Convert-Separators $script_path\@base\gray.png Comfortaa-medium 203 "CONTENT\nRATINGS\nCOLLECTIONS" $script_path\separators\gray\content_rating.jpg
-    Convert-Separators $script_path\@base\gray.png Comfortaa-medium 203 "COUNTRY\nCOLLECTIONS" $script_path\separators\gray\country.jpg
-    Convert-Separators $script_path\@base\gray.png Comfortaa-medium 203 "DECADE\nCOLLECTIONS" $script_path\separators\gray\decade.jpg
-    Convert-Separators $script_path\@base\gray.png Comfortaa-medium 203 "DIRECTOR\nCOLLECTIONS" $script_path\separators\gray\director.jpg
-    Convert-Separators $script_path\@base\gray.png Comfortaa-medium 203 "FRANCHISE\nCOLLECTIONS" $script_path\separators\gray\franchise.jpg
-    Convert-Separators $script_path\@base\gray.png Comfortaa-medium 203 "GENRE\nCOLLECTIONS" $script_path\separators\gray\genre.jpg
-    Convert-Separators $script_path\@base\gray.png Comfortaa-medium 203 "KIDS NETWORK\nCOLLECTIONS" $script_path\separators\gray\network_kids.jpg
-    Convert-Separators $script_path\@base\gray.png Comfortaa-medium 203 "MOVIE CHART\nCOLLECTIONS" $script_path\separators\gray\movie_chart.jpg
-    Convert-Separators $script_path\@base\gray.png Comfortaa-medium 203 "NETWORK\nCOLLECTIONS" $script_path\separators\gray\network.jpg
-    Convert-Separators $script_path\@base\gray.png Comfortaa-medium 203 "PERSONAL\nCOLLECTIONS" $script_path\separators\gray\personal.jpg
-    Convert-Separators $script_path\@base\gray.png Comfortaa-medium 203 "PRODUCER\nCOLLECTIONS" $script_path\separators\gray\producer.jpg
-    Convert-Separators $script_path\@base\gray.png Comfortaa-medium 203 "RESOLUTION\nCOLLECTIONS" $script_path\separators\gray\resolution.jpg
-    Convert-Separators $script_path\@base\gray.png Comfortaa-medium 203 "SEASONAL\nCOLLECTIONS" $script_path\separators\gray\seasonal.jpg
-    Convert-Separators $script_path\@base\gray.png Comfortaa-medium 203 "STREAMING\nCOLLECTIONS" $script_path\separators\gray\streaming.jpg
-    Convert-Separators $script_path\@base\gray.png Comfortaa-medium 203 "STUDIO\nANIMATION\nCOLLECTIONS" $script_path\separators\gray\studio_animation.jpg
-    Convert-Separators $script_path\@base\gray.png Comfortaa-medium 203 "STUDIO\nCOLLECTIONS" $script_path\separators\gray\studio.jpg
-    Convert-Separators $script_path\@base\gray.png Comfortaa-medium 203 "SUBTITLE\nCOLLECTIONS" $script_path\separators\gray\subtitle_language.jpg
-    Convert-Separators $script_path\@base\gray.png Comfortaa-medium 203 "TV CHART\nCOLLECTIONS" $script_path\separators\gray\tv_chart.jpg
-    Convert-Separators $script_path\@base\gray.png Comfortaa-medium 203 "UK NETWORK\nCOLLECTIONS" $script_path\separators\gray\network_uk.jpg
-    Convert-Separators $script_path\@base\gray.png Comfortaa-medium 203 "UK STREAMING\nCOLLECTIONS" $script_path\separators\gray\streaming_uk.jpg
-    Convert-Separators $script_path\@base\gray.png Comfortaa-medium 203 "UNIVERSE\nCOLLECTIONS" $script_path\separators\gray\universe.jpg
-    Convert-Separators $script_path\@base\gray.png Comfortaa-medium 203 "US NETWORK\nCOLLECTIONS" $script_path\separators\gray\network_us.jpg
-    Convert-Separators $script_path\@base\gray.png Comfortaa-medium 203 "US STREAMING\nCOLLECTIONS" $script_path\separators\gray\streaming_us.jpg
-    Convert-Separators $script_path\@base\gray.png Comfortaa-medium 203 "WRITER\nCOLLECTIONS" $script_path\separators\gray\writer.jpg
-    Convert-Separators $script_path\@base\gray.png Comfortaa-medium 203 "YEAR\nCOLLECTIONS" $script_path\separators\gray\year.jpg
-    Convert-Separators $script_path\@base\gray.png Comfortaa-medium 203 "BASED ON...\nCOLLECTIONS" $script_path\separators\gray\based.jpg
-    WriteToLogFile "ImageMagick Commands for     : Separators-green"
-    Convert-Separators $script_path\@base\green.png Comfortaa-medium 195 "COLLECTIONLESS\nCOLLECTIONS" $script_path\separators\green\collectionless.jpg
-    Convert-Separators $script_path\@base\green.png Comfortaa-medium 203 "ACTOR\nCOLLECTIONS" $script_path\separators\green\actor.jpg
-    Convert-Separators $script_path\@base\green.png Comfortaa-medium 203 "AUDIO\nLANGUAGE\nCOLLECTIONS" $script_path\separators\green\audio_language.jpg
-    Convert-Separators $script_path\@base\green.png Comfortaa-medium 203 "AWARD\nCOLLECTIONS" $script_path\separators\green\award.jpg
-    Convert-Separators $script_path\@base\green.png Comfortaa-medium 203 "CHART\nCOLLECTIONS" $script_path\separators\green\chart.jpg
-    Convert-Separators $script_path\@base\green.png Comfortaa-medium 203 "CONTENT\nRATINGS\nCOLLECTIONS" $script_path\separators\green\content_rating.jpg
-    Convert-Separators $script_path\@base\green.png Comfortaa-medium 203 "COUNTRY\nCOLLECTIONS" $script_path\separators\green\country.jpg
-    Convert-Separators $script_path\@base\green.png Comfortaa-medium 203 "DECADE\nCOLLECTIONS" $script_path\separators\green\decade.jpg
-    Convert-Separators $script_path\@base\green.png Comfortaa-medium 203 "DIRECTOR\nCOLLECTIONS" $script_path\separators\green\director.jpg
-    Convert-Separators $script_path\@base\green.png Comfortaa-medium 203 "FRANCHISE\nCOLLECTIONS" $script_path\separators\green\franchise.jpg
-    Convert-Separators $script_path\@base\green.png Comfortaa-medium 203 "GENRE\nCOLLECTIONS" $script_path\separators\green\genre.jpg
-    Convert-Separators $script_path\@base\green.png Comfortaa-medium 203 "KIDS NETWORK\nCOLLECTIONS" $script_path\separators\green\network_kids.jpg
-    Convert-Separators $script_path\@base\green.png Comfortaa-medium 203 "MOVIE CHART\nCOLLECTIONS" $script_path\separators\green\movie_chart.jpg
-    Convert-Separators $script_path\@base\green.png Comfortaa-medium 203 "NETWORK\nCOLLECTIONS" $script_path\separators\green\network.jpg
-    Convert-Separators $script_path\@base\green.png Comfortaa-medium 203 "PERSONAL\nCOLLECTIONS" $script_path\separators\green\personal.jpg
-    Convert-Separators $script_path\@base\green.png Comfortaa-medium 203 "PRODUCER\nCOLLECTIONS" $script_path\separators\green\producer.jpg
-    Convert-Separators $script_path\@base\green.png Comfortaa-medium 203 "RESOLUTION\nCOLLECTIONS" $script_path\separators\green\resolution.jpg
-    Convert-Separators $script_path\@base\green.png Comfortaa-medium 203 "SEASONAL\nCOLLECTIONS" $script_path\separators\green\seasonal.jpg
-    Convert-Separators $script_path\@base\green.png Comfortaa-medium 203 "STREAMING\nCOLLECTIONS" $script_path\separators\green\streaming.jpg
-    Convert-Separators $script_path\@base\green.png Comfortaa-medium 203 "STUDIO\nANIMATION\nCOLLECTIONS" $script_path\separators\green\studio_animation.jpg
-    Convert-Separators $script_path\@base\green.png Comfortaa-medium 203 "STUDIO\nCOLLECTIONS" $script_path\separators\green\studio.jpg
-    Convert-Separators $script_path\@base\green.png Comfortaa-medium 203 "SUBTITLE\nCOLLECTIONS" $script_path\separators\green\subtitle_language.jpg
-    Convert-Separators $script_path\@base\green.png Comfortaa-medium 203 "TV CHART\nCOLLECTIONS" $script_path\separators\green\tv_chart.jpg
-    Convert-Separators $script_path\@base\green.png Comfortaa-medium 203 "UK NETWORK\nCOLLECTIONS" $script_path\separators\green\network_uk.jpg
-    Convert-Separators $script_path\@base\green.png Comfortaa-medium 203 "UK STREAMING\nCOLLECTIONS" $script_path\separators\green\streaming_uk.jpg
-    Convert-Separators $script_path\@base\green.png Comfortaa-medium 203 "UNIVERSE\nCOLLECTIONS" $script_path\separators\green\universe.jpg
-    Convert-Separators $script_path\@base\green.png Comfortaa-medium 203 "US NETWORK\nCOLLECTIONS" $script_path\separators\green\network_us.jpg
-    Convert-Separators $script_path\@base\green.png Comfortaa-medium 203 "US STREAMING\nCOLLECTIONS" $script_path\separators\green\streaming_us.jpg
-    Convert-Separators $script_path\@base\green.png Comfortaa-medium 203 "WRITER\nCOLLECTIONS" $script_path\separators\green\writer.jpg
-    Convert-Separators $script_path\@base\green.png Comfortaa-medium 203 "YEAR\nCOLLECTIONS" $script_path\separators\green\year.jpg
-    Convert-Separators $script_path\@base\green.png Comfortaa-medium 203 "BASED ON...\nCOLLECTIONS" $script_path\separators\green\based.jpg
-    WriteToLogFile "ImageMagick Commands for     : Separators-orig"
-    Convert-Separators $script_path\@base\orig.png Comfortaa-medium 195 "COLLECTIONLESS\nCOLLECTIONS" $script_path\separators\orig\collectionless.jpg
-    Convert-Separators $script_path\@base\orig.png Comfortaa-medium 203 "ACTOR\nCOLLECTIONS" $script_path\separators\orig\actor.jpg
-    Convert-Separators $script_path\@base\orig.png Comfortaa-medium 203 "AUDIO\nLANGUAGE\nCOLLECTIONS" $script_path\separators\orig\audio_language.jpg
-    Convert-Separators $script_path\@base\orig.png Comfortaa-medium 203 "AWARD\nCOLLECTIONS" $script_path\separators\orig\award.jpg
-    Convert-Separators $script_path\@base\orig.png Comfortaa-medium 203 "CHART\nCOLLECTIONS" $script_path\separators\orig\chart.jpg
-    Convert-Separators $script_path\@base\orig.png Comfortaa-medium 203 "CONTENT\nRATINGS\nCOLLECTIONS" $script_path\separators\orig\content_rating.jpg
-    Convert-Separators $script_path\@base\orig.png Comfortaa-medium 203 "COUNTRY\nCOLLECTIONS" $script_path\separators\orig\country.jpg
-    Convert-Separators $script_path\@base\orig.png Comfortaa-medium 203 "DECADE\nCOLLECTIONS" $script_path\separators\orig\decade.jpg
-    Convert-Separators $script_path\@base\orig.png Comfortaa-medium 203 "DIRECTOR\nCOLLECTIONS" $script_path\separators\orig\director.jpg
-    Convert-Separators $script_path\@base\orig.png Comfortaa-medium 203 "FRANCHISE\nCOLLECTIONS" $script_path\separators\orig\franchise.jpg
-    Convert-Separators $script_path\@base\orig.png Comfortaa-medium 203 "GENRE\nCOLLECTIONS" $script_path\separators\orig\genre.jpg
-    Convert-Separators $script_path\@base\orig.png Comfortaa-medium 203 "KIDS NETWORK\nCOLLECTIONS" $script_path\separators\orig\network_kids.jpg
-    Convert-Separators $script_path\@base\orig.png Comfortaa-medium 203 "MOVIE CHART\nCOLLECTIONS" $script_path\separators\orig\movie_chart.jpg
-    Convert-Separators $script_path\@base\orig.png Comfortaa-medium 203 "NETWORK\nCOLLECTIONS" $script_path\separators\orig\network.jpg
-    Convert-Separators $script_path\@base\orig.png Comfortaa-medium 203 "PERSONAL\nCOLLECTIONS" $script_path\separators\orig\personal.jpg
-    Convert-Separators $script_path\@base\orig.png Comfortaa-medium 203 "PRODUCER\nCOLLECTIONS" $script_path\separators\orig\producer.jpg
-    Convert-Separators $script_path\@base\orig.png Comfortaa-medium 203 "RESOLUTION\nCOLLECTIONS" $script_path\separators\orig\resolution.jpg
-    Convert-Separators $script_path\@base\orig.png Comfortaa-medium 203 "SEASONAL\nCOLLECTIONS" $script_path\separators\orig\seasonal.jpg
-    Convert-Separators $script_path\@base\orig.png Comfortaa-medium 203 "STREAMING\nCOLLECTIONS" $script_path\separators\orig\streaming.jpg
-    Convert-Separators $script_path\@base\orig.png Comfortaa-medium 203 "STUDIO\nANIMATION\nCOLLECTIONS" $script_path\separators\orig\studio_animation.jpg
-    Convert-Separators $script_path\@base\orig.png Comfortaa-medium 203 "STUDIO\nCOLLECTIONS" $script_path\separators\orig\studio.jpg
-    Convert-Separators $script_path\@base\orig.png Comfortaa-medium 203 "SUBTITLE\nCOLLECTIONS" $script_path\separators\orig\subtitle_language.jpg
-    Convert-Separators $script_path\@base\orig.png Comfortaa-medium 203 "TV CHART\nCOLLECTIONS" $script_path\separators\orig\tv_chart.jpg
-    Convert-Separators $script_path\@base\orig.png Comfortaa-medium 203 "UK NETWORK\nCOLLECTIONS" $script_path\separators\orig\network_uk.jpg
-    Convert-Separators $script_path\@base\orig.png Comfortaa-medium 203 "UK STREAMING\nCOLLECTIONS" $script_path\separators\orig\streaming_uk.jpg
-    Convert-Separators $script_path\@base\orig.png Comfortaa-medium 203 "UNIVERSE\nCOLLECTIONS" $script_path\separators\orig\universe.jpg
-    Convert-Separators $script_path\@base\orig.png Comfortaa-medium 203 "US NETWORK\nCOLLECTIONS" $script_path\separators\orig\network_us.jpg
-    Convert-Separators $script_path\@base\orig.png Comfortaa-medium 203 "US STREAMING\nCOLLECTIONS" $script_path\separators\orig\streaming_us.jpg
-    Convert-Separators $script_path\@base\orig.png Comfortaa-medium 203 "WRITER\nCOLLECTIONS" $script_path\separators\orig\writer.jpg
-    Convert-Separators $script_path\@base\orig.png Comfortaa-medium 203 "YEAR\nCOLLECTIONS" $script_path\separators\orig\year.jpg
-    Convert-Separators $script_path\@base\orig.png Comfortaa-medium 203 "BASED ON...\nCOLLECTIONS" $script_path\separators\orig\based.jpg
-    WriteToLogFile "ImageMagick Commands for     : Separators-purple"
-    Convert-Separators $script_path\@base\purple.png Comfortaa-medium 195 "COLLECTIONLESS\nCOLLECTIONS" $script_path\separators\purple\collectionless.jpg
-    Convert-Separators $script_path\@base\purple.png Comfortaa-medium 203 "ACTOR\nCOLLECTIONS" $script_path\separators\purple\actor.jpg
-    Convert-Separators $script_path\@base\purple.png Comfortaa-medium 203 "AUDIO\nLANGUAGE\nCOLLECTIONS" $script_path\separators\purple\audio_language.jpg
-    Convert-Separators $script_path\@base\purple.png Comfortaa-medium 203 "AWARD\nCOLLECTIONS" $script_path\separators\purple\award.jpg
-    Convert-Separators $script_path\@base\purple.png Comfortaa-medium 203 "CHART\nCOLLECTIONS" $script_path\separators\purple\chart.jpg
-    Convert-Separators $script_path\@base\purple.png Comfortaa-medium 203 "CONTENT\nRATINGS\nCOLLECTIONS" $script_path\separators\purple\content_rating.jpg
-    Convert-Separators $script_path\@base\purple.png Comfortaa-medium 203 "COUNTRY\nCOLLECTIONS" $script_path\separators\purple\country.jpg
-    Convert-Separators $script_path\@base\purple.png Comfortaa-medium 203 "DECADE\nCOLLECTIONS" $script_path\separators\purple\decade.jpg
-    Convert-Separators $script_path\@base\purple.png Comfortaa-medium 203 "DIRECTOR\nCOLLECTIONS" $script_path\separators\purple\director.jpg
-    Convert-Separators $script_path\@base\purple.png Comfortaa-medium 203 "FRANCHISE\nCOLLECTIONS" $script_path\separators\purple\franchise.jpg
-    Convert-Separators $script_path\@base\purple.png Comfortaa-medium 203 "GENRE\nCOLLECTIONS" $script_path\separators\purple\genre.jpg
-    Convert-Separators $script_path\@base\purple.png Comfortaa-medium 203 "KIDS NETWORK\nCOLLECTIONS" $script_path\separators\purple\network_kids.jpg
-    Convert-Separators $script_path\@base\purple.png Comfortaa-medium 203 "MOVIE CHART\nCOLLECTIONS" $script_path\separators\purple\movie_chart.jpg
-    Convert-Separators $script_path\@base\purple.png Comfortaa-medium 203 "NETWORK\nCOLLECTIONS" $script_path\separators\purple\network.jpg
-    Convert-Separators $script_path\@base\purple.png Comfortaa-medium 203 "PERSONAL\nCOLLECTIONS" $script_path\separators\purple\personal.jpg
-    Convert-Separators $script_path\@base\purple.png Comfortaa-medium 203 "PRODUCER\nCOLLECTIONS" $script_path\separators\purple\producer.jpg
-    Convert-Separators $script_path\@base\purple.png Comfortaa-medium 203 "RESOLUTION\nCOLLECTIONS" $script_path\separators\purple\resolution.jpg
-    Convert-Separators $script_path\@base\purple.png Comfortaa-medium 203 "SEASONAL\nCOLLECTIONS" $script_path\separators\purple\seasonal.jpg
-    Convert-Separators $script_path\@base\purple.png Comfortaa-medium 203 "STREAMING\nCOLLECTIONS" $script_path\separators\purple\streaming.jpg
-    Convert-Separators $script_path\@base\purple.png Comfortaa-medium 203 "STUDIO\nANIMATION\nCOLLECTIONS" $script_path\separators\purple\studio_animation.jpg
-    Convert-Separators $script_path\@base\purple.png Comfortaa-medium 203 "STUDIO\nCOLLECTIONS" $script_path\separators\purple\studio.jpg
-    Convert-Separators $script_path\@base\purple.png Comfortaa-medium 203 "SUBTITLE\nCOLLECTIONS" $script_path\separators\purple\subtitle_language.jpg
-    Convert-Separators $script_path\@base\purple.png Comfortaa-medium 203 "TV CHART\nCOLLECTIONS" $script_path\separators\purple\tv_chart.jpg
-    Convert-Separators $script_path\@base\purple.png Comfortaa-medium 203 "UK NETWORK\nCOLLECTIONS" $script_path\separators\purple\network_uk.jpg
-    Convert-Separators $script_path\@base\purple.png Comfortaa-medium 203 "UK STREAMING\nCOLLECTIONS" $script_path\separators\purple\streaming_uk.jpg
-    Convert-Separators $script_path\@base\purple.png Comfortaa-medium 203 "UNIVERSE\nCOLLECTIONS" $script_path\separators\purple\universe.jpg
-    Convert-Separators $script_path\@base\purple.png Comfortaa-medium 203 "US NETWORK\nCOLLECTIONS" $script_path\separators\purple\network_us.jpg
-    Convert-Separators $script_path\@base\purple.png Comfortaa-medium 203 "US STREAMING\nCOLLECTIONS" $script_path\separators\purple\streaming_us.jpg
-    Convert-Separators $script_path\@base\purple.png Comfortaa-medium 203 "WRITER\nCOLLECTIONS" $script_path\separators\purple\writer.jpg
-    Convert-Separators $script_path\@base\purple.png Comfortaa-medium 203 "YEAR\nCOLLECTIONS" $script_path\separators\purple\year.jpg
-    Convert-Separators $script_path\@base\purple.png Comfortaa-medium 203 "BASED ON...\nCOLLECTIONS" $script_path\separators\purple\based.jpg
-    WriteToLogFile "ImageMagick Commands for     : Separators-red"
-    Convert-Separators $script_path\@base\red.png Comfortaa-medium 195 "COLLECTIONLESS\nCOLLECTIONS" $script_path\separators\red\collectionless.jpg
-    Convert-Separators $script_path\@base\red.png Comfortaa-medium 203 "ACTOR\nCOLLECTIONS" $script_path\separators\red\actor.jpg
-    Convert-Separators $script_path\@base\red.png Comfortaa-medium 203 "AUDIO\nLANGUAGE\nCOLLECTIONS" $script_path\separators\red\audio_language.jpg
-    Convert-Separators $script_path\@base\red.png Comfortaa-medium 203 "AWARD\nCOLLECTIONS" $script_path\separators\red\award.jpg
-    Convert-Separators $script_path\@base\red.png Comfortaa-medium 203 "CHART\nCOLLECTIONS" $script_path\separators\red\chart.jpg
-    Convert-Separators $script_path\@base\red.png Comfortaa-medium 203 "CONTENT\nRATINGS\nCOLLECTIONS" $script_path\separators\red\content_rating.jpg
-    Convert-Separators $script_path\@base\red.png Comfortaa-medium 203 "COUNTRY\nCOLLECTIONS" $script_path\separators\red\country.jpg
-    Convert-Separators $script_path\@base\red.png Comfortaa-medium 203 "DECADE\nCOLLECTIONS" $script_path\separators\red\decade.jpg
-    Convert-Separators $script_path\@base\red.png Comfortaa-medium 203 "DIRECTOR\nCOLLECTIONS" $script_path\separators\red\director.jpg
-    Convert-Separators $script_path\@base\red.png Comfortaa-medium 203 "FRANCHISE\nCOLLECTIONS" $script_path\separators\red\franchise.jpg
-    Convert-Separators $script_path\@base\red.png Comfortaa-medium 203 "GENRE\nCOLLECTIONS" $script_path\separators\red\genre.jpg
-    Convert-Separators $script_path\@base\red.png Comfortaa-medium 203 "KIDS NETWORK\nCOLLECTIONS" $script_path\separators\red\network_kids.jpg
-    Convert-Separators $script_path\@base\red.png Comfortaa-medium 203 "MOVIE CHART\nCOLLECTIONS" $script_path\separators\red\movie_chart.jpg
-    Convert-Separators $script_path\@base\red.png Comfortaa-medium 203 "NETWORK\nCOLLECTIONS" $script_path\separators\red\network.jpg
-    Convert-Separators $script_path\@base\red.png Comfortaa-medium 203 "PERSONAL\nCOLLECTIONS" $script_path\separators\red\personal.jpg
-    Convert-Separators $script_path\@base\red.png Comfortaa-medium 203 "PRODUCER\nCOLLECTIONS" $script_path\separators\red\producer.jpg
-    Convert-Separators $script_path\@base\red.png Comfortaa-medium 203 "RESOLUTION\nCOLLECTIONS" $script_path\separators\red\resolution.jpg
-    Convert-Separators $script_path\@base\red.png Comfortaa-medium 203 "SEASONAL\nCOLLECTIONS" $script_path\separators\red\seasonal.jpg
-    Convert-Separators $script_path\@base\red.png Comfortaa-medium 203 "STREAMING\nCOLLECTIONS" $script_path\separators\red\streaming.jpg
-    Convert-Separators $script_path\@base\red.png Comfortaa-medium 203 "STUDIO\nANIMATION\nCOLLECTIONS" $script_path\separators\red\studio_animation.jpg
-    Convert-Separators $script_path\@base\red.png Comfortaa-medium 203 "STUDIO\nCOLLECTIONS" $script_path\separators\red\studio.jpg
-    Convert-Separators $script_path\@base\red.png Comfortaa-medium 203 "SUBTITLE\nCOLLECTIONS" $script_path\separators\red\subtitle_language.jpg
-    Convert-Separators $script_path\@base\red.png Comfortaa-medium 203 "TV CHART\nCOLLECTIONS" $script_path\separators\red\tv_chart.jpg
-    Convert-Separators $script_path\@base\red.png Comfortaa-medium 203 "UK NETWORK\nCOLLECTIONS" $script_path\separators\red\network_uk.jpg
-    Convert-Separators $script_path\@base\red.png Comfortaa-medium 203 "UK STREAMING\nCOLLECTIONS" $script_path\separators\red\streaming_uk.jpg
-    Convert-Separators $script_path\@base\red.png Comfortaa-medium 203 "UNIVERSE\nCOLLECTIONS" $script_path\separators\red\universe.jpg
-    Convert-Separators $script_path\@base\red.png Comfortaa-medium 203 "US NETWORK\nCOLLECTIONS" $script_path\separators\red\network_us.jpg
-    Convert-Separators $script_path\@base\red.png Comfortaa-medium 203 "US STREAMING\nCOLLECTIONS" $script_path\separators\red\streaming_us.jpg
-    Convert-Separators $script_path\@base\red.png Comfortaa-medium 203 "WRITER\nCOLLECTIONS" $script_path\separators\red\writer.jpg
-    Convert-Separators $script_path\@base\red.png Comfortaa-medium 203 "YEAR\nCOLLECTIONS" $script_path\separators\red\year.jpg
-    Convert-Separators $script_path\@base\red.png Comfortaa-medium 203 "BASED ON...\nCOLLECTIONS" $script_path\separators\red\based.jpg
-    WriteToLogFile "ImageMagick Commands for     : Separators-stb"
-    Convert-Separators $script_path\@base\stb.png Comfortaa-medium 195 "COLLECTIONLESS\nCOLLECTIONS" $script_path\separators\stb\collectionless.jpg
-    Convert-Separators $script_path\@base\stb.png Comfortaa-medium 203 "ACTOR\nCOLLECTIONS" $script_path\separators\stb\actor.jpg
-    Convert-Separators $script_path\@base\stb.png Comfortaa-medium 203 "AUDIO\nLANGUAGE\nCOLLECTIONS" $script_path\separators\stb\audio_language.jpg
-    Convert-Separators $script_path\@base\stb.png Comfortaa-medium 203 "AWARD\nCOLLECTIONS" $script_path\separators\stb\award.jpg
-    Convert-Separators $script_path\@base\stb.png Comfortaa-medium 203 "CHART\nCOLLECTIONS" $script_path\separators\stb\chart.jpg
-    Convert-Separators $script_path\@base\stb.png Comfortaa-medium 203 "CONTENT\nRATINGS\nCOLLECTIONS" $script_path\separators\stb\content_rating.jpg
-    Convert-Separators $script_path\@base\stb.png Comfortaa-medium 203 "COUNTRY\nCOLLECTIONS" $script_path\separators\stb\country.jpg
-    Convert-Separators $script_path\@base\stb.png Comfortaa-medium 203 "DECADE\nCOLLECTIONS" $script_path\separators\stb\decade.jpg
-    Convert-Separators $script_path\@base\stb.png Comfortaa-medium 203 "DIRECTOR\nCOLLECTIONS" $script_path\separators\stb\director.jpg
-    Convert-Separators $script_path\@base\stb.png Comfortaa-medium 203 "FRANCHISE\nCOLLECTIONS" $script_path\separators\stb\franchise.jpg
-    Convert-Separators $script_path\@base\stb.png Comfortaa-medium 203 "GENRE\nCOLLECTIONS" $script_path\separators\stb\genre.jpg
-    Convert-Separators $script_path\@base\stb.png Comfortaa-medium 203 "KIDS NETWORK\nCOLLECTIONS" $script_path\separators\stb\network_kids.jpg
-    Convert-Separators $script_path\@base\stb.png Comfortaa-medium 203 "MOVIE CHART\nCOLLECTIONS" $script_path\separators\stb\movie_chart.jpg
-    Convert-Separators $script_path\@base\stb.png Comfortaa-medium 203 "NETWORK\nCOLLECTIONS" $script_path\separators\stb\network.jpg
-    Convert-Separators $script_path\@base\stb.png Comfortaa-medium 203 "PERSONAL\nCOLLECTIONS" $script_path\separators\stb\personal.jpg
-    Convert-Separators $script_path\@base\stb.png Comfortaa-medium 203 "PRODUCER\nCOLLECTIONS" $script_path\separators\stb\producer.jpg
-    Convert-Separators $script_path\@base\stb.png Comfortaa-medium 203 "RESOLUTION\nCOLLECTIONS" $script_path\separators\stb\resolution.jpg
-    Convert-Separators $script_path\@base\stb.png Comfortaa-medium 203 "SEASONAL\nCOLLECTIONS" $script_path\separators\stb\seasonal.jpg
-    Convert-Separators $script_path\@base\stb.png Comfortaa-medium 203 "STREAMING\nCOLLECTIONS" $script_path\separators\stb\streaming.jpg
-    Convert-Separators $script_path\@base\stb.png Comfortaa-medium 203 "STUDIO\nANIMATION\nCOLLECTIONS" $script_path\separators\stb\studio_animation.jpg
-    Convert-Separators $script_path\@base\stb.png Comfortaa-medium 203 "STUDIO\nCOLLECTIONS" $script_path\separators\stb\studio.jpg
-    Convert-Separators $script_path\@base\stb.png Comfortaa-medium 203 "SUBTITLE\nCOLLECTIONS" $script_path\separators\stb\subtitle_language.jpg
-    Convert-Separators $script_path\@base\stb.png Comfortaa-medium 203 "TV CHART\nCOLLECTIONS" $script_path\separators\stb\tv_chart.jpg
-    Convert-Separators $script_path\@base\stb.png Comfortaa-medium 203 "UK NETWORK\nCOLLECTIONS" $script_path\separators\stb\network_uk.jpg
-    Convert-Separators $script_path\@base\stb.png Comfortaa-medium 203 "UK STREAMING\nCOLLECTIONS" $script_path\separators\stb\streaming_uk.jpg
-    Convert-Separators $script_path\@base\stb.png Comfortaa-medium 203 "UNIVERSE\nCOLLECTIONS" $script_path\separators\stb\universe.jpg
-    Convert-Separators $script_path\@base\stb.png Comfortaa-medium 203 "US NETWORK\nCOLLECTIONS" $script_path\separators\stb\network_us.jpg
-    Convert-Separators $script_path\@base\stb.png Comfortaa-medium 203 "US STREAMING\nCOLLECTIONS" $script_path\separators\stb\streaming_us.jpg
-    Convert-Separators $script_path\@base\stb.png Comfortaa-medium 203 "WRITER\nCOLLECTIONS" $script_path\separators\stb\writer.jpg
-    Convert-Separators $script_path\@base\stb.png Comfortaa-medium 203 "YEAR\nCOLLECTIONS" $script_path\separators\stb\year.jpg
-    Convert-Separators $script_path\@base\stb.png Comfortaa-medium 203 "BASED ON...\nCOLLECTIONS" $script_path\separators\stb\based.jpg
-    Set-Location $script_path
+    $theFont = "ComfortAa-Medium"
+    $theMaxWidth = 1900
+    $initialPointSize = 203
 
+    $myArray = @(
+        'Name| out_name| base_color| other_setting',
+        'collectionless_name| collectionless| #FFFFFF| NA',
+        'ACTOR| actor| #FFFFFF| NA',
+        'AUDIO LANGUAGE| audio_language| #FFFFFF| NA',
+        'AWARD| award| #FFFFFF| NA',
+        'CHART| chart| #FFFFFF| NA',
+        'CONTENT RATINGS| content_rating| #FFFFFF| NA',
+        'COUNTRY| country| #FFFFFF| NA',
+        'DECADE| decade| #FFFFFF| NA',
+        'DIRECTOR| director| #FFFFFF| NA',
+        'FRANCHISE| franchise| #FFFFFF| NA',
+        'GENRE| genre| #FFFFFF| NA',
+        'KIDS NETWORK| network_kids| #FFFFFF| NA',
+        'MOVIE CHART| movie_chart| #FFFFFF| NA',
+        'NETWORK| network| #FFFFFF| NA',
+        'PERSONAL| personal| #FFFFFF| NA',
+        'PRODUCER| producer| #FFFFFF| NA',
+        'RESOLUTION| resolution| #FFFFFF| NA',
+        'SEASONAL| seasonal| #FFFFFF| NA',
+        'STREAMING| streaming| #FFFFFF| NA',
+        'STUDIO ANIMATION| studio_animation| #FFFFFF| NA',
+        'STUDIO| studio| #FFFFFF| NA',
+        'SUBTITLE| subtitle_language| #FFFFFF| NA',
+        'TV CHART| tv_chart| #FFFFFF| NA',
+        'UK NETWORK| network_uk| #FFFFFF| NA',
+        'UK STREAMING| streaming_uk| #FFFFFF| NA',
+        'UNIVERSE| universe| #FFFFFF| NA',
+        'US NETWORK| network_us| #FFFFFF| NA',
+        'US STREAMING| streaming_us| #FFFFFF| NA',
+        'WRITER| writer| #FFFFFF| NA',
+        'YEAR| year| #FFFFFF| NA',
+        'BASED ON...| based| #FFFFFF| NA'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        $myvar1 = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue "separator_name" -CaseSensitivity Upper) 
+        $myvar = Replace-TextBetweenDelimiters -InputString $myvar1 -ReplacementString (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
+        $optimalFontSize = Get-OptimalFontSize $myvar $theFont $theMaxWidth $initialPointSize
+        foreach ($color in $colors) {
+            $arr += ".\create_poster.ps1 -logo `"$script_path\@base\$color.png`" -logo_offset +0 -logo_resize 2000 -text `"$myvar`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"\$color\$($item.out_name)`" -base_color `"#FFFFFF`" -gradient 0 -avg_color 0 -clean 1 -white_wash 0"
+        }
+    }
+    LaunchScripts -ScriptPaths $arr
+    Move-Item -Path output -Destination separators
+    Move-Item -Path output-orig -Destination output
 }
 
 ################################################################################
@@ -2721,7 +2579,7 @@ Function CreateSubtitleLanguage {
         $myvar = Replace-TextBetweenDelimiters -InputString $myvar1 -ReplacementString (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
         $optimalFontSize = Get-OptimalFontSize $myvar $theFont $theMaxWidth $initialPointSize
         $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$myvar`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-        }
+    }
     LaunchScripts -ScriptPaths $arr
     Move-Item -Path output -Destination subtitle_language
     Move-Item -Path output-orig -Destination output
@@ -2997,7 +2855,7 @@ if ([string]::IsNullOrWhiteSpace($LanguageCode)) {
 }
 
 Download-TranslationFile -LanguageCode $LanguageCode
-# Read-Host -Prompt "Press any key to continue..."
+Read-Host -Prompt "Press any key to continue..."
 
 $TranslationFilePath = Join-Path $script_path -ChildPath "@translations"
 $TranslationFilePath = Join-Path $TranslationFilePath -ChildPath "$LanguageCode.yml"
