@@ -33,7 +33,8 @@
 #################################
 $global:font_flag = $null
 $global:magick = $null
-# $global:WidthCache = @{}
+$global:cacheFilePath = $null
+$global:cache = @{}
 
 #################################
 # collect paths
@@ -41,7 +42,28 @@ $global:magick = $null
 $script_path = $PSScriptRoot
 $scriptName = $MyInvocation.MyCommand.Name
 $scriptLog = Join-Path $script_path -ChildPath "$scriptName.log"
-$cacheFilePath = Join-Path $script_path -ChildPath "cache.csv"
+$global:cacheFilePath = Join-Path $script_path -ChildPath "cache.json"
+
+#################################
+# Load cache from disk
+#################################
+
+if (Test-Path $global:cacheFilePath) {
+    $jsonString = Get-Content $global:cacheFilePath -Raw
+    $cacheFromDisk = ConvertFrom-Json $jsonString
+    foreach ($key in $cacheFromDisk.Keys) {
+        $value = $cacheFromDisk[$key] | Select-Object *
+        $value = [Hashtable]$value
+        $global:cache[$key] = $value
+    }
+}
+
+#################################
+# Initialize cache
+#################################
+if ($global:cache -eq $null) {
+    $global:cache = @{}
+}
 
 ################################################################################
 # Function: Remove-Folders
@@ -58,7 +80,6 @@ Function Remove-Folders {
         Remove-Item $path -Force -Recurse -ErrorAction SilentlyContinue
     }
 }
-
 
 ################################################################################
 # Function: Test-ImageMagick
@@ -180,24 +201,26 @@ Function Find-Path-Awards {
         "venice"
     )
 
+    $awardsBasePath = Join-Path -Path $script_path -ChildPath "award"
+
     $awards | ForEach-Object {
-        $awardPath = Join-Path $script_path "award\$_"
+        $awardPath = Join-Path -Path $awardsBasePath -ChildPath $_
         Find-Path $awardPath
-
+    
         $subDirectories = @("winner", "best", "nomination")
-
+    
         $subDirectories | ForEach-Object {
-            $subDirectoryPath = Join-Path $awardPath $_
+            $subDirectoryPath = Join-Path -Path $awardPath -ChildPath $_
             Find-Path $subDirectoryPath
         }
     }
 }
 
 ################################################################################
-# Function: Verify-FileChecksum
+# Function: Compare-FileChecksum
 # Description: validates checksum of files
 ################################################################################
-function Verify-FileChecksum {
+function Compare-FileChecksum {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
@@ -235,10 +258,10 @@ function Verify-FileChecksum {
 }
 
 ################################################################################
-# Function: Download-TranslationFile
+# Function: Get-TranslationFile
 # Description: gets the language yml file from github
 ################################################################################
-function Download-TranslationFile {
+function Get-TranslationFile {
     param(
         [string]$LanguageCode
     )
@@ -247,7 +270,7 @@ function Download-TranslationFile {
     $TranslationFile = "$LanguageCode.yml"
     $TranslationFileUrl = "$GitHubRepository/$TranslationFile"
     $TranslationsPath = Join-Path $script_path "@translations"
-    $TranslationFilePath = Join-Path $TranslationsPath $LanguageCode
+    $TranslationFilePath = Join-Path $TranslationsPath $TranslationFile
 
     Find-Path $TranslationsPath
   
@@ -272,10 +295,10 @@ function Download-TranslationFile {
 }
 
 ################################################################################
-# Function: Replace-TextBetweenDelimiters
+# Function: Set-TextBetweenDelimiters
 # Description: replaces <<something>> with a string
 ################################################################################
-function Replace-TextBetweenDelimiters {
+function Set-TextBetweenDelimiters {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true)]
@@ -291,10 +314,10 @@ function Replace-TextBetweenDelimiters {
 }
 
 ################################################################################
-# Function: Print-TranslationDictionary
+# Function: Export-TranslationDictionary
 # Description: Prints out the translation dictionary for debugging purposes
 ################################################################################
-function Print-TranslationDictionary {
+function Export-TranslationDictionary {
     param(
         [hashtable]$TranslationDictionary
     )
@@ -374,135 +397,101 @@ function Get-TranslatedValue {
 }
 
 ################################################################################
-# Function: Get-Width
-# Description: gets the width of a string based on a font and pointsize
+# Function: UpdateCache
+# Description: Update cache in memory
 ################################################################################
-Function Get-Width($theName, $theFont, $thePointsize) {
-    WriteToLogFile "theName is                   : $theName"
-    WriteToLogFile "theFont is                   : $theFont"
-    WriteToLogFile "thePointsize is              : $thePointsize"
-  
-    $string = magick -debug annotate  xc: -font $theFont -pointsize $thePointsize -annotate 0 $theName null: 2>&1 | Select-String -Pattern Metrics: -CaseSensitive -SimpleMatch
-    $theArray = $string -Split ";"   
-    $arrWidth = $theArray[1].Split(" ")
-    $theWidth = [int]$arrWidth[2]
-    WriteToLogFile "Name Width is                : $theWidth"
-    $theWidth
+Function UpdateCache($key, $value) {
+    # Update cache in memory
+    $global:cache[$key] = $value
 }
 
-$global:WidthCache = @{}
+################################################################################
+# Function: GetFromCache
+# Description: Return value from cache if it exists, otherwise return null
+################################################################################
+Function GetFromCache($key) {
+    # Return value from cache if it exists, otherwise return null
+    if ($global:cache.GetType().Name -eq 'Hashtable' -and $global:cache.ContainsKey($key)) {
+        return $global:cache[$key]
+    }
+    return $null
+}
 
 ################################################################################
-# Function: Export-WidthCache
-# Description: Exports to CSV cache
+# Function: SaveCache
+# Description: saves cache to disk
 ################################################################################
-function Export-WidthCache {
-    param (
-        [string] $cacheFilePath
+Function SaveCache() {
+    # Write updated cache to disk
+    $global:cache | ConvertTo-Json | Out-File $global:cacheFilePath
+}
+
+################################################################################
+# Function: Get-OptimalPointSize
+# Description: Gets the optimal pointsize for a phrase
+################################################################################
+Function Get-OptimalPointSize {
+    param(
+        [string]$text,
+        [string]$font,
+        [int]$box_width,
+        [int]$box_height,
+        [int]$min_pointsize,
+        [int]$max_pointsize
     )
-    $global:WidthCache.GetEnumerator() | Select-Object Text, Font, PointSize, Width | 
-    Export-Csv -Path $cacheFilePath -NoTypeInformation
+
+    # Generate cache key
+    $cache_key = "{0}-{1}-{2}-{3}" -f $text, $font, $box_width, $box_height
+
+    # Check if cache contains the key and return cached result if available
+    $cached_pointsize = GetFromCache($cache_key)
+    if ($null -ne $cached_pointsize) {
+        WriteToLogFile "Cache                        : Cache hit for key '$cache_key'"
+        return $cached_pointsize
+    }
+
+    # Prepare command to get optimal point size
+    # Escape special characters
+    if ($IsWindows) {
+        # Windows-specific escape characters
+        $escaped_text = [System.Management.Automation.WildcardPattern]::Escape($text)
+        $escaped_font = [System.Management.Automation.WildcardPattern]::Escape($font)
+
+        # Escape single quotes (')
+        $escaped_text = $escaped_text -replace "'", "''"
+        $escaped_font = $escaped_font -replace "'", "''"
+    } else {
+        # Unix-specific escape characters (No clue what to put here)
+        $escaped_text = $escaped_text -replace "'", "''"
+        $escaped_font = $escaped_font -replace "'", "''"
+    }
+
+    $cmd = "magick -size ${box_width}x${box_height} -font `"$escaped_font`" -gravity center -fill black caption:`'$escaped_text`' -format `"%[caption:pointsize]`" info:"
+
+    # Execute command and get point size
+    $current_pointsize = [int](Invoke-Expression $cmd | Out-String).Trim()
+    WriteToLogFile "Caption point size           : $current_pointsize"
+
+    # Apply point size limits
+    if ($current_pointsize -gt $max_pointsize) {
+        WriteToLogFile "Optimal Point Size           : Font size limit reached"
+        $current_pointsize = $max_pointsize
+    }
+    elseif ($current_pointsize -lt $min_pointsize) {
+        WriteToLogFile "Optimal Point Size ERROR     : Text is too small and will be truncated"
+        $current_pointsize = $min_pointsize
+    }
+
+    # Update cache with new result
+    UpdateCache $cache_key $current_pointsize
+    WriteToLogFile "Optimal Point Size           : $current_pointsize"
+    # Save cache to disk
+    SaveCache
+
+    # Return optimal point size
+    return $current_pointsize
 }
 
-################################################################################
-# Function: Import-WidthCache
-# Description: Imports from CSV cache
-################################################################################
-function Import-WidthCache {
-    param (
-        [string] $cacheFilePath
-    )
-    if (Test-Path $cacheFilePath) {
-        $cache = Import-Csv -Path $cacheFilePath | ForEach-Object {
-            [pscustomobject] @{
-                Text      = $_.Text
-                Font      = $_.Font
-                PointSize = [int] $_.PointSize
-                Width     = [double] $_.Width
-            }
-        }
-        if ($cache.Count -gt 0) {
-            $global:WidthCache = @{}
-            $cache | ForEach-Object {
-                $global:WidthCache["$($_.Text) $($_.Font) $($_.PointSize)"] = [double]$_.Width
-            }
-            WriteToLogFile "Import-WidthCache            : Import-WidthCache completed"
-        }
-        else {
-            $global:WidthCache = @{}
-            WriteToLogFile "Import-WidthCache            : $cacheFilePath is empty"
-        }
-    }
-    else {
-        WriteToLogFile "Import-WidthCache            : $cacheFilePath not found"
-        $global:WidthCache = @{}
-    }
-}
-
-################################################################################
-# Function: Get-WidthCached
-# Description: Gets the width cache
-################################################################################
-Function Get-WidthCached($text, $font, $pointSize) {
-    foreach ($cacheItem in $global:WidthCache.GetEnumerator()) {
-        if ($cacheItem.Value.Text -eq $text -and $cacheItem.Value.Font -eq $font -and $cacheItem.Value.PointSize -eq $pointSize) {
-            return $cacheItem.Value.Width
-        }
-    }
-    
-    $width = Get-Width $text $font $pointSize
-    $cacheItem = [pscustomobject] @{
-        Text      = $text
-        Font      = $font
-        PointSize = $pointSize
-        Width     = $width
-    }
-    $global:WidthCache["$text $font $pointSize"] = $cacheItem
-    
-    return $width
-}
-
-################################################################################
-# Function: Get-OptimalFontSize
-# Description: Gets the optimal size for a phrase
-################################################################################
-Function Get-OptimalFontSize($theName, $theFont, $theMaxWidth, $initialPointSize) {
-    $words = $theName -split '\s'
-    $minOptimalPointSize = $initialPointSize
-
-    foreach ($word in $words) {
-        $optimalPointSize = $initialPointSize
-        $currentWidth = Get-WidthCached $word $theFont $optimalPointSize
-        
-        if ($currentWidth -gt $theMaxWidth) {
-            $minPointSize = 1
-            $maxPointSize = $optimalPointSize
-            while ($maxPointSize - $minPointSize -gt 1) {
-                $pointSize = [int]($minPointSize + ($maxPointSize - $minPointSize) / 2)
-                
-                $width = Get-WidthCached $word $theFont $pointSize
-                
-                if ($width -gt $theMaxWidth) {
-                    $maxPointSize = $pointSize
-                }
-                else {
-                    $minPointSize = $pointSize
-                }
-            }
-            
-            $optimalPointSize = $minPointSize
-        }
-        
-        if ($optimalPointSize -lt $minOptimalPointSize) {
-            $minOptimalPointSize = $optimalPointSize
-        }
-    }
-    
-    WriteToLogFile "optimalFontSize              : Optimal font size for '$theName' with font '$theFont' and maximum width '$theMaxWidth' is '$minOptimalPointSize'."
-    return $minOptimalPointSize
-}
-
-  
 ################################################################################
 # Function: EncodeIt
 # Description:  base64 string encode
@@ -613,23 +602,6 @@ function MoveFiles {
 }
 
 ################################################################################
-# Function: ConvertSeparators
-# Description: Creates the Separator posters
-################################################################################
-Function Convert-Separators ($theBackdrop, $theFont, $theFontSize, $theLabel, $theFullPath) {
-    WriteToLogFile "theBackdrop                  : $theBackdrop"
-    WriteToLogFile "theFont                      : $theFont"
-    WriteToLogFile "theFontSize                  : $theFontSize"
-    WriteToLogFile "theLabel                     : $theLabel"
-    WriteToLogFile "theFullPath                  : $theFullPath"
-    # write-host "magick $theBackdrop -gravity center -background None -layers Flatten `( -font $theFont -pointsize $theFontSize -fill white -size 1900x1000 -background none label:"$theLabel" -trim -gravity center -extent 1900x1000 `) -gravity center -geometry +0+0 -composite $theFullPath"
-    # magick $theBackdrop -gravity center -background None -layers Flatten `( -font $theFont -pointsize $theFontSize -fill white -size 1900x1000 -background none label:"$theLabel" -trim -gravity center -extent 1900x1000 `) -gravity center -geometry +0+0 -composite $theFullPath
-    $cmd = "$theBackdrop -gravity center -background None -layers Flatten `( -font $theFont -pointsize $theFontSize -fill white -size 1900x1000 -background none label:""$theLabel"" -trim -gravity center -extent 1900x1000 `) -gravity center -geometry +0+0 -composite $theFullPath"
-    WriteToLogFile "magick command               : magick $cmd"
-    Start-Process -NoNewWindow magick $cmd
-}
-
-################################################################################
 # Function: Convert-AwardsBase
 # Description: Creates the base posters for the awards
 ################################################################################
@@ -642,9 +614,12 @@ Function Convert-AwardsBase ($theBackdrop, $theFont, $theFontSize, $theNumber, $
     WriteToLogFile "thePathOnly                  : $thePathOnly"
     $tmp = $null
     $tmp = "text 0,900 '" + $theNumber + "'" 
+    $baseName = "@base-$theNumber.png"
+    $baseOut = Join-Path $thePathOnly $baseName
+
     # write-host "magick @base-NULL.png -font $theFont -fill white -pointsize $theFontSize -gravity center -colorspace RGB -draw "$tmp" @base-$theNumber.png"
     # magick $theBackdrop -font $theFont -fill white -pointsize $theFontSize -gravity center -colorspace RGB -draw "$tmp" $thePathOnly\@base-$theNumber.png
-    $cmd = "$theBackdrop -font $theFont -fill white -pointsize $theFontSize -gravity center -colorspace RGB -draw ""$tmp"" $thePathOnly\@base-$theNumber.png"
+    $cmd = "$theBackdrop -font $theFont -fill white -pointsize $theFontSize -gravity center -colorspace RGB -draw ""$tmp"" $baseOut"
     WriteToLogFile "magick command               : magick $cmd"
     Start-Process -NoNewWindow magick $cmd
 }
@@ -658,7 +633,13 @@ Function Convert-Awards ($theBackdrop, $theBase, $theNumber, $thePathOnly) {
     WriteToLogFile "theBase                      : $theBase"
     WriteToLogFile "theNumber                    : $theNumber"
     WriteToLogFile "thePathOnly                  : $thePathOnly"
-    $cmd = "$theBackdrop $theBase $script_path\@base\@base-$theNumber.png -gravity center -background None -layers Flatten $thePathOnly\$theNumber.jpg"
+    $baseName = "@base-$theNumber.png"
+    $basePath = Join-Path $script_path "@base"
+    $basePathFull = Join-Path $basePath $baseName
+    $baseOut = Join-Path $thePathOnly "$theNumber.jpg"
+    
+    $cmd = "$theBackdrop $theBase $basePathFull -gravity center -background None -layers Flatten $baseOut"
+    # $cmd = "$theBackdrop $theBase $script_path\@base\@base-$theNumber.png -gravity center -background None -layers Flatten $thePathOnly\$theNumber.jpg"
     WriteToLogFile "magick command               : magick $cmd"
     Start-Process -NoNewWindow magick $cmd
 }
@@ -674,8 +655,14 @@ Function Convert-Decades ($theBackdrop, $theBase, $theNumber, $thePathOnly) {
     WriteToLogFile "thePathOnly                  : $thePathOnly"
     $tmp = $null
     $tmp = $theNumber, "s" | Join-String
-    WriteToLogFile "theDecadeTemplate            : $script_path\@base\@zbase-$tmp.png"
-    $cmd = "$theBackdrop $theBase $script_path\@base\@zbase-$tmp.png -gravity center -background None -layers Flatten $thePathOnly\$theNumber.jpg"
+    $baseName = "@zbase-$tmp.png"
+    $basePath = Join-Path $script_path "@base"
+    $basePathFull = Join-Path $basePath $baseName
+    $baseOut = Join-Path $thePathOnly "$theNumber.jpg"
+    
+    WriteToLogFile "theDecadeTemplate            : $basePathFull"
+    $cmd = "$theBackdrop $theBase $basePathFull -gravity center -background None -layers Flatten $baseOut"
+    # $cmd = "$theBackdrop $theBase $script_path\@base\@zbase-$tmp.png -gravity center -background None -layers Flatten $thePathOnly\$theNumber.jpg"
     WriteToLogFile "magick command               : magick $cmd"
     Start-Process -NoNewWindow magick $cmd
 }
@@ -706,7 +693,9 @@ Function CreateAudioLanguage {
     # Find-Path "$script_path\audio_language"
     $theFont = "ComfortAa-Medium"
     $theMaxWidth = 1800
-    $initialPointSize = 250
+    $theMaxHeight = 1000
+    $minPointSize = 100
+    $maxPointSize = 250
     $myvar1 = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue "audio_language_name" -CaseSensitivity Upper) 
 
     Move-Item -Path output -Destination output-orig
@@ -905,8 +894,8 @@ Function CreateAudioLanguage {
         # write-host $($item.Name)
         # write-host $($item.out_name)
         # write-host $($item.base_color)
-        $myvar = Replace-TextBetweenDelimiters -InputString $myvar1 -ReplacementString (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-        $optimalFontSize = Get-OptimalFontSize $myvar $theFont $theMaxWidth $initialPointSize
+        $myvar = Set-TextBetweenDelimiters -InputString $myvar1 -ReplacementString (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
+        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
         $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$myvar`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     }
 
@@ -1310,8 +1299,9 @@ Function CreateBased {
     # Find-Path `"$script_path\based`"
     $theFont = "ComfortAa-Medium"
     $theMaxWidth = 1800
-    $initialPointSize = 250
-    $myvar1 = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue "audio_language_name" -CaseSensitivity Upper) 
+    $theMaxHeight = 1000
+    $minPointSize = 100
+    $maxPointSize = 250
 
     Move-Item -Path output -Destination output-orig
 
@@ -1328,17 +1318,12 @@ Function CreateBased {
         # write-host $($item.Name)
         # write-host $($item.out_name)
         # write-host $($item.base_color)
-        $myvar = Replace-TextBetweenDelimiters -InputString $myvar1 -ReplacementString (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-        $optimalFontSize = Get-OptimalFontSize $myvar $theFont $theMaxWidth $initialPointSize
+        $myvar1 = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue `" $($item.Name)`" -CaseSensitivity Upper) 
+        $myvar = $myvar1
+        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
         $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$myvar`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     }
 
-
-    # $arr = @()
-    # $arr += ".\create_poster.ps1 -logo `"`" -logo_offset +0 -logo_resize 1800 -text `"BASED ON A BOOK`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Book`" -base_color `"#131CA1`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    # $arr += ".\create_poster.ps1 -logo `"`" -logo_offset +0 -logo_resize 1800 -text `"BASED ON A COMIC`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Comic`" -base_color `"#7856EF`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    # $arr += ".\create_poster.ps1 -logo `"`" -logo_offset +0 -logo_resize 1800 -text `"BASED ON A TRUE STORY`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"True Story`" -base_color `"#BC0638`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    # $arr += ".\create_poster.ps1 -logo `"`" -logo_offset +0 -logo_resize 1800 -text `"BASED ON A VIDEO GAME`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Video Game`" -base_color `"#38CC66`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
     LaunchScripts -ScriptPaths $arr
     Move-Item -Path output -Destination based
     Move-Item -Path output-orig -Destination output
@@ -1544,7 +1529,7 @@ Function CreateCountry {
     $arr += ".\create_poster.ps1 -logo `"$script_path\logos_country\ch.png`" -logo_offset -500 -logo_resize 1500 -text `"SWITZERLAND`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Switzerland`" -base_color `"#5803F1`" -gradient 1 -avg_color 0 -clean 1 -white_wash 0"
     $arr += ".\create_poster.ps1 -logo `"$script_path\logos_country\cl.png`" -logo_offset -500 -logo_resize 1500 -text `"CHILE`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Chile`" -base_color `"#AAC41F`" -gradient 1 -avg_color 0 -clean 1 -white_wash 0"
     $arr += ".\create_poster.ps1 -logo `"$script_path\logos_country\cn.png`" -logo_offset -500 -logo_resize 1500 -text `"CHINA`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"China`" -base_color `"#902A62`" -gradient 1 -avg_color 0 -clean 1 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_country\cr.png`" -logo_offset -500 -logo_resize 1500 -text `"COST RICA`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Costa Rica`" -base_color `"#41F306`" -gradient 1 -avg_color 0 -clean 1 -white_wash 0"
+    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_country\cr.png`" -logo_offset -500 -logo_resize 1500 -text `"COSTA RICA`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Costa Rica`" -base_color `"#41F306`" -gradient 1 -avg_color 0 -clean 1 -white_wash 0"
     $arr += ".\create_poster.ps1 -logo `"$script_path\logos_country\cz.png`" -logo_offset -500 -logo_resize 1500 -text `"CZECH REPUBLIC`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Czech Republic`" -base_color `"#9ECE8F`" -gradient 1 -avg_color 0 -clean 1 -white_wash 0"
     $arr += ".\create_poster.ps1 -logo `"$script_path\logos_country\de.png`" -logo_offset -500 -logo_resize 1500 -text `"GERMANY`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Germany`" -base_color `"#97FDAE`" -gradient 1 -avg_color 0 -clean 1 -white_wash 0"
     $arr += ".\create_poster.ps1 -logo `"$script_path\logos_country\dk.png`" -logo_offset -500 -logo_resize 1500 -text `"DENMARK`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Denmark`" -base_color `"#685ECB`" -gradient 1 -avg_color 0 -clean 1 -white_wash 0"
@@ -1615,7 +1600,7 @@ Function CreateCountry {
     $arr += ".\create_poster.ps1 -logo `"$script_path\logos_country\ch.png`" -logo_offset -500 -logo_resize 1500 -text `"SWITZERLAND`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Switzerland`" -base_color `"#5803F1`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     $arr += ".\create_poster.ps1 -logo `"$script_path\logos_country\cl.png`" -logo_offset -500 -logo_resize 1500 -text `"CHILE`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Chile`" -base_color `"#AAC41F`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     $arr += ".\create_poster.ps1 -logo `"$script_path\logos_country\cn.png`" -logo_offset -500 -logo_resize 1500 -text `"CHINA`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"China`" -base_color `"#902A62`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_country\cr.png`" -logo_offset -500 -logo_resize 1500 -text `"COST RICA`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Costa Rica`" -base_color `"#41F306`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
+    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_country\cr.png`" -logo_offset -500 -logo_resize 1500 -text `"COSTA RICA`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Costa Rica`" -base_color `"#41F306`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     $arr += ".\create_poster.ps1 -logo `"$script_path\logos_country\cz.png`" -logo_offset -500 -logo_resize 1500 -text `"CZECH REPUBLIC`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Czech Republic`" -base_color `"#9ECE8F`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     $arr += ".\create_poster.ps1 -logo `"$script_path\logos_country\de.png`" -logo_offset -500 -logo_resize 1500 -text `"GERMANY`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Germany`" -base_color `"#97FDAE`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     $arr += ".\create_poster.ps1 -logo `"$script_path\logos_country\dk.png`" -logo_offset -500 -logo_resize 1500 -text `"DENMARK`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Denmark`" -base_color `"#685ECB`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
@@ -1844,14 +1829,31 @@ Function CreateGenre {
     # Find-Path "$script_path\genre"
     $theFont = "ComfortAa-Medium"
     $theMaxWidth = 1800
-    $initialPointSize = 250
-    # $myvar1 = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue "subtitle_language_name" -CaseSensitivity Upper) 
+    $theMaxHeight = 1000
+    $minPointSize = 100
+    $maxPointSize = 250
+    $myvar1 = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue "genre_name" -CaseSensitivity Upper) 
 
     Move-Item -Path output -Destination output-orig
 
     $myArray = @(
         'Logo| Name| out_name| base_color| ww',
-        'transparent.png| OTHER GENRES| other| #FF2000| 1',
+        'transparent.png| OTHER GENRES| other| #FF2000| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        # write-host $($item.Name)
+        # write-host $($item.out_name)
+        # write-host $($item.base_color)
+        $myvar = Set-TextBetweenDelimiters -InputString $myvar1 -ReplacementString (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
+        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.Logo)`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$myvar`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
+    }
+    LaunchScripts -ScriptPaths $arr
+
+    $myArray = @(
+        'Logo| Name| out_name| base_color| ww',
         'Action & adventure.png| ACTION & ADVENTURE| Action & adventure| #65AEA5| 1',
         'Action.png| ACTION| Action| #387DBF| 1',
         'Adult.png| ADULT| Adult| #D02D2D| 1',
@@ -1956,13 +1958,15 @@ Function CreateGenre {
         'Zombie Horror.png| ZOMBIE HORROR| Zombie Horror| #909513| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
+    Get-OptimalPointSize -text $text -font $font -box_width $box_width -box_height $box_height -min_pointsize $min_pointsize -max_pointsize $max_pointsize
+
     $arr = @()
     foreach ($item in $myArray) {
         # write-host $($item.Name)
         # write-host $($item.out_name)
         # write-host $($item.base_color)
         $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-        $optimalFontSize = Get-OptimalFontSize $myvar $theFont $theMaxWidth $initialPointSize
+        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
         $arr += ".\create_poster.ps1 -logo `"$script_path\logos_genre\$($item.Logo)`" -logo_offset -500 -logo_resize $theMaxWidth -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
     }
     LaunchScripts -ScriptPaths $arr
@@ -2211,7 +2215,9 @@ Function CreateSeparators {
 
     $theFont = "ComfortAa-Medium"
     $theMaxWidth = 1900
-    $initialPointSize = 203
+    $theMaxHeight = 1000
+    $minPointSize = 100
+    $maxPointSize = 203
 
     $myArray = @(
         'Name| out_name| base_color| other_setting',
@@ -2251,8 +2257,8 @@ Function CreateSeparators {
     $arr = @()
     foreach ($item in $myArray) {
         $myvar1 = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue "separator_name" -CaseSensitivity Upper) 
-        $myvar = Replace-TextBetweenDelimiters -InputString $myvar1 -ReplacementString (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-        $optimalFontSize = Get-OptimalFontSize $myvar $theFont $theMaxWidth $initialPointSize
+        $myvar = Set-TextBetweenDelimiters -InputString $myvar1 -ReplacementString (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
+        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
         foreach ($color in $colors) {
             $arr += ".\create_poster.ps1 -logo `"$script_path\@base\$color.png`" -logo_offset +0 -logo_resize 2000 -text `"$myvar`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"\$color\$($item.out_name)`" -base_color `"#FFFFFF`" -gradient 0 -avg_color 0 -clean 1 -white_wash 0"
         }
@@ -2395,7 +2401,9 @@ Function CreateSubtitleLanguage {
     # Find-Path `"$script_path\subtitle_language`"
     $theFont = "ComfortAa-Medium"
     $theMaxWidth = 1800
-    $initialPointSize = 250
+    $theMaxHeight = 1000
+    $minPointSize = 100
+    $maxPointSize = 250
     $myvar1 = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue "subtitle_language_name" -CaseSensitivity Upper) 
 
     Move-Item -Path output -Destination output-orig
@@ -2594,8 +2602,8 @@ Function CreateSubtitleLanguage {
         # write-host $($item.Name)
         # write-host $($item.out_name)
         # write-host $($item.base_color)
-        $myvar = Replace-TextBetweenDelimiters -InputString $myvar1 -ReplacementString (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-        $optimalFontSize = Get-OptimalFontSize $myvar $theFont $theMaxWidth $initialPointSize
+        $myvar = Set-TextBetweenDelimiters -InputString $myvar1 -ReplacementString (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
+        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
         $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$myvar`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     }
     LaunchScripts -ScriptPaths $arr
@@ -2872,7 +2880,7 @@ if ([string]::IsNullOrWhiteSpace($LanguageCode)) {
     $LanguageCode = $DefaultLanguageCode
 }
 
-Download-TranslationFile -LanguageCode $LanguageCode
+Get-TranslationFile -LanguageCode $LanguageCode
 Read-Host -Prompt "Press any key to continue..."
 
 $TranslationFilePath = Join-Path $script_path -ChildPath "@translations"
@@ -3082,87 +3090,87 @@ $expectedChecksum_trans1 = "64A0A1D637FF0687CCBCAECA31B8E6B7235002B1EE8528E7A60B
 $failFlag = [ref] $false
 Write-Output "Begin: " $failFlag.Value
 
-Verify-FileChecksum -Path $script_path\@base\$sep1 -ExpectedChecksum $expectedChecksum_sep1 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\@base\$sep2 -ExpectedChecksum $expectedChecksum_sep2 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\@base\$sep3 -ExpectedChecksum $expectedChecksum_sep3 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\@base\$sep4 -ExpectedChecksum $expectedChecksum_sep4 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\@base\$sep5 -ExpectedChecksum $expectedChecksum_sep5 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\@base\$sep6 -ExpectedChecksum $expectedChecksum_sep6 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\@base\$sep7 -ExpectedChecksum $expectedChecksum_sep7 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\@base\$sep1 -ExpectedChecksum $expectedChecksum_sep1 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\@base\$sep2 -ExpectedChecksum $expectedChecksum_sep2 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\@base\$sep3 -ExpectedChecksum $expectedChecksum_sep3 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\@base\$sep4 -ExpectedChecksum $expectedChecksum_sep4 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\@base\$sep5 -ExpectedChecksum $expectedChecksum_sep5 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\@base\$sep6 -ExpectedChecksum $expectedChecksum_sep6 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\@base\$sep7 -ExpectedChecksum $expectedChecksum_sep7 -failFlag $failFlag
 
-Verify-FileChecksum -Path $script_path\fonts\$ttf1 -ExpectedChecksum $expectedChecksum_ttf1 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\fonts\$ttf2 -ExpectedChecksum $expectedChecksum_ttf2 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\fonts\$ttf3 -ExpectedChecksum $expectedChecksum_ttf3 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\fonts\$ttf4 -ExpectedChecksum $expectedChecksum_ttf4 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\fonts\$ttf5 -ExpectedChecksum $expectedChecksum_ttf5 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\fonts\$ttf6 -ExpectedChecksum $expectedChecksum_ttf6 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\fonts\$ttf7 -ExpectedChecksum $expectedChecksum_ttf7 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\fonts\$ttf8 -ExpectedChecksum $expectedChecksum_ttf8 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\fonts\$ttf9 -ExpectedChecksum $expectedChecksum_ttf9 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\fonts\$ttf10 -ExpectedChecksum $expectedChecksum_ttf10 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\fonts\$ttf11 -ExpectedChecksum $expectedChecksum_ttf11 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\fonts\$ttf12 -ExpectedChecksum $expectedChecksum_ttf12 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\fonts\$ttf13 -ExpectedChecksum $expectedChecksum_ttf13 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\fonts\$ttf14 -ExpectedChecksum $expectedChecksum_ttf14 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\fonts\$ttf15 -ExpectedChecksum $expectedChecksum_ttf15 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\fonts\$ttf16 -ExpectedChecksum $expectedChecksum_ttf16 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\fonts\$ttf17 -ExpectedChecksum $expectedChecksum_ttf17 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\fonts\$ttf1 -ExpectedChecksum $expectedChecksum_ttf1 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\fonts\$ttf2 -ExpectedChecksum $expectedChecksum_ttf2 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\fonts\$ttf3 -ExpectedChecksum $expectedChecksum_ttf3 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\fonts\$ttf4 -ExpectedChecksum $expectedChecksum_ttf4 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\fonts\$ttf5 -ExpectedChecksum $expectedChecksum_ttf5 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\fonts\$ttf6 -ExpectedChecksum $expectedChecksum_ttf6 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\fonts\$ttf7 -ExpectedChecksum $expectedChecksum_ttf7 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\fonts\$ttf8 -ExpectedChecksum $expectedChecksum_ttf8 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\fonts\$ttf9 -ExpectedChecksum $expectedChecksum_ttf9 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\fonts\$ttf10 -ExpectedChecksum $expectedChecksum_ttf10 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\fonts\$ttf11 -ExpectedChecksum $expectedChecksum_ttf11 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\fonts\$ttf12 -ExpectedChecksum $expectedChecksum_ttf12 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\fonts\$ttf13 -ExpectedChecksum $expectedChecksum_ttf13 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\fonts\$ttf14 -ExpectedChecksum $expectedChecksum_ttf14 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\fonts\$ttf15 -ExpectedChecksum $expectedChecksum_ttf15 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\fonts\$ttf16 -ExpectedChecksum $expectedChecksum_ttf16 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\fonts\$ttf17 -ExpectedChecksum $expectedChecksum_ttf17 -failFlag $failFlag
 
-Verify-FileChecksum -Path $script_path\@base\$base1 -ExpectedChecksum $expectedChecksum_base1 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\@base\$base2 -ExpectedChecksum $expectedChecksum_base2 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\@base\$base3 -ExpectedChecksum $expectedChecksum_base3 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\@base\$base4 -ExpectedChecksum $expectedChecksum_base4 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\@base\$base5 -ExpectedChecksum $expectedChecksum_base5 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\@base\$base6 -ExpectedChecksum $expectedChecksum_base6 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\@base\$base7 -ExpectedChecksum $expectedChecksum_base7 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\@base\$base8 -ExpectedChecksum $expectedChecksum_base8 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\@base\$base9 -ExpectedChecksum $expectedChecksum_base9 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\@base\$base10 -ExpectedChecksum $expectedChecksum_base10 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\@base\$base11 -ExpectedChecksum $expectedChecksum_base11 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\@base\$base12 -ExpectedChecksum $expectedChecksum_base12 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\@base\$base13 -ExpectedChecksum $expectedChecksum_base13 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\@base\$base14 -ExpectedChecksum $expectedChecksum_base14 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\@base\$base15 -ExpectedChecksum $expectedChecksum_base15 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\@base\$base16 -ExpectedChecksum $expectedChecksum_base16 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\@base\$base17 -ExpectedChecksum $expectedChecksum_base17 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\@base\$base18 -ExpectedChecksum $expectedChecksum_base18 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\@base\$base19 -ExpectedChecksum $expectedChecksum_base19 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\@base\$base20 -ExpectedChecksum $expectedChecksum_base20 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\@base\$base21 -ExpectedChecksum $expectedChecksum_base21 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\@base\$base22 -ExpectedChecksum $expectedChecksum_base22 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\@base\$base23 -ExpectedChecksum $expectedChecksum_base23 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\@base\$base24 -ExpectedChecksum $expectedChecksum_base24 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\@base\$base25 -ExpectedChecksum $expectedChecksum_base25 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\@base\$base26 -ExpectedChecksum $expectedChecksum_base26 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\@base\$base27 -ExpectedChecksum $expectedChecksum_base27 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\@base\$base28 -ExpectedChecksum $expectedChecksum_base28 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\@base\$base29 -ExpectedChecksum $expectedChecksum_base29 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\@base\$base30 -ExpectedChecksum $expectedChecksum_base30 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\@base\$base31 -ExpectedChecksum $expectedChecksum_base31 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\@base\$base32 -ExpectedChecksum $expectedChecksum_base32 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\@base\$base33 -ExpectedChecksum $expectedChecksum_base33 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\@base\$base34 -ExpectedChecksum $expectedChecksum_base34 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\@base\$base35 -ExpectedChecksum $expectedChecksum_base35 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\@base\$base36 -ExpectedChecksum $expectedChecksum_base36 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\@base\$base37 -ExpectedChecksum $expectedChecksum_base37 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\@base\$base38 -ExpectedChecksum $expectedChecksum_base38 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\@base\$base39 -ExpectedChecksum $expectedChecksum_base39 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\@base\$base40 -ExpectedChecksum $expectedChecksum_base40 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\@base\$base41 -ExpectedChecksum $expectedChecksum_base41 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\@base\$base42 -ExpectedChecksum $expectedChecksum_base42 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\@base\$base43 -ExpectedChecksum $expectedChecksum_base43 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\@base\$base44 -ExpectedChecksum $expectedChecksum_base44 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\@base\$base45 -ExpectedChecksum $expectedChecksum_base45 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\@base\$base46 -ExpectedChecksum $expectedChecksum_base46 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\@base\$base47 -ExpectedChecksum $expectedChecksum_base47 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\@base\$base1 -ExpectedChecksum $expectedChecksum_base1 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\@base\$base2 -ExpectedChecksum $expectedChecksum_base2 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\@base\$base3 -ExpectedChecksum $expectedChecksum_base3 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\@base\$base4 -ExpectedChecksum $expectedChecksum_base4 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\@base\$base5 -ExpectedChecksum $expectedChecksum_base5 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\@base\$base6 -ExpectedChecksum $expectedChecksum_base6 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\@base\$base7 -ExpectedChecksum $expectedChecksum_base7 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\@base\$base8 -ExpectedChecksum $expectedChecksum_base8 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\@base\$base9 -ExpectedChecksum $expectedChecksum_base9 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\@base\$base10 -ExpectedChecksum $expectedChecksum_base10 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\@base\$base11 -ExpectedChecksum $expectedChecksum_base11 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\@base\$base12 -ExpectedChecksum $expectedChecksum_base12 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\@base\$base13 -ExpectedChecksum $expectedChecksum_base13 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\@base\$base14 -ExpectedChecksum $expectedChecksum_base14 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\@base\$base15 -ExpectedChecksum $expectedChecksum_base15 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\@base\$base16 -ExpectedChecksum $expectedChecksum_base16 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\@base\$base17 -ExpectedChecksum $expectedChecksum_base17 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\@base\$base18 -ExpectedChecksum $expectedChecksum_base18 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\@base\$base19 -ExpectedChecksum $expectedChecksum_base19 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\@base\$base20 -ExpectedChecksum $expectedChecksum_base20 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\@base\$base21 -ExpectedChecksum $expectedChecksum_base21 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\@base\$base22 -ExpectedChecksum $expectedChecksum_base22 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\@base\$base23 -ExpectedChecksum $expectedChecksum_base23 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\@base\$base24 -ExpectedChecksum $expectedChecksum_base24 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\@base\$base25 -ExpectedChecksum $expectedChecksum_base25 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\@base\$base26 -ExpectedChecksum $expectedChecksum_base26 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\@base\$base27 -ExpectedChecksum $expectedChecksum_base27 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\@base\$base28 -ExpectedChecksum $expectedChecksum_base28 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\@base\$base29 -ExpectedChecksum $expectedChecksum_base29 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\@base\$base30 -ExpectedChecksum $expectedChecksum_base30 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\@base\$base31 -ExpectedChecksum $expectedChecksum_base31 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\@base\$base32 -ExpectedChecksum $expectedChecksum_base32 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\@base\$base33 -ExpectedChecksum $expectedChecksum_base33 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\@base\$base34 -ExpectedChecksum $expectedChecksum_base34 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\@base\$base35 -ExpectedChecksum $expectedChecksum_base35 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\@base\$base36 -ExpectedChecksum $expectedChecksum_base36 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\@base\$base37 -ExpectedChecksum $expectedChecksum_base37 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\@base\$base38 -ExpectedChecksum $expectedChecksum_base38 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\@base\$base39 -ExpectedChecksum $expectedChecksum_base39 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\@base\$base40 -ExpectedChecksum $expectedChecksum_base40 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\@base\$base41 -ExpectedChecksum $expectedChecksum_base41 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\@base\$base42 -ExpectedChecksum $expectedChecksum_base42 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\@base\$base43 -ExpectedChecksum $expectedChecksum_base43 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\@base\$base44 -ExpectedChecksum $expectedChecksum_base44 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\@base\$base45 -ExpectedChecksum $expectedChecksum_base45 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\@base\$base46 -ExpectedChecksum $expectedChecksum_base46 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\@base\$base47 -ExpectedChecksum $expectedChecksum_base47 -failFlag $failFlag
 
-Verify-FileChecksum -Path $script_path\fades\$fade1 -ExpectedChecksum $expectedChecksum_fade1 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\fades\$fade2 -ExpectedChecksum $expectedChecksum_fade2 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\fades\$fade3 -ExpectedChecksum $expectedChecksum_fade3 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\fades\$fade4 -ExpectedChecksum $expectedChecksum_fade4 -failFlag $failFlag
-Verify-FileChecksum -Path $script_path\fades\$fade5 -ExpectedChecksum $expectedChecksum_fade5 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\fades\$fade1 -ExpectedChecksum $expectedChecksum_fade1 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\fades\$fade2 -ExpectedChecksum $expectedChecksum_fade2 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\fades\$fade3 -ExpectedChecksum $expectedChecksum_fade3 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\fades\$fade4 -ExpectedChecksum $expectedChecksum_fade4 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\fades\$fade5 -ExpectedChecksum $expectedChecksum_fade5 -failFlag $failFlag
 
-Verify-FileChecksum -Path $script_path\$trans1 -ExpectedChecksum $expectedChecksum_trans1 -failFlag $failFlag
+Compare-FileChecksum -Path $script_path\$trans1 -ExpectedChecksum $expectedChecksum_trans1 -failFlag $failFlag
 
 Write-Output "End:" $failFlag.Value
 
@@ -3173,7 +3181,6 @@ if ($failFlag.Value) {
 else {
     WriteToLogFile "Checksums                    : All checksum verifications succeeded."
 }
-Import-WidthCache -cacheFilePath $cacheFilePath
 
 #################################
 # Determine parameters passed from command line
@@ -3247,19 +3254,13 @@ foreach ($param in $args) {
 
 if (!$args) {
     ShowFunctions
+    # CreateBased
 }
 
 #######################
-# Export cache
+# Set current directory
 #######################
 Set-Location $script_path
-
-write-host $global:WidthCache
-write-host $cacheFilePath 
-WriteToLogFile "cacheFilePath                : $cacheFilePath"
-WriteToLogFile "global:WidthCache            : $global:WidthCache"
-
-Export-WidthCache -cacheFilePath $cacheFilePath
 
 #######################
 # Move folders to $script_path\defaults
@@ -3304,3 +3305,13 @@ WriteToLogFile $string
 $string = "Posters per minute           : " + $speed.ToString()
 WriteToLogFile $string
 WriteToLogFile "#### END ####"
+
+# Print the cache in memory
+Write-Host "Cache in memory:"
+$global:cache | ConvertTo-Json -Depth 100
+# Load cache from disk
+if (Test-Path $global:cacheFilePath) {
+    $cachedData = Get-Content $global:cacheFilePath | Out-String | ConvertFrom-Json
+    Write-Host "Cache in file:"
+    $cachedData | ConvertTo-Json -Depth 100
+}
