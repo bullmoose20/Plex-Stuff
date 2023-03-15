@@ -2112,18 +2112,50 @@ Function CreatePlaylist {
     Write-Host "Creating Playlist"
     Set-Location $script_path
     # Find-Path "$script_path\playlist"
+    $theFont = "Bebas-Regular"
+    $theMaxWidth = 1600
+    $theMaxHeight = 1000
+    $minPointSize = 100
+    $maxPointSize = 140
+    $myvar1 = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue "genre_name" -CaseSensitivity Upper) 
+
     Move-Item -Path output -Destination output-orig
+
+    $myArray = @(
+        'Logo| Name| out_name| base_color| ww',
+        'Arrowverse.png| TIMELINE ORDER| Arrowverse (Timeline Order)| #2B8F40| 1',
+        'DragonBall.png| TIMELINE ORDER| Dragon Ball (Timeline Order)| #E39D30| 1',
+        'Marvel Cinematic Universe.png| TIMELINE ORDER| Marvel Cinematic Universe (Timeline Order)| #AD2B2B| 1',
+        'Star Trek.png| TIMELINE ORDER| Star Trek (Timeline Order)| #0193DD| 1',
+        'Pokémon.png| TIMELINE ORDER| Pokémon (Timeline Order)| #FECA06| 1',
+        'dca.png| TIMELINE ORDER| DC Animated Universe (Timeline Order)| #2832C4| 1',
+        'X-men.png| TIMELINE ORDER| X-Men (Timeline Order)| #636363| 1',
+        'Star Wars The Clone Wars.png| TIMELINE ORDER| Star Wars The Clone Wars (Timeline Order)| #ED1C24| 1',
+        'Star Wars.png| TIMELINE ORDER| Star Wars (Timeline Order)| #F8C60A| 1'
+        ) | ConvertFrom-Csv -Delimiter '|'
+    
     $arr = @()
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_playlist\Arrowverse.png`" -logo_offset -200 -logo_resize 1600 -text `"TIMELINE ORDER`" -text_offset +450 -font `"Bebas-Regular`" -font_size 140 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Arrowverse (Timeline Order)`" -base_color `"#2B8F40`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_playlist\DragonBall.png`" -logo_offset -200 -logo_resize 1600 -text `"TIMELINE ORDER`" -text_offset +450 -font `"Bebas-Regular`" -font_size 140 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Dragon Ball (Timeline Order)`" -base_color `"#E39D30`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_playlist\Marvel Cinematic Universe.png`" -logo_offset -200 -logo_resize 1600 -text `"TIMELINE ORDER`" -text_offset +450 -font `"Bebas-Regular`" -font_size 140 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Marvel Cinematic Universe (Timeline Order)`" -base_color `"#AD2B2B`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_playlist\Star Trek.png`" -logo_offset -200 -logo_resize 1600 -text `"TIMELINE ORDER`" -text_offset +450 -font `"Bebas-Regular`" -font_size 140 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Star Trek (Timeline Order)`" -base_color `"#0193DD`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_playlist\Pokémon.png`" -logo_offset -200 -logo_resize 1600 -text `"TIMELINE ORDER`" -text_offset +450 -font `"Bebas-Regular`" -font_size 140 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Pokémon (Timeline Order)`" -base_color `"#FECA06`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_playlist\dca.png`" -logo_offset -200 -logo_resize 1600 -text `"TIMELINE ORDER`" -text_offset +450 -font `"Bebas-Regular`" -font_size 140 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"DC Animated Universe (Timeline Order)`" -base_color `"#2832C4`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_playlist\X-men.png`" -logo_offset -200 -logo_resize 1600 -text `"TIMELINE ORDER`" -text_offset +450 -font `"Bebas-Regular`" -font_size 140 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"X-Men (Timeline Order)`" -base_color `"#636363`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_playlist\Star Wars The Clone Wars.png`" -logo_offset -200 -logo_resize 1600 -text `"TIMELINE ORDER`" -text_offset +450 -font `"Bebas-Regular`" -font_size 140 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Star Wars The Clone Wars (Timeline Order)`" -base_color `"#ED1C24`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_playlist\Star Wars.png`" -logo_offset -200 -logo_resize 1600 -text `"TIMELINE ORDER`" -text_offset +450 -font `"Bebas-Regular`" -font_size 140 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Star Wars (Timeline Order)`" -base_color `"#F8C60A`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
+    foreach ($item in $myArray) {
+        # write-host $($item.Name)
+        # write-host $($item.out_name)
+        # write-host $($item.base_color)
+        $myvar = Set-TextBetweenDelimiters -InputString $myvar1 -ReplacementString (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
+        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_playlist\$($item.Logo)`" -logo_offset -200 -logo_resize $theMaxWidth -text `"$myvar`" -text_offset +450 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+    }
     LaunchScripts -ScriptPaths $arr
+
+    # $arr = @()
+    # $arr += ".\create_poster.ps1 -logo `"$script_path\logos_playlist\Arrowverse.png`" -logo_offset -200 -logo_resize 1600 -text `"TIMELINE ORDER`" -text_offset +450 -font `"Bebas-Regular`" -font_size 140 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Arrowverse (Timeline Order)`" -base_color `"#2B8F40`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
+    # $arr += ".\create_poster.ps1 -logo `"$script_path\logos_playlist\DragonBall.png`" -logo_offset -200 -logo_resize 1600 -text `"TIMELINE ORDER`" -text_offset +450 -font `"Bebas-Regular`" -font_size 140 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Dragon Ball (Timeline Order)`" -base_color `"#E39D30`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
+    # $arr += ".\create_poster.ps1 -logo `"$script_path\logos_playlist\Marvel Cinematic Universe.png`" -logo_offset -200 -logo_resize 1600 -text `"TIMELINE ORDER`" -text_offset +450 -font `"Bebas-Regular`" -font_size 140 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Marvel Cinematic Universe (Timeline Order)`" -base_color `"#AD2B2B`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
+    # $arr += ".\create_poster.ps1 -logo `"$script_path\logos_playlist\Star Trek.png`" -logo_offset -200 -logo_resize 1600 -text `"TIMELINE ORDER`" -text_offset +450 -font `"Bebas-Regular`" -font_size 140 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Star Trek (Timeline Order)`" -base_color `"#0193DD`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
+    # $arr += ".\create_poster.ps1 -logo `"$script_path\logos_playlist\Pokémon.png`" -logo_offset -200 -logo_resize 1600 -text `"TIMELINE ORDER`" -text_offset +450 -font `"Bebas-Regular`" -font_size 140 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Pokémon (Timeline Order)`" -base_color `"#FECA06`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
+    # $arr += ".\create_poster.ps1 -logo `"$script_path\logos_playlist\dca.png`" -logo_offset -200 -logo_resize 1600 -text `"TIMELINE ORDER`" -text_offset +450 -font `"Bebas-Regular`" -font_size 140 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"DC Animated Universe (Timeline Order)`" -base_color `"#2832C4`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
+    # $arr += ".\create_poster.ps1 -logo `"$script_path\logos_playlist\X-men.png`" -logo_offset -200 -logo_resize 1600 -text `"TIMELINE ORDER`" -text_offset +450 -font `"Bebas-Regular`" -font_size 140 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"X-Men (Timeline Order)`" -base_color `"#636363`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
+    # $arr += ".\create_poster.ps1 -logo `"$script_path\logos_playlist\Star Wars The Clone Wars.png`" -logo_offset -200 -logo_resize 1600 -text `"TIMELINE ORDER`" -text_offset +450 -font `"Bebas-Regular`" -font_size 140 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Star Wars The Clone Wars (Timeline Order)`" -base_color `"#ED1C24`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
+    # $arr += ".\create_poster.ps1 -logo `"$script_path\logos_playlist\Star Wars.png`" -logo_offset -200 -logo_resize 1600 -text `"TIMELINE ORDER`" -text_offset +450 -font `"Bebas-Regular`" -font_size 140 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Star Wars (Timeline Order)`" -base_color `"#F8C60A`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
+    # LaunchScripts -ScriptPaths $arr
     Move-Item -Path output -Destination playlist
     Copy-Item -Path logos_playlist -Destination playlist\logos -Recurse
     Move-Item -Path output-orig -Destination output
@@ -2137,9 +2169,33 @@ Function CreateResolution {
     Write-Host "Creating Resolution"
     Set-Location $script_path
     # Find-Path "$script_path\resolution"
+    $theFont = "ComfortAa-Medium"
+    $theMaxWidth = 1800
+    $theMaxHeight = 1000
+    $minPointSize = 100
+    $maxPointSize = 250
+    $myvar1 = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue "genre_name" -CaseSensitivity Upper) 
+
     Move-Item -Path output -Destination output-orig
+
+    $myArray = @(
+        'Logo| Name| out_name| base_color| ww',
+        'transparent.png| OTHER RESOLUTIONS| other| #FF2000| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
     $arr = @()
-    $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"OTHER\nRESOLUTIONS`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"other`" -base_color `"#FF2000`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
+    foreach ($item in $myArray) {
+        # write-host $($item.Name)
+        # write-host $($item.out_name)
+        # write-host $($item.base_color)
+        $myvar = Set-TextBetweenDelimiters -InputString $myvar1 -ReplacementString (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
+        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.Logo)`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$myvar`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+    }
+    LaunchScripts -ScriptPaths $arr
+
+    $arr = @()
+    # $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"OTHER\nRESOLUTIONS`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"other`" -base_color `"#FF2000`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     $arr += ".\create_poster.ps1 -logo `"$script_path\logos_resolution\4K.png`" -logo_offset +0 -logo_resize 1800 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"4k`" -base_color `"#8A46CF`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     $arr += ".\create_poster.ps1 -logo `"$script_path\logos_resolution\8K.png`" -logo_offset +0 -logo_resize 1800 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"8k`" -base_color `"#95BCDC`"-gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     $arr += ".\create_poster.ps1 -logo `"$script_path\logos_resolution\144p.png`" -logo_offset +0 -logo_resize 1800 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"144`" -base_color `"#F0C5E5`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
@@ -2153,7 +2209,18 @@ Function CreateResolution {
     Move-Item -Path output -Destination resolution
     
     $arr = @()
-    $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"OTHER\nRESOLUTIONS`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"other`" -base_color `"#FF2000`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
+    foreach ($item in $myArray) {
+        # write-host $($item.Name)
+        # write-host $($item.out_name)
+        # write-host $($item.base_color)
+        $myvar = Set-TextBetweenDelimiters -InputString $myvar1 -ReplacementString (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
+        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.Logo)`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$myvar`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+    }
+    LaunchScripts -ScriptPaths $arr
+
+    $arr = @()
+    # $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"OTHER\nRESOLUTIONS`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"other`" -base_color `"#FF2000`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     $arr += ".\create_poster.ps1 -logo `"$script_path\logos_resolution\ultrahd.png`" -logo_offset +0 -logo_resize 1800 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"4k`" -base_color `"#8A46CF`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     $arr += ".\create_poster.ps1 -logo `"$script_path\logos_resolution\sd.png`" -logo_offset +0 -logo_resize 1800 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"480`" -base_color `"#3996D3`"-gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     $arr += ".\create_poster.ps1 -logo `"$script_path\logos_resolution\hdready.png`" -logo_offset +0 -logo_resize 1800 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"720`" -base_color `"#30DC76`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
@@ -2330,10 +2397,35 @@ Function CreateStudio {
     Write-Host "Creating Studio"
     Set-Location $script_path
     # Find-Path "$script_path\studio"
+    $theFont = "ComfortAa-Medium"
+    $theMaxWidth = 1800
+    $theMaxHeight = 1000
+    $minPointSize = 100
+    $maxPointSize = 250
+    $myvar1 = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue "genre_name" -CaseSensitivity Upper) 
+
     Move-Item -Path output -Destination output-orig
+
+    $myArray = @(
+        'Logo| Name| out_name| base_color| ww',
+        'transparent.png| OTHER ANIMATION STUDIOS| other_animation| #FF2000| 1',
+        'transparent.png| OTHER STUDIOS| other| #FF2000| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
     $arr = @()
-    $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"OTHER ANIMATION STUDIOS`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"other_animation`" -base_color `"#FF2000`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"OTHER\nSTUDIOS`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"other`" -base_color `"#FF2000`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
+    foreach ($item in $myArray) {
+        # write-host $($item.Name)
+        # write-host $($item.out_name)
+        # write-host $($item.base_color)
+        $myvar = Set-TextBetweenDelimiters -InputString $myvar1 -ReplacementString (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
+        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.Logo)`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$myvar`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+    }
+    LaunchScripts -ScriptPaths $arr
+
+    $arr = @()
+    # $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"OTHER ANIMATION STUDIOS`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"other_animation`" -base_color `"#FF2000`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
+    # $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize 1800 -text `"OTHER\nSTUDIOS`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"other`" -base_color `"#FF2000`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
     $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\20th Century Animation.png`" -logo_offset +0 -logo_resize 1500 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"20th Century Animation`" -base_color `"#9F3137`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
     $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\20th Century Studios.png`" -logo_offset +0 -logo_resize 1500 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"20th Century Studios`" -base_color `"#3387C6`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
     $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\8bit.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"8bit`" -base_color `"#C81246`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
@@ -2627,7 +2719,6 @@ Function CreateSubtitleLanguage {
     Move-Item -Path output -Destination subtitle_language
     Move-Item -Path output-orig -Destination output
 }
-
 
 ################################################################################
 # Function: CreateUniverse
