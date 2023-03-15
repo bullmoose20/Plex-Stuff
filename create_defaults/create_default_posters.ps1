@@ -460,7 +460,8 @@ Function Get-OptimalPointSize {
         # Escape single quotes (')
         $escaped_text = $escaped_text -replace "'", "''"
         $escaped_font = $escaped_font -replace "'", "''"
-    } else {
+    }
+    else {
         # Unix-specific escape characters (No clue what to put here)
         $escaped_text = $escaped_text -replace "'", "''"
         $escaped_font = $escaped_font -replace "'", "''"
@@ -1958,8 +1959,6 @@ Function CreateGenre {
         'Zombie Horror.png| ZOMBIE HORROR| Zombie Horror| #909513| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
-    Get-OptimalPointSize -text $text -font $font -box_width $box_width -box_height $box_height -min_pointsize $min_pointsize -max_pointsize $max_pointsize
-
     $arr = @()
     foreach ($item in $myArray) {
         # write-host $($item.Name)
@@ -2175,20 +2174,38 @@ Function CreateSeasonal {
     Set-Location $script_path
     # Find-Path "$script_path\seasonal"
     Move-Item -Path output -Destination output-orig
+    $theFont = "ComfortAa-Medium"
+    $theMaxWidth = 1800
+    $theMaxHeight = 1000
+    $minPointSize = 100
+    $maxPointSize = 250
+
+    $myArray = @(
+        'Logo| Name| out_name| base_color| ww',
+        '420.png| 4/20| 420| #43C32F| 1',
+        'christmas.png| CHRISTMAS| christmas| #D52414| 1',
+        'easter.png| EASTER| easter| #46D69D| 1',
+        'father.png| FATHER''S DAY| father| #7CDA83| 1',
+        'halloween.png| HALLOWEEN| halloween| #DA8B25| 1',
+        'independence.png| INDEPENDENCE DAY| independence| #2931CB| 1',
+        'labor.png| LABOR DAY| labor| #DA5C5E| 1',
+        'memorial.png| MEMORIAL DAY| memorial| #917C5C| 1',
+        'mother.png| MOTHER''S DAY| mother| #DB81D6| 1',
+        'patrick.png| ST. PATRICK''S DAY| patrick| #26A53E| 1',
+        'thanksgiving.png| THANKSGIVING| thanksgiving| #A1841E| 1',
+        'valentine.png| VALENTINE''S DAY| valentine| #D12AAE| 1',
+        'years.png| NEW YEAR| years| #444444| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+    
     $arr = @()
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_seasonal\420.png`" -logo_offset -500 -logo_resize 1800 -text `"4/20`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"420`" -base_color `"#43C32F`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_seasonal\christmas.png`" -logo_offset -500 -logo_resize 1800 -text `"CHRISTMAS`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"christmas`" -base_color `"#D52414`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_seasonal\easter.png`" -logo_offset -500 -logo_resize 1800 -text `"EASTER`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"easter`" -base_color `"#46D69D`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_seasonal\father.png`" -logo_offset -500 -logo_resize 1800 -text `"FATHER'S DAY`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"father`" -base_color `"#7CDA83`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_seasonal\halloween.png`" -logo_offset -500 -logo_resize 1800 -text `"HALLOWEEN`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"halloween`" -base_color `"#DA8B25`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_seasonal\independence.png`" -logo_offset -500 -logo_resize 1800 -text `"INDEPENDENCE\nDAY`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 220 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"independence`" -base_color `"#2931CB`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_seasonal\labor.png`" -logo_offset -500 -logo_resize 1800 -text `"LABOR DAY`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"labor`" -base_color `"#DA5C5E`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_seasonal\memorial.png`" -logo_offset -500 -logo_resize 1800 -text `"MEMORIAL DAY`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"memorial`" -base_color `"#917C5C`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_seasonal\mother.png`" -logo_offset -500 -logo_resize 1800 -text `"MOTHER'S DAY`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"mother`" -base_color `"#DB81D6`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_seasonal\patrick.png`" -logo_offset -500 -logo_resize 1800 -text `"ST. PATRICK'S DAY`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"patrick`" -base_color `"#26A53E`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_seasonal\thanksgiving.png`" -logo_offset -500 -logo_resize 1800 -text `"THANKSGIVING`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 240 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"thanksgiving`" -base_color `"#A1841E`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_seasonal\valentine.png`" -logo_offset -500 -logo_resize 1800 -text `"VALENTINE'S DAY`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"valentine`" -base_color `"#D12AAE`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_seasonal\years.png`" -logo_offset -500 -logo_resize 1800 -text `"NEW YEAR`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"years`" -base_color `"#444444`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
+    foreach ($item in $myArray) {
+        # write-host $($item.Name)
+        # write-host $($item.out_name)
+        # write-host $($item.base_color)
+        $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
+        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_seasonal\$($item.Logo)`" -logo_offset -500 -logo_resize $theMaxWidth -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+    }
     LaunchScripts -ScriptPaths $arr
     Move-Item -Path output -Destination seasonal
     Copy-Item -Path logos_seasonal -Destination seasonal\logos -Recurse
