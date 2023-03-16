@@ -1338,108 +1338,85 @@ Function CreateChart {
     Write-Host "Creating Chart"
     Set-Location $script_path
     # Find-Path "$script_path\chart"
+    $theFont = "ComfortAa-Medium"
+    $theMaxWidth = 1500
+    $theMaxHeight = 1000
+    $minPointSize = 100
+    $maxPointSize = 250
+
     Move-Item -Path output -Destination output-orig
-    $chart = "POPULAR", "SEASON", "TOP RATED", "TRENDING"
+
+    $myArray = @(
+        'Logo| logo_resize| Name| out_name| base_color| ww',
+        'AniDB.png| 1800| POPULAR| AniDB Popular| #FF7E17| 1',
+        'AniList.png| 1500| POPULAR| AniList Popular| #414A81| 1',
+        'AniList.png| 1500| SEASON| AniList Season| #414A81| 1',
+        'AniList.png| 1500| TOP RATED| AniList Top Rated| #414A81| 1',
+        'AniList.png| 1500| TRENDING| AniList Trending| #414A81| 1',
+        'Apple TV+.png| 1500| TOP 10| apple_top| #494949| 1',
+        'Disney+.png| 1500| TOP 10| disney_top| #002CA1| 1',
+        'HBO Max.png| 1500| TOP 10| hbo_top| #9015C5| 1',
+        'IMDb.png| 1500| BOTTOM RATED| IMDb Bottom Rated| #D7B00B| 1',
+        'IMDb.png| 1500| BOX OFFICE| IMDb Box Office| #D7B00B| 1',
+        'IMDb.png| 1500| LOWEST RATED| IMDb Lowest Rated| #D7B00B| 1',
+        'IMDb.png| 1500| POPULAR| IMDb Popular| #D7B00B| 1',
+        'IMDb.png| 1500| TOP 10| imdb_top| #D7B00B| 1',
+        'IMDb.png| 1500| TOP 250| IMDb Top 250| #D7B00B| 1',
+        'MyAnimeList.png| 1500| FAVORITED| MyAnimeList Favorited| #304DA6| 1',
+        'MyAnimeList.png| 1500| POPULAR| MyAnimeList Popular| #304DA6| 1',
+        'MyAnimeList.png| 1500| SEASON| MyAnimeList Season| #304DA6| 1',
+        'MyAnimeList.png| 1500| TOP AIRING| MyAnimeList Top Airing| #304DA6| 1',
+        'MyAnimeList.png| 1500| TOP RATED| MyAnimeList Top Rated| #304DA6| 1',
+        'Netflix.png| 1500| TOP 10| netflix_top| #B4121D| 1',
+        'Paramount+.png| 1500| TOP 10| paramount_top| #1641C3| 1',
+        'Pirated.png| 1500| TOP 10 PIRATED| Top 10 Pirated Movies of the Week| #93561D| 1',
+        'Plex.png| 1500| NEW EPISODES| New Episodes| #DC9924| 1',
+        'Plex.png| 1500| NEW PREMIERES| New Premieres| #DC9924| 1',
+        'Plex.png| 1500| NEWLY RELEASED EPISODES| Newly Released Episodes| #DC9924| 1',
+        'Plex.png| 1500| NEWLY RELEASED| Newly Released| #DC9924| 1',
+        'Plex.png| 1500| PILOTS| Pilots| #DC9924| 1',
+        'Plex.png| 1500| PLEX PEOPLE WATCHING| Plex People Watching| #DC9924| 1',
+        'Plex.png| 1500| PLEX PILOTS| Plex Pilots| #DC9924| 1',
+        'Plex.png| 1500| PLEX POPULAR| Plex Popular| #DC9924| 1',
+        'Plex.png| 1500| PLEX WATCHED| Plex Watched| #DC9924| 1',
+        'Plex.png| 1500| RECENTLY ADDED| Recently Added| #DC9924| 1',
+        'Plex.png| 1500| RECENTLY AIRED| Recently Aired| #DC9924| 1',
+        'Prime Video.png| 1500| TOP 10| prime_top| #43ABCE| 1',
+        'StevenLu.png| 1500| STEVENLU''S POPULAR MOVIES| StevenLu''s Popular Movies| #1D2D51| 1',
+        'TMDb.png| 1500| AIRING TODAY| TMDb Airing Today| #062AC8| 1',
+        'TMDb.png| 1500| NOW PLAYING| TMDb Now Playing| #062AC8| 1',
+        'TMDb.png| 1500| ON THE AIR| TMDb On The Air| #062AC8| 1',
+        'TMDb.png| 1500| POPULAR| TMDb Popular| #062AC8| 1',
+        'TMDb.png| 1500| TOP RATED| TMDb Top Rated| #062AC8| 1',
+        'TMDb.png| 1500| TRENDING| TMDb Trending| #062AC8| 1',
+        'Tautulli.png| 1500| POPULAR| Tautulli Popular| #B9851F| 1',
+        'Tautulli.png| 1500| WATCHED| Tautulli Watched| #B9851F| 1',
+        'Trakt.png| 1500| COLLECTED| Trakt Collected| #CD1A20| 1',
+        'Trakt.png| 1500| NOW PLAYING| Trakt Now Playing| #CD1A20| 1',
+        'Trakt.png| 1500| POPULAR| Trakt Popular| #CD1A20| 1',
+        'Trakt.png| 1500| RECOMMENDED| Trakt Recommended| #CD1A20| 1',
+        'Trakt.png| 1500| TRENDING| Trakt Trending| #CD1A20| 1',
+        'Trakt.png| 1500| WATCHED| Trakt Watched| #CD1A20| 1',
+        'Trakt.png| 1500| WATCHLIST| Trakt Watchlist| #CD1A20| 1',
+        'css.png| 1500| FAMILIES| Common Sense Selection| #1AA931| 1',
+        'google_play.png| 1500| TOP 10| google_top| #B81282| 1',
+        'hulu.png| 1500| TOP 10| hulu_top| #1BB68A| 1',
+        'itunes.png| 1500| TOP 10| itunes_top| #D500CC| 1',
+        'star_plus.png| 1500| TOP 10| star_plus_top| #4A3159| 1',
+        'vudu.png| 1500| TOP 10| vudu_top| #3567AC| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
     $arr = @()
-    foreach ( $item in $chart ) { 
-        $TextInfo = (Get-Culture).TextInfo
-        $item_lower = $item.ToLower()
-        $item_proper = $TextInfo.ToTitleCase("$item_lower")
-        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_chart\AniList.png`" -logo_offset -500 -logo_resize 1500 -text `"$item`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"AniList $item_proper`" -base_color `"#414A81`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    }
-    LaunchScripts -ScriptPaths $arr
-    
-    $arr = @()
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_chart\AniDB.png`" -logo_offset -500 -logo_resize 1800 -text `"POPULAR`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"AniDB Popular`" -base_color `"#FF7E17`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_chart\css.png`" -logo_offset -500 -logo_resize 1500 -text `"FAMILIES`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Common Sense Selection`" -base_color `"#1AA931`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_chart\Disney+.png`" -logo_offset -500 -logo_resize 1500 -text `"TOP 10`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"disney_top`" -base_color `"#002CA1`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_chart\google_play.png`" -logo_offset -500 -logo_resize 1500 -text `"TOP 10`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"google_top`" -base_color `"#B81282`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_chart\HBO Max.png`" -logo_offset -500 -logo_resize 1500 -text `"TOP 10`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"hbo_top`" -base_color `"#9015C5`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_chart\hulu.png`" -logo_offset -500 -logo_resize 1500 -text `"TOP 10`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"hulu_top`" -base_color `"#1BB68A`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_chart\IMDb.png`" -logo_offset -500 -logo_resize 1500 -text `"TOP 10`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"imdb_top`" -base_color `"#D7B00B`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    LaunchScripts -ScriptPaths $arr
-    
-    $chart = "BOTTOM RATED", "BOX OFFICE", "LOWEST RATED", "POPULAR", "TOP 250"
-    $arr = @()
-    foreach ( $item in $chart ) { 
-        $TextInfo = (Get-Culture).TextInfo
-        $item_lower = $item.ToLower()
-        $item_proper = $TextInfo.ToTitleCase("$item_lower")
-        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_chart\IMDb.png`" -logo_offset -500 -logo_resize 1500 -text `"$item`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"IMDb $item_proper`" -base_color `"#D7B00B`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    }
-    LaunchScripts -ScriptPaths $arr
-    
-    $arr = @()
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_chart\itunes.png`" -logo_offset -500 -logo_resize 1500 -text `"TOP 10`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"itunes_top`" -base_color `"#D500CC`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    LaunchScripts -ScriptPaths $arr
-    
-    $chart = "FAVORITED", "POPULAR", "SEASON", "TOP AIRING", "TOP RATED"
-    $arr = @()
-    foreach ( $item in $chart ) { 
-        $TextInfo = (Get-Culture).TextInfo
-        $item_lower = $item.ToLower()
-        $item_proper = $TextInfo.ToTitleCase("$item_lower")
-        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_chart\MyAnimeList.png`" -logo_offset -500 -logo_resize 1500 -text `"$item`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"MyAnimeList $item_proper`" -base_color `"#304DA6`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    }
-    LaunchScripts -ScriptPaths $arr
-    
-    $arr = @()
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_chart\Apple TV+.png`" -logo_offset -500 -logo_resize 1500 -text `"TOP 10`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"apple_top`" -base_color `"#494949`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_chart\Netflix.png`" -logo_offset -500 -logo_resize 1500 -text `"TOP 10`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"netflix_top`" -base_color `"#B4121D`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_chart\Paramount+.png`" -logo_offset -500 -logo_resize 1500 -text `"TOP 10`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"paramount_top`" -base_color `"#1641C3`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_chart\Pirated.png`" -logo_offset -500 -logo_resize 1500 -text `"TOP 10 PIRATED`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Top 10 Pirated Movies of the Week`" -base_color `"#93561D`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    LaunchScripts -ScriptPaths $arr
-    
-    $chart = "NEW EPISODES", "NEWLY RELEASED EPISODES", "NEWLY RELEASED", "PILOTS", "PLEX PEOPLE WATCHING", "PLEX PILOTS", "PLEX POPULAR", "PLEX WATCHED", "RECENTLY ADDED", "RECENTLY AIRED", "NEW PREMIERES"
-    $arr = @()
-    foreach ( $item in $chart ) { 
-        $TextInfo = (Get-Culture).TextInfo
-        $item_lower = $item.ToLower()
-        $item_proper = $TextInfo.ToTitleCase("$item_lower")
-        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_chart\Plex.png`" -logo_offset -500 -logo_resize 1500 -text `"$item`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$item_proper`" -base_color `"#DC9924`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    }
-    LaunchScripts -ScriptPaths $arr
-    
-    $arr = @()
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_chart\Prime Video.png`" -logo_offset -500 -logo_resize 1500 -text `"TOP 10`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"prime_top`" -base_color `"#43ABCE`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_chart\star_plus.png`" -logo_offset -500 -logo_resize 1500 -text `"TOP 10`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"star_plus_top`" -base_color `"#4A3159`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_chart\StevenLu.png`" -logo_offset -500 -logo_resize 1500 -text `"STEVENLU'S POPULAR MOVIES`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"StevenLu's Popular Movies`" -base_color `"#1D2D51`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    LaunchScripts -ScriptPaths $arr
-    
-    $chart = "POPULAR", "WATCHED"
-    $arr = @()
-    foreach ( $item in $chart ) { 
-        $TextInfo = (Get-Culture).TextInfo
-        $item_lower = $item.ToLower()
-        $item_proper = $TextInfo.ToTitleCase("$item_lower")
-        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_chart\Tautulli.png`" -logo_offset -500 -logo_resize 1500 -text `"$item`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Tautulli $item_proper`" -base_color `"#B9851F`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    }
-    LaunchScripts -ScriptPaths $arr
-    
-    $chart = "AIRING TODAY", "NOW PLAYING", "ON THE AIR", "POPULAR", "TOP RATED", "TRENDING"
-    $arr = @()
-    foreach ( $item in $chart ) { 
-        $TextInfo = (Get-Culture).TextInfo
-        $item_lower = $item.ToLower()
-        $item_proper = $TextInfo.ToTitleCase("$item_lower")
-        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_chart\TMDb.png`" -logo_offset -500 -logo_resize 1500 -text `"$item`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"TMDb $item_proper`" -base_color `"#062AC8`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    }
-    LaunchScripts -ScriptPaths $arr
-    
-    $chart = "COLLECTED", "NOW PLAYING", "POPULAR", "TRENDING", "WATCHED", "WATCHLIST"
-    $arr = @()
-    foreach ( $item in $chart ) { 
-        $TextInfo = (Get-Culture).TextInfo
-        $item_lower = $item.ToLower()
-        $item_proper = $TextInfo.ToTitleCase("$item_lower")
-        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_chart\Trakt.png`" -logo_offset -500 -logo_resize 1500 -text `"$item`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Trakt $item_proper`" -base_color `"#CD1A20`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
+    foreach ($item in $myArray) {
+        # write-host $($item.Name)
+        # write-host $($item.out_name)
+        # write-host $($item.base_color)
+        $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
+        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_chart\$($item.Logo)`" -logo_offset -500 -logo_resize $theMaxWidth -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
     }
     LaunchScripts -ScriptPaths $arr
 
-    $arr = @()
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_chart\Trakt.png`" -logo_offset -500 -logo_resize 1500 -text `"RECOMMENDED`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 220 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Trakt Recommended`" -base_color `"#CD1A20`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_chart\vudu.png`" -logo_offset -500 -logo_resize 1500 -text `"TOP 10`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"vudu_top`" -base_color `"#3567AC`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    LaunchScripts -ScriptPaths $arr
     Move-Item -Path output -Destination chart
     Copy-Item -Path logos_chart -Destination chart\logos -Recurse
     Move-Item -Path output-orig -Destination output
@@ -1640,7 +1617,7 @@ Function CreateCountry {
         'us.png| 1500| UNITED STATES OF AMERICA| United States of America| #D2A345',
         'vn.png| 1500| VIETNAM| Vietnam| #19156E',
         'za.png| 1500| SOUTH AFRICA| South Africa| #E7BB4A'
-        ) | ConvertFrom-Csv -Delimiter '|'
+    ) | ConvertFrom-Csv -Delimiter '|'
     
     $arr = @()
     foreach ($item in $myArray) {
@@ -2183,7 +2160,7 @@ Function CreatePlaylist {
         'X-men.png| TIMELINE ORDER| X-Men (Timeline Order)| #636363| 1',
         'Star Wars The Clone Wars.png| TIMELINE ORDER| Star Wars The Clone Wars (Timeline Order)| #ED1C24| 1',
         'Star Wars.png| TIMELINE ORDER| Star Wars (Timeline Order)| #F8C60A| 1'
-        ) | ConvertFrom-Csv -Delimiter '|'
+    ) | ConvertFrom-Csv -Delimiter '|'
     
     $arr = @()
     foreach ($item in $myArray) {
