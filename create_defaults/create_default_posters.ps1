@@ -111,78 +111,6 @@ Function Find-Path ($sub) {
 }
 
 ################################################################################
-# Function: Find-Fonts
-# Description: Determines if fonts required are installed and visible to ImageMagick
-################################################################################
-# https://www.alkanesolutions.co.uk/2021/12/06/installing-fonts-with-powershell/
-Function Find-Fonts ($theFont, $theFile, $theType) {
-    $tmp = $null
-    $tmp = "Font: " + $theFont + "$"
-    $chkfont1 = magick identify -list font | Select-String $tmp
-    $global:font_flag = $global:font_flag 
-    if ($chkfont1 -eq "" -or $null -eq $chkfont1) {
-        $font_list = magick identify -list font | Select-String "Font: "
-        $font_list -replace "  Font: ", "" | Out-File -FilePath (Join-Path $script_path "magick_fonts.txt")
-        Write-Host "Fonts missing >"$theFont"< not installed/found. List of installed fonts that Imagemagick can use listed and exported here: $(Join-Path $script_path "magick_fonts.txt")." -ForegroundColor Red -BackgroundColor White
-        Write-Host $font_list.count "fonts are visible to Imagemagick." -ForegroundColor Red -BackgroundColor White
-        WriteToLogFile "Fonts missing                : $theFont"
-        WriteToLogFile "Fonts missing                : List of installed fonts that Imagemagick can use listed and exported here: $(Join-Path $script_path "magick_fonts.txt")."
-        $fontFilePath = Join-Path $script_path "fonts" "$theFont.$theType"
-        WriteToLogFile "Creating file                : $fontFilePath"
-        Convert-TextToBinary -Text $theFile -OutputPath $fontFilePath
-        $global:font_flag = 1
-    }
-}
-
-################################################################################
-# Function: Find-BinFile
-# Description: Determines if binary file exists and then creates it if its missing
-################################################################################
-Function Find-BinFile($thePath, $theFile) {
-    if (-not(Test-Path -Path $thePath -PathType Leaf)) {
-        Write-Host "File >$thePath< not found. Creating now. Please standby..." -ForegroundColor Red -BackgroundColor White
-        WriteToLogFile "Creating file                : $thePath"
-        Convert-TextToBinary $theFile $thePath
-    }
-}
-
-################################################################################
-# Function: Convert-BinaryToText
-# Description: Converts binary file to text
-################################################################################
-Function Convert-BinaryToText {
-    param
-    (
-        [Parameter(Mandatory)]
-        [string]
-        $Path
-    )
-
-    $Bytes = [System.IO.File]::ReadAllBytes($Path)
-    [System.Convert]::ToBase64String($Bytes)
-}
-
-################################################################################
-# Function: Convert-TextToBinary
-# Description: Converts text to binary file
-################################################################################
-Function Convert-TextToBinary {
-    param
-    (
-        [Parameter(Mandatory)]
-        [string]
-        $Text,
-
-        [Parameter(Mandatory)]
-        [string]
-        $OutputPath
-    )
-
-    $Bytes = [System.Convert]::FromBase64String($Text)
-    [System.IO.File]::WriteAllBytes($OutputPath, $Bytes)
-}
-
-################################################################################
 # Function: Find-Path-Awards
 # Description: Ensures the paths to the awards are all there
 ################################################################################
@@ -220,7 +148,7 @@ Function Find-Path-Awards {
 # Function: Compare-FileChecksum
 # Description: validates checksum of files
 ################################################################################
-function Compare-FileChecksum {
+Function Compare-FileChecksum {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
@@ -314,24 +242,10 @@ function Set-TextBetweenDelimiters {
 }
 
 ################################################################################
-# Function: Export-TranslationDictionary
-# Description: Prints out the translation dictionary for debugging purposes
-################################################################################
-function Export-TranslationDictionary {
-    param(
-        [hashtable]$TranslationDictionary
-    )
-
-    foreach ($Key in $TranslationDictionary.Keys) {
-        Write-Output "${Key}: $($TranslationDictionary[$Key])"
-    }
-}
-
-################################################################################
 # Function: Get-TranslatedValue
 # Description:  gets the translated value for the poster
 ################################################################################
-function Get-TranslatedValue {
+Function Get-TranslatedValue {
     param(
         [string]$TranslationFilePath,
         [string]$EnglishValue,
