@@ -116,7 +116,7 @@ Function Find-Path ($sub) {
 ################################################################################
 Function Find-Path-Awards {
     $awards = @(
-        "bafta",
+        # "bafta",
         "berlinale",
         "cannes",
         "cesar",
@@ -478,7 +478,7 @@ Function LaunchScripts {
 # Function: MoveFiles
 # Description: Moves Folder and Files to final location
 ################################################################################
-function MoveFiles {
+Function MoveFiles {
     $defaultsPath = Join-Path $script_path -ChildPath "defaults"
 
     $foldersToMove = @(
@@ -830,78 +830,198 @@ Function CreateAwards {
     Find-Path-Awards
     WriteToLogFile "ImageMagick Commands for     : Awards"
     WriteToLogFile "ImageMagick Commands for     : Awards-@base"
+    $theFont = "ComfortAa-Medium"
+    $theMaxWidth = 1500
+    $theMaxHeight = 1000
+    $minPointSize = 100
+    $maxPointSize = 250
+
     Move-Item -Path output -Destination output-orig
+
+    ########################
+    # Razzie #FF0C0C
+    ########################
+    WriteToLogFile "ImageMagick Commands for     : BAFTA"
+    $myArray = @(
+        'Logo| logo_resize| Name| out_name| base_color| ww',
+        'Razzie.png| 1000| WINNERS| winner| #FF0C0C| 1',
+        'Razzie.png| 1000| NOMINATIONS| nomination| #FF0C0C| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
     $arr = @()
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\Razzie.png`" -logo_offset -500 -logo_resize 1000 -text `"WINNERS`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"winner`" -base_color `"#FF0C0C`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\Razzie.png`" -logo_offset -500 -logo_resize 1000 -text `"NOMINATIONS`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 240 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"nomination`" -base_color `"#FF0C0C`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
+    foreach ($item in $myArray) {
+        # write-host $($item.Name)
+        # write-host $($item.out_name)
+        # write-host $($item.base_color)
+        $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
+        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+    }
     LaunchScripts -ScriptPaths $arr
     
+    $myArray = @(
+        'Logo| logo_resize| Name| out_name| base_color| ww',
+        'Razzie.png| 1000| WINNERS| winner| #FF0C0C| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
     $arr = @()
-    for ($i = 1980; $i -lt 2030; $i++) {
-        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\Razzie.png`" -logo_offset -500 -logo_resize 1000 -text `"$i`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name $i -base_color `"#FF0C0C`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
+    foreach ($item in $myArray) {
+        for ($i = 1980; $i -lt 2030; $i++) {
+            $myvar = $i
+            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+        }
     }
     LaunchScripts -ScriptPaths $arr
     Move-Item -Path output -Destination award\razzies
-    
+
+    $myArray = @(
+        'Logo| logo_resize| Name| out_name| base_color| ww',
+        'Razzie.png| 1000| WINNERS| winner| #FF0C0C| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
     $arr = @()
-    for ($i = 1980; $i -lt 2030; $i++) {
-        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\Razzie.png`" -logo_offset -500 -logo_resize 1000 -text `"WINNERS\n$i`" -text_offset +700 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name $i -base_color `"#FF0C0C`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
+    foreach ($item in $myArray) {
+        for ($i = 1980; $i -lt 2030; $i++) {
+            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
+            $myvar = "$myvar\n$i"
+            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+        }
     }
     LaunchScripts -ScriptPaths $arr
     Move-Item -Path output -Destination award\razzies\winner
-    
+
+    $myArray = @(
+        'Logo| logo_resize| Name| out_name| base_color| ww',
+        'Razzie.png| 1000| NOMINATIONS| nomination| #FF0C0C| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
     $arr = @()
-    for ($i = 1980; $i -lt 2030; $i++) {
-        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\Razzie.png`" -logo_offset -500 -logo_resize 1000 -text `"NOMINATIONS\n$i`" -text_offset +700 -font `"ComfortAa-Medium`" -font_size 240 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name $i -base_color `"#FF0C0C`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
+    foreach ($item in $myArray) {
+        for ($i = 1980; $i -lt 2030; $i++) {
+            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
+            $myvar = "$myvar\n$i"
+            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+        }
     }
     LaunchScripts -ScriptPaths $arr
     Move-Item -Path output -Destination award\razzies\nomination
-    
+ 
+    $myArray = @(
+        'Logo| logo_resize| Name| out_name| base_color| ww',
+        'Razzie.png| 1000| BEST PICTURE\nWINNER\n| winner| #FF0C0C| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
     $arr = @()
-    for ($i = 1980; $i -lt 2030; $i++) {
-        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\Razzie.png`" -logo_offset -500 -logo_resize 1000 -text `"BEST PICTURE\nWINNER\n$i`" -text_offset +700 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name $i -base_color `"#FF0C0C`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
+    foreach ($item in $myArray) {
+        for ($i = 1980; $i -lt 2030; $i++) {
+            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
+            $myvar = "$myvar\n$i"
+            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+        }
     }
     LaunchScripts -ScriptPaths $arr
     Move-Item -Path output -Destination award\razzies\best
+
     Copy-Item -Path logos_award -Destination award\logos -Recurse
     Move-Item -Path output-orig -Destination output
+
+    ########################
+    # BAFTA #9C7C26
+    ########################
+    WriteToLogFile "ImageMagick Commands for     : BAFTA"
+    $myArray = @(
+        'Logo| logo_resize| Name| out_name| base_color| ww',
+        'BAFTA.png| 1800| WINNERS| winner| #9C7C26| 1',
+        'BAFTA.png| 1800| NOMINATIONS| nomination| #9C7C26| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        # write-host $($item.Name)
+        # write-host $($item.out_name)
+        # write-host $($item.base_color)
+        $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
+        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+    }
+    LaunchScripts -ScriptPaths $arr
     
-    for ($i = 1900; $i -lt 2030; $i++) {
-        Convert-AwardsBase $script_path\@base\@base-NULL.png Comfortaa-medium 250 $i $script_path\@base
+    $myArray = @(
+        'Logo| logo_resize| Name| out_name| base_color| ww',
+        'BAFTA.png| 1800| WINNERS| winner| #9C7C26| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        for ($i = 1947; $i -lt 2030; $i++) {
+            $myvar = $i
+            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+        }
     }
+    LaunchScripts -ScriptPaths $arr
+    Move-Item -Path output -Destination award\bafta
+
+    $myArray = @(
+        'Logo| logo_resize| Name| out_name| base_color| ww',
+        'BAFTA.png| 1800| WINNERS| winner| #9C7C26| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        for ($i = 1947; $i -lt 2030; $i++) {
+            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
+            $myvar = "$myvar\n$i"
+            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+        }
+    }
+    LaunchScripts -ScriptPaths $arr
+    Move-Item -Path output -Destination award\bafta\winner
+
+    $myArray = @(
+        'Logo| logo_resize| Name| out_name| base_color| ww',
+        'BAFTA.png| 1800| NOMINATIONS| nomination| #9C7C26| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        for ($i = 1947; $i -lt 2030; $i++) {
+            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
+            $myvar = "$myvar\n$i"
+            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+        }
+    }
+    LaunchScripts -ScriptPaths $arr
+    Move-Item -Path output -Destination award\bafta\nomination
+ 
+    $myArray = @(
+        'Logo| logo_resize| Name| out_name| base_color| ww',
+        'BAFTA.png| 1000| BEST PICTURE\nWINNER\n| winner| #9C7C26| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        for ($i = 1947; $i -lt 2030; $i++) {
+            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
+            $myvar = "$myvar\n$i"
+            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+        }
+    }
+    LaunchScripts -ScriptPaths $arr
+    Move-Item -Path output -Destination award\bafta\best
+
+    Copy-Item -Path logos_award -Destination award\logos -Recurse
+    Move-Item -Path output-orig -Destination output
 
     ########################
-    # BAFTA
-    ########################
-    WriteToLogFile "ImageMagick Commands for     : Awards-BAFTA-Winner"
-    for ($i = 1947; $i -lt 2030; $i++) {
-        Convert-Awards $script_path\@base\@zbase-BAFTA.png $script_path\@base\@base-winners.png $i "$script_path\award\bafta\winner"
-    }
-
-    WriteToLogFile "ImageMagick Commands for     : Awards-BAFTA-Nomination"
-    for ($i = 1947; $i -lt 2030; $i++) {
-        Convert-Awards $script_path\@base\@zbase-BAFTA.png $script_path\@base\@base-nomination.png $i "$script_path\award\bafta\nomination"
-    }
-
-    WriteToLogFile "ImageMagick Commands for     : Awards-BAFTA-Best"
-    for ($i = 1947; $i -lt 2030; $i++) {
-        Convert-Awards $script_path\@base\@zbase-BAFTA.png $script_path\@base\@base-best.png $i "$script_path\award\bafta\best"
-    }
-
-    WriteToLogFile "ImageMagick Commands for     : Awards-BAFTA"
-    for ($i = 1947; $i -lt 2030; $i++) {
-        Convert-Awards $script_path\@base\@zbase-BAFTA.png $script_path\@base\@base-$i.png $i "$script_path\award\bafta"
-    }
-
-    WriteToLogFile "ImageMagick Commands for     : Awards-BAFTA-Other"
-    magick $script_path\@base\@zbase-BAFTA.png $script_path\@base\@zbase-winner.png -gravity center -background None -layers Flatten "$script_path\award\bafta\winner.jpg"
-    magick $script_path\@base\@zbase-BAFTA.png $script_path\@base\@zbase-nomination.png -gravity center -background None -layers Flatten "$script_path\award\bafta\nomination.jpg"
-    magick $script_path\@base\@zbase-BAFTA.png $script_path\@base\@zbase-best_picture_winner.png -gravity center -background None -layers Flatten "$script_path\award\bafta\best_picture_winner.jpg"
-    magick $script_path\@base\@zbase-BAFTA.png $script_path\@base\@zbase-best_director_winner.png -gravity center -background None -layers Flatten "$script_path\award\bafta\best_director_winner.jpg"
-    magick $script_path\@base\@zbase-BAFTA.png $script_path\@base\@zbase-BAFTA.png -gravity center -background None -layers Flatten "$script_path\award\bafta\BAFTA.jpg"
-
-    ########################
-    # Berlinale
+    # Berlinale #BB0B34
     ########################
     WriteToLogFile "ImageMagick Commands for     : Awards-Berlinale-Winner"
     for ($i = 1951; $i -lt 2030; $i++) {
@@ -931,7 +1051,7 @@ Function CreateAwards {
     magick $script_path\@base\@zbase-Berlinale.png $script_path\@base\@zbase-Berlinale.png -gravity center -background None -layers Flatten "$script_path\award\Berlinale\Berlinale.jpg"
 
     ########################
-    # Cannes
+    # Cannes #AF8F51
     ########################
     WriteToLogFile "ImageMagick Commands for     : Awards-Cannes-Winner"
     for ($i = 1938; $i -lt 2030; $i++) {
@@ -961,7 +1081,7 @@ Function CreateAwards {
     magick $script_path\@base\@zbase-Cannes.png $script_path\@base\@zbase-Cannes.png -gravity center -background None -layers Flatten "$script_path\award\Cannes\Cannes.jpg"
 
     ########################
-    # Cesar
+    # Cesar #E2A845
     ########################
     WriteToLogFile "ImageMagick Commands for     : Awards-Cesar-Winner"
     for ($i = 1976; $i -lt 2030; $i++) {
@@ -991,7 +1111,7 @@ Function CreateAwards {
     magick $script_path\@base\@zbase-Cesar.png $script_path\@base\@zbase-Cesar.png -gravity center -background None -layers Flatten "$script_path\award\Cesar\Cesar.jpg"
 
     ########################
-    # Emmys
+    # Emmys #D89C27
     ########################
     WriteToLogFile "ImageMagick Commands for     : Awards-Emmys-Winner"
     for ($i = 1947; $i -lt 2030; $i++) {
@@ -1021,7 +1141,7 @@ Function CreateAwards {
     magick $script_path\@base\@zbase-Emmys.png $script_path\@base\@zbase-Emmys.png -gravity center -background None -layers Flatten "$script_path\award\Emmys\Emmys.jpg"
 
     ########################
-    # Golden
+    # Golden #D0A047
     ########################
     WriteToLogFile "ImageMagick Commands for     : Awards-Golden-Winner"
     for ($i = 1943; $i -lt 2030; $i++) {
@@ -1051,7 +1171,7 @@ Function CreateAwards {
     magick $script_path\@base\@zbase-Golden.png $script_path\@base\@zbase-Golden.png -gravity center -background None -layers Flatten "$script_path\award\Golden\Golden.jpg"
 
     ########################
-    # Oscars
+    # Oscars #A9842E
     ########################
     WriteToLogFile "ImageMagick Commands for     : Awards-Oscars-Winner"
     for ($i = 1927; $i -lt 2030; $i++) {
@@ -1081,7 +1201,7 @@ Function CreateAwards {
     magick $script_path\@base\@zbase-Oscars.png $script_path\@base\@zbase-Oscars.png -gravity center -background None -layers Flatten "$script_path\award\Oscars\Oscars.jpg"
 
     ########################
-    # Sundance
+    # Sundance #7EB2CF
     ########################
     WriteToLogFile "ImageMagick Commands for     : Awards-Sundance-Winner"
     for ($i = 1978; $i -lt 2030; $i++) {
@@ -1112,7 +1232,7 @@ Function CreateAwards {
     magick $script_path\@base\@zbase-Sundance.png $script_path\@base\@zbase-Sundance.png -gravity center -background None -layers Flatten "$script_path\award\Sundance\Sundance.jpg"
 
     ########################
-    # Venice
+    # Venice #D21635
     ########################
     WriteToLogFile "ImageMagick Commands for     : Awards-Venice-Winner"
     for ($i = 1932; $i -lt 2030; $i++) {
@@ -1142,7 +1262,7 @@ Function CreateAwards {
     magick $script_path\@base\@zbase-Venice.png $script_path\@base\@zbase-Venice.png -gravity center -background None -layers Flatten "$script_path\award\Venice\Venice.jpg"
 
     ########################
-    # Choice
+    # Choice #AC7427
     ########################
     WriteToLogFile "ImageMagick Commands for     : Awards-Choice-Winner"
     for ($i = 1929; $i -lt 2030; $i++) {
@@ -1172,7 +1292,7 @@ Function CreateAwards {
     magick $script_path\@base\@zbase-Choice.png $script_path\@base\@zbase-Choice.png -gravity center -background None -layers Flatten "$script_path\award\Choice\Choice.jpg"
 
     ########################
-    # Spirit
+    # Spirit #4662E7
     ########################
     WriteToLogFile "ImageMagick Commands for     : Awards-Spirit-Winner"
     for ($i = 1986; $i -lt 2030; $i++) {
@@ -1327,7 +1447,7 @@ Function CreateChart {
         # write-host $($item.base_color)
         $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
         $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_chart\$($item.Logo)`" -logo_offset -500 -logo_resize $theMaxWidth -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_chart\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
     }
     LaunchScripts -ScriptPaths $arr
 
