@@ -750,6 +750,7 @@ Function CreateAudioLanguage {
 Function CreateAwards {
     Write-Host "Creating Awards"
     Set-Location $script_path
+    Find-Path "$script_path\award"
     WriteToLogFile "ImageMagick Commands for     : Awards"
     $theFont = "ComfortAa-Medium"
     $theMaxWidth = 1800
@@ -762,7 +763,7 @@ Function CreateAwards {
     # ########################
     # # Razzie #FF0C0C
     # ########################
-    WriteToLogFile "ImageMagick Commands for     : BAFTA"
+    WriteToLogFile "ImageMagick Commands for     : Razzie"
     $myArray = @(
         'Logo| logo_resize| Name| out_name| base_color| ww',
         'Razzie.png| 1000| WINNERS| winner| #FF0C0C| 1',
