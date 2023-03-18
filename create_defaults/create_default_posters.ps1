@@ -155,11 +155,11 @@ Function Compare-FileChecksum {
 # Function: Get-TranslationFile
 # Description: gets the language yml file from github
 ################################################################################
-function Get-TranslationFile {
+Function Get-TranslationFile {
     param(
         [string]$LanguageCode
     )
-  
+
     $GitHubRepository = "https://raw.githubusercontent.com/meisnate12/Plex-Meta-Manager/master/defaults/translations"
     $TranslationFile = "$LanguageCode.yml"
     $TranslationFileUrl = "$GitHubRepository/$TranslationFile"
@@ -167,14 +167,14 @@ function Get-TranslationFile {
     $TranslationFilePath = Join-Path $TranslationsPath $TranslationFile
 
     Find-Path $TranslationsPath
-  
+
     try {
         $response = Invoke-WebRequest -Uri $TranslationFileUrl -Method Head
         if ($response.StatusCode -eq 404) {
             Write-Error "Error: Translation file not found."
             return
         }
-  
+
         Invoke-WebRequest -Uri $TranslationFileUrl -OutFile $TranslationFilePath
         if ((Get-Content $TranslationFilePath).Length -eq 0) {
             throw "Error: Translation file is empty."
@@ -729,9 +729,6 @@ Function CreateAudioLanguage {
     
     $arr = @()
     foreach ($item in $myArray) {
-        # write-host $($item.Name)
-        # write-host $($item.out_name)
-        # write-host $($item.base_color)
         $myvar = Set-TextBetweenDelimiters -InputString $myvar1 -ReplacementString (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
         $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
         $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$myvar`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
@@ -760,105 +757,9 @@ Function CreateAwards {
 
     Move-Item -Path output -Destination output-orig
 
-    # ########################
-    # # Razzie #FF0C0C
-    # ########################
-    WriteToLogFile "ImageMagick Commands for     : Razzie"
-    $myArray = @(
-        'Logo| logo_resize| Name| out_name| base_color| ww',
-        'Razzie.png| 1000| WINNERS| winner| #FF0C0C| 1',
-        'Razzie.png| 1000| NOMINATIONS| nomination| #FF0C0C| 1',
-        'Razzie.png| 1000| BEST DIRECTOR\WINNERS\n| best_director_winner| #FF0C0C| 1',
-        'Razzie.png| 1000| BEST PICTURE\nWINNERs\n| best_picture_winner| #FF0C0C| 1',
-        'Razzie.png| 1000| | Razzie| #FF0C0C| 1'
-    ) | ConvertFrom-Csv -Delimiter '|'
-
-    $arr = @()
-    foreach ($item in $myArray) {
-        # write-host $($item.Name)
-        # write-host $($item.out_name)
-        # write-host $($item.base_color)
-        if ($($item.Name).ToString() -eq "") {
-            $myvar = $null
-        }
-        else {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-        }
-        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
-    }
-    LaunchScripts -ScriptPaths $arr
-
-    $myArray = @(
-        'Logo| logo_resize| Name| out_name| base_color| ww',
-        'Razzie.png| 1000| WINNERS| winner| #FF0C0C| 1'
-    ) | ConvertFrom-Csv -Delimiter '|'
-
-    $arr = @()
-    foreach ($item in $myArray) {
-        for ($i = 1980; $i -lt 2030; $i++) {
-            $myvar = $i
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
-        }
-    }
-    LaunchScripts -ScriptPaths $arr
-    Move-Item -Path output -Destination award\razzies
-
-    $myArray = @(
-        'Logo| logo_resize| Name| out_name| base_color| ww',
-        'Razzie.png| 1000| WINNERS| winner| #FF0C0C| 1'
-    ) | ConvertFrom-Csv -Delimiter '|'
-
-    $arr = @()
-    foreach ($item in $myArray) {
-        for ($i = 1980; $i -lt 2030; $i++) {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-            $myvar = "$myvar\n$i"
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
-        }
-    }
-    LaunchScripts -ScriptPaths $arr
-    Move-Item -Path output -Destination award\razzies\winner
-
-    $myArray = @(
-        'Logo| logo_resize| Name| out_name| base_color| ww',
-        'Razzie.png| 1000| NOMINATIONS| nomination| #FF0C0C| 1'
-    ) | ConvertFrom-Csv -Delimiter '|'
-
-    $arr = @()
-    foreach ($item in $myArray) {
-        for ($i = 1980; $i -lt 2030; $i++) {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-            $myvar = "$myvar\n$i"
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
-        }
-    }
-    LaunchScripts -ScriptPaths $arr
-    Move-Item -Path output -Destination award\razzies\nomination
- 
-    # $myArray = @(
-    #     'Logo| logo_resize| Name| out_name| base_color| ww',
-    #     'Razzie.png| 1000| BEST PICTURE\nWINNER\n| winner| #FF0C0C| 1'
-    # ) | ConvertFrom-Csv -Delimiter '|'
-
-    # $arr = @()
-    # foreach ($item in $myArray) {
-    #     for ($i = 1980; $i -lt 2030; $i++) {
-    #         $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-    #         $myvar = "$myvar\n$i"
-    #         $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-    #         $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
-    #     }
-    # }
-    # LaunchScripts -ScriptPaths $arr
-    # Move-Item -Path output -Destination award\razzies\best
-
-    # ########################
-    # # BAFTA #9C7C26
-    # ########################
+    ########################
+    # BAFTA #9C7C26
+    ########################
     WriteToLogFile "ImageMagick Commands for     : BAFTA"
     $myArray = @(
         'Logo| logo_resize| Name| out_name| base_color| ww',
@@ -871,9 +772,6 @@ Function CreateAwards {
 
     $arr = @()
     foreach ($item in $myArray) {
-        # write-host $($item.Name)
-        # write-host $($item.out_name)
-        # write-host $($item.base_color)
         if ($($item.Name).ToString() -eq "") {
             $myvar = $null
         }
@@ -935,22 +833,22 @@ Function CreateAwards {
     LaunchScripts -ScriptPaths $arr
     Move-Item -Path output -Destination award\bafta\nomination
  
-    # $myArray = @(
-    #     'Logo| logo_resize| Name| out_name| base_color| ww',
-    #     'BAFTA.png| 1800| BEST PICTURE\nWINNER\n| winner| #9C7C26| 1'
-    # ) | ConvertFrom-Csv -Delimiter '|'
+    $myArray = @(
+        'Logo| logo_resize| Name| out_name| base_color| ww',
+        'BAFTA.png| 1800| BEST PICTURE\nWINNER\n| winner| #9C7C26| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
 
-    # $arr = @()
-    # foreach ($item in $myArray) {
-    #     for ($i = 1947; $i -lt 2030; $i++) {
-    #         $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-    #         $myvar = "$myvar\n$i"
-    #         $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-    #         $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
-    #     }
-    # }
-    # LaunchScripts -ScriptPaths $arr
-    # Move-Item -Path output -Destination award\bafta\best
+    $arr = @()
+    foreach ($item in $myArray) {
+        for ($i = 1947; $i -lt 2030; $i++) {
+            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
+            $myvar = "$myvar\n$i"
+            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+        }
+    }
+    LaunchScripts -ScriptPaths $arr
+    Move-Item -Path output -Destination award\bafta\best
 
     # ########################
     # # Berlinale #BB0B34
@@ -967,9 +865,6 @@ Function CreateAwards {
 
     $arr = @()
     foreach ($item in $myArray) {
-        # write-host $($item.Name)
-        # write-host $($item.out_name)
-        # write-host $($item.base_color)
         if ($($item.Name).ToString() -eq "") {
             $myvar = $null
         }
@@ -988,7 +883,7 @@ Function CreateAwards {
 
     $arr = @()
     foreach ($item in $myArray) {
-        for ($i = 1947; $i -lt 2030; $i++) {
+        for ($i = 1951; $i -lt 2030; $i++) {
             $myvar = $i
             $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
             $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
@@ -1004,7 +899,7 @@ Function CreateAwards {
 
     $arr = @()
     foreach ($item in $myArray) {
-        for ($i = 1947; $i -lt 2030; $i++) {
+        for ($i = 1951; $i -lt 2030; $i++) {
             $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
             $myvar = "$myvar\n$i"
             $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
@@ -1021,7 +916,7 @@ Function CreateAwards {
 
     $arr = @()
     foreach ($item in $myArray) {
-        for ($i = 1947; $i -lt 2030; $i++) {
+        for ($i = 1951; $i -lt 2030; $i++) {
             $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
             $myvar = "$myvar\n$i"
             $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
@@ -1038,7 +933,7 @@ Function CreateAwards {
 
     $arr = @()
     foreach ($item in $myArray) {
-        for ($i = 1947; $i -lt 2030; $i++) {
+        for ($i = 1951; $i -lt 2030; $i++) {
             $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
             $myvar = "$myvar\n$i"
             $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
@@ -1047,32 +942,6 @@ Function CreateAwards {
     }
     LaunchScripts -ScriptPaths $arr
     Move-Item -Path output -Destination award\berlinale\best
-
-    # for ($i = 1951; $i -lt 2030; $i++) {
-    #     Convert-Awards $script_path\@base\@zbase-Berlinale.png $script_path\@base\@base-winners.png $i "$script_path\award\berlinale\winner"
-    # }
-
-    # WriteToLogFile "ImageMagick Commands for     : Awards-Berlinale-Nomination"
-    # for ($i = 1951; $i -lt 2030; $i++) {
-    #     Convert-Awards $script_path\@base\@zbase-Berlinale.png $script_path\@base\@base-nomination.png $i "$script_path\award\berlinale\nomination"
-    # }
-
-    # WriteToLogFile "ImageMagick Commands for     : Awards-Berlinale-Best"
-    # for ($i = 1951; $i -lt 2030; $i++) {
-    #     Convert-Awards $script_path\@base\@zbase-Berlinale.png $script_path\@base\@base-best.png $i "$script_path\award\berlinale\best"
-    # }
-
-    # WriteToLogFile "ImageMagick Commands for     : Awards-Berlinale"
-    # for ($i = 1951; $i -lt 2030; $i++) {
-    #     Convert-Awards $script_path\@base\@zbase-Berlinale.png $script_path\@base\@base-$i.png $i "$script_path\award\berlinale"
-    # }
-
-    # WriteToLogFile "ImageMagick Commands for     : Awards-Berlinale-Other"
-    # magick $script_path\@base\@zbase-Berlinale.png $script_path\@base\@zbase-winner.png -gravity center -background None -layers Flatten "$script_path\award\berlinale\winner.jpg"
-    # magick $script_path\@base\@zbase-Berlinale.png $script_path\@base\@zbase-nomination.png -gravity center -background None -layers Flatten "$script_path\award\berlinale\nomination.jpg"
-    # magick $script_path\@base\@zbase-Berlinale.png $script_path\@base\@zbase-best_picture_winner.png -gravity center -background None -layers Flatten "$script_path\award\berlinale\best_picture_winner.jpg"
-    # magick $script_path\@base\@zbase-Berlinale.png $script_path\@base\@zbase-best_director_winner.png -gravity center -background None -layers Flatten "$script_path\award\berlinale\best_director_winner.jpg"
-    # magick $script_path\@base\@zbase-Berlinale.png $script_path\@base\@zbase-Berlinale.png -gravity center -background None -layers Flatten "$script_path\award\berlinale\Berlinale.jpg"
 
     ########################
     # Cannes #AF8F51
@@ -1089,9 +958,6 @@ Function CreateAwards {
 
     $arr = @()
     foreach ($item in $myArray) {
-        # write-host $($item.Name)
-        # write-host $($item.out_name)
-        # write-host $($item.base_color)
         if ($($item.Name).ToString() -eq "") {
             $myvar = $null
         }
@@ -1170,32 +1036,6 @@ Function CreateAwards {
     LaunchScripts -ScriptPaths $arr
     Move-Item -Path output -Destination award\cannes\best
 
-    # for ($i = 1938; $i -lt 2030; $i++) {
-    #     Convert-Awards $script_path\@base\@zbase-Cannes.png $script_path\@base\@base-winners.png $i "$script_path\award\Cannes\winner"
-    # }
-
-    # WriteToLogFile "ImageMagick Commands for     : Awards-Cannes-Nomination"
-    # for ($i = 1938; $i -lt 2030; $i++) {
-    #     Convert-Awards $script_path\@base\@zbase-Cannes.png $script_path\@base\@base-nomination.png $i "$script_path\award\Cannes\nomination"
-    # }
-
-    # WriteToLogFile "ImageMagick Commands for     : Awards-Cannes-Best"
-    # for ($i = 1938; $i -lt 2030; $i++) {
-    #     Convert-Awards $script_path\@base\@zbase-Cannes.png $script_path\@base\@base-best.png $i "$script_path\award\Cannes\best"
-    # }
-
-    # WriteToLogFile "ImageMagick Commands for     : Awards-Cannes"
-    # for ($i = 1938; $i -lt 2030; $i++) {
-    #     Convert-Awards $script_path\@base\@zbase-Cannes.png $script_path\@base\@base-$i.png $i "$script_path\award\Cannes"
-    # }
-
-    # WriteToLogFile "ImageMagick Commands for     : Awards-Cannes-Other"
-    # magick $script_path\@base\@zbase-Cannes.png $script_path\@base\@zbase-winner.png -gravity center -background None -layers Flatten "$script_path\award\Cannes\winner.jpg"
-    # magick $script_path\@base\@zbase-Cannes.png $script_path\@base\@zbase-nomination.png -gravity center -background None -layers Flatten "$script_path\award\Cannes\nomination.jpg"
-    # magick $script_path\@base\@zbase-Cannes.png $script_path\@base\@zbase-best_picture_winner.png -gravity center -background None -layers Flatten "$script_path\award\Cannes\best_picture_winner.jpg"
-    # magick $script_path\@base\@zbase-Cannes.png $script_path\@base\@zbase-best_director_winner.png -gravity center -background None -layers Flatten "$script_path\award\Cannes\best_director_winner.jpg"
-    # magick $script_path\@base\@zbase-Cannes.png $script_path\@base\@zbase-Cannes.png -gravity center -background None -layers Flatten "$script_path\award\Cannes\Cannes.jpg"
-
     ########################
     # Cesar #E2A845
     ########################
@@ -1211,9 +1051,6 @@ Function CreateAwards {
 
     $arr = @()
     foreach ($item in $myArray) {
-        # write-host $($item.Name)
-        # write-host $($item.out_name)
-        # write-host $($item.base_color)
         if ($($item.Name).ToString() -eq "") {
             $myvar = $null
         }
@@ -1292,645 +1129,6 @@ Function CreateAwards {
     LaunchScripts -ScriptPaths $arr
     Move-Item -Path output -Destination award\cesar\best
 
-    # for ($i = 1976; $i -lt 2030; $i++) {
-    #     Convert-Awards $script_path\@base\@zbase-Cesar.png $script_path\@base\@base-winners.png $i "$script_path\award\Cesar\winner"
-    # }
-
-    # WriteToLogFile "ImageMagick Commands for     : Awards-Cesar-Nomination"
-    # for ($i = 1976; $i -lt 2030; $i++) {
-    #     Convert-Awards $script_path\@base\@zbase-Cesar.png $script_path\@base\@base-nomination.png $i "$script_path\award\Cesar\nomination"
-    # }
-
-    # WriteToLogFile "ImageMagick Commands for     : Awards-Cesar-Best"
-    # for ($i = 1976; $i -lt 2030; $i++) {
-    #     Convert-Awards $script_path\@base\@zbase-Cesar.png $script_path\@base\@base-best.png $i "$script_path\award\Cesar\best"
-    # }
-
-    # WriteToLogFile "ImageMagick Commands for     : Awards-Cesar"
-    # for ($i = 1976; $i -lt 2030; $i++) {
-    #     Convert-Awards $script_path\@base\@zbase-Cesar.png $script_path\@base\@base-$i.png $i "$script_path\award\Cesar"
-    # }
-
-    # WriteToLogFile "ImageMagick Commands for     : Awards-Cesar-Other"
-    # magick $script_path\@base\@zbase-Cesar.png $script_path\@base\@zbase-winner.png -gravity center -background None -layers Flatten "$script_path\award\Cesar\winner.jpg"
-    # magick $script_path\@base\@zbase-Cesar.png $script_path\@base\@zbase-nomination.png -gravity center -background None -layers Flatten "$script_path\award\Cesar\nomination.jpg"
-    # magick $script_path\@base\@zbase-Cesar.png $script_path\@base\@zbase-best_picture_winner.png -gravity center -background None -layers Flatten "$script_path\award\Cesar\best_picture_winner.jpg"
-    # magick $script_path\@base\@zbase-Cesar.png $script_path\@base\@zbase-best_director_winner.png -gravity center -background None -layers Flatten "$script_path\award\Cesar\best_director_winner.jpg"
-    # magick $script_path\@base\@zbase-Cesar.png $script_path\@base\@zbase-Cesar.png -gravity center -background None -layers Flatten "$script_path\award\Cesar\Cesar.jpg"
-
-    ########################
-    # Emmys #D89C27
-    ########################
-    WriteToLogFile "ImageMagick Commands for     : Awards-Emmys-Winner"
-    $myArray = @(
-        'Logo| logo_resize| Name| out_name| base_color| ww',
-        'Emmys.png| 1500| WINNERS| winner| #D89C27| 1',
-        'Emmys.png| 1500| NOMINATIONS| nomination| #D89C27| 1'
-        'Emmys.png| 1500| BEST DIRECTOR\WINNERS\n| best_director_winner| #D89C27| 1',
-        'Emmys.png| 1500| BEST PICTURE\nWINNERs\n| best_picture_winner| #D89C27| 1',
-        'Emmys.png| 1500| | Emmys| #D89C27| 1'
-    ) | ConvertFrom-Csv -Delimiter '|'
-
-    $arr = @()
-    foreach ($item in $myArray) {
-        # write-host $($item.Name)
-        # write-host $($item.out_name)
-        # write-host $($item.base_color)
-        if ($($item.Name).ToString() -eq "") {
-            $myvar = $null
-        }
-        else {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-        }
-        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
-    }
-    LaunchScripts -ScriptPaths $arr
-    
-    $myArray = @(
-        'Logo| logo_resize| Name| out_name| base_color| ww',
-        'Emmys.png| 1500| WINNERS| winner| #D89C27| 1'
-    ) | ConvertFrom-Csv -Delimiter '|'
-
-    $arr = @()
-    foreach ($item in $myArray) {
-        for ($i = 1947; $i -lt 2030; $i++) {
-            $myvar = $i
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
-        }
-    }
-    LaunchScripts -ScriptPaths $arr
-    Move-Item -Path output -Destination award\emmys
-
-    $myArray = @(
-        'Logo| logo_resize| Name| out_name| base_color| ww',
-        'Emmys.png| 1500| WINNERS| winner| #D89C27| 1'
-    ) | ConvertFrom-Csv -Delimiter '|'
-
-    $arr = @()
-    foreach ($item in $myArray) {
-        for ($i = 1947; $i -lt 2030; $i++) {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-            $myvar = "$myvar\n$i"
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
-        }
-    }
-    LaunchScripts -ScriptPaths $arr
-    Move-Item -Path output -Destination award\emmys\winner
-
-    $myArray = @(
-        'Logo| logo_resize| Name| out_name| base_color| ww',
-        'Emmys.png| 1500| NOMINATIONS| nomination| #D89C27| 1'
-    ) | ConvertFrom-Csv -Delimiter '|'
-
-    $arr = @()
-    foreach ($item in $myArray) {
-        for ($i = 1947; $i -lt 2030; $i++) {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-            $myvar = "$myvar\n$i"
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
-        }
-    }
-    LaunchScripts -ScriptPaths $arr
-    Move-Item -Path output -Destination award\emmys\nomination
- 
-    $myArray = @(
-        'Logo| logo_resize| Name| out_name| base_color| ww',
-        'Emmys.png| 1500| BEST PICTURE\nWINNER\n| winner| #D89C27| 1'
-    ) | ConvertFrom-Csv -Delimiter '|'
-
-    $arr = @()
-    foreach ($item in $myArray) {
-        for ($i = 1947; $i -lt 2030; $i++) {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-            $myvar = "$myvar\n$i"
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
-        }
-    }
-    LaunchScripts -ScriptPaths $arr
-    Move-Item -Path output -Destination award\emmys\best
-
-    # for ($i = 1947; $i -lt 2030; $i++) {
-    #     Convert-Awards $script_path\@base\@zbase-Emmys.png $script_path\@base\@base-winners.png $i "$script_path\award\Emmys\winner"
-    # }
-
-    # WriteToLogFile "ImageMagick Commands for     : Awards-Emmys-Nomination"
-    # for ($i = 1947; $i -lt 2030; $i++) {
-    #     Convert-Awards $script_path\@base\@zbase-Emmys.png $script_path\@base\@base-nomination.png $i "$script_path\award\Emmys\nomination"
-    # }
-
-    # WriteToLogFile "ImageMagick Commands for     : Awards-Emmys-Best"
-    # for ($i = 1947; $i -lt 2030; $i++) {
-    #     Convert-Awards $script_path\@base\@zbase-Emmys.png $script_path\@base\@base-best.png $i "$script_path\award\Emmys\best"
-    # }
-
-    # WriteToLogFile "ImageMagick Commands for     : Awards-Emmys"
-    # for ($i = 1947; $i -lt 2030; $i++) {
-    #     Convert-Awards $script_path\@base\@zbase-Emmys.png $script_path\@base\@base-$i.png $i "$script_path\award\Emmys"
-    # }
-
-    # WriteToLogFile "ImageMagick Commands for     : Awards-Emmys-Other"
-    # magick $script_path\@base\@zbase-Emmys.png $script_path\@base\@zbase-winner.png -gravity center -background None -layers Flatten "$script_path\award\Emmys\winner.jpg"
-    # magick $script_path\@base\@zbase-Emmys.png $script_path\@base\@zbase-nomination.png -gravity center -background None -layers Flatten "$script_path\award\Emmys\nomination.jpg"
-    # magick $script_path\@base\@zbase-Emmys.png $script_path\@base\@zbase-best_picture_winner.png -gravity center -background None -layers Flatten "$script_path\award\Emmys\best_picture_winner.jpg"
-    # magick $script_path\@base\@zbase-Emmys.png $script_path\@base\@zbase-best_director_winner.png -gravity center -background None -layers Flatten "$script_path\award\Emmys\best_director_winner.jpg"
-    # magick $script_path\@base\@zbase-Emmys.png $script_path\@base\@zbase-Emmys.png -gravity center -background None -layers Flatten "$script_path\award\Emmys\Emmys.jpg"
-
-    ########################
-    # Golden #D0A047
-    ########################
-    WriteToLogFile "ImageMagick Commands for     : Golden"
-    $myArray = @(
-        'Logo| logo_resize| Name| out_name| base_color| ww',
-        'Golden.png| 1500| WINNERS| winner| #D0A047| 1',
-        'Golden.png| 1500| NOMINATIONS| nomination| #D0A047| 1'
-        'Golden.png| 1500| BEST DIRECTOR\WINNERS\n| best_director_winner| #D0A047| 1',
-        'Golden.png| 1500| BEST PICTURE\nWINNERs\n| best_picture_winner| #D0A047| 1',
-        'Golden.png| 1500| | Golden| #D0A047| 1'
-    ) | ConvertFrom-Csv -Delimiter '|'
-
-    $arr = @()
-    foreach ($item in $myArray) {
-        # write-host $($item.Name)
-        # write-host $($item.out_name)
-        # write-host $($item.base_color)
-        if ($($item.Name).ToString() -eq "") {
-            $myvar = $null
-        }
-        else {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-        }
-        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
-    }
-    LaunchScripts -ScriptPaths $arr
-    
-    $myArray = @(
-        'Logo| logo_resize| Name| out_name| base_color| ww',
-        'Golden.png| 1500| WINNERS| winner| #D0A047| 1'
-    ) | ConvertFrom-Csv -Delimiter '|'
-
-    $arr = @()
-    foreach ($item in $myArray) {
-        for ($i = 1943; $i -lt 2030; $i++) {
-            $myvar = $i
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
-        }
-    }
-    LaunchScripts -ScriptPaths $arr
-    Move-Item -Path output -Destination award\golden
-
-    $myArray = @(
-        'Logo| logo_resize| Name| out_name| base_color| ww',
-        'Golden.png| 1500| WINNERS| winner| #D0A047| 1'
-    ) | ConvertFrom-Csv -Delimiter '|'
-
-    $arr = @()
-    foreach ($item in $myArray) {
-        for ($i = 1943; $i -lt 2030; $i++) {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-            $myvar = "$myvar\n$i"
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
-        }
-    }
-    LaunchScripts -ScriptPaths $arr
-    Move-Item -Path output -Destination award\golden\winner
-
-    $myArray = @(
-        'Logo| logo_resize| Name| out_name| base_color| ww',
-        'Golden.png| 1500| NOMINATIONS| nomination| #D0A047| 1'
-    ) | ConvertFrom-Csv -Delimiter '|'
-
-    $arr = @()
-    foreach ($item in $myArray) {
-        for ($i = 1943; $i -lt 2030; $i++) {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-            $myvar = "$myvar\n$i"
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
-        }
-    }
-    LaunchScripts -ScriptPaths $arr
-    Move-Item -Path output -Destination award\golden\nomination
- 
-    $myArray = @(
-        'Logo| logo_resize| Name| out_name| base_color| ww',
-        'Golden.png| 1500| BEST PICTURE\nWINNER\n| winner| #D0A047| 1'
-    ) | ConvertFrom-Csv -Delimiter '|'
-
-    $arr = @()
-    foreach ($item in $myArray) {
-        for ($i = 1943; $i -lt 2030; $i++) {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-            $myvar = "$myvar\n$i"
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
-        }
-    }
-    LaunchScripts -ScriptPaths $arr
-    Move-Item -Path output -Destination award\golden\best
-
-    # for ($i = 1943; $i -lt 2030; $i++) {
-    #     Convert-Awards $script_path\@base\@zbase-Golden.png $script_path\@base\@base-winners.png $i "$script_path\award\Golden\winner"
-    # }
-
-    # WriteToLogFile "ImageMagick Commands for     : Awards-Golden-Nomination"
-    # for ($i = 1943; $i -lt 2030; $i++) {
-    #     Convert-Awards $script_path\@base\@zbase-Golden.png $script_path\@base\@base-nomination.png $i "$script_path\award\Golden\nomination"
-    # }
-
-    # WriteToLogFile "ImageMagick Commands for     : Awards-Golden-Best"
-    # for ($i = 1943; $i -lt 2030; $i++) {
-    #     Convert-Awards $script_path\@base\@zbase-Golden.png $script_path\@base\@base-best.png $i "$script_path\award\Golden\best"
-    # }
-
-    # WriteToLogFile "ImageMagick Commands for     : Awards-Golden"
-    # for ($i = 1943; $i -lt 2030; $i++) {
-    #     Convert-Awards $script_path\@base\@zbase-Golden.png $script_path\@base\@base-$i.png $i "$script_path\award\Golden"
-    # }
-
-    # WriteToLogFile "ImageMagick Commands for     : Awards-Golden-Other"
-    # magick $script_path\@base\@zbase-Golden.png $script_path\@base\@zbase-winner.png -gravity center -background None -layers Flatten "$script_path\award\Golden\winner.jpg"
-    # magick $script_path\@base\@zbase-Golden.png $script_path\@base\@zbase-nomination.png -gravity center -background None -layers Flatten "$script_path\award\Golden\nomination.jpg"
-    # magick $script_path\@base\@zbase-Golden.png $script_path\@base\@zbase-best_picture_winner.png -gravity center -background None -layers Flatten "$script_path\award\Golden\best_picture_winner.jpg"
-    # magick $script_path\@base\@zbase-Golden.png $script_path\@base\@zbase-best_director_winner.png -gravity center -background None -layers Flatten "$script_path\award\Golden\best_director_winner.jpg"
-    # magick $script_path\@base\@zbase-Golden.png $script_path\@base\@zbase-Golden.png -gravity center -background None -layers Flatten "$script_path\award\Golden\Golden.jpg"
-
-    ########################
-    # Oscars #A9842E
-    ########################
-    WriteToLogFile "ImageMagick Commands for     : Oscars"
-    $myArray = @(
-        'Logo| logo_resize| Name| out_name| base_color| ww',
-        'Oscars.png| 1500| WINNERS| winner| #A9842E| 1',
-        'Oscars.png| 1500| NOMINATIONS| nomination| #A9842E| 1'
-        'Oscars.png| 1500| BEST DIRECTOR\WINNERS\n| best_director_winner| #A9842E| 1',
-        'Oscars.png| 1500| BEST PICTURE\nWINNERs\n| best_picture_winner| #A9842E| 1',
-        'Oscars.png| 1500| | Oscars| #A9842E| 1'
-    ) | ConvertFrom-Csv -Delimiter '|'
-
-    $arr = @()
-    foreach ($item in $myArray) {
-        # write-host $($item.Name)
-        # write-host $($item.out_name)
-        # write-host $($item.base_color)
-        if ($($item.Name).ToString() -eq "") {
-            $myvar = $null
-        }
-        else {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-        }
-        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
-    }
-    LaunchScripts -ScriptPaths $arr
-    
-    $myArray = @(
-        'Logo| logo_resize| Name| out_name| base_color| ww',
-        'Oscars.png| 1500| WINNERS| winner| #A9842E| 1'
-    ) | ConvertFrom-Csv -Delimiter '|'
-
-    $arr = @()
-    foreach ($item in $myArray) {
-        for ($i = 1927; $i -lt 2030; $i++) {
-            $myvar = $i
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
-        }
-    }
-    LaunchScripts -ScriptPaths $arr
-    Move-Item -Path output -Destination award\oscars
-
-    $myArray = @(
-        'Logo| logo_resize| Name| out_name| base_color| ww',
-        'Oscars.png| 1500| WINNERS| winner| #A9842E| 1'
-    ) | ConvertFrom-Csv -Delimiter '|'
-
-    $arr = @()
-    foreach ($item in $myArray) {
-        for ($i = 1927; $i -lt 2030; $i++) {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-            $myvar = "$myvar\n$i"
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
-        }
-    }
-    LaunchScripts -ScriptPaths $arr
-    Move-Item -Path output -Destination award\oscars\winner
-
-    $myArray = @(
-        'Logo| logo_resize| Name| out_name| base_color| ww',
-        'Oscars.png| 1500| NOMINATIONS| nomination| #A9842E| 1'
-    ) | ConvertFrom-Csv -Delimiter '|'
-
-    $arr = @()
-    foreach ($item in $myArray) {
-        for ($i = 1927; $i -lt 2030; $i++) {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-            $myvar = "$myvar\n$i"
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
-        }
-    }
-    LaunchScripts -ScriptPaths $arr
-    Move-Item -Path output -Destination award\oscars\nomination
- 
-    $myArray = @(
-        'Logo| logo_resize| Name| out_name| base_color| ww',
-        'Oscars.png| 1500| BEST PICTURE\nWINNER\n| winner| #A9842E| 1'
-    ) | ConvertFrom-Csv -Delimiter '|'
-
-    $arr = @()
-    foreach ($item in $myArray) {
-        for ($i = 1927; $i -lt 2030; $i++) {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-            $myvar = "$myvar\n$i"
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
-        }
-    }
-    LaunchScripts -ScriptPaths $arr
-    Move-Item -Path output -Destination award\oscars\best
-
-    # for ($i = 1927; $i -lt 2030; $i++) {
-    #     Convert-Awards $script_path\@base\@zbase-Oscars.png $script_path\@base\@base-winners.png $i "$script_path\award\Oscars\winner"
-    # }
-
-    # WriteToLogFile "ImageMagick Commands for     : Awards-Oscars-Nomination"
-    # for ($i = 1927; $i -lt 2030; $i++) {
-    #     Convert-Awards $script_path\@base\@zbase-Oscars.png $script_path\@base\@base-nomination.png $i "$script_path\award\Oscars\nomination"
-    # }
-
-    # WriteToLogFile "ImageMagick Commands for     : Awards-Oscars-Best"
-    # for ($i = 1927; $i -lt 2030; $i++) {
-    #     Convert-Awards $script_path\@base\@zbase-Oscars.png $script_path\@base\@base-best.png $i "$script_path\award\Oscars\best"
-    # }
-
-    # WriteToLogFile "ImageMagick Commands for     : Awards-Oscars"
-    # for ($i = 1927; $i -lt 2030; $i++) {
-    #     Convert-Awards $script_path\@base\@zbase-Oscars.png $script_path\@base\@base-$i.png $i "$script_path\award\Oscars"
-    # }
-
-    # WriteToLogFile "ImageMagick Commands for     : Awards-Oscars-Other"
-    # magick $script_path\@base\@zbase-Oscars.png $script_path\@base\@zbase-winner.png -gravity center -background None -layers Flatten "$script_path\award\Oscars\winner.jpg"
-    # magick $script_path\@base\@zbase-Oscars.png $script_path\@base\@zbase-nomination.png -gravity center -background None -layers Flatten "$script_path\award\Oscars\nomination.jpg"
-    # magick $script_path\@base\@zbase-Oscars.png $script_path\@base\@zbase-best_picture_winner.png -gravity center -background None -layers Flatten "$script_path\award\Oscars\best_picture_winner.jpg"
-    # magick $script_path\@base\@zbase-Oscars.png $script_path\@base\@zbase-best_director_winner.png -gravity center -background None -layers Flatten "$script_path\award\Oscars\best_director_winner.jpg"
-    # magick $script_path\@base\@zbase-Oscars.png $script_path\@base\@zbase-Oscars.png -gravity center -background None -layers Flatten "$script_path\award\Oscars\Oscars.jpg"
-
-    ########################
-    # Sundance #7EB2CF
-    ########################
-    WriteToLogFile "ImageMagick Commands for     : Sundance"
-    $myArray = @(
-        'Logo| logo_resize| Name| out_name| base_color| ww',
-        'Sundance.png| 1500| WINNERS| winner| #7EB2CF| 1',
-        'Sundance.png| 1500| NOMINATIONS| nomination| #7EB2CF| 1'
-        'Sundance.png| 1500| BEST DIRECTOR\WINNERS\n| best_director_winner| #7EB2CF| 1',
-        'Sundance.png| 1500| BEST PICTURE\nWINNERs\n| best_picture_winner| #7EB2CF| 1',
-        'Sundance.png| 1500| GRAND JURY\nWINNERs\n| grand_jury_winner| #7EB2CF| 1',
-        'Sundance.png| 1500| | Sundance| #7EB2CF| 1'
-    ) | ConvertFrom-Csv -Delimiter '|'
-
-    $arr = @()
-    foreach ($item in $myArray) {
-        # write-host $($item.Name)
-        # write-host $($item.out_name)
-        # write-host $($item.base_color)
-        if ($($item.Name).ToString() -eq "") {
-            $myvar = $null
-        }
-        else {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-        }
-        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
-    }
-    LaunchScripts -ScriptPaths $arr
-    
-    $myArray = @(
-        'Logo| logo_resize| Name| out_name| base_color| ww',
-        'Sundance.png| 1500| WINNERS| winner| #7EB2CF| 1'
-    ) | ConvertFrom-Csv -Delimiter '|'
-
-    $arr = @()
-    foreach ($item in $myArray) {
-        for ($i = 1978; $i -lt 2030; $i++) {
-            $myvar = $i
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
-        }
-    }
-    LaunchScripts -ScriptPaths $arr
-    Move-Item -Path output -Destination award\venice
-
-    $myArray = @(
-        'Logo| logo_resize| Name| out_name| base_color| ww',
-        'Sundance.png| 1500| WINNERS| winner| #7EB2CF| 1'
-    ) | ConvertFrom-Csv -Delimiter '|'
-
-    $arr = @()
-    foreach ($item in $myArray) {
-        for ($i = 1978; $i -lt 2030; $i++) {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-            $myvar = "$myvar\n$i"
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
-        }
-    }
-    LaunchScripts -ScriptPaths $arr
-    Move-Item -Path output -Destination award\venice\winner
-
-    $myArray = @(
-        'Logo| logo_resize| Name| out_name| base_color| ww',
-        'Sundance.png| 1500| NOMINATIONS| nomination| #7EB2CF| 1'
-    ) | ConvertFrom-Csv -Delimiter '|'
-
-    $arr = @()
-    foreach ($item in $myArray) {
-        for ($i = 1978; $i -lt 2030; $i++) {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-            $myvar = "$myvar\n$i"
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
-        }
-    }
-    LaunchScripts -ScriptPaths $arr
-    Move-Item -Path output -Destination award\venice\nomination
- 
-    $myArray = @(
-        'Logo| logo_resize| Name| out_name| base_color| ww',
-        'Sundance.png| 1500| BEST PICTURE\nWINNER\n| winner| #7EB2CF| 1'
-    ) | ConvertFrom-Csv -Delimiter '|'
-
-    $arr = @()
-    foreach ($item in $myArray) {
-        for ($i = 1978; $i -lt 2030; $i++) {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-            $myvar = "$myvar\n$i"
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
-        }
-    }
-    LaunchScripts -ScriptPaths $arr
-    Move-Item -Path output -Destination award\venice\best
-
-
-    # for ($i = 1978; $i -lt 2030; $i++) {
-    #     Convert-Awards $script_path\@base\@zbase-Sundance.png $script_path\@base\@base-winners.png $i "$script_path\award\Sundance\winner"
-    # }
-
-    # WriteToLogFile "ImageMagick Commands for     : Awards-Sundance-Nomination"
-    # for ($i = 1978; $i -lt 2030; $i++) {
-    #     Convert-Awards $script_path\@base\@zbase-Sundance.png $script_path\@base\@base-nomination.png $i "$script_path\award\Sundance\nomination"
-    # }
-
-    # WriteToLogFile "ImageMagick Commands for     : Awards-Sundance-Best"
-    # for ($i = 1978; $i -lt 2030; $i++) {
-    #     Convert-Awards $script_path\@base\@zbase-Sundance.png $script_path\@base\@base-best.png $i "$script_path\award\Sundance\best"
-    # }
-
-    # WriteToLogFile "ImageMagick Commands for     : Awards-Sundance"
-    # for ($i = 1978; $i -lt 2030; $i++) {
-    #     Convert-Awards $script_path\@base\@zbase-Sundance.png $script_path\@base\@base-$i.png $i "$script_path\award\Sundance"
-    # }
-
-    # WriteToLogFile "ImageMagick Commands for     : Awards-Sundance-Other"
-    # magick $script_path\@base\@zbase-Sundance.png $script_path\@base\@zbase-winner.png -gravity center -background None -layers Flatten "$script_path\award\Sundance\winner.jpg"
-    # magick $script_path\@base\@zbase-Sundance.png $script_path\@base\@zbase-nomination.png -gravity center -background None -layers Flatten "$script_path\award\Sundance\nomination.jpg"
-    # magick $script_path\@base\@zbase-Sundance.png $script_path\@base\@zbase-best_picture_winner.png -gravity center -background None -layers Flatten "$script_path\award\Sundance\best_picture_winner.jpg"
-    # magick $script_path\@base\@zbase-Sundance.png $script_path\@base\@zbase-best_director_winner.png -gravity center -background None -layers Flatten "$script_path\award\Sundance\best_director_winner.jpg"
-    # magick $script_path\@base\@zbase-Sundance.png $script_path\@base\@zbase-grand_jury_winner.png -gravity center -background None -layers Flatten "$script_path\award\Sundance\grand_jury_winner.jpg"
-    # magick $script_path\@base\@zbase-Sundance.png $script_path\@base\@zbase-Sundance.png -gravity center -background None -layers Flatten "$script_path\award\Sundance\Sundance.jpg"
-
-    ########################
-    # Venice #D21635
-    ########################
-    WriteToLogFile "ImageMagick Commands for     : Venice"
-    $myArray = @(
-        'Logo| logo_resize| Name| out_name| base_color| ww',
-        'Venice.png| 1500| WINNERS| winner| #D21635| 1',
-        'Venice.png| 1500| NOMINATIONS| nomination| #D21635| 1'
-        'Venice.png| 1500| BEST DIRECTOR\WINNERS\n| best_director_winner| #D21635| 1',
-        'Venice.png| 1500| BEST PICTURE\nWINNERs\n| best_picture_winner| #D21635| 1',
-        'Venice.png| 1500| | Venice| #D21635| 1'
-    ) | ConvertFrom-Csv -Delimiter '|'
-
-    $arr = @()
-    foreach ($item in $myArray) {
-        # write-host $($item.Name)
-        # write-host $($item.out_name)
-        # write-host $($item.base_color)
-        if ($($item.Name).ToString() -eq "") {
-            $myvar = $null
-        }
-        else {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-        }
-        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
-    }
-    LaunchScripts -ScriptPaths $arr
-    
-    $myArray = @(
-        'Logo| logo_resize| Name| out_name| base_color| ww',
-        'Venice.png| 1500| WINNERS| winner| #D21635| 1'
-    ) | ConvertFrom-Csv -Delimiter '|'
-
-    $arr = @()
-    foreach ($item in $myArray) {
-        for ($i = 1932; $i -lt 2030; $i++) {
-            $myvar = $i
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
-        }
-    }
-    LaunchScripts -ScriptPaths $arr
-    Move-Item -Path output -Destination award\sundance
-
-    $myArray = @(
-        'Logo| logo_resize| Name| out_name| base_color| ww',
-        'Venice.png| 1500| WINNERS| winner| #D21635| 1'
-    ) | ConvertFrom-Csv -Delimiter '|'
-
-    $arr = @()
-    foreach ($item in $myArray) {
-        for ($i = 1932; $i -lt 2030; $i++) {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-            $myvar = "$myvar\n$i"
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
-        }
-    }
-    LaunchScripts -ScriptPaths $arr
-    Move-Item -Path output -Destination award\sundance\winner
-
-    $myArray = @(
-        'Logo| logo_resize| Name| out_name| base_color| ww',
-        'Venice.png| 1500| NOMINATIONS| nomination| #D21635| 1'
-    ) | ConvertFrom-Csv -Delimiter '|'
-
-    $arr = @()
-    foreach ($item in $myArray) {
-        for ($i = 1932; $i -lt 2030; $i++) {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-            $myvar = "$myvar\n$i"
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
-        }
-    }
-    LaunchScripts -ScriptPaths $arr
-    Move-Item -Path output -Destination award\sundance\nomination
- 
-    $myArray = @(
-        'Logo| logo_resize| Name| out_name| base_color| ww',
-        'Venice.png| 1500| BEST PICTURE\nWINNER\n| winner| #D21635| 1'
-    ) | ConvertFrom-Csv -Delimiter '|'
-
-    $arr = @()
-    foreach ($item in $myArray) {
-        for ($i = 1932; $i -lt 2030; $i++) {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-            $myvar = "$myvar\n$i"
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
-        }
-    }
-    LaunchScripts -ScriptPaths $arr
-    Move-Item -Path output -Destination award\sundance\best
-
-    # for ($i = 1932; $i -lt 2030; $i++) {
-    #     Convert-Awards $script_path\@base\@zbase-Venice.png $script_path\@base\@base-winners.png $i "$script_path\award\Venice\winner"
-    # }
-
-    # WriteToLogFile "ImageMagick Commands for     : Awards-Venice-Nomination"
-    # for ($i = 1932; $i -lt 2030; $i++) {
-    #     Convert-Awards $script_path\@base\@zbase-Venice.png $script_path\@base\@base-nomination.png $i "$script_path\award\Venice\nomination"
-    # }
-
-    # WriteToLogFile "ImageMagick Commands for     : Awards-Venice-Best"
-    # for ($i = 1932; $i -lt 2030; $i++) {
-    #     Convert-Awards $script_path\@base\@zbase-Venice.png $script_path\@base\@base-best.png $i "$script_path\award\Venice\best"
-    # }
-
-    # WriteToLogFile "ImageMagick Commands for     : Awards-Venice"
-    # for ($i = 1932; $i -lt 2030; $i++) {
-    #     Convert-Awards $script_path\@base\@zbase-Venice.png $script_path\@base\@base-$i.png $i "$script_path\award\Venice"
-    # }
-
-    # WriteToLogFile "ImageMagick Commands for     : Awards-Venice-Other"
-    # magick $script_path\@base\@zbase-Venice.png $script_path\@base\@zbase-winner.png -gravity center -background None -layers Flatten "$script_path\award\Venice\winner.jpg"
-    # magick $script_path\@base\@zbase-Venice.png $script_path\@base\@zbase-nomination.png -gravity center -background None -layers Flatten "$script_path\award\Venice\nomination.jpg"
-    # magick $script_path\@base\@zbase-Venice.png $script_path\@base\@zbase-best_picture_winner.png -gravity center -background None -layers Flatten "$script_path\award\Venice\best_picture_winner.jpg"
-    # magick $script_path\@base\@zbase-Venice.png $script_path\@base\@zbase-best_director_winner.png -gravity center -background None -layers Flatten "$script_path\award\Venice\best_director_winner.jpg"
-    # magick $script_path\@base\@zbase-Venice.png $script_path\@base\@zbase-Venice.png -gravity center -background None -layers Flatten "$script_path\award\Venice\Venice.jpg"
-
     ########################
     # Choice #AC7427
     ########################
@@ -1946,9 +1144,6 @@ Function CreateAwards {
 
     $arr = @()
     foreach ($item in $myArray) {
-        # write-host $($item.Name)
-        # write-host $($item.out_name)
-        # write-host $($item.base_color)
         if ($($item.Name).ToString() -eq "") {
             $myvar = $null
         }
@@ -2027,31 +1222,377 @@ Function CreateAwards {
     LaunchScripts -ScriptPaths $arr
     Move-Item -Path output -Destination award\choice\best
 
-    # for ($i = 1929; $i -lt 2030; $i++) {
-    #     Convert-Awards $script_path\@base\@zbase-Choice.png $script_path\@base\@base-winners.png $i "$script_path\award\Choice\winner"
-    # }
+    ########################
+    # Emmys #D89C27
+    ########################
+    WriteToLogFile "ImageMagick Commands for     : Awards-Emmys-Winner"
+    $myArray = @(
+        'Logo| logo_resize| Name| out_name| base_color| ww',
+        'Emmys.png| 1500| WINNERS| winner| #D89C27| 1',
+        'Emmys.png| 1500| NOMINATIONS| nomination| #D89C27| 1'
+        'Emmys.png| 1500| BEST DIRECTOR\WINNERS\n| best_director_winner| #D89C27| 1',
+        'Emmys.png| 1500| BEST PICTURE\nWINNERs\n| best_picture_winner| #D89C27| 1',
+        'Emmys.png| 1500| | Emmys| #D89C27| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
 
-    # WriteToLogFile "ImageMagick Commands for     : Awards-Choice-Nomination"
-    # for ($i = 1929; $i -lt 2030; $i++) {
-    #     Convert-Awards $script_path\@base\@zbase-Choice.png $script_path\@base\@base-nomination.png $i "$script_path\award\Choice\nomination"
-    # }
+    $arr = @()
+    foreach ($item in $myArray) {
+        if ($($item.Name).ToString() -eq "") {
+            $myvar = $null
+        }
+        else {
+            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
+        }
+        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+    }
+    LaunchScripts -ScriptPaths $arr
+    
+    $myArray = @(
+        'Logo| logo_resize| Name| out_name| base_color| ww',
+        'Emmys.png| 1500| WINNERS| winner| #D89C27| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
 
-    # WriteToLogFile "ImageMagick Commands for     : Awards-Choice-Best"
-    # for ($i = 1929; $i -lt 2030; $i++) {
-    #     Convert-Awards $script_path\@base\@zbase-Choice.png $script_path\@base\@base-best.png $i "$script_path\award\Choice\best"
-    # }
+    $arr = @()
+    foreach ($item in $myArray) {
+        for ($i = 1947; $i -lt 2030; $i++) {
+            $myvar = $i
+            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+        }
+    }
+    LaunchScripts -ScriptPaths $arr
+    Move-Item -Path output -Destination award\emmys
 
-    # WriteToLogFile "ImageMagick Commands for     : Awards-Choice"
-    # for ($i = 1929; $i -lt 2030; $i++) {
-    #     Convert-Awards $script_path\@base\@zbase-Choice.png $script_path\@base\@base-$i.png $i "$script_path\award\Choice"
-    # }
+    $myArray = @(
+        'Logo| logo_resize| Name| out_name| base_color| ww',
+        'Emmys.png| 1500| WINNERS| winner| #D89C27| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
 
-    # WriteToLogFile "ImageMagick Commands for     : Awards-Choice-Other"
-    # magick $script_path\@base\@zbase-Choice.png $script_path\@base\@zbase-winner.png -gravity center -background None -layers Flatten "$script_path\award\Choice\winner.jpg"
-    # magick $script_path\@base\@zbase-Choice.png $script_path\@base\@zbase-nomination.png -gravity center -background None -layers Flatten "$script_path\award\Choice\nomination.jpg"
-    # magick $script_path\@base\@zbase-Choice.png $script_path\@base\@zbase-best_picture_winner.png -gravity center -background None -layers Flatten "$script_path\award\Choice\best_picture_winner.jpg"
-    # magick $script_path\@base\@zbase-Choice.png $script_path\@base\@zbase-best_director_winner.png -gravity center -background None -layers Flatten "$script_path\award\Choice\best_director_winner.jpg"
-    # magick $script_path\@base\@zbase-Choice.png $script_path\@base\@zbase-Choice.png -gravity center -background None -layers Flatten "$script_path\award\Choice\Choice.jpg"
+    $arr = @()
+    foreach ($item in $myArray) {
+        for ($i = 1947; $i -lt 2030; $i++) {
+            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
+            $myvar = "$myvar\n$i"
+            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+        }
+    }
+    LaunchScripts -ScriptPaths $arr
+    Move-Item -Path output -Destination award\emmys\winner
+
+    $myArray = @(
+        'Logo| logo_resize| Name| out_name| base_color| ww',
+        'Emmys.png| 1500| NOMINATIONS| nomination| #D89C27| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        for ($i = 1947; $i -lt 2030; $i++) {
+            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
+            $myvar = "$myvar\n$i"
+            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+        }
+    }
+    LaunchScripts -ScriptPaths $arr
+    Move-Item -Path output -Destination award\emmys\nomination
+ 
+    $myArray = @(
+        'Logo| logo_resize| Name| out_name| base_color| ww',
+        'Emmys.png| 1500| BEST PICTURE\nWINNER\n| winner| #D89C27| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        for ($i = 1947; $i -lt 2030; $i++) {
+            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
+            $myvar = "$myvar\n$i"
+            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+        }
+    }
+    LaunchScripts -ScriptPaths $arr
+    Move-Item -Path output -Destination award\emmys\best
+
+    ########################
+    # Golden #D0A047
+    ########################
+    WriteToLogFile "ImageMagick Commands for     : Golden"
+    $myArray = @(
+        'Logo| logo_resize| Name| out_name| base_color| ww',
+        'Golden.png| 1500| WINNERS| winner| #D0A047| 1',
+        'Golden.png| 1500| NOMINATIONS| nomination| #D0A047| 1'
+        'Golden.png| 1500| BEST DIRECTOR\WINNERS\n| best_director_winner| #D0A047| 1',
+        'Golden.png| 1500| BEST PICTURE\nWINNERs\n| best_picture_winner| #D0A047| 1',
+        'Golden.png| 1500| | Golden| #D0A047| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        if ($($item.Name).ToString() -eq "") {
+            $myvar = $null
+        }
+        else {
+            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
+        }
+        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+    }
+    LaunchScripts -ScriptPaths $arr
+    
+    $myArray = @(
+        'Logo| logo_resize| Name| out_name| base_color| ww',
+        'Golden.png| 1500| WINNERS| winner| #D0A047| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        for ($i = 1943; $i -lt 2030; $i++) {
+            $myvar = $i
+            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+        }
+    }
+    LaunchScripts -ScriptPaths $arr
+    Move-Item -Path output -Destination award\golden
+
+    $myArray = @(
+        'Logo| logo_resize| Name| out_name| base_color| ww',
+        'Golden.png| 1500| WINNERS| winner| #D0A047| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        for ($i = 1943; $i -lt 2030; $i++) {
+            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
+            $myvar = "$myvar\n$i"
+            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+        }
+    }
+    LaunchScripts -ScriptPaths $arr
+    Move-Item -Path output -Destination award\golden\winner
+
+    $myArray = @(
+        'Logo| logo_resize| Name| out_name| base_color| ww',
+        'Golden.png| 1500| NOMINATIONS| nomination| #D0A047| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        for ($i = 1943; $i -lt 2030; $i++) {
+            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
+            $myvar = "$myvar\n$i"
+            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+        }
+    }
+    LaunchScripts -ScriptPaths $arr
+    Move-Item -Path output -Destination award\golden\nomination
+ 
+    $myArray = @(
+        'Logo| logo_resize| Name| out_name| base_color| ww',
+        'Golden.png| 1500| BEST PICTURE\nWINNER\n| winner| #D0A047| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        for ($i = 1943; $i -lt 2030; $i++) {
+            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
+            $myvar = "$myvar\n$i"
+            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+        }
+    }
+    LaunchScripts -ScriptPaths $arr
+    Move-Item -Path output -Destination award\golden\best
+
+    ########################
+    # Oscars #A9842E
+    ########################
+    WriteToLogFile "ImageMagick Commands for     : Oscars"
+    $myArray = @(
+        'Logo| logo_resize| Name| out_name| base_color| ww',
+        'Oscars.png| 1500| WINNERS| winner| #A9842E| 1',
+        'Oscars.png| 1500| NOMINATIONS| nomination| #A9842E| 1'
+        'Oscars.png| 1500| BEST DIRECTOR\WINNERS\n| best_director_winner| #A9842E| 1',
+        'Oscars.png| 1500| BEST PICTURE\nWINNERs\n| best_picture_winner| #A9842E| 1',
+        'Oscars.png| 1500| | Oscars| #A9842E| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        if ($($item.Name).ToString() -eq "") {
+            $myvar = $null
+        }
+        else {
+            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
+        }
+        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+    }
+    LaunchScripts -ScriptPaths $arr
+    
+    $myArray = @(
+        'Logo| logo_resize| Name| out_name| base_color| ww',
+        'Oscars.png| 1500| WINNERS| winner| #A9842E| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        for ($i = 1927; $i -lt 2030; $i++) {
+            $myvar = $i
+            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+        }
+    }
+    LaunchScripts -ScriptPaths $arr
+    Move-Item -Path output -Destination award\oscars
+
+    $myArray = @(
+        'Logo| logo_resize| Name| out_name| base_color| ww',
+        'Oscars.png| 1500| WINNERS| winner| #A9842E| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        for ($i = 1927; $i -lt 2030; $i++) {
+            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
+            $myvar = "$myvar\n$i"
+            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+        }
+    }
+    LaunchScripts -ScriptPaths $arr
+    Move-Item -Path output -Destination award\oscars\winner
+
+    $myArray = @(
+        'Logo| logo_resize| Name| out_name| base_color| ww',
+        'Oscars.png| 1500| NOMINATIONS| nomination| #A9842E| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        for ($i = 1927; $i -lt 2030; $i++) {
+            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
+            $myvar = "$myvar\n$i"
+            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+        }
+    }
+    LaunchScripts -ScriptPaths $arr
+    Move-Item -Path output -Destination award\oscars\nomination
+ 
+    $myArray = @(
+        'Logo| logo_resize| Name| out_name| base_color| ww',
+        'Oscars.png| 1500| BEST PICTURE\nWINNER\n| winner| #A9842E| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        for ($i = 1927; $i -lt 2030; $i++) {
+            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
+            $myvar = "$myvar\n$i"
+            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+        }
+    }
+    LaunchScripts -ScriptPaths $arr
+    Move-Item -Path output -Destination award\oscars\best
+
+    ########################
+    # Razzie #FF0C0C
+    ########################
+    WriteToLogFile "ImageMagick Commands for     : Razzie"
+    $myArray = @(
+        'Logo| logo_resize| Name| out_name| base_color| ww',
+        'Razzie.png| 1000| WINNERS| winner| #FF0C0C| 1',
+        'Razzie.png| 1000| NOMINATIONS| nomination| #FF0C0C| 1',
+        'Razzie.png| 1000| BEST DIRECTOR\WINNERS\n| best_director_winner| #FF0C0C| 1',
+        'Razzie.png| 1000| BEST PICTURE\nWINNERs\n| best_picture_winner| #FF0C0C| 1',
+        'Razzie.png| 1000| | Razzie| #FF0C0C| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        if ($($item.Name).ToString() -eq "") {
+            $myvar = $null
+        }
+        else {
+            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
+        }
+        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+    }
+    LaunchScripts -ScriptPaths $arr
+
+    $myArray = @(
+        'Logo| logo_resize| Name| out_name| base_color| ww',
+        'Razzie.png| 1000| WINNERS| winner| #FF0C0C| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        for ($i = 1980; $i -lt 2030; $i++) {
+            $myvar = $i
+            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+        }
+    }
+    LaunchScripts -ScriptPaths $arr
+    Move-Item -Path output -Destination award\razzies
+
+    $myArray = @(
+        'Logo| logo_resize| Name| out_name| base_color| ww',
+        'Razzie.png| 1000| WINNERS| winner| #FF0C0C| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        for ($i = 1980; $i -lt 2030; $i++) {
+            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
+            $myvar = "$myvar\n$i"
+            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+        }
+    }
+    LaunchScripts -ScriptPaths $arr
+    Move-Item -Path output -Destination award\razzies\winner
+
+    $myArray = @(
+        'Logo| logo_resize| Name| out_name| base_color| ww',
+        'Razzie.png| 1000| NOMINATIONS| nomination| #FF0C0C| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        for ($i = 1980; $i -lt 2030; $i++) {
+            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
+            $myvar = "$myvar\n$i"
+            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+        }
+    }
+    LaunchScripts -ScriptPaths $arr
+    Move-Item -Path output -Destination award\razzies\nomination
+ 
+    $myArray = @(
+        'Logo| logo_resize| Name| out_name| base_color| ww',
+        'Razzie.png| 1000| BEST PICTURE\nWINNER\n| winner| #FF0C0C| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        for ($i = 1980; $i -lt 2030; $i++) {
+            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
+            $myvar = "$myvar\n$i"
+            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+        }
+    }
+    LaunchScripts -ScriptPaths $arr
+    Move-Item -Path output -Destination award\razzies\best
 
     ########################
     # Spirit #4662E7
@@ -2068,9 +1609,6 @@ Function CreateAwards {
 
     $arr = @()
     foreach ($item in $myArray) {
-        # write-host $($item.Name)
-        # write-host $($item.out_name)
-        # write-host $($item.base_color)
         if ($($item.Name).ToString() -eq "") {
             $myvar = $null
         }
@@ -2149,31 +1687,192 @@ Function CreateAwards {
     LaunchScripts -ScriptPaths $arr
     Move-Item -Path output -Destination award\spirit\best
 
-    # for ($i = 1986; $i -lt 2030; $i++) {
-    #     Convert-Awards $script_path\@base\@zbase-Spirit.png $script_path\@base\@base-winners.png $i "$script_path\award\Spirit\winner"
-    # }
+    ########################
+    # Sundance #7EB2CF
+    ########################
+    WriteToLogFile "ImageMagick Commands for     : Sundance"
+    $myArray = @(
+        'Logo| logo_resize| Name| out_name| base_color| ww',
+        'Sundance.png| 1500| WINNERS| winner| #7EB2CF| 1',
+        'Sundance.png| 1500| NOMINATIONS| nomination| #7EB2CF| 1'
+        'Sundance.png| 1500| BEST DIRECTOR\WINNERS\n| best_director_winner| #7EB2CF| 1',
+        'Sundance.png| 1500| BEST PICTURE\nWINNERs\n| best_picture_winner| #7EB2CF| 1',
+        'Sundance.png| 1500| GRAND JURY\nWINNERs\n| grand_jury_winner| #7EB2CF| 1',
+        'Sundance.png| 1500| | Sundance| #7EB2CF| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
 
-    # WriteToLogFile "ImageMagick Commands for     : Awards-Spirit-Nomination"
-    # for ($i = 1986; $i -lt 2030; $i++) {
-    #     Convert-Awards $script_path\@base\@zbase-Spirit.png $script_path\@base\@base-nomination.png $i "$script_path\award\Spirit\nomination"
-    # }
+    $arr = @()
+    foreach ($item in $myArray) {
+        if ($($item.Name).ToString() -eq "") {
+            $myvar = $null
+        }
+        else {
+            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
+        }
+        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+    }
+    LaunchScripts -ScriptPaths $arr
+    
+    $myArray = @(
+        'Logo| logo_resize| Name| out_name| base_color| ww',
+        'Sundance.png| 1500| WINNERS| winner| #7EB2CF| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
 
-    # WriteToLogFile "ImageMagick Commands for     : Awards-Spirit-Best"
-    # for ($i = 1986; $i -lt 2030; $i++) {
-    #     Convert-Awards $script_path\@base\@zbase-Spirit.png $script_path\@base\@base-best.png $i "$script_path\award\Spirit\best"
-    # }
+    $arr = @()
+    foreach ($item in $myArray) {
+        for ($i = 1978; $i -lt 2030; $i++) {
+            $myvar = $i
+            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+        }
+    }
+    LaunchScripts -ScriptPaths $arr
+    Move-Item -Path output -Destination award\sundance
 
-    # WriteToLogFile "ImageMagick Commands for     : Awards-Spirit"
-    # for ($i = 1986; $i -lt 2030; $i++) {
-    #     Convert-Awards $script_path\@base\@zbase-Spirit.png $script_path\@base\@base-$i.png $i "$script_path\award\Spirit"
-    # }
+    $myArray = @(
+        'Logo| logo_resize| Name| out_name| base_color| ww',
+        'Sundance.png| 1500| WINNERS| winner| #7EB2CF| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
 
-    # WriteToLogFile "ImageMagick Commands for     : Awards-Spirit-Other"
-    # magick $script_path\@base\@zbase-Spirit.png $script_path\@base\@zbase-winner.png -gravity center -background None -layers Flatten "$script_path\award\Spirit\winner.jpg"
-    # magick $script_path\@base\@zbase-Spirit.png $script_path\@base\@zbase-nomination.png -gravity center -background None -layers Flatten "$script_path\award\Spirit\nomination.jpg"
-    # magick $script_path\@base\@zbase-Spirit.png $script_path\@base\@zbase-best_picture_winner.png -gravity center -background None -layers Flatten "$script_path\award\Spirit\best_picture_winner.jpg"
-    # magick $script_path\@base\@zbase-Spirit.png $script_path\@base\@zbase-best_director_winner.png -gravity center -background None -layers Flatten "$script_path\award\Spirit\best_director_winner.jpg"
-    # magick $script_path\@base\@zbase-Spirit.png $script_path\@base\@zbase-Spirit.png -gravity center -background None -layers Flatten "$script_path\award\Spirit\Spirit.jpg"
+    $arr = @()
+    foreach ($item in $myArray) {
+        for ($i = 1978; $i -lt 2030; $i++) {
+            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
+            $myvar = "$myvar\n$i"
+            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+        }
+    }
+    LaunchScripts -ScriptPaths $arr
+    Move-Item -Path output -Destination award\sundance\winner
+
+    $myArray = @(
+        'Logo| logo_resize| Name| out_name| base_color| ww',
+        'Sundance.png| 1500| NOMINATIONS| nomination| #7EB2CF| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        for ($i = 1978; $i -lt 2030; $i++) {
+            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
+            $myvar = "$myvar\n$i"
+            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+        }
+    }
+    LaunchScripts -ScriptPaths $arr
+    Move-Item -Path output -Destination award\sundance\nomination
+ 
+    $myArray = @(
+        'Logo| logo_resize| Name| out_name| base_color| ww',
+        'Sundance.png| 1500| BEST PICTURE\nWINNER\n| winner| #7EB2CF| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        for ($i = 1978; $i -lt 2030; $i++) {
+            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
+            $myvar = "$myvar\n$i"
+            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+        }
+    }
+    LaunchScripts -ScriptPaths $arr
+    Move-Item -Path output -Destination award\sundance\best
+
+    ########################
+    # Venice #D21635
+    ########################
+    WriteToLogFile "ImageMagick Commands for     : Venice"
+    $myArray = @(
+        'Logo| logo_resize| Name| out_name| base_color| ww',
+        'Venice.png| 1500| WINNERS| winner| #D21635| 1',
+        'Venice.png| 1500| NOMINATIONS| nomination| #D21635| 1'
+        'Venice.png| 1500| BEST DIRECTOR\WINNERS\n| best_director_winner| #D21635| 1',
+        'Venice.png| 1500| BEST PICTURE\nWINNERs\n| best_picture_winner| #D21635| 1',
+        'Venice.png| 1500| | Venice| #D21635| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        if ($($item.Name).ToString() -eq "") {
+            $myvar = $null
+        }
+        else {
+            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
+        }
+        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+    }
+    LaunchScripts -ScriptPaths $arr
+    
+    $myArray = @(
+        'Logo| logo_resize| Name| out_name| base_color| ww',
+        'Venice.png| 1500| WINNERS| winner| #D21635| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        for ($i = 1932; $i -lt 2030; $i++) {
+            $myvar = $i
+            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+        }
+    }
+    LaunchScripts -ScriptPaths $arr
+    Move-Item -Path output -Destination award\venice
+
+    $myArray = @(
+        'Logo| logo_resize| Name| out_name| base_color| ww',
+        'Venice.png| 1500| WINNERS| winner| #D21635| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        for ($i = 1932; $i -lt 2030; $i++) {
+            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
+            $myvar = "$myvar\n$i"
+            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+        }
+    }
+    LaunchScripts -ScriptPaths $arr
+    Move-Item -Path output -Destination award\venice\winner
+
+    $myArray = @(
+        'Logo| logo_resize| Name| out_name| base_color| ww',
+        'Venice.png| 1500| NOMINATIONS| nomination| #D21635| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        for ($i = 1932; $i -lt 2030; $i++) {
+            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
+            $myvar = "$myvar\n$i"
+            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+        }
+    }
+    LaunchScripts -ScriptPaths $arr
+    Move-Item -Path output -Destination award\venice\nomination
+ 
+    $myArray = @(
+        'Logo| logo_resize| Name| out_name| base_color| ww',
+        'Venice.png| 1500| BEST PICTURE\nWINNER\n| winner| #D21635| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        for ($i = 1932; $i -lt 2030; $i++) {
+            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
+            $myvar = "$myvar\n$i"
+            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+        }
+    }
+    LaunchScripts -ScriptPaths $arr
+    Move-Item -Path output -Destination award\venice\best
 
     Copy-Item -Path logos_award -Destination award\logos -Recurse
     Move-Item -Path output-orig -Destination output
@@ -2207,9 +1906,6 @@ Function CreateBased {
     
     $arr = @()
     foreach ($item in $myArray) {
-        # write-host $($item.Name)
-        # write-host $($item.out_name)
-        # write-host $($item.base_color)
         $myvar1 = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue `" $($item.Name)`" -CaseSensitivity Upper) 
         $myvar = $myvar1
         $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
@@ -2299,9 +1995,6 @@ Function CreateChart {
 
     $arr = @()
     foreach ($item in $myArray) {
-        # write-host $($item.Name)
-        # write-host $($item.out_name)
-        # write-host $($item.base_color)
         $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
         $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
         $arr += ".\create_poster.ps1 -logo `"$script_path\logos_chart\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
@@ -2338,9 +2031,6 @@ Function CreateContentRating {
 
     $arr = @()
     foreach ($item in $myArray) {
-        # write-host $($item.Name)
-        # write-host $($item.out_name)
-        # write-host $($item.base_color)
         $myvar = Set-TextBetweenDelimiters -InputString $myvar1 -ReplacementString (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
         $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
         $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.Logo)`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$myvar`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
@@ -2432,9 +2122,6 @@ Function CreateCountry {
 
     $arr = @()
     foreach ($item in $myArray) {
-        # write-host $($item.Name)
-        # write-host $($item.out_name)
-        # write-host $($item.base_color)
         $myvar = Set-TextBetweenDelimiters -InputString $myvar1 -ReplacementString (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
         $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
         $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.Logo)`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$myvar`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
@@ -2512,9 +2199,6 @@ Function CreateCountry {
     
     $arr = @()
     foreach ($item in $myArray) {
-        # write-host $($item.Name)
-        # write-host $($item.out_name)
-        # write-host $($item.base_color)
         $myvar = Set-TextBetweenDelimiters -InputString $myvar1 -ReplacementString (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
         $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
         $arr += ".\create_poster.ps1 -logo `"$script_path\logos_country\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash 0"
@@ -2525,9 +2209,6 @@ Function CreateCountry {
 
     $arr = @()
     foreach ($item in $myArray) {
-        # write-host $($item.Name)
-        # write-host $($item.out_name)
-        # write-host $($item.base_color)
         $myvar = Set-TextBetweenDelimiters -InputString $myvar1 -ReplacementString (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
         $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
         $arr += ".\create_poster.ps1 -logo `"$script_path\logos_country\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
@@ -2541,9 +2222,6 @@ Function CreateCountry {
 
     $arr = @()
     foreach ($item in $myArray) {
-        # write-host $($item.Name)
-        # write-host $($item.out_name)
-        # write-host $($item.base_color)
         $myvar = Set-TextBetweenDelimiters -InputString $myvar1 -ReplacementString (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
         $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
         $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.Logo)`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$myvar`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
@@ -2739,9 +2417,6 @@ Function CreateGenre {
 
     $arr = @()
     foreach ($item in $myArray) {
-        # write-host $($item.Name)
-        # write-host $($item.out_name)
-        # write-host $($item.base_color)
         $myvar = Set-TextBetweenDelimiters -InputString $myvar1 -ReplacementString (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
         $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
         $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.Logo)`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$myvar`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
@@ -2856,9 +2531,6 @@ Function CreateGenre {
 
     $arr = @()
     foreach ($item in $myArray) {
-        # write-host $($item.Name)
-        # write-host $($item.out_name)
-        # write-host $($item.base_color)
         $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
         $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
         $arr += ".\create_poster.ps1 -logo `"$script_path\logos_genre\$($item.Logo)`" -logo_offset -500 -logo_resize $theMaxWidth -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
@@ -2895,9 +2567,6 @@ Function CreateNetwork {
 
     $arr = @()
     foreach ($item in $myArray) {
-        # write-host $($item.Name)
-        # write-host $($item.out_name)
-        # write-host $($item.base_color)
         $myvar = Set-TextBetweenDelimiters -InputString $myvar1 -ReplacementString (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
         $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
         $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.Logo)`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$myvar`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
@@ -3055,9 +2724,6 @@ Function CreatePlaylist {
     
     $arr = @()
     foreach ($item in $myArray) {
-        # write-host $($item.Name)
-        # write-host $($item.out_name)
-        # write-host $($item.base_color)
         $myvar = Set-TextBetweenDelimiters -InputString $myvar1 -ReplacementString (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
         $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
         $arr += ".\create_poster.ps1 -logo `"$script_path\logos_playlist\$($item.Logo)`" -logo_offset -200 -logo_resize $theMaxWidth -text `"$myvar`" -text_offset +450 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
@@ -3104,9 +2770,6 @@ Function CreateResolution {
 
     $arr = @()
     foreach ($item in $myArray) {
-        # write-host $($item.Name)
-        # write-host $($item.out_name)
-        # write-host $($item.base_color)
         $myvar = Set-TextBetweenDelimiters -InputString $myvar1 -ReplacementString (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
         $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
         $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.Logo)`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$myvar`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
@@ -3129,9 +2792,6 @@ Function CreateResolution {
     
     $arr = @()
     foreach ($item in $myArray) {
-        # write-host $($item.Name)
-        # write-host $($item.out_name)
-        # write-host $($item.base_color)
         $myvar = Set-TextBetweenDelimiters -InputString $myvar1 -ReplacementString (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
         $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
         $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.Logo)`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$myvar`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
@@ -3185,9 +2845,6 @@ Function CreateSeasonal {
     
     $arr = @()
     foreach ($item in $myArray) {
-        # write-host $($item.Name)
-        # write-host $($item.out_name)
-        # write-host $($item.base_color)
         $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
         $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
         $arr += ".\create_poster.ps1 -logo `"$script_path\logos_seasonal\$($item.Logo)`" -logo_offset -500 -logo_resize $theMaxWidth -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
@@ -3333,9 +2990,6 @@ Function CreateStudio {
 
     $arr = @()
     foreach ($item in $myArray) {
-        # write-host $($item.Name)
-        # write-host $($item.out_name)
-        # write-host $($item.base_color)
         $myvar = Set-TextBetweenDelimiters -InputString $myvar1 -ReplacementString (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
         $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
         $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.Logo)`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$myvar`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
@@ -3627,9 +3281,6 @@ Function CreateSubtitleLanguage {
     
     $arr = @()
     foreach ($item in $myArray) {
-        # write-host $($item.Name)
-        # write-host $($item.out_name)
-        # write-host $($item.base_color)
         $myvar = Set-TextBetweenDelimiters -InputString $myvar1 -ReplacementString (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
         $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
         $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$myvar`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
