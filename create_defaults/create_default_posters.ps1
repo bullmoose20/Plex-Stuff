@@ -400,8 +400,20 @@ Function Get-OptimalPointSize {
     # Generate cache key
     $cache_key = "{0}-{1}-{2}-{3}" -f $text, $font, $box_width, $box_height
 
+    if ($IsWindows) {
+        # Windows-specific escape characters
+        $escaped_cache_key = [System.Management.Automation.WildcardPattern]::Escape($cache_key)
+
+        # Escape single quotes (')
+        $escaped_cache_key = $escaped_cache_key -replace "'", "''"
+    }
+    else {
+        # Unix-specific escape characters (No clue what to put here)
+        $escaped_cache_key = $escaped_cache_key -replace "'", "''"
+    }
+
     # Check if cache contains the key and return cached result if available
-    $cached_pointsize = (Get-SqliteData -Path $databasePath -Query "SELECT PointSize FROM Cache WHERE CacheKey = '$cache_key'")
+    $cached_pointsize = (Get-SqliteData -Path $databasePath -Query "SELECT PointSize FROM Cache WHERE CacheKey = '$escaped_cache_key'")
     if ($null -ne $cached_pointsize) {
         WriteToLogFile "Cache                        : Cache hit for key '$cache_key'"
         return $cached_pointsize
@@ -441,7 +453,7 @@ Function Get-OptimalPointSize {
     }
 
     # Update cache with new result
-    $null = Set-SqliteData -Path $databasePath -Query "INSERT OR REPLACE INTO Cache (CacheKey, PointSize) VALUES ('$cache_key', $current_pointsize)"
+    $null = Set-SqliteData -Path $databasePath -Query "INSERT OR REPLACE INTO Cache (CacheKey, PointSize) VALUES ('$escaped_cache_key', $current_pointsize)"
     WriteToLogFile "Optimal Point Size           : $current_pointsize"
 
     # Return optimal point size
@@ -4006,8 +4018,9 @@ foreach ($param in $args) {
 }
 
 if (!$args) {
-    ShowFunctions
-    # CreateBased
+    # ShowFunctions
+    CreateBased
+    CreateAudioLanguage
 }
 
 #######################
