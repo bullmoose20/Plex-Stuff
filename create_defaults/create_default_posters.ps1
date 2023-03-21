@@ -253,7 +253,7 @@ Function Get-TranslatedValue {
 
         if ($null -eq $TranslatedValue) {
             Write-Output "TRANSLATION NOT FOUND"
-            WriteToLogFile "TranslatedValue  ERROR       : ${EnglishValue}: TRANSLATION NOT FOUND in $TranslationFilePath"
+            WriteToLogFile "TranslatedValue [ERROR]      : ${EnglishValue}: TRANSLATION NOT FOUND in $TranslationFilePath"
             return
         }
         
@@ -398,7 +398,7 @@ Function Get-OptimalPointSize {
     }
 
     # Generate cache key
-    $cache_key = "{0}-{1}-{2}-{3}" -f $text, $font, $box_width, $box_height
+    $cache_key = "{0}-{1}-{2}-{3}-{4}-{5}" -f $text, $font, $box_width, $box_height, $min_pointsize, $max_pointsize
 
     if ($IsWindows) {
         # Windows-specific escape characters
@@ -945,7 +945,7 @@ Function CreateAwards {
         'Logo| logo_resize| Name| out_name| base_color| ww',
         'Berlinale.png| 1000| WINNERS| winner| #BB0B34| 1',
         'Berlinale.png| 1000| NOMINATIONS| nomination| #BB0B34| 1'
-        'Berlinale.png| 1000| BEST DIRECTOR\WINNERS| best_director_winner| #BB0B34| 1',
+        'Berlinale.png| 1000| BEST DIRECTOR WINNERS| best_director_winner| #BB0B34| 1',
         'Berlinale.png| 1000| BEST PICTURE WINNERS| best_picture_winner| #BB0B34| 1',
         'Berlinale.png| 1000| | Berlinale| #BB0B34| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
@@ -1038,7 +1038,7 @@ Function CreateAwards {
         'Logo| logo_resize| Name| out_name| base_color| ww',
         'Cannes.png| 1800| WINNERS| winner| #AF8F51| 1',
         'Cannes.png| 1800| NOMINATIONS| nomination| #AF8F51| 1'
-        'Cannes.png| 1800| BEST DIRECTOR\WINNERS| best_director_winner| #AF8F51| 1',
+        'Cannes.png| 1800| BEST DIRECTOR WINNERS| best_director_winner| #AF8F51| 1',
         'Cannes.png| 1800| BEST PICTURE WINNERS| best_picture_winner| #AF8F51| 1',
         'Cannes.png| 1800| | Cannes| #AF8F51| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
@@ -1131,7 +1131,7 @@ Function CreateAwards {
         'Logo| logo_resize| Name| out_name| base_color| ww',
         'Cesar.png| 1800| WINNERS| winner| #E2A845| 1',
         'Cesar.png| 1800| NOMINATIONS| nomination| #E2A845| 1'
-        'Cesar.png| 1800| BEST DIRECTOR\WINNERS| best_director_winner| #E2A845| 1',
+        'Cesar.png| 1800| BEST DIRECTOR WINNERS| best_director_winner| #E2A845| 1',
         'Cesar.png| 1800| BEST PICTURE WINNERS| best_picture_winner| #E2A845| 1',
         'Cesar.png| 1800| | Cesar| #E2A845| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
@@ -1224,7 +1224,7 @@ Function CreateAwards {
         'Logo| logo_resize| Name| out_name| base_color| ww',
         'Choice.png| 600| WINNERS| winner| #AC7427| 1',
         'Choice.png| 600| NOMINATIONS| nomination| #AC7427| 1'
-        'Choice.png| 600| BEST DIRECTOR\WINNERS| best_director_winner| #AC7427| 1',
+        'Choice.png| 600| BEST DIRECTOR WINNERS| best_director_winner| #AC7427| 1',
         'Choice.png| 600| BEST PICTURE WINNERS| best_picture_winner| #AC7427| 1',
         'Choice.png| 600|| Choice| #AC7427| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
@@ -1317,7 +1317,7 @@ Function CreateAwards {
         'Logo| logo_resize| Name| out_name| base_color| ww',
         'Emmys.png| 1500| WINNERS| winner| #D89C27| 1',
         'Emmys.png| 1500| NOMINATIONS| nomination| #D89C27| 1'
-        'Emmys.png| 1500| BEST DIRECTOR\WINNERS| best_director_winner| #D89C27| 1',
+        'Emmys.png| 1500| BEST DIRECTOR WINNERS| best_director_winner| #D89C27| 1',
         'Emmys.png| 1500| BEST PICTURE WINNERS| best_picture_winner| #D89C27| 1',
         'Emmys.png| 1500|| Emmys| #D89C27| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
@@ -1410,7 +1410,7 @@ Function CreateAwards {
         'Logo| logo_resize| Name| out_name| base_color| ww',
         'Golden.png| 1500| WINNERS| winner| #D0A047| 1',
         'Golden.png| 1500| NOMINATIONS| nomination| #D0A047| 1'
-        'Golden.png| 1500| BEST DIRECTOR\WINNERS| best_director_winner| #D0A047| 1',
+        'Golden.png| 1500| BEST DIRECTOR WINNERS| best_director_winner| #D0A047| 1',
         'Golden.png| 1500| BEST PICTURE WINNERS| best_picture_winner| #D0A047| 1',
         'Golden.png| 1500| | Golden| #D0A047| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
@@ -1503,7 +1503,7 @@ Function CreateAwards {
         'Logo| logo_resize| Name| out_name| base_color| ww',
         'Oscars.png| 1500| WINNERS| winner| #A9842E| 1',
         'Oscars.png| 1500| NOMINATIONS| nomination| #A9842E| 1'
-        'Oscars.png| 1500| BEST DIRECTOR\WINNERS| best_director_winner| #A9842E| 1',
+        'Oscars.png| 1500| BEST DIRECTOR WINNERS| best_director_winner| #A9842E| 1',
         'Oscars.png| 1500| BEST PICTURE WINNERS| best_picture_winner| #A9842E| 1',
         'Oscars.png| 1500| | Oscars| #A9842E| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
@@ -1596,7 +1596,7 @@ Function CreateAwards {
         'Logo| logo_resize| Name| out_name| base_color| ww',
         'Razzie.png| 1000| WINNERS| winner| #FF0C0C| 1',
         'Razzie.png| 1000| NOMINATIONS| nomination| #FF0C0C| 1',
-        'Razzie.png| 1000| BEST DIRECTOR\WINNERS| best_director_winner| #FF0C0C| 1',
+        'Razzie.png| 1000| BEST DIRECTOR WINNERS| best_director_winner| #FF0C0C| 1',
         'Razzie.png| 1000| BEST PICTURE WINNERS| best_picture_winner| #FF0C0C| 1',
         'Razzie.png| 1000| | Razzie| #FF0C0C| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
@@ -1689,7 +1689,7 @@ Function CreateAwards {
         'Logo| logo_resize| Name| out_name| base_color| ww',
         'Spirit.png| 1000| WINNERS| winner| #4662E7| 1',
         'Spirit.png| 1000| NOMINATIONS| nomination| #4662E7| 1'
-        'Spirit.png| 1000| BEST DIRECTOR\WINNERS| best_director_winner| #4662E7| 1',
+        'Spirit.png| 1000| BEST DIRECTOR WINNERS| best_director_winner| #4662E7| 1',
         'Spirit.png| 1000| BEST PICTURE WINNERS| best_picture_winner| #4662E7| 1',
         'Spirit.png| 1000| | Spirit| #4662E7| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
@@ -1782,7 +1782,7 @@ Function CreateAwards {
         'Logo| logo_resize| Name| out_name| base_color| ww',
         'Sundance.png| 1500| WINNERS| winner| #7EB2CF| 1',
         'Sundance.png| 1500| NOMINATIONS| nomination| #7EB2CF| 1'
-        'Sundance.png| 1500| BEST DIRECTOR\WINNERS| best_director_winner| #7EB2CF| 1',
+        'Sundance.png| 1500| BEST DIRECTOR WINNERS| best_director_winner| #7EB2CF| 1',
         'Sundance.png| 1500| BEST PICTURE WINNERS| best_picture_winner| #7EB2CF| 1',
         'Sundance.png| 1500| GRAND JURY WINNERS| grand_jury_winner| #7EB2CF| 1',
         'Sundance.png| 1500| | Sundance| #7EB2CF| 1'
@@ -1876,7 +1876,7 @@ Function CreateAwards {
         'Logo| logo_resize| Name| out_name| base_color| ww',
         'Venice.png| 1500| WINNERS| winner| #D21635| 1',
         'Venice.png| 1500| NOMINATIONS| nomination| #D21635| 1'
-        'Venice.png| 1500| BEST DIRECTOR\WINNERS| best_director_winner| #D21635| 1',
+        'Venice.png| 1500| BEST DIRECTOR WINNERS| best_director_winner| #D21635| 1',
         'Venice.png| 1500| BEST PICTURE WINNERS| best_picture_winner| #D21635| 1',
         'Venice.png| 1500| | Venice| #D21635| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
@@ -3417,164 +3417,226 @@ Function CreateUniverse {
 Function CreateYear {
     Write-Host "Creating Year"
     Set-Location $script_path
-    Find-Path "$script_path\year"
-    Find-Path "$script_path\year\best"
+    # Find-Path "$script_path\year"
+    # Find-Path "$script_path\year\best"
     WriteToLogFile "ImageMagick Commands for     : Years"
-    WriteToLogFile "ImageMagick Commands for     : Years-Best"
 
-    .\create_poster.ps1 -logo "$script_path\transparent.png" -logo_offset +0 -logo_resize 1800 -text "OTHER\nYEARS" -text_offset +0 -font "ComfortAa-Medium" -font_size 250 -font_color "#FFFFFF" -border 0 -border_width 15 -border_color "#FFFFFF" -avg_color_image "" -out_name "other" -base_color "#FF2000" -gradient 1 -avg_color 0 -clean 1 -white_wash 1
-    Move-Item output\other.jpg -Destination year
+    Move-Item -Path output -Destination output-orig
 
-    for ($i = 1880; $i -lt 1890; $i++) {
-        $j = $i - 1880
-        Convert-Years $script_path\@base\@zbase-0$j.png $script_path\@base\@zbase-best.png Rye-Regular 1900x500 $i "$script_path\year\best"
+    $theFont = "ComfortAa-Medium"
+    $theMaxWidth = 1800
+    $theMaxHeight = 1000
+    $minPointSize = 100
+    $maxPointSize = 250
+
+    $myArray = @(
+        'Logo| Name| out_name| base_color| ww',
+        'transparent.png| OTHER YEARS| other| #FF2000| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        $myvar =(Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
+        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.Logo)`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$myvar`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
+    }
+    LaunchScripts -ScriptPaths $arr
+
+
+    # $theFont = "ComfortAa-Medium"
+    $theMaxWidth = 1900
+    $theMaxHeight = 500
+    $minPointSize = 100
+    $maxPointSize = 400
+
+    $myArray = @(
+        'Name| out_name| base_color| font_name',
+        '1880| 1880| #EF10D3| Rye-Regular',
+        '1881| 1881| #EF102A| Rye-Regular',
+        '1882| 1882| #EF6210| Rye-Regular',
+        '1883| 1883| #EFC910| Rye-Regular',
+        '1884| 1884| #10EFA3| Rye-Regular',
+        '1885| 1885| #108FEF| Rye-Regular',
+        '1886| 1886| #A900EF| Rye-Regular',
+        '1887| 1887| #8D848E| Rye-Regular',
+        '1888| 1888| #992C2E| Rye-Regular',
+        '1889| 1889| #131CA1| Rye-Regular',
+        '1890| 1890| #EF10D3| Limelight-Regular',
+        '1891| 1891| #EF102A| Limelight-Regular',
+        '1892| 1892| #EF6210| Limelight-Regular',
+        '1893| 1893| #EFC910| Limelight-Regular',
+        '1894| 1894| #10EFA3| Limelight-Regular',
+        '1895| 1895| #108FEF| Limelight-Regular',
+        '1896| 1896| #A900EF| Limelight-Regular',
+        '1897| 1897| #8D848E| Limelight-Regular',
+        '1898| 1898| #992C2E| Limelight-Regular',
+        '1899| 1899| #131CA1| Limelight-Regular',
+        '1900| 1900| #EF10D3| BoecklinsUniverse',
+        '1901| 1901| #EF102A| BoecklinsUniverse',
+        '1902| 1902| #EF6210| BoecklinsUniverse',
+        '1903| 1903| #EFC910| BoecklinsUniverse',
+        '1904| 1904| #10EFA3| BoecklinsUniverse',
+        '1905| 1905| #108FEF| BoecklinsUniverse',
+        '1906| 1906| #A900EF| BoecklinsUniverse',
+        '1907| 1907| #8D848E| BoecklinsUniverse',
+        '1908| 1908| #992C2E| BoecklinsUniverse',
+        '1909| 1909| #131CA1| BoecklinsUniverse',
+        '1910| 1910| #EF10D3| Glass-Antiqua',
+        '1911| 1911| #EF102A| Glass-Antiqua',
+        '1912| 1912| #EF6210| Glass-Antiqua',
+        '1913| 1913| #EFC910| Glass-Antiqua',
+        '1914| 1914| #10EFA3| Glass-Antiqua',
+        '1915| 1915| #108FEF| Glass-Antiqua',
+        '1916| 1916| #A900EF| Glass-Antiqua',
+        '1917| 1917| #8D848E| Glass-Antiqua',
+        '1918| 1918| #992C2E| Glass-Antiqua',
+        '1919| 1919| #131CA1| Glass-Antiqua',
+        '1920| 1920| #EF10D3| Young-20s-Regular',
+        '1921| 1921| #EF102A| Young-20s-Regular',
+        '1922| 1922| #EF6210| Young-20s-Regular',
+        '1923| 1923| #EFC910| Young-20s-Regular',
+        '1924| 1924| #10EFA3| Young-20s-Regular',
+        '1925| 1925| #108FEF| Young-20s-Regular',
+        '1926| 1926| #A900EF| Young-20s-Regular',
+        '1927| 1927| #8D848E| Young-20s-Regular',
+        '1928| 1928| #992C2E| Young-20s-Regular',
+        '1929| 1929| #131CA1| Young-20s-Regular',
+        '1930| 1930| #EF10D3| AirstreamNF',
+        '1931| 1931| #EF102A| AirstreamNF',
+        '1932| 1932| #EF6210| AirstreamNF',
+        '1933| 1933| #EFC910| AirstreamNF',
+        '1934| 1934| #10EFA3| AirstreamNF',
+        '1935| 1935| #108FEF| AirstreamNF',
+        '1936| 1936| #A900EF| AirstreamNF',
+        '1937| 1937| #8D848E| AirstreamNF',
+        '1938| 1938| #992C2E| AirstreamNF',
+        '1939| 1939| #131CA1| AirstreamNF',
+        '1940| 1940| #EF10D3| RicksAmericanNF',
+        '1941| 1941| #EF102A| RicksAmericanNF',
+        '1942| 1942| #EF6210| RicksAmericanNF',
+        '1943| 1943| #EFC910| RicksAmericanNF',
+        '1944| 1944| #10EFA3| RicksAmericanNF',
+        '1945| 1945| #108FEF| RicksAmericanNF',
+        '1946| 1946| #A900EF| RicksAmericanNF',
+        '1947| 1947| #8D848E| RicksAmericanNF',
+        '1948| 1948| #992C2E| RicksAmericanNF',
+        '1949| 1949| #131CA1| RicksAmericanNF',
+        '1950| 1950| #EF10D3| Sacramento',
+        '1951| 1951| #EF102A| Sacramento',
+        '1952| 1952| #EF6210| Sacramento',
+        '1953| 1953| #EFC910| Sacramento',
+        '1954| 1954| #10EFA3| Sacramento',
+        '1955| 1955| #108FEF| Sacramento',
+        '1956| 1956| #A900EF| Sacramento',
+        '1957| 1957| #8D848E| Sacramento',
+        '1958| 1958| #992C2E| Sacramento',
+        '1959| 1959| #131CA1| Sacramento',
+        '1960| 1960| #EF10D3| ActionIs',
+        '1961| 1961| #EF102A| ActionIs',
+        '1962| 1962| #EF6210| ActionIs',
+        '1963| 1963| #EFC910| ActionIs',
+        '1964| 1964| #10EFA3| ActionIs',
+        '1965| 1965| #108FEF| ActionIs',
+        '1966| 1966| #A900EF| ActionIs',
+        '1967| 1967| #8D848E| ActionIs',
+        '1968| 1968| #992C2E| ActionIs',
+        '1969| 1969| #131CA1| ActionIs',
+        '1970| 1970| #EF10D3| Mexcellent-Regular',
+        '1971| 1971| #EF102A| Mexcellent-Regular',
+        '1972| 1972| #EF6210| Mexcellent-Regular',
+        '1973| 1973| #EFC910| Mexcellent-Regular',
+        '1974| 1974| #10EFA3| Mexcellent-Regular',
+        '1975| 1975| #108FEF| Mexcellent-Regular',
+        '1976| 1976| #A900EF| Mexcellent-Regular',
+        '1977| 1977| #8D848E| Mexcellent-Regular',
+        '1978| 1978| #992C2E| Mexcellent-Regular',
+        '1979| 1979| #131CA1| Mexcellent-Regular',
+        '1980| 1980| #EF10D3| Press-Start-2P',
+        '1981| 1981| #EF102A| Press-Start-2P',
+        '1982| 1982| #EF6210| Press-Start-2P',
+        '1983| 1983| #EFC910| Press-Start-2P',
+        '1984| 1984| #10EFA3| Press-Start-2P',
+        '1985| 1985| #108FEF| Press-Start-2P',
+        '1986| 1986| #A900EF| Press-Start-2P',
+        '1987| 1987| #8D848E| Press-Start-2P',
+        '1988| 1988| #992C2E| Press-Start-2P',
+        '1989| 1989| #131CA1| Press-Start-2P',
+        '1990| 1990| #EF10D3| Milenia',
+        '1991| 1991| #EF102A| Milenia',
+        '1992| 1992| #EF6210| Milenia',
+        '1993| 1993| #EFC910| Milenia',
+        '1994| 1994| #10EFA3| Milenia',
+        '1995| 1995| #108FEF| Milenia',
+        '1996| 1996| #A900EF| Milenia',
+        '1997| 1997| #8D848E| Milenia',
+        '1998| 1998| #992C2E| Milenia',
+        '1999| 1999| #131CA1| Milenia',
+        '2000| 2000| #EF10D3| XBAND-Rough',
+        '2001| 2001| #EF102A| XBAND-Rough',
+        '2002| 2002| #EF6210| XBAND-Rough',
+        '2003| 2003| #EFC910| XBAND-Rough',
+        '2004| 2004| #10EFA3| XBAND-Rough',
+        '2005| 2005| #108FEF| XBAND-Rough',
+        '2006| 2006| #A900EF| XBAND-Rough',
+        '2007| 2007| #8D848E| XBAND-Rough',
+        '2008| 2008| #992C2E| XBAND-Rough',
+        '2009| 2009| #131CA1| XBAND-Rough',
+        '2010| 2010| #EF10D3| VAL-UltraBlack',
+        '2011| 2011| #EF102A| VAL-UltraBlack',
+        '2012| 2012| #EF6210| VAL-UltraBlack',
+        '2013| 2013| #EFC910| VAL-UltraBlack',
+        '2014| 2014| #10EFA3| VAL-UltraBlack',
+        '2015| 2015| #108FEF| VAL-UltraBlack',
+        '2016| 2016| #A900EF| VAL-UltraBlack',
+        '2017| 2017| #8D848E| VAL-UltraBlack',
+        '2018| 2018| #992C2E| VAL-UltraBlack',
+        '2019| 2019| #131CA1| VAL-UltraBlack',
+        '2020| 2020| #EF10D3| Helvetica-Bold',
+        '2021| 2021| #EF102A| Helvetica-Bold',
+        '2022| 2022| #EF6210| Helvetica-Bold',
+        '2023| 2023| #EFC910| Helvetica-Bold',
+        '2024| 2024| #10EFA3| Helvetica-Bold',
+        '2025| 2025| #108FEF| Helvetica-Bold',
+        '2026| 2026| #A900EF| Helvetica-Bold',
+        '2027| 2027| #8D848E| Helvetica-Bold',
+        '2028| 2028| #992C2E| Helvetica-Bold',
+        '2029| 2029| #131CA1| Helvetica-Bold'
+    ) | ConvertFrom-Csv -Delimiter '|'
+    
+    $arr = @()
+    foreach ($item in $myArray) {
+        $myvar = $($item.Name)
+        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $($item.font_name) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$myvar`" -text_offset +0 -font `"$($item.font_name)`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     }
 
-    for ($i = 1890; $i -lt 1900; $i++) {
-        $j = $i - 1890
-        Convert-Years $script_path\@base\@zbase-0$j.png $script_path\@base\@zbase-best.png Limelight-Regular 1900x500 $i "$script_path\year\best"
-    }
+    LaunchScripts -ScriptPaths $arr
+    WriteToLogFile "MonitorProcess               : Waiting for all processes to end before continuing..."
+    Start-Sleep -Seconds 3
+    MonitorProcess -ProcessName "magick.exe"
+    
+    Move-Item -Path output -Destination year
 
-    for ($i = 1900; $i -lt 1910; $i++) {
-        $j = $i - 1900
-        Convert-Years $script_path\@base\@zbase-0$j.png $script_path\@base\@zbase-best.png BoecklinsUniverse 1900x500 $i "$script_path\year\best"
-    }
+    $myvar1 = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue "BEST OF" -CaseSensitivity Upper) 
 
-    for ($i = 1910; $i -lt 1920; $i++) {
-        $j = $i - 1910
-        Convert-Years $script_path\@base\@zbase-0$j.png $script_path\@base\@zbase-best.png Glass-Antiqua 1900x500 $i "$script_path\year\best"
-    }
+    $theFont = "ComfortAa-Medium"
+    $theMaxWidth = 1800
+    $theMaxHeight = 1000
+    $minPointSize = 100
+    $maxPointSize = 200
 
-    for ($i = 1920; $i -lt 1930; $i++) {
-        $j = $i - 1920
-        Convert-Years $script_path\@base\@zbase-0$j.png $script_path\@base\@zbase-best.png Young-20s-Regular 1900x500 $i "$script_path\year\best"
+    $arr = @()
+    for ($i = 1880; $i -lt 2030; $i++) {
+        $myvar = $myvar1
+        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\year\$i.jpg`" -logo_offset +0 -logo_resize 2000 -text `"$myvar`" -text_offset -300 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"#FFFFFF`" -gradient 1 -avg_color 0 -clean 1 -white_wash 0"
     }
+    LaunchScripts -ScriptPaths $arr
+    Start-Sleep -Seconds 3
+    MonitorProcess -ProcessName "magick.exe"
+    Move-Item -Path output -Destination "$script_path\year\best"
+    Move-Item -Path output-orig -Destination output
 
-    for ($i = 1930; $i -lt 1940; $i++) {
-        $j = $i - 1930
-        Convert-Years $script_path\@base\@zbase-0$j.png $script_path\@base\@zbase-best.png AirstreamNF 1900x500 $i "$script_path\year\best"
-    }
-
-    for ($i = 1940; $i -lt 1950; $i++) {
-        $j = $i - 1940
-        Convert-Years $script_path\@base\@zbase-0$j.png $script_path\@base\@zbase-best.png RicksAmericanNF 1900x500 $i "$script_path\year\best"
-    }
-
-    for ($i = 1950; $i -lt 1960; $i++) {
-        $j = $i - 1950
-        Convert-Years $script_path\@base\@zbase-0$j.png $script_path\@base\@zbase-best.png Sacramento 1900x500 $i "$script_path\year\best"
-    }
-
-    for ($i = 1960; $i -lt 1970; $i++) {
-        $j = $i - 1960
-        Convert-Years $script_path\@base\@zbase-0$j.png $script_path\@base\@zbase-best.png ActionIs 1900x500 $i "$script_path\year\best"
-    }
-
-    for ($i = 1970; $i -lt 1980; $i++) {
-        $j = $i - 1970
-        Convert-Years $script_path\@base\@zbase-0$j.png $script_path\@base\@zbase-best.png Mexcellent-Regular 1900x500 $i "$script_path\year\best"
-    }
-
-    for ($i = 1980; $i -lt 1990; $i++) {
-        $j = $i - 1980
-        Convert-Years $script_path\@base\@zbase-0$j.png $script_path\@base\@zbase-best.png Press-Start-2P 1900x300 $i "$script_path\year\best"
-    }
-
-    for ($i = 1990; $i -lt 2000; $i++) {
-        $j = $i - 1990
-        Convert-Years $script_path\@base\@zbase-0$j.png $script_path\@base\@zbase-best.png Milenia 1900x500 $i "$script_path\year\best"
-    }
-
-    for ($i = 2000; $i -lt 2010; $i++) {
-        $j = $i - 2000
-        Convert-Years $script_path\@base\@zbase-0$j.png $script_path\@base\@zbase-best.png XBAND-Rough 1900x500 $i "$script_path\year\best"
-    }
-
-    for ($i = 2010; $i -lt 2020; $i++) {
-        $j = $i - 2010
-        Convert-Years $script_path\@base\@zbase-0$j.png $script_path\@base\@zbase-best.png VAL-UltraBlack 1900x500 $i "$script_path\year\best"
-    }
-
-    for ($i = 2020; $i -lt 2030; $i++) {
-        $j = $i - 2020
-        Convert-Years $script_path\@base\@zbase-0$j.png $script_path\@base\@zbase-best.png Helvetica-Bold 1900x500 $i "$script_path\year\best"
-    }
-
-    WriteToLogFile "ImageMagick Commands for     : Years"
-    for ($i = 1880; $i -lt 1890; $i++) {
-        $j = $i - 1880
-        Convert-Years $script_path\@base\@zbase-0$j.png $script_path\@base\@zbase-0$j.png Rye-Regular 1900x500 $i "$script_path\year"
-    }
-
-    for ($i = 1890; $i -lt 1900; $i++) {
-        $j = $i - 1890
-        Convert-Years $script_path\@base\@zbase-0$j.png $script_path\@base\@zbase-0$j.png Limelight-Regular 1900x500 $i "$script_path\year"
-    }
-
-    for ($i = 1900; $i -lt 1910; $i++) {
-        $j = $i - 1900
-        Convert-Years $script_path\@base\@zbase-0$j.png $script_path\@base\@zbase-0$j.png BoecklinsUniverse 1900x500 $i "$script_path\year"
-    }
-
-    for ($i = 1910; $i -lt 1920; $i++) {
-        $j = $i - 1910
-        Convert-Years $script_path\@base\@zbase-0$j.png $script_path\@base\@zbase-0$j.png Glass-Antiqua 1900x500 $i "$script_path\year"
-    }
-
-    for ($i = 1920; $i -lt 1930; $i++) {
-        $j = $i - 1920
-        Convert-Years $script_path\@base\@zbase-0$j.png $script_path\@base\@zbase-0$j.png Young-20s-Regular 1900x500 $i "$script_path\year"
-    }
-
-    for ($i = 1930; $i -lt 1940; $i++) {
-        $j = $i - 1930
-        Convert-Years $script_path\@base\@zbase-0$j.png $script_path\@base\@zbase-0$j.png AirstreamNF 1900x500 $i "$script_path\year"
-    }
-
-    for ($i = 1940; $i -lt 1950; $i++) {
-        $j = $i - 1940
-        Convert-Years $script_path\@base\@zbase-0$j.png $script_path\@base\@zbase-0$j.png RicksAmericanNF 1900x500 $i "$script_path\year"
-    }
-
-    for ($i = 1950; $i -lt 1960; $i++) {
-        $j = $i - 1950
-        Convert-Years $script_path\@base\@zbase-0$j.png $script_path\@base\@zbase-0$j.png Sacramento 1900x500 $i "$script_path\year"
-    }
-
-    for ($i = 1960; $i -lt 1970; $i++) {
-        $j = $i - 1960
-        Convert-Years $script_path\@base\@zbase-0$j.png $script_path\@base\@zbase-0$j.png ActionIs 1900x500 $i "$script_path\year"
-    }
-
-    for ($i = 1970; $i -lt 1980; $i++) {
-        $j = $i - 1970
-        Convert-Years $script_path\@base\@zbase-0$j.png $script_path\@base\@zbase-0$j.png Mexcellent-Regular 1900x500 $i "$script_path\year"
-    }
-
-    for ($i = 1980; $i -lt 1990; $i++) {
-        $j = $i - 1980
-        Convert-Years $script_path\@base\@zbase-0$j.png $script_path\@base\@zbase-0$j.png Press-Start-2P 1900x300 $i "$script_path\year"
-    }
-
-    for ($i = 1990; $i -lt 2000; $i++) {
-        $j = $i - 1990
-        Convert-Years $script_path\@base\@zbase-0$j.png $script_path\@base\@zbase-0$j.png Milenia 1900x500 $i "$script_path\year"
-    }
-
-    for ($i = 2000; $i -lt 2010; $i++) {
-        $j = $i - 2000
-        Convert-Years $script_path\@base\@zbase-0$j.png $script_path\@base\@zbase-0$j.png XBAND-Rough 1900x500 $i "$script_path\year"
-    }
-
-    for ($i = 2010; $i -lt 2020; $i++) {
-        $j = $i - 2010
-        Convert-Years $script_path\@base\@zbase-0$j.png $script_path\@base\@zbase-0$j.png VAL-UltraBlack 1900x500 $i "$script_path\year"
-    }
-
-    for ($i = 2020; $i -lt 2030; $i++) {
-        $j = $i - 2020
-        Convert-Years $script_path\@base\@zbase-0$j.png $script_path\@base\@zbase-0$j.png Helvetica-Bold 1900x500 $i "$script_path\year"
-    }
 }
 
 ################################################################################
@@ -4019,8 +4081,9 @@ foreach ($param in $args) {
 
 if (!$args) {
     # ShowFunctions
-    CreateBased
-    CreateAudioLanguage
+    CreateYear
+    # CreateBased
+    # CreateAudioLanguage
 }
 
 #######################
