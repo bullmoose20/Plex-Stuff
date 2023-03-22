@@ -570,45 +570,6 @@ Function MoveFiles {
 }
 
 ################################################################################
-# Function: Convert-Decades
-# Description: Creates the decade posters
-################################################################################
-Function Convert-Decades ($theBackdrop, $theBase, $theNumber, $thePathOnly) {
-    WriteToLogFile "theBackdrop                  : $theBackdrop"
-    WriteToLogFile "theBase                      : $theBase"
-    WriteToLogFile "theNumber                    : $theNumber"
-    WriteToLogFile "thePathOnly                  : $thePathOnly"
-    $tmp = $null
-    $tmp = $theNumber, "s" | Join-String
-    $baseName = "@zbase-$tmp.png"
-    $basePath = Join-Path $script_path "@base"
-    $basePathFull = Join-Path $basePath $baseName
-    $baseOut = Join-Path $thePathOnly "$theNumber.jpg"
-    
-    WriteToLogFile "theDecadeTemplate            : $basePathFull"
-    $cmd = "$theBackdrop $theBase $basePathFull -gravity center -background None -layers Flatten $baseOut"
-    # $cmd = "$theBackdrop $theBase $script_path\@base\@zbase-$tmp.png -gravity center -background None -layers Flatten $thePathOnly\$theNumber.jpg"
-    WriteToLogFile "magick command               : magick $cmd"
-    Start-Process -NoNewWindow magick $cmd
-}
-
-################################################################################
-# Function: Convert-Years
-# Description: Creates the years posters
-################################################################################
-Function Convert-Years ($theBackdrop, $theBase, $theFont, $theTextSize, $theNumber, $thePathOnly) {
-    WriteToLogFile "theBackdrop                  : $theBackdrop"
-    WriteToLogFile "theBase                      : $theBase"
-    WriteToLogFile "theFont                      : $theFont"
-    WriteToLogFile "theTextSize                  : $theTextSize"
-    WriteToLogFile "theNumber                    : $theNumber"
-    WriteToLogFile "thePathOnly                  : $thePathOnly"
-    $cmd = "$theBackdrop $theBase -gravity center -background None -layers Flatten `( -font $theFont -fill white -size $theTextSize -background none label:""$theNumber"" -trim -gravity center -extent $theTextSize `) -gravity center -geometry +0+0 -composite $thePathOnly\$theNumber.jpg"
-    WriteToLogFile "magick command               : magick $cmd"
-    Start-Process -NoNewWindow magick $cmd
-}
-
-################################################################################
 # Function: CreateAudioLanguage
 # Description:  Creates audio language
 ################################################################################
@@ -2326,38 +2287,71 @@ Function CreateCountry {
 # Description:  Creates Decade
 ################################################################################
 Function CreateDecade {
-    # Define paths
-    $decade_path = Join-Path $script_path "decade"
-    $best_path = Join-Path $decade_path "best"
-    $logo_path = Join-Path $script_path "transparent.png"
-    $output_path = Join-Path $script_path "output"
-    $base_path = Join-Path $script_path "@base"
-    $base_decade_path = Join-Path $base_path "@zbase-decade.png"
-    $base_best_path = Join-Path $base_path "@zbase-best.png"
-    $create_poster_path = Join-Path $script_path "create_poster.ps1"
-
-    # Create directories
-    New-Item -ItemType Directory -Force -Path $decade_path
-    New-Item -ItemType Directory -Force -Path $best_path
-    New-Item -ItemType Directory -Force -Path $output_path
-
     Write-Host "Creating Decade"
     Set-Location $script_path
-    Find-Path $decade_path
-    Find-Path $best_path
     WriteToLogFile "ImageMagick Commands for     : Decades"
-    WriteToLogFile "ImageMagick Commands for     : Decades-Best"
-    & $create_poster_path -logo $logo_path -logo_offset +0 -logo_resize 1800 -text "OTHER\nDECADES" -text_offset +0 -font "ComfortAa-Medium" -font_size 250 -font_color "#FFFFFF" -border 0 -border_width 15 -border_color "#FFFFFF" -avg_color_image "" -out_name "other" -base_color "#FF2000" -gradient 1 -avg_color 0 -clean 1 -white_wash 1
-    Move-Item (Join-Path $output_path "other.jpg") -Destination $decade_path
-        
-    for ($i = 1880; $i -lt 2030; $i += 10) {
-        Convert-Decades $base_decade_path $base_best_path $i $best_path
-    }
+
+    Move-Item -Path output -Destination output-orig
+
+    # $theFont = "ComfortAa-Medium"
+    $theMaxWidth = 1900
+    $theMaxHeight = 550
+    $minPointSize = 250
+    $maxPointSize = 1000
+
+    $myArray = @(
+        'Name| out_name| base_color| font_name| font_size',
+        '1880s| 1880| #44EF10| Rye-Regular| 453',
+        '1890s| 1890| #44EF10| Limelight-Regular| 453',
+        '1900s| 1900| #44EF10| BoecklinsUniverse| 453',
+        '1910s| 1910| #44EF10| UnifrakturCook| 700',
+        '1920s| 1920| #44EF10| Trochut| 500',
+        '1930s| 1930| #44EF10| Righteous| 500',
+        '1940s| 1940| #44EF10| Yesteryear| 700',
+        '1950s| 1950| #44EF10| Cherry-Cream-Soda-Regular| 500',
+        '1960s| 1960| #44EF10| Boogaloo-Regular| 500',
+        '1970s| 1970| #44EF10| Monoton| 500',
+        '1980s| 1980| #44EF10| Press-Start-2P| 300',
+        '1990s| 1990| #44EF10| Jura-Bold| 500',
+        '2000s| 2000| #44EF10| Special-Elite-Regular| 500',
+        '2010s| 2010| #44EF10| Barlow-Regular| 500',
+        '2020s| 2020| #44EF10| Helvetica-Bold| 500'
+    ) | ConvertFrom-Csv -Delimiter '|'
     
-    WriteToLogFile "ImageMagick Commands for     : Decades"
-    for ($i = 1880; $i -lt 2030; $i += 10) {
-        Convert-Decades $base_decade_path $base_decade_path $i $decade_path
+    $arr = @()
+    foreach ($item in $myArray) {
+        $myvar = $($item.Name)
+        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $($item.font_name) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $($item.font_size)
+        $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$myvar`" -text_offset +0 -font `"$($item.font_name)`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     }
+
+    LaunchScripts -ScriptPaths $arr
+    WriteToLogFile "MonitorProcess               : Waiting for all processes to end before continuing..."
+    Start-Sleep -Seconds 3
+    MonitorProcess -ProcessName "magick.exe"
+    
+    Move-Item -Path output -Destination decade
+
+    $myvar1 = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue "BEST OF" -CaseSensitivity Upper) 
+
+    $theFont = "ComfortAa-Medium"
+    $theMaxWidth = 1800
+    $theMaxHeight = 1000
+    $minPointSize = 100
+    $maxPointSize = 200
+
+    $arr = @()
+    for ($i = 1880; $i -lt 2030; $i += 10) {
+        $myvar = $myvar1
+        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\decade\$i.jpg`" -logo_offset +0 -logo_resize 2000 -text `"$myvar`" -text_offset -400 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"#FFFFFF`" -gradient 1 -avg_color 0 -clean 1 -white_wash 0"
+    }
+    LaunchScripts -ScriptPaths $arr
+    Start-Sleep -Seconds 3
+    MonitorProcess -ProcessName "magick.exe"
+    Move-Item -Path output -Destination "$script_path\decade\best"
+    Move-Item -Path output-orig -Destination output
+
 }
 
 ################################################################################
