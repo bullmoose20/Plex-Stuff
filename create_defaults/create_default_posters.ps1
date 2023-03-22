@@ -132,14 +132,6 @@ Function Compare-FileChecksum {
 
     $actualChecksum = Get-FileHash $Path -Algorithm SHA256 | Select-Object -ExpandProperty Hash
 
-    $status = if ($actualChecksum -eq $ExpectedChecksum) {
-        "Success"
-    }
-    else {
-        $failFlag.Value = $true
-        "Failed"
-    }
-
     $output = [PSCustomObject]@{
         Path             = $Path
         ExpectedChecksum = $ExpectedChecksum
@@ -148,7 +140,15 @@ Function Compare-FileChecksum {
         failFlag         = $failFlag
     }
 
-    WriteToLogFile "Checksum verification        : $($output.Status) for file $($output.Path). Expected checksum: $($output.ExpectedChecksum), actual checksum: $($output.ActualChecksum)."
+    $status = if ($actualChecksum -eq $ExpectedChecksum) {
+        "Success"
+        WriteToLogFile "Checksum verification        : Success for file $($output.Path). Expected checksum: $($output.ExpectedChecksum), actual checksum: $($output.ActualChecksum)."
+    }
+    else {
+        $failFlag.Value = $true
+        "Failed"
+        WriteToLogFile "Checksum verification [ERROR]: Failed for file $($output.Path). Expected checksum: $($output.ExpectedChecksum), actual checksum: $($output.ActualChecksum)."
+    }
 
     return $output
 }
@@ -3436,7 +3436,7 @@ Function CreateYear {
 
     $arr = @()
     foreach ($item in $myArray) {
-        $myvar =(Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
+        $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
         $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
         $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.Logo)`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$myvar`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     }
@@ -3445,168 +3445,168 @@ Function CreateYear {
 
     # $theFont = "ComfortAa-Medium"
     $theMaxWidth = 1900
-    $theMaxHeight = 500
-    $minPointSize = 100
-    $maxPointSize = 400
+    $theMaxHeight = 550
+    $minPointSize = 250
+    $maxPointSize = 1000
 
     $myArray = @(
-        'Name| out_name| base_color| font_name',
-        '1880| 1880| #EF10D3| Rye-Regular',
-        '1881| 1881| #EF102A| Rye-Regular',
-        '1882| 1882| #EF6210| Rye-Regular',
-        '1883| 1883| #EFC910| Rye-Regular',
-        '1884| 1884| #10EFA3| Rye-Regular',
-        '1885| 1885| #108FEF| Rye-Regular',
-        '1886| 1886| #A900EF| Rye-Regular',
-        '1887| 1887| #8D848E| Rye-Regular',
-        '1888| 1888| #992C2E| Rye-Regular',
-        '1889| 1889| #131CA1| Rye-Regular',
-        '1890| 1890| #EF10D3| Limelight-Regular',
-        '1891| 1891| #EF102A| Limelight-Regular',
-        '1892| 1892| #EF6210| Limelight-Regular',
-        '1893| 1893| #EFC910| Limelight-Regular',
-        '1894| 1894| #10EFA3| Limelight-Regular',
-        '1895| 1895| #108FEF| Limelight-Regular',
-        '1896| 1896| #A900EF| Limelight-Regular',
-        '1897| 1897| #8D848E| Limelight-Regular',
-        '1898| 1898| #992C2E| Limelight-Regular',
-        '1899| 1899| #131CA1| Limelight-Regular',
-        '1900| 1900| #EF10D3| BoecklinsUniverse',
-        '1901| 1901| #EF102A| BoecklinsUniverse',
-        '1902| 1902| #EF6210| BoecklinsUniverse',
-        '1903| 1903| #EFC910| BoecklinsUniverse',
-        '1904| 1904| #10EFA3| BoecklinsUniverse',
-        '1905| 1905| #108FEF| BoecklinsUniverse',
-        '1906| 1906| #A900EF| BoecklinsUniverse',
-        '1907| 1907| #8D848E| BoecklinsUniverse',
-        '1908| 1908| #992C2E| BoecklinsUniverse',
-        '1909| 1909| #131CA1| BoecklinsUniverse',
-        '1910| 1910| #EF10D3| Glass-Antiqua',
-        '1911| 1911| #EF102A| Glass-Antiqua',
-        '1912| 1912| #EF6210| Glass-Antiqua',
-        '1913| 1913| #EFC910| Glass-Antiqua',
-        '1914| 1914| #10EFA3| Glass-Antiqua',
-        '1915| 1915| #108FEF| Glass-Antiqua',
-        '1916| 1916| #A900EF| Glass-Antiqua',
-        '1917| 1917| #8D848E| Glass-Antiqua',
-        '1918| 1918| #992C2E| Glass-Antiqua',
-        '1919| 1919| #131CA1| Glass-Antiqua',
-        '1920| 1920| #EF10D3| Young-20s-Regular',
-        '1921| 1921| #EF102A| Young-20s-Regular',
-        '1922| 1922| #EF6210| Young-20s-Regular',
-        '1923| 1923| #EFC910| Young-20s-Regular',
-        '1924| 1924| #10EFA3| Young-20s-Regular',
-        '1925| 1925| #108FEF| Young-20s-Regular',
-        '1926| 1926| #A900EF| Young-20s-Regular',
-        '1927| 1927| #8D848E| Young-20s-Regular',
-        '1928| 1928| #992C2E| Young-20s-Regular',
-        '1929| 1929| #131CA1| Young-20s-Regular',
-        '1930| 1930| #EF10D3| AirstreamNF',
-        '1931| 1931| #EF102A| AirstreamNF',
-        '1932| 1932| #EF6210| AirstreamNF',
-        '1933| 1933| #EFC910| AirstreamNF',
-        '1934| 1934| #10EFA3| AirstreamNF',
-        '1935| 1935| #108FEF| AirstreamNF',
-        '1936| 1936| #A900EF| AirstreamNF',
-        '1937| 1937| #8D848E| AirstreamNF',
-        '1938| 1938| #992C2E| AirstreamNF',
-        '1939| 1939| #131CA1| AirstreamNF',
-        '1940| 1940| #EF10D3| RicksAmericanNF',
-        '1941| 1941| #EF102A| RicksAmericanNF',
-        '1942| 1942| #EF6210| RicksAmericanNF',
-        '1943| 1943| #EFC910| RicksAmericanNF',
-        '1944| 1944| #10EFA3| RicksAmericanNF',
-        '1945| 1945| #108FEF| RicksAmericanNF',
-        '1946| 1946| #A900EF| RicksAmericanNF',
-        '1947| 1947| #8D848E| RicksAmericanNF',
-        '1948| 1948| #992C2E| RicksAmericanNF',
-        '1949| 1949| #131CA1| RicksAmericanNF',
-        '1950| 1950| #EF10D3| Sacramento',
-        '1951| 1951| #EF102A| Sacramento',
-        '1952| 1952| #EF6210| Sacramento',
-        '1953| 1953| #EFC910| Sacramento',
-        '1954| 1954| #10EFA3| Sacramento',
-        '1955| 1955| #108FEF| Sacramento',
-        '1956| 1956| #A900EF| Sacramento',
-        '1957| 1957| #8D848E| Sacramento',
-        '1958| 1958| #992C2E| Sacramento',
-        '1959| 1959| #131CA1| Sacramento',
-        '1960| 1960| #EF10D3| ActionIs',
-        '1961| 1961| #EF102A| ActionIs',
-        '1962| 1962| #EF6210| ActionIs',
-        '1963| 1963| #EFC910| ActionIs',
-        '1964| 1964| #10EFA3| ActionIs',
-        '1965| 1965| #108FEF| ActionIs',
-        '1966| 1966| #A900EF| ActionIs',
-        '1967| 1967| #8D848E| ActionIs',
-        '1968| 1968| #992C2E| ActionIs',
-        '1969| 1969| #131CA1| ActionIs',
-        '1970| 1970| #EF10D3| Mexcellent-Regular',
-        '1971| 1971| #EF102A| Mexcellent-Regular',
-        '1972| 1972| #EF6210| Mexcellent-Regular',
-        '1973| 1973| #EFC910| Mexcellent-Regular',
-        '1974| 1974| #10EFA3| Mexcellent-Regular',
-        '1975| 1975| #108FEF| Mexcellent-Regular',
-        '1976| 1976| #A900EF| Mexcellent-Regular',
-        '1977| 1977| #8D848E| Mexcellent-Regular',
-        '1978| 1978| #992C2E| Mexcellent-Regular',
-        '1979| 1979| #131CA1| Mexcellent-Regular',
-        '1980| 1980| #EF10D3| Press-Start-2P',
-        '1981| 1981| #EF102A| Press-Start-2P',
-        '1982| 1982| #EF6210| Press-Start-2P',
-        '1983| 1983| #EFC910| Press-Start-2P',
-        '1984| 1984| #10EFA3| Press-Start-2P',
-        '1985| 1985| #108FEF| Press-Start-2P',
-        '1986| 1986| #A900EF| Press-Start-2P',
-        '1987| 1987| #8D848E| Press-Start-2P',
-        '1988| 1988| #992C2E| Press-Start-2P',
-        '1989| 1989| #131CA1| Press-Start-2P',
-        '1990| 1990| #EF10D3| Milenia',
-        '1991| 1991| #EF102A| Milenia',
-        '1992| 1992| #EF6210| Milenia',
-        '1993| 1993| #EFC910| Milenia',
-        '1994| 1994| #10EFA3| Milenia',
-        '1995| 1995| #108FEF| Milenia',
-        '1996| 1996| #A900EF| Milenia',
-        '1997| 1997| #8D848E| Milenia',
-        '1998| 1998| #992C2E| Milenia',
-        '1999| 1999| #131CA1| Milenia',
-        '2000| 2000| #EF10D3| XBAND-Rough',
-        '2001| 2001| #EF102A| XBAND-Rough',
-        '2002| 2002| #EF6210| XBAND-Rough',
-        '2003| 2003| #EFC910| XBAND-Rough',
-        '2004| 2004| #10EFA3| XBAND-Rough',
-        '2005| 2005| #108FEF| XBAND-Rough',
-        '2006| 2006| #A900EF| XBAND-Rough',
-        '2007| 2007| #8D848E| XBAND-Rough',
-        '2008| 2008| #992C2E| XBAND-Rough',
-        '2009| 2009| #131CA1| XBAND-Rough',
-        '2010| 2010| #EF10D3| VAL-UltraBlack',
-        '2011| 2011| #EF102A| VAL-UltraBlack',
-        '2012| 2012| #EF6210| VAL-UltraBlack',
-        '2013| 2013| #EFC910| VAL-UltraBlack',
-        '2014| 2014| #10EFA3| VAL-UltraBlack',
-        '2015| 2015| #108FEF| VAL-UltraBlack',
-        '2016| 2016| #A900EF| VAL-UltraBlack',
-        '2017| 2017| #8D848E| VAL-UltraBlack',
-        '2018| 2018| #992C2E| VAL-UltraBlack',
-        '2019| 2019| #131CA1| VAL-UltraBlack',
-        '2020| 2020| #EF10D3| Helvetica-Bold',
-        '2021| 2021| #EF102A| Helvetica-Bold',
-        '2022| 2022| #EF6210| Helvetica-Bold',
-        '2023| 2023| #EFC910| Helvetica-Bold',
-        '2024| 2024| #10EFA3| Helvetica-Bold',
-        '2025| 2025| #108FEF| Helvetica-Bold',
-        '2026| 2026| #A900EF| Helvetica-Bold',
-        '2027| 2027| #8D848E| Helvetica-Bold',
-        '2028| 2028| #992C2E| Helvetica-Bold',
-        '2029| 2029| #131CA1| Helvetica-Bold'
+        'Name| out_name| base_color| font_name| font_size',
+        '1880| 1880| #EF10D3| Rye-Regular| 453',
+        '1881| 1881| #EF102A| Rye-Regular| 453',
+        '1882| 1882| #EF6210| Rye-Regular| 453',
+        '1883| 1883| #EFC910| Rye-Regular| 453',
+        '1884| 1884| #10EFA3| Rye-Regular| 453',
+        '1885| 1885| #108FEF| Rye-Regular| 453',
+        '1886| 1886| #A900EF| Rye-Regular| 453',
+        '1887| 1887| #8D848E| Rye-Regular| 453',
+        '1888| 1888| #992C2E| Rye-Regular| 453',
+        '1889| 1889| #131CA1| Rye-Regular| 453',
+        '1890| 1890| #EF10D3| Limelight-Regular| 453',
+        '1891| 1891| #EF102A| Limelight-Regular| 453',
+        '1892| 1892| #EF6210| Limelight-Regular| 453',
+        '1893| 1893| #EFC910| Limelight-Regular| 453',
+        '1894| 1894| #10EFA3| Limelight-Regular| 453',
+        '1895| 1895| #108FEF| Limelight-Regular| 453',
+        '1896| 1896| #A900EF| Limelight-Regular| 453',
+        '1897| 1897| #8D848E| Limelight-Regular| 453',
+        '1898| 1898| #992C2E| Limelight-Regular| 453',
+        '1899| 1899| #131CA1| Limelight-Regular| 453',
+        '1900| 1900| #EF10D3| BoecklinsUniverse| 453',
+        '1901| 1901| #EF102A| BoecklinsUniverse| 453',
+        '1902| 1902| #EF6210| BoecklinsUniverse| 453',
+        '1903| 1903| #EFC910| BoecklinsUniverse| 453',
+        '1904| 1904| #10EFA3| BoecklinsUniverse| 453',
+        '1905| 1905| #108FEF| BoecklinsUniverse| 453',
+        '1906| 1906| #A900EF| BoecklinsUniverse| 453',
+        '1907| 1907| #8D848E| BoecklinsUniverse| 453',
+        '1908| 1908| #992C2E| BoecklinsUniverse| 453',
+        '1909| 1909| #131CA1| BoecklinsUniverse| 453',
+        '1910| 1910| #EF10D3| UnifrakturCook| 700',
+        '1911| 1911| #EF102A| UnifrakturCook| 700',
+        '1912| 1912| #EF6210| UnifrakturCook| 700',
+        '1913| 1913| #EFC910| UnifrakturCook| 700',
+        '1914| 1914| #10EFA3| UnifrakturCook| 700',
+        '1915| 1915| #108FEF| UnifrakturCook| 700',
+        '1916| 1916| #A900EF| UnifrakturCook| 700',
+        '1917| 1917| #8D848E| UnifrakturCook| 700',
+        '1918| 1918| #992C2E| UnifrakturCook| 700',
+        '1919| 1919| #131CA1| UnifrakturCook| 700',
+        '1920| 1920| #EF10D3| Trochut| 500',
+        '1921| 1921| #EF102A| Trochut| 500',
+        '1922| 1922| #EF6210| Trochut| 500',
+        '1923| 1923| #EFC910| Trochut| 500',
+        '1924| 1924| #10EFA3| Trochut| 500',
+        '1925| 1925| #108FEF| Trochut| 500',
+        '1926| 1926| #A900EF| Trochut| 500',
+        '1927| 1927| #8D848E| Trochut| 500',
+        '1928| 1928| #992C2E| Trochut| 500',
+        '1929| 1929| #131CA1| Trochut| 500',
+        '1930| 1930| #EF10D3| Righteous| 500',
+        '1931| 1931| #EF102A| Righteous| 500',
+        '1932| 1932| #EF6210| Righteous| 500',
+        '1933| 1933| #EFC910| Righteous| 500',
+        '1934| 1934| #10EFA3| Righteous| 500',
+        '1935| 1935| #108FEF| Righteous| 500',
+        '1936| 1936| #A900EF| Righteous| 500',
+        '1937| 1937| #8D848E| Righteous| 500',
+        '1938| 1938| #992C2E| Righteous| 500',
+        '1939| 1939| #131CA1| Righteous| 500',
+        '1940| 1940| #EF10D3| Yesteryear| 700',
+        '1941| 1941| #EF102A| Yesteryear| 700',
+        '1942| 1942| #EF6210| Yesteryear| 700',
+        '1943| 1943| #EFC910| Yesteryear| 700',
+        '1944| 1944| #10EFA3| Yesteryear| 700',
+        '1945| 1945| #108FEF| Yesteryear| 700',
+        '1946| 1946| #A900EF| Yesteryear| 700',
+        '1947| 1947| #8D848E| Yesteryear| 700',
+        '1948| 1948| #992C2E| Yesteryear| 700',
+        '1949| 1949| #131CA1| Yesteryear| 700',
+        '1950| 1950| #EF10D3| Cherry-Cream-Soda-Regular| 500',
+        '1951| 1951| #EF102A| Cherry-Cream-Soda-Regular| 500',
+        '1952| 1952| #EF6210| Cherry-Cream-Soda-Regular| 500',
+        '1953| 1953| #EFC910| Cherry-Cream-Soda-Regular| 500',
+        '1954| 1954| #10EFA3| Cherry-Cream-Soda-Regular| 500',
+        '1955| 1955| #108FEF| Cherry-Cream-Soda-Regular| 500',
+        '1956| 1956| #A900EF| Cherry-Cream-Soda-Regular| 500',
+        '1957| 1957| #8D848E| Cherry-Cream-Soda-Regular| 500',
+        '1958| 1958| #992C2E| Cherry-Cream-Soda-Regular| 500',
+        '1959| 1959| #131CA1| Cherry-Cream-Soda-Regular| 500',
+        '1960| 1960| #EF10D3| Boogaloo-Regular| 500',
+        '1961| 1961| #EF102A| Boogaloo-Regular| 500',
+        '1962| 1962| #EF6210| Boogaloo-Regular| 500',
+        '1963| 1963| #EFC910| Boogaloo-Regular| 500',
+        '1964| 1964| #10EFA3| Boogaloo-Regular| 500',
+        '1965| 1965| #108FEF| Boogaloo-Regular| 500',
+        '1966| 1966| #A900EF| Boogaloo-Regular| 500',
+        '1967| 1967| #8D848E| Boogaloo-Regular| 500',
+        '1968| 1968| #992C2E| Boogaloo-Regular| 500',
+        '1969| 1969| #131CA1| Boogaloo-Regular| 500',
+        '1970| 1970| #EF10D3| Monoton| 500',
+        '1971| 1971| #EF102A| Monoton| 500',
+        '1972| 1972| #EF6210| Monoton| 500',
+        '1973| 1973| #EFC910| Monoton| 500',
+        '1974| 1974| #10EFA3| Monoton| 500',
+        '1975| 1975| #108FEF| Monoton| 500',
+        '1976| 1976| #A900EF| Monoton| 500',
+        '1977| 1977| #8D848E| Monoton| 500',
+        '1978| 1978| #992C2E| Monoton| 500',
+        '1979| 1979| #131CA1| Monoton| 500',
+        '1980| 1980| #EF10D3| Press-Start-2P| 300',
+        '1981| 1981| #EF102A| Press-Start-2P| 300',
+        '1982| 1982| #EF6210| Press-Start-2P| 300',
+        '1983| 1983| #EFC910| Press-Start-2P| 300',
+        '1984| 1984| #10EFA3| Press-Start-2P| 300',
+        '1985| 1985| #108FEF| Press-Start-2P| 300',
+        '1986| 1986| #A900EF| Press-Start-2P| 300',
+        '1987| 1987| #8D848E| Press-Start-2P| 300',
+        '1988| 1988| #992C2E| Press-Start-2P| 300',
+        '1989| 1989| #131CA1| Press-Start-2P| 300',
+        '1990| 1990| #EF10D3| Jura-Bold| 500',
+        '1991| 1991| #EF102A| Jura-Bold| 500',
+        '1992| 1992| #EF6210| Jura-Bold| 500',
+        '1993| 1993| #EFC910| Jura-Bold| 500',
+        '1994| 1994| #10EFA3| Jura-Bold| 500',
+        '1995| 1995| #108FEF| Jura-Bold| 500',
+        '1996| 1996| #A900EF| Jura-Bold| 500',
+        '1997| 1997| #8D848E| Jura-Bold| 500',
+        '1998| 1998| #992C2E| Jura-Bold| 500',
+        '1999| 1999| #131CA1| Jura-Bold| 500',
+        '2000| 2000| #EF10D3| Special-Elite-Regular| 500',
+        '2001| 2001| #EF102A| Special-Elite-Regular| 500',
+        '2002| 2002| #EF6210| Special-Elite-Regular| 500',
+        '2003| 2003| #EFC910| Special-Elite-Regular| 500',
+        '2004| 2004| #10EFA3| Special-Elite-Regular| 500',
+        '2005| 2005| #108FEF| Special-Elite-Regular| 500',
+        '2006| 2006| #A900EF| Special-Elite-Regular| 500',
+        '2007| 2007| #8D848E| Special-Elite-Regular| 500',
+        '2008| 2008| #992C2E| Special-Elite-Regular| 500',
+        '2009| 2009| #131CA1| Special-Elite-Regular| 500',
+        '2010| 2010| #EF10D3| Barlow-Regular| 500',
+        '2011| 2011| #EF102A| Barlow-Regular| 500',
+        '2012| 2012| #EF6210| Barlow-Regular| 500',
+        '2013| 2013| #EFC910| Barlow-Regular| 500',
+        '2014| 2014| #10EFA3| Barlow-Regular| 500',
+        '2015| 2015| #108FEF| Barlow-Regular| 500',
+        '2016| 2016| #A900EF| Barlow-Regular| 500',
+        '2017| 2017| #8D848E| Barlow-Regular| 500',
+        '2018| 2018| #992C2E| Barlow-Regular| 500',
+        '2019| 2019| #131CA1| Barlow-Regular| 500',
+        '2020| 2020| #EF10D3| Helvetica-Bold| 500',
+        '2021| 2021| #EF102A| Helvetica-Bold| 500',
+        '2022| 2022| #EF6210| Helvetica-Bold| 500',
+        '2023| 2023| #EFC910| Helvetica-Bold| 500',
+        '2024| 2024| #10EFA3| Helvetica-Bold| 500',
+        '2025| 2025| #108FEF| Helvetica-Bold| 500',
+        '2026| 2026| #A900EF| Helvetica-Bold| 500',
+        '2027| 2027| #8D848E| Helvetica-Bold| 500',
+        '2028| 2028| #992C2E| Helvetica-Bold| 500',
+        '2029| 2029| #131CA1| Helvetica-Bold| 500'
     ) | ConvertFrom-Csv -Delimiter '|'
     
     $arr = @()
     foreach ($item in $myArray) {
         $myvar = $($item.Name)
-        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $($item.font_name) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $($item.font_name) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $($item.font_size)
         $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$myvar`" -text_offset +0 -font `"$($item.font_name)`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     }
 
@@ -3629,7 +3629,7 @@ Function CreateYear {
     for ($i = 1880; $i -lt 2030; $i++) {
         $myvar = $myvar1
         $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-        $arr += ".\create_poster.ps1 -logo `"$script_path\year\$i.jpg`" -logo_offset +0 -logo_resize 2000 -text `"$myvar`" -text_offset -300 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"#FFFFFF`" -gradient 1 -avg_color 0 -clean 1 -white_wash 0"
+        $arr += ".\create_poster.ps1 -logo `"$script_path\year\$i.jpg`" -logo_offset +0 -logo_resize 2000 -text `"$myvar`" -text_offset -400 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"#FFFFFF`" -gradient 1 -avg_color 0 -clean 1 -white_wash 0"
     }
     LaunchScripts -ScriptPaths $arr
     Start-Sleep -Seconds 3
@@ -3759,23 +3759,23 @@ $sep4 = "orig.png"
 $sep5 = "purple.png"
 $sep6 = "red.png"
 $sep7 = "stb.png"
-$ttf1 = "ActionIs.ttf"
-$ttf2 = "AirstreamNF.ttf"
+$ttf1 = "Boogaloo-Regular.ttf"
+$ttf2 = "Righteous-Regular.ttf"
 $ttf3 = "Bebas-Regular.ttf"
 $ttf4 = "BoecklinsUniverse.ttf"
 $ttf5 = "Comfortaa-Medium.ttf"
-$ttf6 = "Glass-Antiqua.ttf"
+$ttf6 = "UnifrakturCook-Bold.ttf"
 $ttf7 = "Helvetica-Bold.ttf"
 $ttf8 = "Limelight-Regular.ttf"
-$ttf9 = "Mexcellent-Regular.ttf"
-$ttf10 = "Milenia.ttf"
+$ttf9 = "Monoton-Regular.ttf"
+$ttf10 = "Jura-Bold.ttf"
 $ttf11 = "Press-Start-2P.ttf"
-$ttf12 = "RicksAmericanNF.ttf"
+$ttf12 = "Yesteryear-Regular.ttf"
 $ttf13 = "Rye-Regular.ttf"
-$ttf14 = "Sacramento.ttf"
-$ttf15 = "VAL-UltraBlack.ttf"
-$ttf16 = "XBAND-Rough.ttf"
-$ttf17 = "Young-20s-Regular.ttf"
+$ttf14 = "CherryCreamSoda-Regular.ttf"
+$ttf15 = "Barlow-Regular.ttf"
+$ttf16 = "SpecialElite-Regular.ttf"
+$ttf17 = "Trochut-Regular.ttf"
 $base1 = "@base-best.png"
 $base2 = "@base-nomination.png"
 $base3 = "@base-NULL.png"
@@ -3840,23 +3840,23 @@ $expectedChecksum_sep5 = "3768CA736B6BD1CAD0CD02827A6BA7BDBCA2077B1A109802C57144
 $expectedChecksum_sep6 = "03E9026430C8F0ABD031B608225BF40CB87FD1983899C113E410A511CC5622A7"
 $expectedChecksum_sep7 = "A01695FAB8646079331811F381A38A529E76AFC31538285E7EE60600CA07ADC1"
 
-$expectedChecksum_ttf1 = "86862A55996EE1DC2AACE43C4B82737D1A07F067588FF08BB27F08E12C93B9CB"
-$expectedChecksum_ttf2 = "128F10A9D74C18CC42A923D66D38B3FEBE9C4E1C859F24C8A879A1C9077F4E23"
+$expectedChecksum_ttf1 = "6AA7C9F7096B090A6783E31278ABF907EC84A4BD98F280C925AB033D1FE91EB7"
+$expectedChecksum_ttf2 = "4C3CDC5DE2D70C4EE75FC9C1723A6B8F2D7316F49B383335FD8257A17DD88ADE"
 $expectedChecksum_ttf3 = "39D2EB178FDD52B4C350AC6DEE3D2090AE5A7C187225B0D161A1473CCBB6320D"
 $expectedChecksum_ttf4 = "5F6F6396EDEE3FA1FE9443258D7463F82E6B2512A03C5102A90295A095339FB5"
 $expectedChecksum_ttf5 = "992F89F3C26BE37CCEBF784B294D36F40B96ED96AD9A3CC1396F4D389FC69D0C"
-$expectedChecksum_ttf6 = "AF93FAEDD95BD2EA55FD6F6CA62136933B641497693F15B19FC3642D54B5B44E"
+$expectedChecksum_ttf6 = "B9ED8DA80463792A29675199B0F6580871025C35B2C539CAD7D5DE050D216A0C"
 $expectedChecksum_ttf7 = "D19CCD4211E3CAAAC2C7F1AE544456F5C67CD912E2BDFB1EFB6602C090C724EE"
 $expectedChecksum_ttf8 = "5D2C9F43D8CB4D49481A39A33CDC2A9157B1FCBFB381063A11617EDE209A105C"
-$expectedChecksum_ttf9 = "4170A34DD5956F96B2D2F2725363B566FFD72BC0DFC75C5A0F514D99E7F69830"
-$expectedChecksum_ttf10 = "34C62B45859DE99BD80EA57817E558524117EB074DA0DF63512B55A7F0062DD0"
+$expectedChecksum_ttf9 = "1565B395F454D5C2642D0F411030051E7342FBAF6D5BFC5DA5899C47ECD3511E"
+$expectedChecksum_ttf10 = "1A3B4D7412F10CC17C34289C357E00C5E91BB2EC61B123C2A72CB975E0CBE94D"
 $expectedChecksum_ttf11 = "17EC7D250FF590971A6D966B4FDC5AA04D5E39A7694F4A0BECB515B6A70A7228"
-$expectedChecksum_ttf12 = "96E18BC0DE6A9E1B67070D9DD2B358C01E0DD44BB135A1917DABCCF0CEDDCB0C"
+$expectedChecksum_ttf12 = "B9D7736030DCA2B5849F4FA565A75F91065CC5DED8B6023444BD74445A263C77"
 $expectedChecksum_ttf13 = "722825F800CF7CEAE4791B274D45DA9DF517DB7CF7A07BFAFD34452B787C5354"
-$expectedChecksum_ttf14 = "9341FDA10ADBFEB7EFC94302B34507A3E227D7E7F5C432DF3F5AC8753FF73D24"
-$expectedChecksum_ttf15 = "44CCF182F86E3A538ACF06EF0297507ABB1C73E2B21577BF6F62B7959DF9FB79"
-$expectedChecksum_ttf16 = "06DB27021D3651175CB4FFCD9CE581CFD69ED2AD681FD336631E45B31A6B1263"
-$expectedChecksum_ttf17 = "6089FD0829F574CCCEC9E3A790FEE04A7AB65F132CD2BA35CD8B6D9E92CDDB94"
+$expectedChecksum_ttf14 = "D70EAFE96ABBAAD50D94538B11077D88BB91AC3538DD0E70F0BDC0CE04E410E9"
+$expectedChecksum_ttf15 = "77FB1AC54D2CEB980E3EBDFA7A9D0F64E85A66E4FDFB7F914A7B0AA08FB33A5D"
+$expectedChecksum_ttf16 = "14780EA85064DCB150C23C9A87E2B870439C38668B6D8F1DAD5C6DB701AB9520"
+$expectedChecksum_ttf17 = "EC48B8641254BDCACC417B77992F7776A747A14F8A16C5D5AF9D1B75F4BEC17D"
 
 $expectedChecksum_base1 = "2F5EC311CDE0EB4F198A0CC2CA75F20FF67154D81D6828484090CEC094020005"
 $expectedChecksum_base2 = "F8BB53CB9503BD6AFACD7C9D195CACFFFF7FC4F6D972D1C85AFA0CB10E81D027"
@@ -4002,7 +4002,7 @@ Compare-FileChecksum -Path $script_path\$trans1 -ExpectedChecksum $expectedCheck
 Write-Output "End:" $failFlag.Value
 
 if ($failFlag.Value) {
-    WriteToLogFile "Checksums                    : At least one checksum verification failed. Aborting..."
+    WriteToLogFile "Checksums [ERROR]            : At least one checksum verification failed. Aborting..."
     exit
 }
 else {
