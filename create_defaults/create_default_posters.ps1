@@ -2178,7 +2178,7 @@ Function CreateCountry {
 
     $myArray = @(
         'Logo| Name| out_name| base_color| ww',
-        'transparent.png| country_other_name| other| #FF2000| 1'
+        'transparent.png| country_other_name| Other Countries| #FF2000| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
@@ -2278,7 +2278,7 @@ Function CreateCountry {
 
     $myArray = @(
         'Logo| Name| out_name| base_color| ww',
-        'transparent.png| country_other_name| other| #FF2000| 1'
+        'transparent.png| country_other_name| Other Countries| #FF2000| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
@@ -3780,53 +3780,6 @@ $ttf14 = "CherryCreamSoda-Regular.ttf"
 $ttf15 = "Barlow-Regular.ttf"
 $ttf16 = "SpecialElite-Regular.ttf"
 $ttf17 = "Trochut-Regular.ttf"
-$base1 = "@base-best.png"
-$base2 = "@base-nomination.png"
-$base3 = "@base-NULL.png"
-$base4 = "@base-winners.png"
-$base5 = "@zbase-00.png"
-$base6 = "@zbase-01.png"
-$base7 = "@zbase-02.png"
-$base8 = "@zbase-03.png"
-$base9 = "@zbase-04.png"
-$base10 = "@zbase-05.png"
-$base11 = "@zbase-06.png"
-$base12 = "@zbase-07.png"
-$base13 = "@zbase-08.png"
-$base14 = "@zbase-09.png"
-$base15 = "@zbase-1880s.png"
-$base16 = "@zbase-1890s.png"
-$base17 = "@zbase-1900s.png"
-$base18 = "@zbase-1910s.png"
-$base19 = "@zbase-1920s.png"
-$base20 = "@zbase-1930s.png"
-$base21 = "@zbase-1940s.png"
-$base22 = "@zbase-1950s.png"
-$base23 = "@zbase-1960s.png"
-$base24 = "@zbase-1970s.png"
-$base25 = "@zbase-1980s.png"
-$base26 = "@zbase-1990s.png"
-$base27 = "@zbase-2000s.png"
-$base28 = "@zbase-2010s.png"
-$base29 = "@zbase-2020s.png"
-$base30 = "@zbase-BAFTA.png"
-$base31 = "@zbase-Berlinale.png"
-$base32 = "@zbase-best_director_winner.png"
-$base33 = "@zbase-best_picture_winner.png"
-$base34 = "@zbase-best.png"
-$base35 = "@zbase-Cannes.png"
-$base36 = "@zbase-Cesar.png"
-$base37 = "@zbase-Choice.png"
-$base38 = "@zbase-decade.png"
-$base39 = "@zbase-Emmys.png"
-$base40 = "@zbase-Golden.png"
-$base41 = "@zbase-grand_jury_winner.png"
-$base42 = "@zbase-nomination.png"
-$base43 = "@zbase-Oscars.png"
-$base44 = "@zbase-Spirit.png"
-$base45 = "@zbase-Sundance.png"
-$base46 = "@zbase-Venice.png"
-$base47 = "@zbase-winner.png"
 
 $fade1 = "@bottom-top-fade.png"
 $fade2 = "@bottom-up-fade.png"
@@ -3861,54 +3814,6 @@ $expectedChecksum_ttf14 = "D70EAFE96ABBAAD50D94538B11077D88BB91AC3538DD0E70F0BDC
 $expectedChecksum_ttf15 = "77FB1AC54D2CEB980E3EBDFA7A9D0F64E85A66E4FDFB7F914A7B0AA08FB33A5D"
 $expectedChecksum_ttf16 = "14780EA85064DCB150C23C9A87E2B870439C38668B6D8F1DAD5C6DB701AB9520"
 $expectedChecksum_ttf17 = "EC48B8641254BDCACC417B77992F7776A747A14F8A16C5D5AF9D1B75F4BEC17D"
-
-$expectedChecksum_base1 = "2F5EC311CDE0EB4F198A0CC2CA75F20FF67154D81D6828484090CEC094020005"
-$expectedChecksum_base2 = "F8BB53CB9503BD6AFACD7C9D195CACFFFF7FC4F6D972D1C85AFA0CB10E81D027"
-$expectedChecksum_base3 = "4C166FDC756B04E3AA6F87BCF6896CB4DD23C2374129A589F570FEC284818896"
-$expectedChecksum_base4 = "FA91DEABE72BB51D94CE6EB76E617AFE9CC16E5C7ECD8FCE90B7B00B559574FA"
-$expectedChecksum_base5 = "CB998DA647D537852CE06403EF22EE64588E49CA690C96C3B2BA04F8E07CF36B"
-$expectedChecksum_base6 = "169CA870948C69EDFBBD12C20F8900EA9AFD7EC592F31ECCF3B2993EF1278980"
-$expectedChecksum_base7 = "29E82A0F99FA7EDAF0E804DAB344447F82AD7C2CBAB400B133AF2230EE466F00"
-$expectedChecksum_base8 = "FD7228CC318E901ABAD8A648A5D6A09DCF07C2F8DF7740131CDC8CE257722D12"
-$expectedChecksum_base9 = "BA04F2148EB8D387AE4AD7F94573DE28EC4C207D71470F3CC0A602D74443ED69"
-$expectedChecksum_base10 = "B9DB691FC235E129DB3CD40647578110633E9FB70CAEA416CD77BEF2A23D3760"
-$expectedChecksum_base11 = "42B555C2F944A4A1B2078702861187D28939ED6635BB921E6EF2BA446C49188A"
-$expectedChecksum_base12 = "9D21D44B0A4C3AD180DE496851C23E866ECBC18BBA8A57AC4E658DB153483A5E"
-$expectedChecksum_base13 = "7103464487DB234575EAE8B544F9334937DE8B1A1D19D0CEA9E78F7367F59396"
-$expectedChecksum_base14 = "FE21543996792C2C2D4FF9A7417D2756D8D8216F1726C582819E852BCC82490A"
-$expectedChecksum_base15 = "8839109ACEBE09A49F2D136434ADC2747E32B361D96562EE1FBE0CD039D912F8"
-$expectedChecksum_base16 = "4DBE7AC1B165BF6EABCBCE9870F597A50AA55E3EEE8464E308EBF80999308823"
-$expectedChecksum_base17 = "F22A0B5F9C6290F28D06A6978D5D44CF398862CF655F72A4D6E17167478D6F6F"
-$expectedChecksum_base18 = "C3B89A46827231B56A4818530DE30E529114F6CF4B0A2633C1EB84C0BF51EB01"
-$expectedChecksum_base19 = "90D315EF0656BA39B1BD3F261D69A96A69FA3332A9714991CA990656CE864D27"
-$expectedChecksum_base20 = "11B6002460BCC798B3DF811A1B1DA9C66E70A2970EF83BB7CA2B2FCBF210920B"
-$expectedChecksum_base21 = "AF02FC1F817F0773CD5A4AA591B28D4932054BC7229E2331622D2103DB82A147"
-$expectedChecksum_base22 = "269AD0F54C294345B5EEF485E12E8463FE79F8CEBB2A80D9E11F1B0D961E52B0"
-$expectedChecksum_base23 = "B0012A960453E75A41527CE73CC7422980604ABD548DFB803CD7E8AAB81720EB"
-$expectedChecksum_base24 = "A9A736CE0E63AFA36E6B4262F22D78948780248ADDDA8E035D44D5AE08D5FAF7"
-$expectedChecksum_base25 = "9161CE1200062CAD400AA7A0D382CFB284443C549BE8FE17838B65168F2970BB"
-$expectedChecksum_base26 = "1F577EBEC9B53607E177D6CB083D9373C1A2577F2EFD781BFEFF24D3C8081537"
-$expectedChecksum_base27 = "6C26ADEC9DA35A6417B38B6AF083A9F8240F674882247B398F0ED2F162C10DC4"
-$expectedChecksum_base28 = "EE442FF1CD82D809E4AE2A5FFA43F3B177C0952B683704C6C9936D7A2A76E1FD"
-$expectedChecksum_base29 = "8DF15F8FA52C076BE85B1031B005D452C802D61A1872A502462A096375804472"
-$expectedChecksum_base30 = "F9DC96A0BE900951EFE99A0E39F6B067C335B01713175C732E541A916AF635DD"
-$expectedChecksum_base31 = "5A59FA31B05CDD27088DF17EB05A3AA7C04BC57C7210244136156895C64EF68C"
-$expectedChecksum_base32 = "81749AE86D6DA76A781391BF46AB14D1CA724897117D5715D2020BF91558C29D"
-$expectedChecksum_base33 = "21D790B049BA73364B8FB8AA109CBD373CCB2C1D94CA10AF554C823E4EC9E867"
-$expectedChecksum_base34 = "597CA9E13D39B943ED22A0A6029EC02EE0693EBCCE8A8C4501CF091EA194EC88"
-$expectedChecksum_base35 = "B19157A68186AE02881EAAA3C95E2CEC7920DFD066819784A0637B0D2526C83A"
-$expectedChecksum_base36 = "26AB5358249755D5C2A249155DB752842C18B2E0A5597E092A4F9EE1D930C9A3"
-$expectedChecksum_base37 = "4742A22B862331B40DEAE73371A0CDAC303401796147646C1D039F2B016E1658"
-$expectedChecksum_base38 = "D693075F0AF4CDB3F7503E5C3135197079465C07596D394D5D2591E6E1EF5196"
-$expectedChecksum_base39 = "416BAFFA38C5BA859F5DDF5B6611603F52172E4A37FDD3BD970354D8EF633617"
-$expectedChecksum_base40 = "1B37A0AF6A3ED5B0BC23FDEAD62C9AD4C0A140CB98A89EDB62E9AB4D3CBC216F"
-$expectedChecksum_base41 = "AF82581F1D9F0CF64023F7A63A1C419475E1E01EB6FB11CA6E7C4634A257376F"
-$expectedChecksum_base42 = "5759BB9FA8C9F9CE68CE26C42B7E9441C53397F3F8F88678FCCBCA7CD77FBDF0"
-$expectedChecksum_base43 = "F326B2D94D42189516C9CCAF02C10064AA2028FE9480B1C78D4A20AEE1BAE9CA"
-$expectedChecksum_base44 = "6097877450E63890250F03A47B8EB935DEE5BB2205B541F1AB4F83A4F817D729"
-$expectedChecksum_base45 = "0925F59D38BA4213B917BCA0FDD70C9E9EE13115471713ED1F67D5856E44C662"
-$expectedChecksum_base46 = "1DD63AD69190BD7DA0E858BBB8DF9B1D6C5BAC4D566185487CF8623DE1BFDE21"
-$expectedChecksum_base47 = "19893DD5E4D8F5F50CD8639C2B87A35B54962B7383A415091237289448EBC3CF"
 
 $expectedChecksum_fade1 = "79D93B7455A694820A4DF4B27B4418EA0063AF59400ED778FC66F83648DAA110"
 $expectedChecksum_fade2 = "7ED182E395A08B4035B687E6F0661029EF938F8027923EC9434EBCBC5D144CFD"
@@ -3946,54 +3851,6 @@ Compare-FileChecksum -Path $script_path\fonts\$ttf14 -ExpectedChecksum $expected
 Compare-FileChecksum -Path $script_path\fonts\$ttf15 -ExpectedChecksum $expectedChecksum_ttf15 -failFlag $failFlag
 Compare-FileChecksum -Path $script_path\fonts\$ttf16 -ExpectedChecksum $expectedChecksum_ttf16 -failFlag $failFlag
 Compare-FileChecksum -Path $script_path\fonts\$ttf17 -ExpectedChecksum $expectedChecksum_ttf17 -failFlag $failFlag
-
-Compare-FileChecksum -Path $script_path\@base\$base1 -ExpectedChecksum $expectedChecksum_base1 -failFlag $failFlag
-Compare-FileChecksum -Path $script_path\@base\$base2 -ExpectedChecksum $expectedChecksum_base2 -failFlag $failFlag
-Compare-FileChecksum -Path $script_path\@base\$base3 -ExpectedChecksum $expectedChecksum_base3 -failFlag $failFlag
-Compare-FileChecksum -Path $script_path\@base\$base4 -ExpectedChecksum $expectedChecksum_base4 -failFlag $failFlag
-Compare-FileChecksum -Path $script_path\@base\$base5 -ExpectedChecksum $expectedChecksum_base5 -failFlag $failFlag
-Compare-FileChecksum -Path $script_path\@base\$base6 -ExpectedChecksum $expectedChecksum_base6 -failFlag $failFlag
-Compare-FileChecksum -Path $script_path\@base\$base7 -ExpectedChecksum $expectedChecksum_base7 -failFlag $failFlag
-Compare-FileChecksum -Path $script_path\@base\$base8 -ExpectedChecksum $expectedChecksum_base8 -failFlag $failFlag
-Compare-FileChecksum -Path $script_path\@base\$base9 -ExpectedChecksum $expectedChecksum_base9 -failFlag $failFlag
-Compare-FileChecksum -Path $script_path\@base\$base10 -ExpectedChecksum $expectedChecksum_base10 -failFlag $failFlag
-Compare-FileChecksum -Path $script_path\@base\$base11 -ExpectedChecksum $expectedChecksum_base11 -failFlag $failFlag
-Compare-FileChecksum -Path $script_path\@base\$base12 -ExpectedChecksum $expectedChecksum_base12 -failFlag $failFlag
-Compare-FileChecksum -Path $script_path\@base\$base13 -ExpectedChecksum $expectedChecksum_base13 -failFlag $failFlag
-Compare-FileChecksum -Path $script_path\@base\$base14 -ExpectedChecksum $expectedChecksum_base14 -failFlag $failFlag
-Compare-FileChecksum -Path $script_path\@base\$base15 -ExpectedChecksum $expectedChecksum_base15 -failFlag $failFlag
-Compare-FileChecksum -Path $script_path\@base\$base16 -ExpectedChecksum $expectedChecksum_base16 -failFlag $failFlag
-Compare-FileChecksum -Path $script_path\@base\$base17 -ExpectedChecksum $expectedChecksum_base17 -failFlag $failFlag
-Compare-FileChecksum -Path $script_path\@base\$base18 -ExpectedChecksum $expectedChecksum_base18 -failFlag $failFlag
-Compare-FileChecksum -Path $script_path\@base\$base19 -ExpectedChecksum $expectedChecksum_base19 -failFlag $failFlag
-Compare-FileChecksum -Path $script_path\@base\$base20 -ExpectedChecksum $expectedChecksum_base20 -failFlag $failFlag
-Compare-FileChecksum -Path $script_path\@base\$base21 -ExpectedChecksum $expectedChecksum_base21 -failFlag $failFlag
-Compare-FileChecksum -Path $script_path\@base\$base22 -ExpectedChecksum $expectedChecksum_base22 -failFlag $failFlag
-Compare-FileChecksum -Path $script_path\@base\$base23 -ExpectedChecksum $expectedChecksum_base23 -failFlag $failFlag
-Compare-FileChecksum -Path $script_path\@base\$base24 -ExpectedChecksum $expectedChecksum_base24 -failFlag $failFlag
-Compare-FileChecksum -Path $script_path\@base\$base25 -ExpectedChecksum $expectedChecksum_base25 -failFlag $failFlag
-Compare-FileChecksum -Path $script_path\@base\$base26 -ExpectedChecksum $expectedChecksum_base26 -failFlag $failFlag
-Compare-FileChecksum -Path $script_path\@base\$base27 -ExpectedChecksum $expectedChecksum_base27 -failFlag $failFlag
-Compare-FileChecksum -Path $script_path\@base\$base28 -ExpectedChecksum $expectedChecksum_base28 -failFlag $failFlag
-Compare-FileChecksum -Path $script_path\@base\$base29 -ExpectedChecksum $expectedChecksum_base29 -failFlag $failFlag
-Compare-FileChecksum -Path $script_path\@base\$base30 -ExpectedChecksum $expectedChecksum_base30 -failFlag $failFlag
-Compare-FileChecksum -Path $script_path\@base\$base31 -ExpectedChecksum $expectedChecksum_base31 -failFlag $failFlag
-Compare-FileChecksum -Path $script_path\@base\$base32 -ExpectedChecksum $expectedChecksum_base32 -failFlag $failFlag
-Compare-FileChecksum -Path $script_path\@base\$base33 -ExpectedChecksum $expectedChecksum_base33 -failFlag $failFlag
-Compare-FileChecksum -Path $script_path\@base\$base34 -ExpectedChecksum $expectedChecksum_base34 -failFlag $failFlag
-Compare-FileChecksum -Path $script_path\@base\$base35 -ExpectedChecksum $expectedChecksum_base35 -failFlag $failFlag
-Compare-FileChecksum -Path $script_path\@base\$base36 -ExpectedChecksum $expectedChecksum_base36 -failFlag $failFlag
-Compare-FileChecksum -Path $script_path\@base\$base37 -ExpectedChecksum $expectedChecksum_base37 -failFlag $failFlag
-Compare-FileChecksum -Path $script_path\@base\$base38 -ExpectedChecksum $expectedChecksum_base38 -failFlag $failFlag
-Compare-FileChecksum -Path $script_path\@base\$base39 -ExpectedChecksum $expectedChecksum_base39 -failFlag $failFlag
-Compare-FileChecksum -Path $script_path\@base\$base40 -ExpectedChecksum $expectedChecksum_base40 -failFlag $failFlag
-Compare-FileChecksum -Path $script_path\@base\$base41 -ExpectedChecksum $expectedChecksum_base41 -failFlag $failFlag
-Compare-FileChecksum -Path $script_path\@base\$base42 -ExpectedChecksum $expectedChecksum_base42 -failFlag $failFlag
-Compare-FileChecksum -Path $script_path\@base\$base43 -ExpectedChecksum $expectedChecksum_base43 -failFlag $failFlag
-Compare-FileChecksum -Path $script_path\@base\$base44 -ExpectedChecksum $expectedChecksum_base44 -failFlag $failFlag
-Compare-FileChecksum -Path $script_path\@base\$base45 -ExpectedChecksum $expectedChecksum_base45 -failFlag $failFlag
-Compare-FileChecksum -Path $script_path\@base\$base46 -ExpectedChecksum $expectedChecksum_base46 -failFlag $failFlag
-Compare-FileChecksum -Path $script_path\@base\$base47 -ExpectedChecksum $expectedChecksum_base47 -failFlag $failFlag
 
 Compare-FileChecksum -Path $script_path\fades\$fade1 -ExpectedChecksum $expectedChecksum_fade1 -failFlag $failFlag
 Compare-FileChecksum -Path $script_path\fades\$fade2 -ExpectedChecksum $expectedChecksum_fade2 -failFlag $failFlag
