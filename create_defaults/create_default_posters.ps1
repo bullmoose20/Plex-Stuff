@@ -42,31 +42,64 @@ Set-Location $script_path
 $scriptName = $MyInvocation.MyCommand.Name
 $scriptLog = Join-Path $script_path -ChildPath "$scriptName.log"
 
-#################################
-# SQL Cache setup
-#################################
+################################################################################
+# Function: New-SQLCache
+# Description: creates a sqlcache file
+################################################################################
+Function New-SQLCache {
+    # Import the required .NET assemblies
+    Add-Type -Path "System.Data.SQLite.dll"
 
-# Import the required .NET assemblies
-Add-Type -Path "System.Data.SQLite.dll"
+    # Define the SQLite database file path and table name
+    $databasePath = Join-Path $script_path -ChildPath "OptimalPointSizeCache.db"
+    $tableName = "Cache"
 
-# Define the SQLite database file path and table name
-$databasePath = Join-Path $script_path -ChildPath "OptimalPointSizeCache.db"
-$tableName = "Cache"
+    # Create a SQLite connection and command objects
+    $connection = New-Object System.Data.SQLite.SQLiteConnection "Data Source=$databasePath"
+    $command = New-Object System.Data.SQLite.SQLiteCommand($connection)
 
-# Create a SQLite connection and command objects
-$connection = New-Object System.Data.SQLite.SQLiteConnection "Data Source=$databasePath"
-$command = New-Object System.Data.SQLite.SQLiteCommand($connection)
-
-# Create the Cache table if it does not already exist
-$command.CommandText = @"
-CREATE TABLE IF NOT EXISTS $tableName (
-    CacheKey TEXT PRIMARY KEY,
-    PointSize INTEGER NOT NULL
-);
+    # Create the Cache table if it does not already exist
+    $command.CommandText = @"
+    CREATE TABLE IF NOT EXISTS $tableName (
+        CacheKey TEXT PRIMARY KEY,
+        PointSize INTEGER NOT NULL
+    );
 "@
-$connection.Open()
-$command.ExecuteNonQuery()
-$connection.Close()
+    $connection.Open()
+    $command.ExecuteNonQuery()
+    $connection.Close()
+}
+
+################################################################################
+# Function: Update-LogFile
+# Description: Rotates logs up to 10
+################################################################################
+Function Update-LogFile {
+    param (
+        [string]$LogPath
+    )
+
+    if (Test-Path $LogPath) {
+        # Check if the last log file exists and delete it if it does
+        $lastLog = Join-Path $script_path -ChildPath "$scriptName.10.log"
+        if (Test-Path $lastLog) {
+            Remove-Item $lastLog -Force
+        }
+
+        # Rename existing log files
+        for ($i = 9; $i -ge 1; $i--) {
+            $prevLog = Join-Path $script_path -ChildPath "$scriptName.$('{0:d2}' -f $i).log"
+            $newLog = Join-Path $script_path -ChildPath "$scriptName.$('{0:d2}' -f ($i+1)).log"
+            if (Test-Path $prevLog) {
+                Rename-Item $prevLog -NewName $newLog -Force
+            }
+        }
+
+        # Rename current log file
+        $newLog = Join-Path $script_path -ChildPath "$scriptName.01.log"
+        Rename-Item $LogPath -NewName $newLog -Force
+    }
+}
 
 ################################################################################
 # Function: InstallFontsIfNeeded
@@ -92,7 +125,7 @@ Function InstallFontsIfNeeded {
         "Barlow-Regular", 
         "Helvetica-Bold"
     )
-        $missingFonts = $fontNames | Where-Object { !(magick identify -list font | Select-String "Font: $_$") }
+    $missingFonts = $fontNames | Where-Object { !(magick identify -list font | Select-String "Font: $_$") }
     
     if ($missingFonts) {
         $fontList = magick identify -list font | Select-String "Font: " | ForEach-Object { $_.ToString().Trim().Substring(6) }
@@ -2343,6 +2376,25 @@ Function CreateDecade {
 
     Move-Item -Path output -Destination output-orig
 
+    $theFont = "ComfortAa-Medium"
+    $theMaxWidth = 1800
+    $theMaxHeight = 1000
+    $minPointSize = 100
+    $maxPointSize = 250
+
+    $myArray = @(
+        'Logo| Name| out_name| base_color| ww',
+        'transparent.png| decade_other_name| other| #FF2000| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
+        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.Logo)`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$myvar`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
+    }
+    LaunchScripts -ScriptPaths $arr
+
     # $theFont = "ComfortAa-Medium"
     $theMaxWidth = 1900
     $theMaxHeight = 550
@@ -2484,6 +2536,7 @@ Function CreateFranchise {
     $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Resident Evil.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Resident Evil`" -base_color `"#940E0F`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
     $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Rocky Creed.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Rocky Creed`" -base_color `"#C52A2A`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
     $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Rocky.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Rocky`" -base_color `"#C22121`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
+    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\RuPaul's Drag Race.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"RuPaul's Drag Race`" -base_color `"#FF5757`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
     $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Scooby-Doo!.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Scooby-Doo!`" -base_color `"#5F3879`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
     $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Shaft.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Shaft`" -base_color `"#382637`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
     $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Shrek.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Shrek`" -base_color `"#3DB233`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
@@ -2502,6 +2555,7 @@ Function CreateFranchise {
     $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\The Hunger Games.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"The Hunger Games`" -base_color `"#619AB5`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
     $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\The Man With No Name.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"The Man With No Name`" -base_color `"#9A7B40`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
     $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\The Mummy.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"The Mummy`" -base_color `"#C28A25`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
+    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\The Real Housewives.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"The Real Housewives`" -base_color `"#400EA4`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
     $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\The Rookie.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"The Rookie`" -base_color `"#DC5A2B`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
     $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\The Texas Chainsaw Massacre.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"The Texas Chainsaw Massacre`" -base_color `"#B15253`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
     $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\The Three Stooges.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"The Three Stooges`" -base_color `"#B9532A`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
@@ -2517,6 +2571,7 @@ Function CreateFranchise {
     $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Wallace & Gromit.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Wallace & Gromit`" -base_color `"#BA2A20`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
     $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Wizarding World.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Wizarding World`" -base_color `"#7B7A33`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
     $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\X-Men.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"X-Men`" -base_color `"#636363`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
+    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Yellowstone.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Yellowstone`" -base_color `"#441515`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
     LaunchScripts -ScriptPaths $arr
     Move-Item -Path output -Destination franchise
     Copy-Item -Path logos_franchise -Destination franchise\logos -Recurse
@@ -3729,9 +3784,9 @@ Function ShowFunctions {
 #################################
 Set-Location $script_path
 $font_flag = $null
-if (Test-Path $scriptLog) {
-    Remove-Item $scriptLog
-}
+Update-LogFile -LogPath $scriptLog
+New-SQLCache
+
 #################################
 # Language Code
 #################################
