@@ -69,6 +69,43 @@ $command.ExecuteNonQuery()
 $connection.Close()
 
 ################################################################################
+# Function: InstallFontsIfNeeded
+# Description: Determines if font is installed and if not, exits script
+################################################################################
+Function InstallFontsIfNeeded {
+    $fontNames = @(
+        "Comfortaa-Medium", 
+        "Bebas-Regular",
+        "Rye-Regular", 
+        "Limelight-Regular", 
+        "BoecklinsUniverse", 
+        "UnifrakturCook", 
+        "Trochut", 
+        "Righteous", 
+        "Yesteryear", 
+        "Cherry-Cream-Soda-Regular", 
+        "Boogaloo-Regular", 
+        "Monoton", 
+        "Press-Start-2P", 
+        "Jura-Bold", 
+        "Special-Elite-Regular", 
+        "Barlow-Regular", 
+        "Helvetica-Bold"
+    )
+        $missingFonts = $fontNames | Where-Object { !(magick identify -list font | Select-String "Font: $_$") }
+    
+    if ($missingFonts) {
+        $fontList = magick identify -list font | Select-String "Font: " | ForEach-Object { $_.ToString().Trim().Substring(6) }
+        $fontList | Out-File -Encoding utf8 -FilePath "magick_fonts.txt"
+        WriteToLogFile "Fonts Check [ERROR]          : Fonts missing $($missingFonts -join ', ') are not installed/found. List of installed fonts that Imagemagick can use listed and exported here: magick_fonts.txt."
+        WriteToLogFile "Fonts Check [ERROR]          : $($fontList.Count) fonts are visible to Imagemagick."
+        WriteToLogFile "Fonts Check [ERROR]          : Please right-click 'Install for all users' on each font file in the $script_path\fonts folder before retrying."
+        return $false
+    }
+    return $true
+}
+
+################################################################################
 # Function: Remove-Folders
 # Description: Removes folders to start fresh run
 ################################################################################
@@ -3868,6 +3905,12 @@ if ($failFlag.Value) {
 }
 else {
     WriteToLogFile "Checksums                    : All checksum verifications succeeded."
+}
+
+# Call the InstallFontsIfNeeded function
+if (-not (InstallFontsIfNeeded)) {
+    # If the function returns $false, exit the script
+    exit 1
 }
 
 #################################
