@@ -230,10 +230,17 @@ Function Compare-FileChecksum {
 ################################################################################
 Function Get-TranslationFile {
     param(
-        [string]$LanguageCode
+        [string]$LanguageCode,
+        [string]$BranchOption = "nightly"
     )
 
-    $GitHubRepository = "https://raw.githubusercontent.com/meisnate12/Plex-Meta-Manager/master/defaults/translations"
+    $BranchOptions = @("master", "develop", "nightly")
+    if ($BranchOptions -notcontains $BranchOption) {
+        Write-Error "Error: Invalid branch option."
+        return
+    }
+
+    $GitHubRepository = "https://raw.githubusercontent.com/meisnate12/Plex-Meta-Manager/$BranchOption/defaults/translations"
     $TranslationFile = "$LanguageCode.yml"
     $TranslationFileUrl = "$GitHubRepository/$TranslationFile"
     $TranslationsPath = Join-Path $script_path "@translations"
@@ -3991,12 +3998,28 @@ if ([string]::IsNullOrWhiteSpace($LanguageCode)) {
     $LanguageCode = $DefaultLanguageCode
 }
 
-Get-TranslationFile -LanguageCode $LanguageCode
-Read-Host -Prompt "Press any key to continue..."
+$BranchOptions = @("master", "develop", "nightly")
+$DefaultBranchOption = "nightly"
+$BranchOption = Read-Host "Enter branch option ($($BranchOptions -join ', ')). Press Enter to use the default branch option: $DefaultBranchOption"
+
+if (-not [string]::IsNullOrWhiteSpace($BranchOption) -and $BranchOptions -notcontains $BranchOption) {
+    Write-Error "Error: Invalid branch option."
+    return
+}
+
+if ([string]::IsNullOrWhiteSpace($BranchOption)) {
+    $BranchOption = $DefaultBranchOption
+}
+
+Get-TranslationFile -LanguageCode $LanguageCode -BranchOption $BranchOption
+Read-Host -Prompt "If you have a custom translation file, overwrite the downloaded one now and then Press any key to continue..."
 
 $TranslationFilePath = Join-Path $script_path -ChildPath "@translations"
 $TranslationFilePath = Join-Path $TranslationFilePath -ChildPath "$LanguageCode.yml"
 
+#################################
+# Imagemagick version check
+#################################
 Test-ImageMagick
 $test = $global:magick
 if ($null -eq $test) {
@@ -4006,9 +4029,18 @@ if ($null -eq $test) {
 else {
     WriteToLogFile "Imagemagick                  : Imagemagick is installed. $global:magick"
 }
+
+#################################
+# Powershell version check
+#################################
 $tmp = $null
 $tmp = $PSVersionTable.PSVersion.ToString()
 WriteToLogFile "Powershell Version           : $tmp"
+
+if ($PSVersionTable.PSVersion.Major -lt 7) {
+    Write-Error "Error: This script requires PowerShell version 7 or higher."
+    return
+}
 
 #################################
 # Cleanup Folders
