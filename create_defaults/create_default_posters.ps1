@@ -4034,9 +4034,9 @@ else {
 #################################
 # Powershell version check
 #################################
-$tmp = $null
-$tmp = $PSVersionTable.PSVersion.ToString()
-WriteToLogFile "Powershell Version           : $tmp"
+$pversion = $null
+$pversion = $PSVersionTable.PSVersion.ToString()
+WriteToLogFile "Powershell Version           : $pversion"
 
 if ($PSVersionTable.PSVersion.Major -lt 7) {
     Write-Error "Error: This script requires PowerShell version 7 or higher."
@@ -4134,8 +4134,8 @@ foreach ($param in $args) {
 }
 
 if (!$args) {
-    # ShowFunctions
-    CreateNetwork
+    ShowFunctions
+    # CreateNetwork
     # CreateYear
     # CreateBased
     # CreateAudioLanguage
@@ -4169,12 +4169,23 @@ Set-Location $script_path
 Get-ChildItem -Recurse ".\defaults\" -Name -File | ForEach-Object { '"{0}"' -f $_ } | Out-File defaults_list.txt
 
 #######################
+# Count [ERROR] lines
+#######################
+$errorCount = (Get-Content $scriptLog | Select-String -Pattern "\[ERROR\]" | Measure-Object).Count
+
+#######################
 # SUMMARY
 #######################
 Set-Location $script_path
 WriteToLogFile "#######################"
 WriteToLogFile "# SUMMARY"
 WriteToLogFile "#######################"
+WriteToLogFile "Original command line        : $($MyInvocation.Line)"
+WriteToLogFile "Powershell Version           : $pversion"
+WriteToLogFile "Imagemagick                  : $global:magick"
+WriteToLogFile "LanguageCode                 : $LanguageCode"
+WriteToLogFile "BranchOption                 : $BranchOption"
+WriteToLogFile "Number of [ERROR] lines      : $errorCount"
 
 $x = [math]::Round($Stopwatch.Elapsed.TotalMinutes, 2)
 $speed = [math]::Round($files_to_process / $Stopwatch.Elapsed.TotalMinutes, 2)
