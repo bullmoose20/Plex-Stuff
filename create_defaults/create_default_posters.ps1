@@ -27,12 +27,13 @@
 # create_default_posters.ps1 All
 ################################################################################
 
-
 #################################
 # GLOBAL VARS
 #################################
 $global:font_flag = $null
 $global:magick = $null
+$global:ConfigObj = $null
+$global:Config = $null
 
 #################################
 # collect paths
@@ -69,6 +70,21 @@ Function New-SQLCache {
     $connection.Open()
     $command.ExecuteNonQuery()
     $connection.Close()
+}
+
+################################################################################
+# Function: Import-YamlModule
+# Description: installs module if its not there
+################################################################################
+Function Import-YamlModule {
+    # Check if PowerShell-YAML module is installed
+    if (!(Get-Module -Name PowerShell-YAML -ListAvailable)) {
+        # If not installed, install the module
+        Install-Module -Name PowerShell-YAML -Scope CurrentUser -Force
+    }
+
+    # Import the module
+    Import-Module -Name PowerShell-YAML
 }
 
 ################################################################################
@@ -240,7 +256,8 @@ Function Get-TranslationFile {
         return
     }
 
-    $GitHubRepository = "https://raw.githubusercontent.com/meisnate12/Plex-Meta-Manager/$BranchOption/defaults/translations"
+    # $GitHubRepository = "https://raw.githubusercontent.com/meisnate12/Plex-Meta-Manager/$BranchOption/defaults/translations"
+    $GitHubRepository = "https://raw.githubusercontent.com/meisnate12/PMM-Translations/master/defaults"
     $TranslationFile = "$LanguageCode.yml"
     $TranslationFileUrl = "$GitHubRepository/$TranslationFile"
     $TranslationsPath = Join-Path $script_path "@translations"
@@ -269,6 +286,54 @@ Function Get-TranslationFile {
 }
 
 ################################################################################
+# Function: Read-Yaml
+# Description: read in yaml file for use
+################################################################################
+Function Read-Yaml {
+    $global:Config = Get-Content $TranslationFilePath -Raw
+    $global:ConfigObj = $global:Config | ConvertFrom-Yaml
+}
+
+################################################################################
+# Function: Get-YamlPropertyValue
+# Description: searches the yaml
+################################################################################
+Function Get-YamlPropertyValue {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$PropertyPath,
+        
+        [Parameter(Mandatory = $true)]
+        [object]$ConfigObject,
+        
+        [Parameter()]
+        [ValidateSet("Exact", "Upper", "Lower")]
+        [string]$CaseSensitivity = "Exact"
+    )
+    
+    $value = $ConfigObject
+    foreach ($path in $PropertyPath.Split(".")) {
+        if ($value.ContainsKey($path)) {
+            $value = $value.$path
+        }
+        else {
+            Write-Output "TRANSLATION NOT FOUND"
+            WriteToLogFile "TranslatedValue [ERROR]      : ${path}: TRANSLATION NOT FOUND in $TranslationFilePath"
+            return
+        }
+    }
+    
+    switch ($CaseSensitivity) {
+        "Exact" { break }
+        "Upper" { $value = $value.ToUpper() }
+        "Lower" { $value = $value.ToLower() }
+    }
+    WriteToLogFile "TranslatedValue              : ${path}: $value in $TranslationFilePath"
+    return $value
+}
+
+################################################################################
 # Function: Set-TextBetweenDelimiters
 # Description: replaces <<something>> with a string
 ################################################################################
@@ -287,74 +352,6 @@ Function Set-TextBetweenDelimiters {
     return $outputString
 }
 
-################################################################################
-# Function: Get-TranslatedValue
-# Description:  gets the translated value for the poster
-################################################################################
-Function Get-TranslatedValue {
-    param(
-        [string]$TranslationFilePath,
-        [string]$EnglishValue,
-        [ValidateSet("Exact", "Upper", "Lower")]
-        [string]$CaseSensitivity = "Exact"
-    )
-
-    try {
-        $TranslationDictionary = @{}
-
-        # Load the YML file into a dictionary
-        Get-Content $TranslationFilePath | ForEach-Object {
-            $Line = $_.Trim()
-            if ($Line -match "^(.+):\s+(.+)$") {
-                $TranslationDictionary[$Matches[1]] = $Matches[2]
-            }
-            elseif ($Line -match "^(.+):$") {
-                if ($TranslationFilePath.EndsWith("default.yml")) {
-                    $TranslationDictionary[$Matches[1]] = $Matches[1]
-                }
-            }
-        }
-
-        if ($TranslationFilePath.EndsWith("default.yml")) {
-            # Loop through the file again to add the commented key-value pairs
-            Get-Content $TranslationFilePath | ForEach-Object {
-                $Line = $_.Trim()
-                if ($Line -match "^#\s*(.+):\s+(.+)$") {
-                    $TranslationDictionary[$Matches[1]] = $Matches[2]
-                }
-            }
-        }
-
-        # Get the translated value
-        $EnglishValue = $EnglishValue.Replace("\n", " ")
-        $TranslatedValue = $TranslationDictionary[$EnglishValue]
-
-        if ($null -eq $TranslatedValue) {
-            Write-Output "TRANSLATION NOT FOUND"
-            WriteToLogFile "TranslatedValue [ERROR]      : ${EnglishValue}: TRANSLATION NOT FOUND in $TranslationFilePath"
-            return
-        }
-        
-        # Apply the requested case sensitivity
-        switch ($CaseSensitivity) {
-            "Exact" { break }
-            "Upper" { $TranslatedValue = $TranslatedValue.ToUpper() }
-            "Lower" { $TranslatedValue = $TranslatedValue.ToLower() }
-        }
-
-        # Replace spaces with newline characters if the original English value had a newline character
-        if ($EnglishValue -contains "\n") {
-            $TranslatedValue = $TranslatedValue.Replace(" ", "\n")
-        }
-
-        Write-Output $TranslatedValue
-        WriteToLogFile "TranslatedValue              : ${EnglishValue}: $TranslatedValue in $TranslationFilePath"
-    }
-    catch {
-        Write-Error "Error: Value not found in dictionary."
-        return
-    }
-}
 
 ################################################################################
 # Function: New-SqliteTable
@@ -665,18 +662,18 @@ Function CreateAudioLanguage {
 
     $myArray = @(
         'Logo| Name| out_name| base_color| ww',
-        'transparent.png| audio_language_other_name| other| #FF2000| 1'
+        'transparent.png| audio_language_other| other| #FF2000| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
     foreach ($item in $myArray) {
-        $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-        $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.Logo)`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$myvar`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+        $value = (Get-YamlPropertyValue -PropertyPath "collections.$($item.name).name" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.Logo)`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$value`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
     }
     LaunchScripts -ScriptPaths $arr
 
-    $myvar1 = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue "audio_language_name" -CaseSensitivity Upper) 
+    $pre_value = Get-YamlPropertyValue -PropertyPath "collections.audio_language.name" -ConfigObject $global:ConfigObj -CaseSensitivity Upper
 
     $myArray = @(
         'Name| out_name| base_color| other_setting',
@@ -705,12 +702,12 @@ Function CreateAudioLanguage {
         'BULGARIAN| bg| #D5442A| NA',
         'BURMESE| my| #9E5CF0| NA',
         'CATALAN| ca| #99BC95| NA',
-        'CENTRAL KHMER| km| #6ABDD6| NA',
+        'CENTRAL_KHMER| km| #6ABDD6| NA',
         'CHAMORRO| ch| #22302F| NA',
         'CHECHEN| ce| #83E832| NA',
         'CHICHEWA| ny| #03E31C| NA',
         'CHINESE| zh| #40EA69| NA',
-        'CHURCH SLAVIC| cu| #C76DC2| NA',
+        'CHURCH_SLAVIC| cu| #C76DC2| NA',
         'CHUVASH| cv| #920F92| NA',
         'CORNISH| kw| #55137D| NA',
         'CORSICAN| co| #C605DC| NA',
@@ -744,7 +741,7 @@ Function CreateAudioLanguage {
         'HEBREW| he| #E9C58A| NA',
         'HERERO| hz| #E9DF57| NA',
         'HINDI| hi| #77775B| NA',
-        'HIRI MOTU| ho| #3BB41B| NA',
+        'HIRI_MOTU| ho| #3BB41B| NA',
         'HUNGARIAN| hu| #111457| NA',
         'ICELANDIC| is| #0ACE8F| NA',
         'IDO| io| #75CA6C| NA',
@@ -793,10 +790,10 @@ Function CreateAudioLanguage {
         'NAVAJO| nv| #48F865| NA',
         'NDONGA| ng| #83538B| NA',
         'NEPALI| ne| #5A15FC| NA',
-        'NORTH NDEBELE| nd| #A1533B| NA',
-        'NORTHERN SAMI| se| #AAD61B| NA',
-        'NORWEGIAN BOKMÅL| nb| #0AEB4A| NA',
-        'NORWEGIAN NYNORSK| nn| #278B62| NA',
+        'NORTH_NDEBELE| nd| #A1533B| NA',
+        'NORTHERN_SAMI| se| #AAD61B| NA',
+        'NORWEGIAN_BOKMÅL| nb| #0AEB4A| NA',
+        'NORWEGIAN_NYNORSK| nn| #278B62| NA',
         'NORWEGIAN| no| #13FF63| NA',
         'OCCITAN| oc| #B5B607| NA',
         'OJIBWA| oj| #100894| NA',
@@ -820,14 +817,14 @@ Function CreateAudioLanguage {
         'SARDINIAN| sc| #28AF67| NA',
         'SERBIAN| sr| #FB3F2C| NA',
         'SHONA| sn| #40F3EC| NA',
-        'SICHUAN YI| ii| #FA3474| NA',
+        'SICHUAN_YI| ii| #FA3474| NA',
         'SINDHI| sd| #62D1BE| NA',
         'SINHALA| si| #24787A| NA',
         'SLOVAK| sk| #66104F| NA',
         'SLOVENIAN| sl| #6F79E6| NA',
         'SOMALI| so| #A36185| NA',
-        'SOUTH NDEBELE| nr| #8090E5| NA',
-        'SOUTHERN SOTHO| st| #4C3417| NA',
+        'SOUTH_NDEBELE| nr| #8090E5| NA',
+        'SOUTHERN_SOTHO| st| #4C3417| NA',
         'SPANISH| es| #7842AE| NA',
         'SUNDANESE| su| #B2D05B| NA',
         'SWAHILI| sw| #D32F20| NA',
@@ -857,7 +854,7 @@ Function CreateAudioLanguage {
         'VOLAPÜK| vo| #77D574| NA',
         'WALLOON| wa| #BD440A| NA',
         'WELSH| cy| #45E39C| NA',
-        'WESTERN FRISIAN| fy| #01F471| NA',
+        'WESTERN_FRISIAN| fy| #01F471| NA',
         'WOLOF| wo| #BDD498| NA',
         'XHOSA| xh| #0C6D9C| NA',
         'YIDDISH| yi| #111D14| NA',
@@ -868,9 +865,9 @@ Function CreateAudioLanguage {
     
     $arr = @()
     foreach ($item in $myArray) {
-        $myvar = Set-TextBetweenDelimiters -InputString $myvar1 -ReplacementString (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-        $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$myvar`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
+        $value = Set-TextBetweenDelimiters -InputString $pre_value -ReplacementString (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$value`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     }
 
     LaunchScripts -ScriptPaths $arr
@@ -904,21 +901,21 @@ Function CreateAwards {
         'Logo| logo_resize| Name| out_name| base_color| ww',
         'BAFTA.png| 1800| WINNERS| winner| #9C7C26| 1',
         'BAFTA.png| 1800| NOMINATIONS| nomination| #9C7C26| 1'
-        'BAFTA.png| 1800| BEST DIRECTOR WINNERS| best_director_winner| #9C7C26| 1',
-        'BAFTA.png| 1800| BEST PICTURE WINNERS| best_picture_winner| #9C7C26| 1',
+        'BAFTA.png| 1800| BEST_DIRECTOR_WINNERS| best_director_winner| #9C7C26| 1',
+        'BAFTA.png| 1800| BEST_PICTURE_WINNERS| best_picture_winner| #9C7C26| 1',
         'BAFTA.png| 1800| | BAFTA| #9C7C26| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
     foreach ($item in $myArray) {
         if ($($item.Name).ToString() -eq "") {
-            $myvar = $null
+            $value = $null
         }
         else {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
         }
-        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
     }
     LaunchScripts -ScriptPaths $arr
 
@@ -930,9 +927,9 @@ Function CreateAwards {
     $arr = @()
     foreach ($item in $myArray) {
         for ($i = 1947; $i -lt 2030; $i++) {
-            $myvar = $i
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+            $value = $i
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
     LaunchScripts -ScriptPaths $arr
@@ -946,10 +943,10 @@ Function CreateAwards {
     $arr = @()
     foreach ($item in $myArray) {
         for ($i = 1947; $i -lt 2030; $i++) {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-            $myvar = "$myvar $i"
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+            $value = "$value $i"
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
     LaunchScripts -ScriptPaths $arr
@@ -963,10 +960,10 @@ Function CreateAwards {
     $arr = @()
     foreach ($item in $myArray) {
         for ($i = 1947; $i -lt 2030; $i++) {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-            $myvar = "$myvar $i"
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+            $value = "$value $i"
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
     LaunchScripts -ScriptPaths $arr
@@ -974,16 +971,16 @@ Function CreateAwards {
  
     $myArray = @(
         'Logo| logo_resize| Name| out_name| base_color| ww',
-        'BAFTA.png| 1800| BEST PICTURE WINNER| winner| #9C7C26| 1'
+        'BAFTA.png| 1800| BEST_PICTURE_WINNER| winner| #9C7C26| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
     foreach ($item in $myArray) {
         for ($i = 1947; $i -lt 2030; $i++) {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-            $myvar = "$myvar $i"
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+            $value = "$value $i"
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
     LaunchScripts -ScriptPaths $arr
@@ -997,21 +994,21 @@ Function CreateAwards {
         'Logo| logo_resize| Name| out_name| base_color| ww',
         'Berlinale.png| 1000| WINNERS| winner| #BB0B34| 1',
         'Berlinale.png| 1000| NOMINATIONS| nomination| #BB0B34| 1'
-        'Berlinale.png| 1000| BEST DIRECTOR WINNERS| best_director_winner| #BB0B34| 1',
-        'Berlinale.png| 1000| BEST PICTURE WINNERS| best_picture_winner| #BB0B34| 1',
+        'Berlinale.png| 1000| BEST_DIRECTOR_WINNERS| best_director_winner| #BB0B34| 1',
+        'Berlinale.png| 1000| BEST_PICTURE_WINNERS| best_picture_winner| #BB0B34| 1',
         'Berlinale.png| 1000| | Berlinale| #BB0B34| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
     foreach ($item in $myArray) {
         if ($($item.Name).ToString() -eq "") {
-            $myvar = $null
+            $value = $null
         }
         else {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
         }
-        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
     }
     LaunchScripts -ScriptPaths $arr
 
@@ -1023,9 +1020,9 @@ Function CreateAwards {
     $arr = @()
     foreach ($item in $myArray) {
         for ($i = 1951; $i -lt 2030; $i++) {
-            $myvar = $i
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+            $value = $i
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
     LaunchScripts -ScriptPaths $arr
@@ -1039,10 +1036,10 @@ Function CreateAwards {
     $arr = @()
     foreach ($item in $myArray) {
         for ($i = 1951; $i -lt 2030; $i++) {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-            $myvar = "$myvar $i"
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+            $value = "$value $i"
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
     LaunchScripts -ScriptPaths $arr
@@ -1056,10 +1053,10 @@ Function CreateAwards {
     $arr = @()
     foreach ($item in $myArray) {
         for ($i = 1951; $i -lt 2030; $i++) {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-            $myvar = "$myvar $i"
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+            $value = "$value $i"
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
     LaunchScripts -ScriptPaths $arr
@@ -1067,16 +1064,16 @@ Function CreateAwards {
  
     $myArray = @(
         'Logo| logo_resize| Name| out_name| base_color| ww',
-        'Berlinale.png| 1000| BEST PICTURE WINNER| winner| #BB0B34| 1'
+        'Berlinale.png| 1000| BEST_PICTURE_WINNER| winner| #BB0B34| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
     foreach ($item in $myArray) {
         for ($i = 1951; $i -lt 2030; $i++) {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-            $myvar = "$myvar $i"
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+            $value = "$value $i"
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
     LaunchScripts -ScriptPaths $arr
@@ -1090,21 +1087,21 @@ Function CreateAwards {
         'Logo| logo_resize| Name| out_name| base_color| ww',
         'Cannes.png| 1800| WINNERS| winner| #AF8F51| 1',
         'Cannes.png| 1800| NOMINATIONS| nomination| #AF8F51| 1'
-        'Cannes.png| 1800| BEST DIRECTOR WINNERS| best_director_winner| #AF8F51| 1',
-        'Cannes.png| 1800| BEST PICTURE WINNERS| best_picture_winner| #AF8F51| 1',
+        'Cannes.png| 1800| BEST_DIRECTOR_WINNERS| best_director_winner| #AF8F51| 1',
+        'Cannes.png| 1800| BEST_PICTURE_WINNERS| best_picture_winner| #AF8F51| 1',
         'Cannes.png| 1800| | Cannes| #AF8F51| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
     foreach ($item in $myArray) {
         if ($($item.Name).ToString() -eq "") {
-            $myvar = $null
+            $value = $null
         }
         else {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
         }
-        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
     }
     LaunchScripts -ScriptPaths $arr
     
@@ -1116,9 +1113,9 @@ Function CreateAwards {
     $arr = @()
     foreach ($item in $myArray) {
         for ($i = 1938; $i -lt 2030; $i++) {
-            $myvar = $i
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+            $value = $i
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
     LaunchScripts -ScriptPaths $arr
@@ -1132,10 +1129,10 @@ Function CreateAwards {
     $arr = @()
     foreach ($item in $myArray) {
         for ($i = 1938; $i -lt 2030; $i++) {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-            $myvar = "$myvar $i"
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+            $value = "$value $i"
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
     LaunchScripts -ScriptPaths $arr
@@ -1149,10 +1146,10 @@ Function CreateAwards {
     $arr = @()
     foreach ($item in $myArray) {
         for ($i = 1938; $i -lt 2030; $i++) {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-            $myvar = "$myvar $i"
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+            $value = "$value $i"
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
     LaunchScripts -ScriptPaths $arr
@@ -1160,16 +1157,16 @@ Function CreateAwards {
  
     $myArray = @(
         'Logo| logo_resize| Name| out_name| base_color| ww',
-        'Cannes.png| 1800| BEST PICTURE WINNER| winner| #AF8F51| 1'
+        'Cannes.png| 1800| BEST_PICTURE_WINNER| winner| #AF8F51| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
     foreach ($item in $myArray) {
         for ($i = 1938; $i -lt 2030; $i++) {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-            $myvar = "$myvar $i"
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+            $value = "$value $i"
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
     LaunchScripts -ScriptPaths $arr
@@ -1183,21 +1180,21 @@ Function CreateAwards {
         'Logo| logo_resize| Name| out_name| base_color| ww',
         'Cesar.png| 1800| WINNERS| winner| #E2A845| 1',
         'Cesar.png| 1800| NOMINATIONS| nomination| #E2A845| 1'
-        'Cesar.png| 1800| BEST DIRECTOR WINNERS| best_director_winner| #E2A845| 1',
-        'Cesar.png| 1800| BEST PICTURE WINNERS| best_picture_winner| #E2A845| 1',
+        'Cesar.png| 1800| BEST_DIRECTOR_WINNERS| best_director_winner| #E2A845| 1',
+        'Cesar.png| 1800| BEST_PICTURE_WINNERS| best_picture_winner| #E2A845| 1',
         'Cesar.png| 1800| | Cesar| #E2A845| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
     foreach ($item in $myArray) {
         if ($($item.Name).ToString() -eq "") {
-            $myvar = $null
+            $value = $null
         }
         else {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
         }
-        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
     }
     LaunchScripts -ScriptPaths $arr
     
@@ -1209,9 +1206,9 @@ Function CreateAwards {
     $arr = @()
     foreach ($item in $myArray) {
         for ($i = 1976; $i -lt 2030; $i++) {
-            $myvar = $i
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+            $value = $i
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
     LaunchScripts -ScriptPaths $arr
@@ -1225,10 +1222,10 @@ Function CreateAwards {
     $arr = @()
     foreach ($item in $myArray) {
         for ($i = 1976; $i -lt 2030; $i++) {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-            $myvar = "$myvar $i"
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+            $value = "$value $i"
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
     LaunchScripts -ScriptPaths $arr
@@ -1242,10 +1239,10 @@ Function CreateAwards {
     $arr = @()
     foreach ($item in $myArray) {
         for ($i = 1976; $i -lt 2030; $i++) {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-            $myvar = "$myvar $i"
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+            $value = "$value $i"
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
     LaunchScripts -ScriptPaths $arr
@@ -1253,16 +1250,16 @@ Function CreateAwards {
  
     $myArray = @(
         'Logo| logo_resize| Name| out_name| base_color| ww',
-        'Cesar.png| 1800| BEST PICTURE WINNER| winner| #E2A845| 1'
+        'Cesar.png| 1800| BEST_PICTURE_WINNER| winner| #E2A845| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
     foreach ($item in $myArray) {
         for ($i = 1976; $i -lt 2030; $i++) {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-            $myvar = "$myvar $i"
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+            $value = "$value $i"
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
     LaunchScripts -ScriptPaths $arr
@@ -1276,21 +1273,21 @@ Function CreateAwards {
         'Logo| logo_resize| Name| out_name| base_color| ww',
         'Choice.png| 600| WINNERS| winner| #AC7427| 1',
         'Choice.png| 600| NOMINATIONS| nomination| #AC7427| 1'
-        'Choice.png| 600| BEST DIRECTOR WINNERS| best_director_winner| #AC7427| 1',
-        'Choice.png| 600| BEST PICTURE WINNERS| best_picture_winner| #AC7427| 1',
+        'Choice.png| 600| BEST_DIRECTOR_WINNERS| best_director_winner| #AC7427| 1',
+        'Choice.png| 600| BEST_PICTURE_WINNERS| best_picture_winner| #AC7427| 1',
         'Choice.png| 600|| Choice| #AC7427| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
     foreach ($item in $myArray) {
         if ($($item.Name).ToString() -eq "") {
-            $myvar = $null
+            $value = $null
         }
         else {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
         }
-        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
     }
     LaunchScripts -ScriptPaths $arr
     
@@ -1302,9 +1299,9 @@ Function CreateAwards {
     $arr = @()
     foreach ($item in $myArray) {
         for ($i = 1929; $i -lt 2030; $i++) {
-            $myvar = $i
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+            $value = $i
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
     LaunchScripts -ScriptPaths $arr
@@ -1318,10 +1315,10 @@ Function CreateAwards {
     $arr = @()
     foreach ($item in $myArray) {
         for ($i = 1929; $i -lt 2030; $i++) {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-            $myvar = "$myvar $i"
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+            $value = "$value $i"
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
     LaunchScripts -ScriptPaths $arr
@@ -1335,10 +1332,10 @@ Function CreateAwards {
     $arr = @()
     foreach ($item in $myArray) {
         for ($i = 1929; $i -lt 2030; $i++) {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-            $myvar = "$myvar $i"
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+            $value = "$value $i"
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
     LaunchScripts -ScriptPaths $arr
@@ -1346,16 +1343,16 @@ Function CreateAwards {
  
     $myArray = @(
         'Logo| logo_resize| Name| out_name| base_color| ww',
-        'Choice.png| 600| BEST PICTURE WINNER| winner| #AC7427| 1'
+        'Choice.png| 600| BEST_PICTURE_WINNER| winner| #AC7427| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
     foreach ($item in $myArray) {
         for ($i = 1929; $i -lt 2030; $i++) {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-            $myvar = "$myvar $i"
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+            $value = "$value $i"
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
     LaunchScripts -ScriptPaths $arr
@@ -1369,21 +1366,21 @@ Function CreateAwards {
         'Logo| logo_resize| Name| out_name| base_color| ww',
         'Emmys.png| 1500| WINNERS| winner| #D89C27| 1',
         'Emmys.png| 1500| NOMINATIONS| nomination| #D89C27| 1'
-        'Emmys.png| 1500| BEST DIRECTOR WINNERS| best_director_winner| #D89C27| 1',
-        'Emmys.png| 1500| BEST PICTURE WINNERS| best_picture_winner| #D89C27| 1',
+        'Emmys.png| 1500| BEST_DIRECTOR_WINNERS| best_director_winner| #D89C27| 1',
+        'Emmys.png| 1500| BEST_PICTURE_WINNERS| best_picture_winner| #D89C27| 1',
         'Emmys.png| 1500|| Emmys| #D89C27| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
     foreach ($item in $myArray) {
         if ($($item.Name).ToString() -eq "") {
-            $myvar = $null
+            $value = $null
         }
         else {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
         }
-        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
     }
     LaunchScripts -ScriptPaths $arr
     
@@ -1395,9 +1392,9 @@ Function CreateAwards {
     $arr = @()
     foreach ($item in $myArray) {
         for ($i = 1947; $i -lt 2030; $i++) {
-            $myvar = $i
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+            $value = $i
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
     LaunchScripts -ScriptPaths $arr
@@ -1411,10 +1408,10 @@ Function CreateAwards {
     $arr = @()
     foreach ($item in $myArray) {
         for ($i = 1947; $i -lt 2030; $i++) {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-            $myvar = "$myvar $i"
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+            $value = "$value $i"
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
     LaunchScripts -ScriptPaths $arr
@@ -1428,10 +1425,10 @@ Function CreateAwards {
     $arr = @()
     foreach ($item in $myArray) {
         for ($i = 1947; $i -lt 2030; $i++) {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-            $myvar = "$myvar $i"
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+            $value = "$value $i"
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
     LaunchScripts -ScriptPaths $arr
@@ -1439,16 +1436,16 @@ Function CreateAwards {
  
     $myArray = @(
         'Logo| logo_resize| Name| out_name| base_color| ww',
-        'Emmys.png| 1500| BEST PICTURE WINNER| winner| #D89C27| 1'
+        'Emmys.png| 1500| BEST_PICTURE_WINNER| winner| #D89C27| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
     foreach ($item in $myArray) {
         for ($i = 1947; $i -lt 2030; $i++) {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-            $myvar = "$myvar $i"
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+            $value = "$value $i"
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
     LaunchScripts -ScriptPaths $arr
@@ -1462,21 +1459,21 @@ Function CreateAwards {
         'Logo| logo_resize| Name| out_name| base_color| ww',
         'Golden.png| 1500| WINNERS| winner| #D0A047| 1',
         'Golden.png| 1500| NOMINATIONS| nomination| #D0A047| 1'
-        'Golden.png| 1500| BEST DIRECTOR WINNERS| best_director_winner| #D0A047| 1',
-        'Golden.png| 1500| BEST PICTURE WINNERS| best_picture_winner| #D0A047| 1',
+        'Golden.png| 1500| BEST_DIRECTOR_WINNERS| best_director_winner| #D0A047| 1',
+        'Golden.png| 1500| BEST_PICTURE_WINNERS| best_picture_winner| #D0A047| 1',
         'Golden.png| 1500| | Golden| #D0A047| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
     foreach ($item in $myArray) {
         if ($($item.Name).ToString() -eq "") {
-            $myvar = $null
+            $value = $null
         }
         else {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
         }
-        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
     }
     LaunchScripts -ScriptPaths $arr
     
@@ -1488,9 +1485,9 @@ Function CreateAwards {
     $arr = @()
     foreach ($item in $myArray) {
         for ($i = 1943; $i -lt 2030; $i++) {
-            $myvar = $i
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+            $value = $i
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
     LaunchScripts -ScriptPaths $arr
@@ -1504,10 +1501,10 @@ Function CreateAwards {
     $arr = @()
     foreach ($item in $myArray) {
         for ($i = 1943; $i -lt 2030; $i++) {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-            $myvar = "$myvar $i"
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+            $value = "$value $i"
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
     LaunchScripts -ScriptPaths $arr
@@ -1521,10 +1518,10 @@ Function CreateAwards {
     $arr = @()
     foreach ($item in $myArray) {
         for ($i = 1943; $i -lt 2030; $i++) {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-            $myvar = "$myvar $i"
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+            $value = "$value $i"
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
     LaunchScripts -ScriptPaths $arr
@@ -1532,16 +1529,16 @@ Function CreateAwards {
  
     $myArray = @(
         'Logo| logo_resize| Name| out_name| base_color| ww',
-        'Golden.png| 1500| BEST PICTURE WINNER| winner| #D0A047| 1'
+        'Golden.png| 1500| BEST_PICTURE_WINNER| winner| #D0A047| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
     foreach ($item in $myArray) {
         for ($i = 1943; $i -lt 2030; $i++) {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-            $myvar = "$myvar $i"
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+            $value = "$value $i"
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
     LaunchScripts -ScriptPaths $arr
@@ -1555,21 +1552,21 @@ Function CreateAwards {
         'Logo| logo_resize| Name| out_name| base_color| ww',
         'Oscars.png| 1500| WINNERS| winner| #A9842E| 1',
         'Oscars.png| 1500| NOMINATIONS| nomination| #A9842E| 1'
-        'Oscars.png| 1500| BEST DIRECTOR WINNERS| best_director_winner| #A9842E| 1',
-        'Oscars.png| 1500| BEST PICTURE WINNERS| best_picture_winner| #A9842E| 1',
+        'Oscars.png| 1500| BEST_DIRECTOR_WINNERS| best_director_winner| #A9842E| 1',
+        'Oscars.png| 1500| BEST_PICTURE_WINNERS| best_picture_winner| #A9842E| 1',
         'Oscars.png| 1500| | Oscars| #A9842E| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
     foreach ($item in $myArray) {
         if ($($item.Name).ToString() -eq "") {
-            $myvar = $null
+            $value = $null
         }
         else {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
         }
-        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
     }
     LaunchScripts -ScriptPaths $arr
     
@@ -1581,9 +1578,9 @@ Function CreateAwards {
     $arr = @()
     foreach ($item in $myArray) {
         for ($i = 1927; $i -lt 2030; $i++) {
-            $myvar = $i
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+            $value = $i
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
     LaunchScripts -ScriptPaths $arr
@@ -1597,10 +1594,10 @@ Function CreateAwards {
     $arr = @()
     foreach ($item in $myArray) {
         for ($i = 1927; $i -lt 2030; $i++) {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-            $myvar = "$myvar $i"
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+            $value = "$value $i"
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
     LaunchScripts -ScriptPaths $arr
@@ -1614,10 +1611,10 @@ Function CreateAwards {
     $arr = @()
     foreach ($item in $myArray) {
         for ($i = 1927; $i -lt 2030; $i++) {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-            $myvar = "$myvar $i"
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+            $value = "$value $i"
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
     LaunchScripts -ScriptPaths $arr
@@ -1625,16 +1622,16 @@ Function CreateAwards {
  
     $myArray = @(
         'Logo| logo_resize| Name| out_name| base_color| ww',
-        'Oscars.png| 1500| BEST PICTURE WINNER| winner| #A9842E| 1'
+        'Oscars.png| 1500| BEST_PICTURE_WINNER| winner| #A9842E| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
     foreach ($item in $myArray) {
         for ($i = 1927; $i -lt 2030; $i++) {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-            $myvar = "$myvar $i"
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+            $value = "$value $i"
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
     LaunchScripts -ScriptPaths $arr
@@ -1648,21 +1645,21 @@ Function CreateAwards {
         'Logo| logo_resize| Name| out_name| base_color| ww',
         'Razzie.png| 1000| WINNERS| winner| #FF0C0C| 1',
         'Razzie.png| 1000| NOMINATIONS| nomination| #FF0C0C| 1',
-        'Razzie.png| 1000| BEST DIRECTOR WINNERS| best_director_winner| #FF0C0C| 1',
-        'Razzie.png| 1000| BEST PICTURE WINNERS| best_picture_winner| #FF0C0C| 1',
+        'Razzie.png| 1000| BEST_DIRECTOR_WINNERS| best_director_winner| #FF0C0C| 1',
+        'Razzie.png| 1000| BEST_PICTURE_WINNERS| best_picture_winner| #FF0C0C| 1',
         'Razzie.png| 1000| | Razzie| #FF0C0C| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
     foreach ($item in $myArray) {
         if ($($item.Name).ToString() -eq "") {
-            $myvar = $null
+            $value = $null
         }
         else {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
         }
-        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
     }
     LaunchScripts -ScriptPaths $arr
 
@@ -1674,9 +1671,9 @@ Function CreateAwards {
     $arr = @()
     foreach ($item in $myArray) {
         for ($i = 1980; $i -lt 2030; $i++) {
-            $myvar = $i
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+            $value = $i
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
     LaunchScripts -ScriptPaths $arr
@@ -1690,10 +1687,10 @@ Function CreateAwards {
     $arr = @()
     foreach ($item in $myArray) {
         for ($i = 1980; $i -lt 2030; $i++) {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-            $myvar = "$myvar $i"
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+            $value = "$value $i"
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
     LaunchScripts -ScriptPaths $arr
@@ -1707,10 +1704,10 @@ Function CreateAwards {
     $arr = @()
     foreach ($item in $myArray) {
         for ($i = 1980; $i -lt 2030; $i++) {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-            $myvar = "$myvar $i"
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+            $value = "$value $i"
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
     LaunchScripts -ScriptPaths $arr
@@ -1718,16 +1715,16 @@ Function CreateAwards {
  
     $myArray = @(
         'Logo| logo_resize| Name| out_name| base_color| ww',
-        'Razzie.png| 1000| BEST PICTURE WINNER| winner| #FF0C0C| 1'
+        'Razzie.png| 1000| BEST_PICTURE_WINNER| winner| #FF0C0C| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
     foreach ($item in $myArray) {
         for ($i = 1980; $i -lt 2030; $i++) {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-            $myvar = "$myvar $i"
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+            $value = "$value $i"
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
     LaunchScripts -ScriptPaths $arr
@@ -1741,21 +1738,21 @@ Function CreateAwards {
         'Logo| logo_resize| Name| out_name| base_color| ww',
         'Spirit.png| 1000| WINNERS| winner| #4662E7| 1',
         'Spirit.png| 1000| NOMINATIONS| nomination| #4662E7| 1'
-        'Spirit.png| 1000| BEST DIRECTOR WINNERS| best_director_winner| #4662E7| 1',
-        'Spirit.png| 1000| BEST PICTURE WINNERS| best_picture_winner| #4662E7| 1',
+        'Spirit.png| 1000| BEST_DIRECTOR_WINNERS| best_director_winner| #4662E7| 1',
+        'Spirit.png| 1000| BEST_PICTURE_WINNERS| best_picture_winner| #4662E7| 1',
         'Spirit.png| 1000| | Spirit| #4662E7| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
     foreach ($item in $myArray) {
         if ($($item.Name).ToString() -eq "") {
-            $myvar = $null
+            $value = $null
         }
         else {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
         }
-        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
     }
     LaunchScripts -ScriptPaths $arr
     
@@ -1767,9 +1764,9 @@ Function CreateAwards {
     $arr = @()
     foreach ($item in $myArray) {
         for ($i = 1986; $i -lt 2030; $i++) {
-            $myvar = $i
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+            $value = $i
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
     LaunchScripts -ScriptPaths $arr
@@ -1783,10 +1780,10 @@ Function CreateAwards {
     $arr = @()
     foreach ($item in $myArray) {
         for ($i = 1986; $i -lt 2030; $i++) {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-            $myvar = "$myvar $i"
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+            $value = "$value $i"
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
     LaunchScripts -ScriptPaths $arr
@@ -1800,10 +1797,10 @@ Function CreateAwards {
     $arr = @()
     foreach ($item in $myArray) {
         for ($i = 1986; $i -lt 2030; $i++) {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-            $myvar = "$myvar $i"
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+            $value = "$value $i"
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
     LaunchScripts -ScriptPaths $arr
@@ -1811,16 +1808,16 @@ Function CreateAwards {
  
     $myArray = @(
         'Logo| logo_resize| Name| out_name| base_color| ww',
-        'Spirit.png| 1000| BEST PICTURE WINNER| winner| #4662E7| 1'
+        'Spirit.png| 1000| BEST_PICTURE_WINNER| winner| #4662E7| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
     foreach ($item in $myArray) {
         for ($i = 1986; $i -lt 2030; $i++) {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-            $myvar = "$myvar $i"
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+            $value = "$value $i"
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
     LaunchScripts -ScriptPaths $arr
@@ -1834,22 +1831,22 @@ Function CreateAwards {
         'Logo| logo_resize| Name| out_name| base_color| ww',
         'Sundance.png| 1500| WINNERS| winner| #7EB2CF| 1',
         'Sundance.png| 1500| NOMINATIONS| nomination| #7EB2CF| 1'
-        'Sundance.png| 1500| BEST DIRECTOR WINNERS| best_director_winner| #7EB2CF| 1',
-        'Sundance.png| 1500| BEST PICTURE WINNERS| best_picture_winner| #7EB2CF| 1',
-        'Sundance.png| 1500| GRAND JURY WINNERS| grand_jury_winner| #7EB2CF| 1',
+        'Sundance.png| 1500| BEST_DIRECTOR_WINNERS| best_director_winner| #7EB2CF| 1',
+        'Sundance.png| 1500| BEST_PICTURE_WINNERS| best_picture_winner| #7EB2CF| 1',
+        'Sundance.png| 1500| GRAND_JURY_WINNERS| grand_jury_winner| #7EB2CF| 1',
         'Sundance.png| 1500| | Sundance| #7EB2CF| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
     foreach ($item in $myArray) {
         if ($($item.Name).ToString() -eq "") {
-            $myvar = $null
+            $value = $null
         }
         else {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
         }
-        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
     }
     LaunchScripts -ScriptPaths $arr
     
@@ -1861,9 +1858,9 @@ Function CreateAwards {
     $arr = @()
     foreach ($item in $myArray) {
         for ($i = 1978; $i -lt 2030; $i++) {
-            $myvar = $i
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+            $value = $i
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
     LaunchScripts -ScriptPaths $arr
@@ -1877,10 +1874,10 @@ Function CreateAwards {
     $arr = @()
     foreach ($item in $myArray) {
         for ($i = 1978; $i -lt 2030; $i++) {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-            $myvar = "$myvar $i"
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+            $value = "$value $i"
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
     LaunchScripts -ScriptPaths $arr
@@ -1894,10 +1891,10 @@ Function CreateAwards {
     $arr = @()
     foreach ($item in $myArray) {
         for ($i = 1978; $i -lt 2030; $i++) {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-            $myvar = "$myvar $i"
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+            $value = "$value $i"
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
     LaunchScripts -ScriptPaths $arr
@@ -1905,16 +1902,16 @@ Function CreateAwards {
  
     $myArray = @(
         'Logo| logo_resize| Name| out_name| base_color| ww',
-        'Sundance.png| 1500| BEST PICTURE WINNER| winner| #7EB2CF| 1'
+        'Sundance.png| 1500| BEST_PICTURE_WINNER| winner| #7EB2CF| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
     foreach ($item in $myArray) {
         for ($i = 1978; $i -lt 2030; $i++) {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-            $myvar = "$myvar $i"
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+            $value = "$value $i"
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
     LaunchScripts -ScriptPaths $arr
@@ -1928,21 +1925,21 @@ Function CreateAwards {
         'Logo| logo_resize| Name| out_name| base_color| ww',
         'Venice.png| 1500| WINNERS| winner| #D21635| 1',
         'Venice.png| 1500| NOMINATIONS| nomination| #D21635| 1'
-        'Venice.png| 1500| BEST DIRECTOR WINNERS| best_director_winner| #D21635| 1',
-        'Venice.png| 1500| BEST PICTURE WINNERS| best_picture_winner| #D21635| 1',
+        'Venice.png| 1500| BEST_DIRECTOR_WINNERS| best_director_winner| #D21635| 1',
+        'Venice.png| 1500| BEST_PICTURE_WINNERS| best_picture_winner| #D21635| 1',
         'Venice.png| 1500| | Venice| #D21635| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
     foreach ($item in $myArray) {
         if ($($item.Name).ToString() -eq "") {
-            $myvar = $null
+            $value = $null
         }
         else {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
         }
-        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
     }
     LaunchScripts -ScriptPaths $arr
     
@@ -1954,9 +1951,9 @@ Function CreateAwards {
     $arr = @()
     foreach ($item in $myArray) {
         for ($i = 1932; $i -lt 2030; $i++) {
-            $myvar = $i
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+            $value = $i
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
     LaunchScripts -ScriptPaths $arr
@@ -1970,10 +1967,10 @@ Function CreateAwards {
     $arr = @()
     foreach ($item in $myArray) {
         for ($i = 1932; $i -lt 2030; $i++) {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-            $myvar = "$myvar $i"
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+            $value = "$value $i"
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
     LaunchScripts -ScriptPaths $arr
@@ -1987,10 +1984,10 @@ Function CreateAwards {
     $arr = @()
     foreach ($item in $myArray) {
         for ($i = 1932; $i -lt 2030; $i++) {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-            $myvar = "$myvar $i"
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+            $value = "$value $i"
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
     LaunchScripts -ScriptPaths $arr
@@ -1998,16 +1995,16 @@ Function CreateAwards {
  
     $myArray = @(
         'Logo| logo_resize| Name| out_name| base_color| ww',
-        'Venice.png| 1500| BEST PICTURE WINNER| winner| #D21635| 1'
+        'Venice.png| 1500| BEST_PICTURE_WINNER| winner| #D21635| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
     foreach ($item in $myArray) {
         for ($i = 1932; $i -lt 2030; $i++) {
-            $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-            $myvar = "$myvar $i"
-            $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+            $value = "$value $i"
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
     LaunchScripts -ScriptPaths $arr
@@ -2037,18 +2034,17 @@ Function CreateBased {
 
     $myArray = @(
         'Name| out_name| base_color| other_setting',
-        'BASED ON A BOOK| Book| #131CA1| NA',
-        'BASED ON A COMIC| Comic| #7856EF| NA',
-        'BASED ON A TRUE STORY| True Story| #BC0638| NA',
-        'BASED ON A VIDEO GAME| Video Game| #38CC66| NA'
+        'BASED_ON_A_BOOK| Book| #131CA1| NA',
+        'BASED_ON_A_COMIC| Comic| #7856EF| NA',
+        'BASED_ON_A_TRUE_STORY| True Story| #BC0638| NA',
+        'BASED_ON_A_VIDEO_GAME| Video Game| #38CC66| NA'
     ) | ConvertFrom-Csv -Delimiter '|'
     
     $arr = @()
     foreach ($item in $myArray) {
-        $myvar1 = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper) 
-        $myvar = $myvar1
-        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-        $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$myvar`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
+        $value = Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$value`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     }
 
     LaunchScripts -ScriptPaths $arr
@@ -2077,66 +2073,66 @@ Function CreateChart {
         'AniDB.png| 1800| POPULAR| AniDB Popular| #FF7E17| 1',
         'AniList.png| 1500| POPULAR| AniList Popular| #414A81| 1',
         'AniList.png| 1500| SEASON| AniList Season| #414A81| 1',
-        'AniList.png| 1500| TOP RATED| AniList Top Rated| #414A81| 1',
+        'AniList.png| 1500| TOP_RATED| AniList Top Rated| #414A81| 1',
         'AniList.png| 1500| TRENDING| AniList Trending| #414A81| 1',
-        'Apple TV+.png| 1500| TOP 10| apple_top| #494949| 1',
-        'Disney+.png| 1500| TOP 10| disney_top| #002CA1| 1',
-        'HBO Max.png| 1500| TOP 10| hbo_top| #9015C5| 1',
-        'IMDb.png| 1500| BOTTOM RATED| IMDb Bottom Rated| #D7B00B| 1',
-        'IMDb.png| 1500| BOX OFFICE| IMDb Box Office| #D7B00B| 1',
-        'IMDb.png| 1500| LOWEST RATED| IMDb Lowest Rated| #D7B00B| 1',
+        'Apple TV+.png| 1500| TOP_10| apple_top| #494949| 1',
+        'Disney+.png| 1500| TOP_10| disney_top| #002CA1| 1',
+        'HBO Max.png| 1500| TOP_10| hbo_top| #9015C5| 1',
+        'IMDb.png| 1500| BOTTOM_RATED| IMDb Bottom Rated| #D7B00B| 1',
+        'IMDb.png| 1500| BOX_OFFICE| IMDb Box Office| #D7B00B| 1',
+        'IMDb.png| 1500| LOWEST_RATED| IMDb Lowest Rated| #D7B00B| 1',
         'IMDb.png| 1500| POPULAR| IMDb Popular| #D7B00B| 1',
-        'IMDb.png| 1500| TOP 10| imdb_top| #D7B00B| 1',
-        'IMDb.png| 1500| TOP 250| IMDb Top 250| #D7B00B| 1',
+        'IMDb.png| 1500| TOP_10| imdb_top| #D7B00B| 1',
+        'IMDb.png| 1500| TOP_250| IMDb Top 250| #D7B00B| 1',
         'MyAnimeList.png| 1500| FAVORITED| MyAnimeList Favorited| #304DA6| 1',
         'MyAnimeList.png| 1500| POPULAR| MyAnimeList Popular| #304DA6| 1',
         'MyAnimeList.png| 1500| SEASON| MyAnimeList Season| #304DA6| 1',
-        'MyAnimeList.png| 1500| TOP AIRING| MyAnimeList Top Airing| #304DA6| 1',
-        'MyAnimeList.png| 1500| TOP RATED| MyAnimeList Top Rated| #304DA6| 1',
-        'Netflix.png| 1500| TOP 10| netflix_top| #B4121D| 1',
-        'Paramount+.png| 1500| TOP 10| paramount_top| #1641C3| 1',
-        'Pirated.png| 1500| TOP 10 PIRATED| Top 10 Pirated Movies of the Week| #93561D| 1',
-        'Plex.png| 1500| NEW EPISODES| New Episodes| #DC9924| 1',
-        'Plex.png| 1500| NEW PREMIERES| New Premieres| #DC9924| 1',
-        'Plex.png| 1500| NEWLY RELEASED EPISODES| Newly Released Episodes| #DC9924| 1',
-        'Plex.png| 1500| NEWLY RELEASED| Newly Released| #DC9924| 1',
+        'MyAnimeList.png| 1500| TOP_AIRING| MyAnimeList Top Airing| #304DA6| 1',
+        'MyAnimeList.png| 1500| TOP_RATED| MyAnimeList Top Rated| #304DA6| 1',
+        'Netflix.png| 1500| TOP_10| netflix_top| #B4121D| 1',
+        'Paramount+.png| 1500| TOP_10| paramount_top| #1641C3| 1',
+        'Pirated.png| 1500| TOP_10_PIRATED| Top 10 Pirated Movies of the Week| #93561D| 1',
+        'Plex.png| 1500| NEW_EPISODES| New Episodes| #DC9924| 1',
+        'Plex.png| 1500| NEW_PREMIERES| New Premieres| #DC9924| 1',
+        'Plex.png| 1500| NEWLY_RELEASED_EPISODES| Newly Released Episodes| #DC9924| 1',
+        'Plex.png| 1500| NEWLY_RELEASED| Newly Released| #DC9924| 1',
         'Plex.png| 1500| PILOTS| Pilots| #DC9924| 1',
-        'Plex.png| 1500| PLEX PEOPLE WATCHING| Plex People Watching| #DC9924| 1',
-        'Plex.png| 1500| PLEX PILOTS| Plex Pilots| #DC9924| 1',
-        'Plex.png| 1500| PLEX POPULAR| Plex Popular| #DC9924| 1',
-        'Plex.png| 1500| PLEX WATCHED| Plex Watched| #DC9924| 1',
-        'Plex.png| 1500| RECENTLY ADDED| Recently Added| #DC9924| 1',
-        'Plex.png| 1500| RECENTLY AIRED| Recently Aired| #DC9924| 1',
-        'Prime Video.png| 1500| TOP 10| prime_top| #43ABCE| 1',
-        'StevenLu.png| 1500| STEVENLU''S POPULAR MOVIES| StevenLu''s Popular Movies| #1D2D51| 1',
-        'TMDb.png| 1500| AIRING TODAY| TMDb Airing Today| #062AC8| 1',
-        'TMDb.png| 1500| NOW PLAYING| TMDb Now Playing| #062AC8| 1',
-        'TMDb.png| 1500| ON THE AIR| TMDb On The Air| #062AC8| 1',
+        'Plex.png| 1500| PLEX_PEOPLE_WATCHING| Plex People Watching| #DC9924| 1',
+        'Plex.png| 1500| PLEX_PILOTS| Plex Pilots| #DC9924| 1',
+        'Plex.png| 1500| PLEX_POPULAR| Plex Popular| #DC9924| 1',
+        'Plex.png| 1500| PLEX_WATCHED| Plex Watched| #DC9924| 1',
+        'Plex.png| 1500| RECENTLY_ADDED| Recently Added| #DC9924| 1',
+        'Plex.png| 1500| RECENTLY_AIRED| Recently Aired| #DC9924| 1',
+        'Prime Video.png| 1500| TOP_10| prime_top| #43ABCE| 1',
+        'StevenLu.png| 1500| STEVENLU''S_POPULAR_MOVIES| StevenLu''s Popular Movies| #1D2D51| 1',
+        'TMDb.png| 1500| AIRING_TODAY| TMDb Airing Today| #062AC8| 1',
+        'TMDb.png| 1500| NOW_PLAYING| TMDb Now Playing| #062AC8| 1',
+        'TMDb.png| 1500| ON_THE_AIR| TMDb On The Air| #062AC8| 1',
         'TMDb.png| 1500| POPULAR| TMDb Popular| #062AC8| 1',
-        'TMDb.png| 1500| TOP RATED| TMDb Top Rated| #062AC8| 1',
+        'TMDb.png| 1500| TOP_RATED| TMDb Top Rated| #062AC8| 1',
         'TMDb.png| 1500| TRENDING| TMDb Trending| #062AC8| 1',
         'Tautulli.png| 1500| POPULAR| Tautulli Popular| #B9851F| 1',
         'Tautulli.png| 1500| WATCHED| Tautulli Watched| #B9851F| 1',
         'Trakt.png| 1500| COLLECTED| Trakt Collected| #CD1A20| 1',
-        'Trakt.png| 1500| NOW PLAYING| Trakt Now Playing| #CD1A20| 1',
+        'Trakt.png| 1500| NOW_PLAYING| Trakt Now Playing| #CD1A20| 1',
         'Trakt.png| 1500| POPULAR| Trakt Popular| #CD1A20| 1',
         'Trakt.png| 1500| RECOMMENDED| Trakt Recommended| #CD1A20| 1',
         'Trakt.png| 1500| TRENDING| Trakt Trending| #CD1A20| 1',
         'Trakt.png| 1500| WATCHED| Trakt Watched| #CD1A20| 1',
         'Trakt.png| 1500| WATCHLIST| Trakt Watchlist| #CD1A20| 1',
         'css.png| 1500| FAMILIES| Common Sense Selection| #1AA931| 1',
-        'google_play.png| 1500| TOP 10| google_top| #B81282| 1',
-        'hulu.png| 1500| TOP 10| hulu_top| #1BB68A| 1',
-        'itunes.png| 1500| TOP 10| itunes_top| #D500CC| 1',
-        'star_plus.png| 1500| TOP 10| star_plus_top| #4A3159| 1',
-        'vudu.png| 1500| TOP 10| vudu_top| #3567AC| 1'
+        'google_play.png| 1500| TOP_10| google_top| #B81282| 1',
+        'hulu.png| 1500| TOP_10| hulu_top| #1BB68A| 1',
+        'itunes.png| 1500| TOP_10| itunes_top| #D500CC| 1',
+        'star_plus.png| 1500| TOP_10| star_plus_top| #4A3159| 1',
+        'vudu.png| 1500| TOP_10| vudu_top| #3567AC| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
     foreach ($item in $myArray) {
-        $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_chart\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+        $value = Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_chart\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
     }
     LaunchScripts -ScriptPaths $arr
 
@@ -2159,20 +2155,19 @@ Function CreateContentRating {
     $theMaxHeight = 1000
     $minPointSize = 100
     $maxPointSize = 250
-    # $myvar1 = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue "content_rating_name" -CaseSensitivity Upper) 
 
     Move-Item -Path output -Destination output-orig
 
     $myArray = @(
         'Logo| Name| out_name| base_color| ww',
-        'transparent.png| content_ratings_other_name| other| #FF2000| 1'
+        'transparent.png| content_ratings_other| other| #FF2000| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
     foreach ($item in $myArray) {
-        $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-        $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.Logo)`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$myvar`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
+        $value = (Get-YamlPropertyValue -PropertyPath "collections.$($item.name).name" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.Logo)`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$value`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     }
     LaunchScripts -ScriptPaths $arr
 
@@ -2180,14 +2175,14 @@ Function CreateContentRating {
     
     $arr = @()
     for ($i = 1; $i -lt 19; $i++) {
-        $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue "AGE" -CaseSensitivity Upper)
-        $myvar = "$myvar $i+"
-        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_content_rating\cs.png`" -logo_offset -500 -logo_resize $theMaxWidth -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"#1AA931`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
+        $value = (Get-YamlPropertyValue -PropertyPath "key_names.age" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+        $value = "$value $i+"
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_content_rating\cs.png`" -logo_offset -500 -logo_resize $theMaxWidth -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"#1AA931`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     }
-    $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue "NOT RATED" -CaseSensitivity Upper)
-    $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_content_rating\cs.png`" -logo_offset -500 -logo_resize $theMaxWidth -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"NR`" -base_color `"#1AA931`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
+    $value = (Get-YamlPropertyValue -PropertyPath "key_names.NOT_RATED" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+    $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_content_rating\cs.png`" -logo_offset -500 -logo_resize $theMaxWidth -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"NR`" -base_color `"#1AA931`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     LaunchScripts -ScriptPaths $arr
 
     Move-Item -Path output -Destination content_rating\cs
@@ -2195,14 +2190,14 @@ Function CreateContentRating {
     $content_rating = "G", "PG", "PG-13", "R", "R+", "Rx"
     $arr = @()
     foreach ( $cr in $content_rating ) { 
-        $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue "RATED" -CaseSensitivity Upper)
-        $myvar = "$myvar $cr"
-        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_content_rating\mal.png`" -logo_offset -500 -logo_resize $theMaxWidth -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$cr`" -base_color `"#2444D1`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
+        $value = (Get-YamlPropertyValue -PropertyPath "key_names.RATED" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+        $value = "$value $cr"
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_content_rating\mal.png`" -logo_offset -500 -logo_resize $theMaxWidth -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$cr`" -base_color `"#2444D1`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     }
-    $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue "NOT RATED" -CaseSensitivity Upper)
-    $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_content_rating\mal.png`" -logo_offset -500 -logo_resize $theMaxWidth -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"NR`" -base_color `"#2444D1`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
+    $value = (Get-YamlPropertyValue -PropertyPath "key_names.NOT_RATED" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+    $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_content_rating\mal.png`" -logo_offset -500 -logo_resize $theMaxWidth -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"NR`" -base_color `"#2444D1`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     LaunchScripts -ScriptPaths $arr
     
     Move-Item -Path output -Destination content_rating\mal
@@ -2250,26 +2245,25 @@ Function CreateCountry {
     $theMaxHeight = 1000
     $minPointSize = 100
     $maxPointSize = 250
-    $myvar1 = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue "country_name" -CaseSensitivity Upper) 
 
     Move-Item -Path output -Destination output-orig
 
     $myArray = @(
         'Logo| Name| out_name| base_color| ww',
-        'transparent.png| country_other_name| Other Countries| #FF2000| 1'
+        'transparent.png| country_other| Other Countries| #FF2000| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
     foreach ($item in $myArray) {
-        $myvar = Set-TextBetweenDelimiters -InputString $myvar1 -ReplacementString (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-        $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.Logo)`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$myvar`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
+        $value = (Get-YamlPropertyValue -PropertyPath "collections.$($item.name).name" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.Logo)`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$value`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     }
     LaunchScripts -ScriptPaths $arr
 
     $myArray = @(
         'Logo| logo_resize| Name| out_name| base_color',
-        'ae.png| 1500| UNITED ARAB EMIRATES| United Arab Emirates| #BC9C16',
+        'ae.png| 1500| UNITED_ARAB_EMIRATES| United Arab Emirates| #BC9C16',
         'ar.png| 750| ARGENTINA| Argentina| #F05610',
         'at.png| 1500| AUSTRIA| Austria| #F5E6AE',
         'au.png| 1500| AUSTRALIA| Australia| #D5237B',
@@ -2281,19 +2275,19 @@ Function CreateCountry {
         'ch.png| 1500| SWITZERLAND| Switzerland| #5803F1',
         'cl.png| 1500| CHILE| Chile| #AAC41F',
         'cn.png| 1500| CHINA| China| #902A62',
-        'cr.png| 1500| COSTA RICA| Costa Rica| #41F306',
-        'cz.png| 1500| CZECH REPUBLIC| Czech Republic| #9ECE8F',
+        'cr.png| 1500| COSTA_RICA| Costa Rica| #41F306',
+        'cz.png| 1500| CZECH_REPUBLIC| Czech Republic| #9ECE8F',
         'de.png| 1500| GERMANY| Germany| #97FDAE',
         'dk.png| 1500| DENMARK| Denmark| #685ECB',
-        'do.png| 1500| DOMINICAN REPUBLIC| Dominican Republic| #83F0A2',
+        'do.png| 1500| DOMINICAN_REPUBLIC| Dominican Republic| #83F0A2',
         'ee.png| 1500| ESTONIA| Estonia| #5145DA',
         'eg.png| 1500| EGYPT| Egypt| #86B137',
         'es.png| 1500| SPAIN| Spain| #99DA4B',
         'fi.png| 750| FINLAND| Finland| #856518',
         'fr.png| 1500| FRANCE| France| #D0404D',
-        'gb.png| 1500| UNITED KINGDOM| United Kingdom| #C7B89D',
+        'gb.png| 1500| UNITED_KINGDOM| United Kingdom| #C7B89D',
         'gr.png| 1500| GREECE| Greece| #431832',
-        'hk.png| 1500| HONG KONG| Hong Kong| #F6B541',
+        'hk.png| 1500| HONG_KONG| Hong Kong| #F6B541',
         'hr.png| 1500| CROATIA| Croatia| #62BF53',
         'hu.png| 1500| HUNGARY| Hungary| #E5983C',
         'id.png| 1500| INDONESIA| Indonesia| #3E33E4',
@@ -2305,7 +2299,7 @@ Function CreateCountry {
         'ir.png| 1500| IRAN| Iran| #2AAC15',
         'jp.png| 1500| JAPAN| Japan| #4FCF54',
         'kr.png| 1500| KOREA| Korea| #127FFE',
-        'lk.png| 750| SRI LANKA| Sri Lanka| #6415FD',
+        'lk.png| 750| SRI_LANKA| Sri Lanka| #6415FD',
         'lu.png| 750| LUXEMBOURG| Luxembourg| #C90586',
         'lv.png| 1500| LATVIA| Latvia| #5326A3',
         'ma.png| 1500| MOROCCO| Morocco| #B28BDC',
@@ -2314,7 +2308,7 @@ Function CreateCountry {
         'nl.png| 1500| NETHERLANDS| Netherlands| #B14FAA',
         'no.png| 1500| NORWAY| Norway| #AC320E',
         'np.png| 1500| NEPAL| Nepal| #3F847B',
-        'nz.png| 1500| NEW ZEALAND| New Zealand| #E0A486',
+        'nz.png| 1500| NEW_ZEALAND| New Zealand| #E0A486',
         'pa.png| 1500| PANAMA| Panama| #417818',
         'pe.png| 750| PERU| Peru| #803704',
         'ph.png| 1500| PHILIPPINES| Philippines| #2DF423',
@@ -2325,22 +2319,22 @@ Function CreateCountry {
         'ro.png| 1500| ROMANIA| Romania| #ABD0CF',
         'rs.png| 1500| SERBIA| Serbia| #7E0D8E',
         'ru.png| 1500| RUSSIA| Russia| #97D820',
-        'sa.png| 1500| SAUDI ARABIA| Saudi Arabia| #D34B83',
+        'sa.png| 1500| SAUDI_ARABIA| Saudi Arabia| #D34B83',
         'se.png| 1500| SWEDEN| Sweden| #E3C61A',
         'sg.png| 1500| SINGAPORE| Singapore| #0328DB',
         'th.png| 1500| THAILAND| Thailand| #32DBD9',
         'tr.png| 1500| TURKEY| Turkey| #CD90D1',
         'ua.png| 1500| UKRAINE| Ukraine| #1640B6',
-        'us.png| 1500| UNITED STATES OF AMERICA| United States of America| #D2A345',
+        'us.png| 1500| UNITED_STATES_OF_AMERICA| United States of America| #D2A345',
         'vn.png| 1500| VIETNAM| Vietnam| #19156E',
-        'za.png| 1500| SOUTH AFRICA| South Africa| #E7BB4A'
+        'za.png| 1500| SOUTH_AFRICA| South Africa| #E7BB4A'
     ) | ConvertFrom-Csv -Delimiter '|'
     
     $arr = @()
     foreach ($item in $myArray) {
-        $myvar = Set-TextBetweenDelimiters -InputString $myvar1 -ReplacementString (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_country\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash 0"
+        $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_country\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash 0"
     }
     LaunchScripts -ScriptPaths $arr
 
@@ -2348,22 +2342,22 @@ Function CreateCountry {
 
     $arr = @()
     foreach ($item in $myArray) {
-        $myvar = Set-TextBetweenDelimiters -InputString $myvar1 -ReplacementString (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_country\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
+        $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_country\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     }
     LaunchScripts -ScriptPaths $arr
 
     $myArray = @(
         'Logo| Name| out_name| base_color| ww',
-        'transparent.png| country_other_name| Other Countries| #FF2000| 1'
+        'transparent.png| country_other| Other Countries| #FF2000| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
     foreach ($item in $myArray) {
-        $myvar = Set-TextBetweenDelimiters -InputString $myvar1 -ReplacementString (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-        $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.Logo)`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$myvar`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
+        $value = (Get-YamlPropertyValue -PropertyPath "collections.$($item.name).name" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.Logo)`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$value`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     }
     LaunchScripts -ScriptPaths $arr
 
@@ -2392,14 +2386,14 @@ Function CreateDecade {
 
     $myArray = @(
         'Logo| Name| out_name| base_color| ww',
-        'transparent.png| decade_other_name| other| #FF2000| 1'
+        'transparent.png| decade_other| other| #FF2000| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
     foreach ($item in $myArray) {
-        $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-        $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.Logo)`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$myvar`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
+        $value = (Get-YamlPropertyValue -PropertyPath "collections.$($item.name).name" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.Logo)`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$value`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     }
     LaunchScripts -ScriptPaths $arr
 
@@ -2430,9 +2424,9 @@ Function CreateDecade {
     
     $arr = @()
     foreach ($item in $myArray) {
-        $myvar = $($item.Name)
-        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $($item.font_name) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $($item.font_size)
-        $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$myvar`" -text_offset +0 -font `"$($item.font_name)`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
+        $value = $($item.Name)
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font_name) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $($item.font_size)
+        $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$value`" -text_offset +0 -font `"$($item.font_name)`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     }
 
     LaunchScripts -ScriptPaths $arr
@@ -2442,7 +2436,7 @@ Function CreateDecade {
     
     Move-Item -Path output -Destination decade
 
-    $myvar1 = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue "BEST OF" -CaseSensitivity Upper) 
+    $pre_value = Get-YamlPropertyValue -PropertyPath "key_names.BEST_OF" -ConfigObject $global:ConfigObj -CaseSensitivity Upper
 
     $theFont = "ComfortAa-Medium"
     $theMaxWidth = 1800
@@ -2452,9 +2446,9 @@ Function CreateDecade {
 
     $arr = @()
     for ($i = 1880; $i -lt 2030; $i += 10) {
-        $myvar = $myvar1
-        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-        $arr += ".\create_poster.ps1 -logo `"$script_path\decade\$i.jpg`" -logo_offset +0 -logo_resize 2000 -text `"$myvar`" -text_offset -400 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"#FFFFFF`" -gradient 1 -avg_color 0 -clean 1 -white_wash 0"
+        $value = $pre_value
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\decade\$i.jpg`" -logo_offset +0 -logo_resize 2000 -text `"$value`" -text_offset -400 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"#FFFFFF`" -gradient 1 -avg_color 0 -clean 1 -white_wash 0"
     }
     LaunchScripts -ScriptPaths $arr
     Start-Sleep -Seconds 3
@@ -2601,134 +2595,132 @@ Function CreateGenre {
     $minPointSize = 100
     $maxPointSize = 250
 
-    # $myvar1 = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue "genre_name" -CaseSensitivity Upper) 
-
     Move-Item -Path output -Destination output-orig
 
     $myArray = @(
         'Logo| Name| out_name| base_color| ww',
-        'transparent.png| genre_other_name| other| #FF2000| 1'
+        'transparent.png| genre_other| other| #FF2000| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
     foreach ($item in $myArray) {
-        $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-        $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.Logo)`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$myvar`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
+        $value = (Get-YamlPropertyValue -PropertyPath "collections.$($item.name).name" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.Logo)`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$value`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     }
     LaunchScripts -ScriptPaths $arr
 
     $myArray = @(
         'Logo| Name| out_name| base_color| ww',
-        'Action & adventure.png| ACTION & ADVENTURE| Action & adventure| #65AEA5| 1',
+        'Action & adventure.png| ACTION_ADVENTURE| Action & adventure| #65AEA5| 1',
         'Action.png| ACTION| Action| #387DBF| 1',
         'Adult.png| ADULT| Adult| #D02D2D| 1',
         'Adventure.png| ADVENTURE| Adventure| #40B997| 1',
         'Animation.png| ANIMATION| Animation| #9035BE| 1',
         'Anime.png| ANIME| Anime| #41A4BE| 1',
-        'APAC month.png| ASIAN AMERICAN & PACIFIC ISLANDER HERITAGE MONTH| APAC month| #0EC26B| 1',
+        'APAC month.png| ASIAN_AMERICAN_PACIFIC_ISLANDER_HERITAGE_MONTH| APAC month| #0EC26B| 1',
         'Assassin.png| ASSASSIN| Assasin| #C52124| 1',
         'Biography.png| BIOGRAPHY| Biography| #C1A13E| 1',
         'Biopic.png| BIOPIC| Biopic| #C1A13E| 1',
-        'Black History.png| BLACK HISTORY MONTH| Black History| #D86820| 0',
-        'Black History2.png| BLACK HISTORY MONTH| Black History2| #D86820| 1',
-        'Boys Love.png| BOYS LOVE| Boys Love| #85ADAC| 1',
+        'Black History.png| BLACK_HISTORY_MONTH| Black History| #D86820| 0',
+        'Black History2.png| BLACK_HISTORY_MONTH| Black History2| #D86820| 1',
+        'Boys Love.png| BOYS_LOVE| Boys Love| #85ADAC| 1',
         'Cars.png| CARS| Cars| #7B36D2| 1',
         'Children.png| CHILDREN| Children| #9C42C2| 1',
         'Comedy.png| COMEDY| Comedy| #B7363E| 1',
         'Competition.png| COMPETITION| Competition| #55BF48| 1',
-        'Con Artist.png| CON ARTIST| Con Artist| #C7A5A1| 1',
-        'Creature Horror.png| CREATURE HORROR| Creature Horror| #AD8603| 1',
+        'Con Artist.png| CON_ARTIST| Con Artist| #C7A5A1| 1',
+        'Creature Horror.png| CREATURE_HORROR| Creature Horror| #AD8603| 1',
         'Crime.png| CRIME| Crime| #888888| 1',
         'Demons.png| DEMONS| Demons| #9A2A2A| 1',
-        'Disabilities.png| DAY OF PERSONS WITH DISABILITIES| Disabilities| #40B9FE| 1',
+        'Disabilities.png| DAY_OF_PERSONS_WITH_DISABILITIES| Disabilities| #40B9FE| 1',
         'Documentary.png| DOCUMENTARY| Documentary| #2C4FA8| 1',
         'Drama.png| DRAMA| Drama| #A22C2C| 1',
         'Ecchi.png| ECCHI| Ecchi| #C592C0| 1',
         'Erotica.png| EROTICA| Erotica| #CA9FC9| 1',
         'Family.png| FAMILY| Family| #BABA6C| 1',
         'Fantasy.png| FANTASY| Fantasy| #CC2BC6| 1',
-        'Film Noir.png| FILM NOIR| Film Noir| #5B5B5B| 1',
+        'Film Noir.png| FILM_NOIR| Film Noir| #5B5B5B| 1',
         'Food.png| FOOD| Food| #A145C1| 1',
-        'Found Footage Horror.png| FOUND FOOTAGE HORROR| Found Footage Horror| #2C3B08| 1',
-        'Game Show.png| GAME SHOW| Game Show| #32D184| 1',
+        'Found Footage Horror.png| FOUND_FOOTAGE_HORROR| Found Footage Horror| #2C3B08| 1',
+        'Game Show.png| GAME_SHOW| Game Show| #32D184| 1',
         'Game.png| GAME| Game| #70BD98| 1',
         'Gangster.png| GANGSTER| Gangster| #77ACBD| 1',
-        'Girls Love.png| GIRLS LOVE| Girls Love| #AC86AD| 1',
+        'Girls Love.png| GIRLS_LOVE| Girls Love| #AC86AD| 1',
         'Gourmet.png| GOURMET| Gourmet| #83AC8F| 1',
         'Harem.png| HAREM| Harem| #7DB0C5| 1',
         'Heist.png| HEIST| Heist| #4281C9| 1',
         'Hentai.png| HENTAI| Hentai| #B274BF| 1',
         'History.png| HISTORY| History| #B7A95D| 1',
-        'Home and Garden.png| HOME AND GARDEN| Home and Garden| #8CC685| 1',
+        'Home and Garden.png| HOME_AND_GARDEN| Home and Garden| #8CC685| 1',
         'Horror.png| HORROR| Horror| #B94948| 1',
         'Indie.png| INDIE| Indie| #BB7493| 1',
         'Kids.png| KIDS| Kids| #9F40C6| 1',
-        'LatinX Month.png| LATINX HERITAGE MONTH| LatinX| #FF5F5F| 1',
-        'LGBTQ+.png| LGBTQ+| LGBTQ+| #BD86C4| 1',
-        'LGBTQ+ Month.png| LGBTQ+ PRIDE MONTH| LGBTQ+ Month| #FF3B3C| 1',
-        'Martial Arts.png| MARTIAL ARTS| Martial Arts| #777777| 1',
+        'LatinX Month.png| LATINX_HERITAGE_MONTH| LatinX| #FF5F5F| 1',
+        'LGBTQ+.png| LGBTQ| LGBTQ+| #BD86C4| 1',
+        'LGBTQ+ Month.png| LGBTQ_PRIDE_MONTH| LGBTQ+ Month| #FF3B3C| 1',
+        'Martial Arts.png| MARTIAL_ARTS| Martial Arts| #777777| 1',
         'Mecha.png| MECHA| Mecha| #8B8B8B| 1',
         'Military.png| MILITARY| Military| #87552F| 1',
-        'Mind-Bend.png| MIND-BEND| Mind-Bend| #619DA2| 1',
-        'Mind-Fuck.png| MIND-FUCK| Mind-Fuck| #619DA2| 1',
-        'Mind-Fuck2.png| MIND-F**K| Mind-Fuck2| #619DA2| 1',
-        'Mini-Series.png| MINI-SERIES| Mini-Series| #66B7BE| 1',
+        'Mind-Bend.png| MIND_BEND| Mind-Bend| #619DA2| 1',
+        'Mind-Fuck.png| MIND_FUCK| Mind-Fuck| #619DA2| 1',
+        'Mind-Fuck2.png| MIND_F**K| Mind-Fuck2| #619DA2| 1',
+        'Mini-Series.png| MINI_SERIES| Mini-Series| #66B7BE| 1',
         'Music.png| MUSIC| Music| #3CC79C| 1',
         'Musical.png| MUSICAL| Musical| #C38CB7| 1',
         'Mystery.png| MYSTERY| Mystery| #867CB5| 1',
-        'News & Politics.png| NEWS & POLITICS| News & Politics| #C83131| 1',
+        'News & Politics.png| NEWS_POLITICS| News & Politics| #C83131| 1',
         'News.png| NEWS| News| #C83131| 1',
-        'Outdoor Adventure.png| OUTDOOR ADVENTURE| Outdoor Adventure| #56C89C| 1',
+        'Outdoor Adventure.png| OUTDOOR_ADVENTURE| Outdoor Adventure| #56C89C| 1',
         'Parody.png| PARODY| Parody| #83A9A2| 1',
         'Police.png| POLICE| Police| #262398| 1',
         'Politics.png| POLITICS| Politics| #3F5FC0| 1',
         'Psychedelic.png| PSYCHEDELIC| Psychedelic| #E973F6| 0',
-        'Psychological Horror.png| PSYCHOLOGICAL\nHORROR| Psychological Horror| #AC5969| 1',
+        'Psychological Horror.png| PSYCHOLOGICAL_HORROR| Psychological Horror| #AC5969| 1',
         'Psychological.png| PSYCHOLOGICAL| Psychological| #C79367| 1',
         'Reality.png| REALITY| Reality| #7CB6AE| 1',
         'Romance.png| ROMANCE| Romance| #B6398E| 1',
-        'Romantic Comedy.png| ROMANTIC COMEDY| Romantic Comedy| #B2445D| 1',
-        'Romantic Drama.png| ROMANTIC DRAMA| Romantic Drama| #AB89C0| 1',
+        'Romantic Comedy.png| ROMANTIC_COMEDY| Romantic Comedy| #B2445D| 1',
+        'Romantic Drama.png| ROMANTIC_DRAMA| Romantic Drama| #AB89C0| 1',
         'Samurai.png| SAMURAI| Samurai| #C0C282| 1',
         'School.png| SCHOOL| School| #4DC369| 1',
-        'Sci-Fi & Fantasy.png| SCI-FI & FANTASY| Sci-Fi & Fantasy| #9254BA| 1',
-        'Science Fiction.png| SCIENCE FICTION| Science Fiction| #545FBA| 1',
-        'Serial Killer.png| SERIAL KILLER| Serial Killer| #163F56| 1',
+        'Sci-Fi & Fantasy.png| SCI-FI_&_FANTASY| Sci-Fi & Fantasy| #9254BA| 1',
+        'Science Fiction.png| SCIENCE_FICTION| Science Fiction| #545FBA| 1',
+        'Serial Killer.png| SERIAL_KILLER| Serial Killer| #163F56| 1',
         'Short.png| SHORT| Short| #BCBB7B| 1',
         'Shoujo.png| SHOUJO| Shoujo| #89529D| 1',
         'Shounen.png| SHOUNEN| Shounen| #505E99| 1',
         'Slasher.png| SLASHER| Slasher| #B75157| 1',
-        'Slice of Life.png| SLICE OF LIFE| Slice of Life| #C696C4| 1',
+        'Slice of Life.png| SLICE_OF_LIFE| Slice of Life| #C696C4| 1',
         'Soap.png| SOAP| Soap| #AF7CC0| 1',
         'Space.png| SPACE| Space| #A793C1| 1',
         'Sport.png| SPORT| Sport| #587EB1| 1',
         'Spy.png| SPY| Spy| #B7D99F| 1',
-        'Stand-Up Comedy.png| STAND-UP COMEDY| Stand-Up Comedy| #CF8A49| 1',
-        'Stoner Comedy.png| STONER COMEDY| Stoner Comedy| #79D14D| 1',
-        'Super Power.png| SUPER POWER| Super Power| #279552| 1',
+        'Stand-Up Comedy.png| STAND-UP_COMEDY| Stand-Up Comedy| #CF8A49| 1',
+        'Stoner Comedy.png| STONER_COMEDY| Stoner Comedy| #79D14D| 1',
+        'Super Power.png| SUPER_POWER| Super Power| #279552| 1',
         'Superhero.png| SUPERHERO| Superhero| #DA8536| 1',
         'Supernatural.png| SUPERNATURAL| Supernatural| #262693| 1',
         'Survival.png| SURVIVAL| Survival| #434447| 1',
         'Suspense.png| SUSPENSE| Suspense| #AE5E37| 1',
-        'Sword & Sorcery.png| SWORD & SORCERY| Sword & Sorcery| #B44FBA| 1',
-        'TV Movie.png| TV MOVIE| TV Movie| #85A5B4| 1',
-        'Talk Show.png| TALK SHOW| Talk Show| #82A2B5| 1',
+        'Sword & Sorcery.png| SWORD_SORCERY| Sword & Sorcery| #B44FBA| 1',
+        'TV Movie.png| TV_MOVIE| TV Movie| #85A5B4| 1',
+        'Talk Show.png| TALK_SHOW| Talk Show| #82A2B5| 1',
         'Thriller.png| THRILLER| Thriller| #C3602B| 1',
         'Travel.png| TRAVEL| Travel| #B6BA6D| 1',
         'Vampire.png| VAMPIRE| Vampire| #7D2627| 1',
-        'War & Politics.png| WAR & POLITICS| War & Politics| #4ABF6E| 1',
+        'War & Politics.png| WAR_POLITICS| War & Politics| #4ABF6E| 1',
         'War.png| WAR| War| #63AB62| 1',
         'Western.png| WESTERN| Western| #AD9B6D| 1',
-        'Womens History.png| WOMEN''S HISTORY MONTH| Womens Month| #874E83| 1',
-        'Zombie Horror.png| ZOMBIE HORROR| Zombie Horror| #909513| 1'
+        'Womens History.png| WOMENS_HISTORY_MONTH| Womens Month| #874E83| 1',
+        'Zombie Horror.png| ZOMBIE_HORROR| Zombie Horror| #909513| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
     foreach ($item in $myArray) {
-        $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_genre\$($item.Logo)`" -logo_offset -500 -logo_resize $theMaxWidth -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+        $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_genre\$($item.Logo)`" -logo_offset -500 -logo_resize $theMaxWidth -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
     }
     LaunchScripts -ScriptPaths $arr
     Move-Item -Path output -Destination genre
@@ -2750,21 +2742,20 @@ Function CreateNetwork {
     $theMaxHeight = 1000
     $minPointSize = 100
     $maxPointSize = 250
-    $myvar1 = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue "network_name" -CaseSensitivity Upper) 
 
     Move-Item -Path output -Destination output-orig
 
     $myArray = @(
         'Logo| Name| out_name| base_color| ww',
-        'transparent.png| network_kids_other_name| Other Kids Networks| #FF2000| 1',
-        'transparent.png| network_other_name| Other Networks| #FF2000| 1'
+        'transparent.png| network_kids_other| Other Kids Networks| #FF2000| 1',
+        'transparent.png| network_other| Other Networks| #FF2000| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
     foreach ($item in $myArray) {
-        $myvar = Set-TextBetweenDelimiters -InputString $myvar1 -ReplacementString (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-        $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.Logo)`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$myvar`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+        $value = (Get-YamlPropertyValue -PropertyPath "collections.$($item.name).name" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.Logo)`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$value`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
     }
     LaunchScripts -ScriptPaths $arr
     $arr = @()
@@ -2952,22 +2943,22 @@ Function CreatePlaylist {
 
     $myArray = @(
         'Logo| Name| out_name| base_color| ww',
-        'Arrowverse.png| TIMELINE ORDER| Arrowverse (Timeline Order)| #2B8F40| 1',
-        'DragonBall.png| TIMELINE ORDER| Dragon Ball (Timeline Order)| #E39D30| 1',
-        'Marvel Cinematic Universe.png| TIMELINE ORDER| Marvel Cinematic Universe (Timeline Order)| #AD2B2B| 1',
-        'Star Trek.png| TIMELINE ORDER| Star Trek (Timeline Order)| #0193DD| 1',
-        'Pokémon.png| TIMELINE ORDER| Pokémon (Timeline Order)| #FECA06| 1',
-        'dca.png| TIMELINE ORDER| DC Animated Universe (Timeline Order)| #2832C4| 1',
-        'X-men.png| TIMELINE ORDER| X-Men (Timeline Order)| #636363| 1',
-        'Star Wars The Clone Wars.png| TIMELINE ORDER| Star Wars The Clone Wars (Timeline Order)| #ED1C24| 1',
-        'Star Wars.png| TIMELINE ORDER| Star Wars (Timeline Order)| #F8C60A| 1'
+        'Arrowverse.png| TIMELINE_ORDER| Arrowverse (Timeline Order)| #2B8F40| 1',
+        'DragonBall.png| TIMELINE_ORDER| Dragon Ball (Timeline Order)| #E39D30| 1',
+        'Marvel Cinematic Universe.png| TIMELINE_ORDER| Marvel Cinematic Universe (Timeline Order)| #AD2B2B| 1',
+        'Star Trek.png| TIMELINE_ORDER| Star Trek (Timeline Order)| #0193DD| 1',
+        'Pokémon.png| TIMELINE_ORDER| Pokémon (Timeline Order)| #FECA06| 1',
+        'dca.png| TIMELINE_ORDER| DC Animated Universe (Timeline Order)| #2832C4| 1',
+        'X-men.png| TIMELINE_ORDER| X-Men (Timeline Order)| #636363| 1',
+        'Star Wars The Clone Wars.png| TIMELINE_ORDER| Star Wars The Clone Wars (Timeline Order)| #ED1C24| 1',
+        'Star Wars.png| TIMELINE_ORDER| Star Wars (Timeline Order)| #F8C60A| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
     
     $arr = @()
     foreach ($item in $myArray) {
-        $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_playlist\$($item.Logo)`" -logo_offset -200 -logo_resize $theMaxWidth -text `"$myvar`" -text_offset +450 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+        $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_playlist\$($item.Logo)`" -logo_offset -200 -logo_resize $theMaxWidth -text `"$value`" -text_offset +450 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
     }
     LaunchScripts -ScriptPaths $arr
 
@@ -2994,18 +2985,16 @@ Function CreateResolution {
 
     $myArray = @(
         'Logo| Name| out_name| base_color| ww',
-        'transparent.png| resolutions_other_name| other| #FF2000| 1'
+        'transparent.png| resolutions_other| other| #FF2000| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
     foreach ($item in $myArray) {
-        $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-        $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.Logo)`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$myvar`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+        $value = (Get-YamlPropertyValue -PropertyPath "collections.$($item.name).name" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.Logo)`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$value`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
     }
     LaunchScripts -ScriptPaths $arr
-
-    # $myvar1 = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue "resolution_name" -CaseSensitivity Upper) 
 
     $arr = @()
     $arr += ".\create_poster.ps1 -logo `"$script_path\logos_resolution\4K.png`" -logo_offset +0 -logo_resize 1800 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"4k`" -base_color `"#8A46CF`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
@@ -3022,9 +3011,9 @@ Function CreateResolution {
     
     $arr = @()
     foreach ($item in $myArray) {
-        $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-        $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.Logo)`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$myvar`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+        $value = (Get-YamlPropertyValue -PropertyPath "collections.$($item.name).name" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.Logo)`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$value`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
     }
     LaunchScripts -ScriptPaths $arr
 
@@ -3060,23 +3049,23 @@ Function CreateSeasonal {
         '420.png| 4/20| 420| #43C32F| 1',
         'christmas.png| CHRISTMAS| christmas| #D52414| 1',
         'easter.png| EASTER| easter| #46D69D| 1',
-        'father.png| FATHER''S DAY| father| #7CDA83| 1',
+        'father.png| FATHERS_DAY| father| #7CDA83| 1',
         'halloween.png| HALLOWEEN| halloween| #DA8B25| 1',
-        'independence.png| INDEPENDENCE DAY| independence| #2931CB| 1',
-        'labor.png| LABOR DAY| labor| #DA5C5E| 1',
-        'memorial.png| MEMORIAL DAY| memorial| #917C5C| 1',
-        'mother.png| MOTHER''S DAY| mother| #DB81D6| 1',
-        'patrick.png| ST. PATRICK''S DAY| patrick| #26A53E| 1',
+        'independence.png| INDEPENDENCE_DAY| independence| #2931CB| 1',
+        'labor.png| LABOR_DAY| labor| #DA5C5E| 1',
+        'memorial.png| MEMORIAL_DAY| memorial| #917C5C| 1',
+        'mother.png| MOTHERS_DAY| mother| #DB81D6| 1',
+        'patrick.png| ST_PATRICKS_DAY| patrick| #26A53E| 1',
         'thanksgiving.png| THANKSGIVING| thanksgiving| #A1841E| 1',
-        'valentine.png| VALENTINE''S DAY| valentine| #D12AAE| 1',
-        'years.png| NEW YEAR| years| #444444| 1'
+        'valentine.png| VALENTINES_DAY| valentine| #D12AAE| 1',
+        'years.png| NEW_YEAR| years| #444444| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
     
     $arr = @()
     foreach ($item in $myArray) {
-        $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_seasonal\$($item.Logo)`" -logo_offset -500 -logo_resize $theMaxWidth -text `"$myvar`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+        $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_seasonal\$($item.Logo)`" -logo_offset -500 -logo_resize $theMaxWidth -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
     }
     LaunchScripts -ScriptPaths $arr
     Move-Item -Path output -Destination seasonal
@@ -3099,7 +3088,9 @@ Function CreateSeparators {
         Find-Path "$script_path\output\$color"
     }
 
-    .\create_poster.ps1 -logo "$script_path\logos_chart\Plex.png" -logo_offset -500 -logo_resize 1500 -text "COLLECTIONLESS" -text_offset +850 -font "ComfortAa-Medium" -font_size 195 -font_color "#FFFFFF" -border 0 -border_width 15 -border_color "#FFFFFF" -avg_color_image "" -out_name "collectionless" -base_color "#DC9924" -gradient 1 -avg_color 0 -clean 1 -white_wash 1
+    $value = Get-YamlPropertyValue -PropertyPath "collections.COLLECTIONLESS.name" -ConfigObject $global:ConfigObj -CaseSensitivity Upper
+
+    .\create_poster.ps1 -logo "$script_path\logos_chart\Plex.png" -logo_offset -500 -logo_resize 1500 -text "$value" -text_offset +850 -font "ComfortAa-Medium" -font_size 195 -font_color "#FFFFFF" -border 0 -border_width 15 -border_color "#FFFFFF" -avg_color_image "" -out_name "collectionless" -base_color "#DC9924" -gradient 1 -avg_color 0 -clean 1 -white_wash 1
     Move-Item -Path $script_path\output\collectionless.jpg -Destination $script_path\collectionless.jpg
 
     $theFont = "ComfortAa-Medium"
@@ -3110,46 +3101,47 @@ Function CreateSeparators {
 
     $myArray = @(
         'Name| out_name| base_color| other_setting',
-        'collectionless_name| collectionless| #FFFFFF| NA',
+        'COLLECTIONLESS| collectionless| #FFFFFF| NA',
         'ACTOR| actor| #FFFFFF| NA',
-        'AUDIO LANGUAGE| audio_language| #FFFFFF| NA',
+        'AUDIO_LANGUAGE| audio_language| #FFFFFF| NA',
         'AWARD| award| #FFFFFF| NA',
         'CHART| chart| #FFFFFF| NA',
-        'CONTENT RATINGS| content_rating| #FFFFFF| NA',
+        'CONTENT_RATINGS| content_rating| #FFFFFF| NA',
         'COUNTRY| country| #FFFFFF| NA',
         'DECADE| decade| #FFFFFF| NA',
         'DIRECTOR| director| #FFFFFF| NA',
         'FRANCHISE| franchise| #FFFFFF| NA',
         'GENRE| genre| #FFFFFF| NA',
-        'KIDS NETWORK| network_kids| #FFFFFF| NA',
-        'MOVIE CHART| movie_chart| #FFFFFF| NA',
+        'KIDS_NETWORK| network_kids| #FFFFFF| NA',
+        'MOVIE_CHART| movie_chart| #FFFFFF| NA',
         'NETWORK| network| #FFFFFF| NA',
         'PERSONAL| personal| #FFFFFF| NA',
         'PRODUCER| producer| #FFFFFF| NA',
         'RESOLUTION| resolution| #FFFFFF| NA',
         'SEASONAL| seasonal| #FFFFFF| NA',
         'STREAMING| streaming| #FFFFFF| NA',
-        'STUDIO ANIMATION| studio_animation| #FFFFFF| NA',
+        'STUDIO_ANIMATION| studio_animation| #FFFFFF| NA',
         'STUDIO| studio| #FFFFFF| NA',
         'SUBTITLE| subtitle_language| #FFFFFF| NA',
-        'TV CHART| tv_chart| #FFFFFF| NA',
-        'UK NETWORK| network_uk| #FFFFFF| NA',
-        'UK STREAMING| streaming_uk| #FFFFFF| NA',
+        'TV_CHART| tv_chart| #FFFFFF| NA',
+        'UK_NETWORK| network_uk| #FFFFFF| NA',
+        'UK_STREAMING| streaming_uk| #FFFFFF| NA',
         'UNIVERSE| universe| #FFFFFF| NA',
-        'US NETWORK| network_us| #FFFFFF| NA',
-        'US STREAMING| streaming_us| #FFFFFF| NA',
+        'US_NETWORK| network_us| #FFFFFF| NA',
+        'US_STREAMING| streaming_us| #FFFFFF| NA',
         'WRITER| writer| #FFFFFF| NA',
         'YEAR| year| #FFFFFF| NA',
-        'BASED ON...| based| #FFFFFF| NA'
+        'BASED_ON| based| #FFFFFF| NA'
     ) | ConvertFrom-Csv -Delimiter '|'
+
+    $pre_value = Get-YamlPropertyValue -PropertyPath "collections.separator.name" -ConfigObject $global:ConfigObj -CaseSensitivity Upper
 
     $arr = @()
     foreach ($item in $myArray) {
-        $myvar1 = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue "separator_name" -CaseSensitivity Upper) 
-        $myvar = Set-TextBetweenDelimiters -InputString $myvar1 -ReplacementString (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $value = Set-TextBetweenDelimiters -InputString $pre_value -ReplacementString (Get-YamlPropertyValue -PropertyPath "key_names.$($item.Name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
         foreach ($color in $colors) {
-            $arr += ".\create_poster.ps1 -logo `"$script_path\@base\$color.png`" -logo_offset +0 -logo_resize 2000 -text `"$myvar`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"\$color\$($item.out_name)`" -base_color `"#FFFFFF`" -gradient 0 -avg_color 0 -clean 1 -white_wash 0"
+            $arr += ".\create_poster.ps1 -logo `"$script_path\@base\$color.png`" -logo_offset +0 -logo_resize 2000 -text `"$value`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"\$color\$($item.out_name)`" -base_color `"#FFFFFF`" -gradient 0 -avg_color 0 -clean 1 -white_wash 0"
         }
     }
     LaunchScripts -ScriptPaths $arr
@@ -3207,21 +3199,20 @@ Function CreateStudio {
     $theMaxHeight = 1000
     $minPointSize = 100
     $maxPointSize = 250
-    $myvar1 = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue "studio_name" -CaseSensitivity Upper) 
 
     Move-Item -Path output -Destination output-orig
 
     $myArray = @(
         'Logo| Name| out_name| base_color| ww',
-        'transparent.png| studio_animation_other_name| other_animation| #FF2000| 1',
-        'transparent.png| studio_other_name| other| #FF2000| 1'
+        'transparent.png| studio_animation_other| other_animation| #FF2000| 1',
+        'transparent.png| studio_other| other| #FF2000| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
     foreach ($item in $myArray) {
-        $myvar = Set-TextBetweenDelimiters -InputString $myvar1 -ReplacementString (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-        $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.Logo)`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$myvar`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+        $value = (Get-YamlPropertyValue -PropertyPath "collections.$($item.name).name" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.Logo)`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$value`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
     }
     LaunchScripts -ScriptPaths $arr
 
@@ -3318,18 +3309,18 @@ Function CreateSubtitleLanguage {
 
     $myArray = @(
         'Logo| Name| out_name| base_color| ww',
-        'transparent.png| subtitle_language_other_name| other| #FF2000| 1'
+        'transparent.png| subtitle_language_other| other| #FF2000| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
     foreach ($item in $myArray) {
-        $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-        $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.Logo)`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$myvar`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+        $value = (Get-YamlPropertyValue -PropertyPath "collections.$($item.name).name" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.Logo)`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$value`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
     }
     LaunchScripts -ScriptPaths $arr
 
-    $myvar1 = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue "subtitle_language_name" -CaseSensitivity Upper) 
+    $pre_value = Get-YamlPropertyValue -PropertyPath "collections.subtitle_language.name" -ConfigObject $global:ConfigObj -CaseSensitivity Upper
 
     $myArray = @(
         'Name| out_name| base_color| other_setting',
@@ -3358,12 +3349,12 @@ Function CreateSubtitleLanguage {
         'BULGARIAN| bg| #D5442A| NA',
         'BURMESE| my| #9E5CF0| NA',
         'CATALAN| ca| #99BC95| NA',
-        'CENTRAL KHMER| km| #6ABDD6| NA',
+        'CENTRAL_KHMER| km| #6ABDD6| NA',
         'CHAMORRO| ch| #22302F| NA',
         'CHECHEN| ce| #83E832| NA',
         'CHICHEWA| ny| #03E31C| NA',
         'CHINESE| zh| #40EA69| NA',
-        'CHURCH SLAVIC| cu| #C76DC2| NA',
+        'CHURCH_SLAVIC| cu| #C76DC2| NA',
         'CHUVASH| cv| #920F92| NA',
         'CORNISH| kw| #55137D| NA',
         'CORSICAN| co| #C605DC| NA',
@@ -3397,7 +3388,7 @@ Function CreateSubtitleLanguage {
         'HEBREW| he| #E9C58A| NA',
         'HERERO| hz| #E9DF57| NA',
         'HINDI| hi| #77775B| NA',
-        'HIRI MOTU| ho| #3BB41B| NA',
+        'HIRI_MOTU| ho| #3BB41B| NA',
         'HUNGARIAN| hu| #111457| NA',
         'ICELANDIC| is| #0ACE8F| NA',
         'IDO| io| #75CA6C| NA',
@@ -3446,10 +3437,10 @@ Function CreateSubtitleLanguage {
         'NAVAJO| nv| #48F865| NA',
         'NDONGA| ng| #83538B| NA',
         'NEPALI| ne| #5A15FC| NA',
-        'NORTH NDEBELE| nd| #A1533B| NA',
-        'NORTHERN SAMI| se| #AAD61B| NA',
-        'NORWEGIAN BOKMÅL| nb| #0AEB4A| NA',
-        'NORWEGIAN NYNORSK| nn| #278B62| NA',
+        'NORTH_NDEBELE| nd| #A1533B| NA',
+        'NORTHERN_SAMI| se| #AAD61B| NA',
+        'NORWEGIAN_BOKMÅL| nb| #0AEB4A| NA',
+        'NORWEGIAN_NYNORSK| nn| #278B62| NA',
         'NORWEGIAN| no| #13FF63| NA',
         'OCCITAN| oc| #B5B607| NA',
         'OJIBWA| oj| #100894| NA',
@@ -3473,14 +3464,14 @@ Function CreateSubtitleLanguage {
         'SARDINIAN| sc| #28AF67| NA',
         'SERBIAN| sr| #FB3F2C| NA',
         'SHONA| sn| #40F3EC| NA',
-        'SICHUAN YI| ii| #FA3474| NA',
+        'SICHUAN_YI| ii| #FA3474| NA',
         'SINDHI| sd| #62D1BE| NA',
         'SINHALA| si| #24787A| NA',
         'SLOVAK| sk| #66104F| NA',
         'SLOVENIAN| sl| #6F79E6| NA',
         'SOMALI| so| #A36185| NA',
-        'SOUTH NDEBELE| nr| #8090E5| NA',
-        'SOUTHERN SOTHO| st| #4C3417| NA',
+        'SOUTH_NDEBELE| nr| #8090E5| NA',
+        'SOUTHERN_SOTHO| st| #4C3417| NA',
         'SPANISH| es| #7842AE| NA',
         'SUNDANESE| su| #B2D05B| NA',
         'SWAHILI| sw| #D32F20| NA',
@@ -3510,7 +3501,7 @@ Function CreateSubtitleLanguage {
         'VOLAPÜK| vo| #77D574| NA',
         'WALLOON| wa| #BD440A| NA',
         'WELSH| cy| #45E39C| NA',
-        'WESTERN FRISIAN| fy| #01F471| NA',
+        'WESTERN_FRISIAN| fy| #01F471| NA',
         'WOLOF| wo| #BDD498| NA',
         'XHOSA| xh| #0C6D9C| NA',
         'YIDDISH| yi| #111D14| NA',
@@ -3521,9 +3512,9 @@ Function CreateSubtitleLanguage {
     
     $arr = @()
     foreach ($item in $myArray) {
-        $myvar = Set-TextBetweenDelimiters -InputString $myvar1 -ReplacementString (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-        $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$myvar`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
+        $value = Set-TextBetweenDelimiters -InputString $pre_value -ReplacementString (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$value`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     }
     LaunchScripts -ScriptPaths $arr
     Move-Item -Path output -Destination subtitle_language
@@ -3584,14 +3575,14 @@ Function CreateYear {
 
     $myArray = @(
         'Logo| Name| out_name| base_color| ww',
-        'transparent.png| year_other_name| other| #FF2000| 1'
+        'transparent.png| year_other| other| #FF2000| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
     foreach ($item in $myArray) {
-        $myvar = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue $($item.Name) -CaseSensitivity Upper)
-        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-        $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.Logo)`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$myvar`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
+        $value = (Get-YamlPropertyValue -PropertyPath "collections.$($item.name).name" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.Logo)`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$value`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     }
     LaunchScripts -ScriptPaths $arr
 
@@ -3758,9 +3749,9 @@ Function CreateYear {
     
     $arr = @()
     foreach ($item in $myArray) {
-        $myvar = $($item.Name)
-        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $($item.font_name) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $($item.font_size)
-        $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$myvar`" -text_offset +0 -font `"$($item.font_name)`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
+        $value = $($item.Name)
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font_name) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $($item.font_size)
+        $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$value`" -text_offset +0 -font `"$($item.font_name)`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     }
 
     LaunchScripts -ScriptPaths $arr
@@ -3770,7 +3761,7 @@ Function CreateYear {
     
     Move-Item -Path output -Destination year
 
-    $myvar1 = (Get-TranslatedValue -TranslationFilePath $TranslationFilePath -EnglishValue "BEST OF" -CaseSensitivity Upper) 
+    $pre_value = Get-YamlPropertyValue -PropertyPath "key_names.BEST_OF" -ConfigObject $global:ConfigObj -CaseSensitivity Upper
 
     $theFont = "ComfortAa-Medium"
     $theMaxWidth = 1800
@@ -3780,9 +3771,9 @@ Function CreateYear {
 
     $arr = @()
     for ($i = 1880; $i -lt 2030; $i++) {
-        $myvar = $myvar1
-        $optimalFontSize = Get-OptimalPointSize -text $myvar -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-        $arr += ".\create_poster.ps1 -logo `"$script_path\year\$i.jpg`" -logo_offset +0 -logo_resize 2000 -text `"$myvar`" -text_offset -400 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"#FFFFFF`" -gradient 1 -avg_color 0 -clean 1 -white_wash 0"
+        $value = $pre_value
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\year\$i.jpg`" -logo_offset +0 -logo_resize 2000 -text `"$value`" -text_offset -400 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"#FFFFFF`" -gradient 1 -avg_color 0 -clean 1 -white_wash 0"
     }
     LaunchScripts -ScriptPaths $arr
     Start-Sleep -Seconds 3
@@ -3980,14 +3971,14 @@ WriteToLogFile "Script Path                  : $script_path"
 $Stopwatch = [System.Diagnostics.Stopwatch]::new()
 $Stopwatch.Start()
 New-SQLCache
-
+Import-YamlModule
 Get-CheckSum-Files -script_path $script_path
 
 #################################
 # Language Code
 #################################
-$LanguageCodes = @("default", "da", "de", "es", "fr", "it", "pt-br")
-$DefaultLanguageCode = "default"
+$LanguageCodes = @("en", "da", "de", "es", "fr", "it", "pt-br")
+$DefaultLanguageCode = "en"
 $LanguageCode = Read-Host "Enter language code ($($LanguageCodes -join ', ')). Press Enter to use the default language code: $DefaultLanguageCode"
 
 if (-not [string]::IsNullOrWhiteSpace($LanguageCode) -and $LanguageCodes -notcontains $LanguageCode) {
@@ -4017,6 +4008,8 @@ Read-Host -Prompt "If you have a custom translation file, overwrite the download
 
 $TranslationFilePath = Join-Path $script_path -ChildPath "@translations"
 $TranslationFilePath = Join-Path $TranslationFilePath -ChildPath "$LanguageCode.yml"
+
+Read-Yaml
 
 #################################
 # Imagemagick version check
@@ -4134,11 +4127,11 @@ foreach ($param in $args) {
 }
 
 if (!$args) {
-    ShowFunctions
+    # ShowFunctions
     # CreateNetwork
     # CreateYear
     # CreateBased
-    # CreateAudioLanguage
+    CreateAudioLanguage
 }
 
 #######################
