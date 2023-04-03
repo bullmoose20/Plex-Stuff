@@ -161,7 +161,7 @@ Function InstallFontsIfNeeded {
 ################################################################################
 Function Remove-Folders {
     $folders = "audio_language", "award", "based", "chart", "content_rating", "country",
-    "decade", "defaults", "franchise", "genre", "network", "playlist", "resolution",
+    "decade", "$DefaultsPath", "franchise", "genre", "network", "playlist", "resolution",
     "seasonal", "separators", "streaming", "studio", "subtitle_language",
     "translations", "universe", "year"
     
@@ -607,7 +607,7 @@ Function LaunchScripts {
 # Description: Moves Folder and Files to final location
 ################################################################################
 Function MoveFiles {
-    $defaultsPath = Join-Path $script_path -ChildPath "defaults"
+    # $defaultsPath = Join-Path $script_path -ChildPath "defaults"
 
     $foldersToMove = @(
         "audio_language"
@@ -636,11 +636,11 @@ Function MoveFiles {
     )
 
     foreach ($folder in $foldersToMove) {
-        Move-Item -Path (Join-Path $script_path -ChildPath $folder) -Destination $defaultsPath -Force -ErrorAction SilentlyContinue
+        Move-Item -Path (Join-Path $script_path -ChildPath $folder) -Destination $DefaultsPath -Force -ErrorAction SilentlyContinue
     }
 
     foreach ($file in $filesToMove) {
-        Move-Item -Path (Join-Path $script_path -ChildPath $file) -Destination $defaultsPath -Force -ErrorAction SilentlyContinue
+        Move-Item -Path (Join-Path $script_path -ChildPath $file) -Destination $DefaultsPath -Force -ErrorAction SilentlyContinue
     }
 }
 
@@ -4008,6 +4008,7 @@ Read-Host -Prompt "If you have a custom translation file, overwrite the download
 
 $TranslationFilePath = Join-Path $script_path -ChildPath "@translations"
 $TranslationFilePath = Join-Path $TranslationFilePath -ChildPath "$LanguageCode.yml"
+$DefaultsPath = Join-Path $script_path -ChildPath "defaults-$LanguageCode"
 
 Read-Yaml
 
@@ -4046,7 +4047,7 @@ Remove-Folders
 # Create Paths if needed
 #################################
 Find-Path "$script_path\@base"
-Find-Path "$script_path\defaults"
+Find-Path $DefaultsPath
 Find-Path "$script_path\fonts"
 Find-Path "$script_path\output"
 
@@ -4140,7 +4141,7 @@ if (!$args) {
 Set-Location $script_path
 
 #######################
-# Move folders to $script_path\defaults
+# Wait for processes to end and then MoveFiles
 #######################
 Set-Location $script_path
 WriteToLogFile "MonitorProcess               : Waiting for all processes to end..."
@@ -4152,14 +4153,14 @@ MoveFiles
 # Count files created
 #######################
 Set-Location $script_path
-$tmp = (Get-ChildItem $script_path\defaults -Recurse -File | Measure-Object).Count
+$tmp = (Get-ChildItem $DefaultsPath -Recurse -File | Measure-Object).Count
 $files_to_process = $tmp
 
 #######################
 # Output files created to a file
 #######################
 Set-Location $script_path
-Get-ChildItem -Recurse ".\defaults\" -Name -File | ForEach-Object { '"{0}"' -f $_ } | Out-File defaults_list.txt
+Get-ChildItem -Recurse $DefaultsPath -Name -File | ForEach-Object { '"{0}"' -f $_ } | Out-File defaults-${LanguageCode}_list.txt
 
 #######################
 # Count [ERROR] lines
