@@ -161,7 +161,7 @@ Function InstallFontsIfNeeded {
 ################################################################################
 Function Remove-Folders {
     $folders = "audio_language", "award", "based", "chart", "content_rating", "country",
-    "decade", "$DefaultsPath", "franchise", "genre", "network", "playlist", "resolution",
+    "decade", "defaults-$LanguageCode", "franchise", "genre", "network", "playlist", "resolution",
     "seasonal", "separators", "streaming", "studio", "subtitle_language",
     "translations", "universe", "year"
     
@@ -3966,13 +3966,11 @@ if (!(Test-Path "$scriptLogPath" -ErrorAction SilentlyContinue)) {
 Update-LogFile -LogPath $scriptLog
 
 WriteToLogFile "#### START ####"
-WriteToLogFile "Script Path                  : $script_path"
 
 $Stopwatch = [System.Diagnostics.Stopwatch]::new()
 $Stopwatch.Start()
 New-SQLCache
 Import-YamlModule
-Get-CheckSum-Files -script_path $script_path
 
 #################################
 # Language Code
@@ -4017,25 +4015,52 @@ Read-Yaml
 #################################
 Test-ImageMagick
 $test = $global:magick
-if ($null -eq $test) {
-    WriteToLogFile "Imagemagick                  : Imagemagick is NOT installed. Aborting.... Imagemagick must be installed - https://imagemagick.org/script/download.php"
-    exit
-}
-else {
-    WriteToLogFile "Imagemagick                  : Imagemagick is installed. $global:magick"
-}
 
 #################################
 # Powershell version check
 #################################
 $pversion = $null
 $pversion = $PSVersionTable.PSVersion.ToString()
+
+WriteToLogFile "#######################"
+WriteToLogFile "# SETTINGS"
+WriteToLogFile "#######################"
+WriteToLogFile "Script Path                  : $script_path"
+WriteToLogFile "Original command line        : $($MyInvocation.Line)"
 WriteToLogFile "Powershell Version           : $pversion"
+WriteToLogFile "Imagemagick                  : $global:magick"
+WriteToLogFile "LanguageCode                 : $LanguageCode"
+WriteToLogFile "BranchOption                 : $BranchOption"
+WriteToLogFile "#### PROCESSING CHECKS NOW ####"
+
+Get-CheckSum-Files -script_path $script_path
+
+if ($null -eq $test) {
+    WriteToLogFile "Imagemagick [ERROR]          : Imagemagick is NOT installed. Aborting.... Imagemagick must be installed - https://imagemagick.org/script/download.php"
+    exit 1
+}
+else {
+    WriteToLogFile "Imagemagick                  : Imagemagick is installed."
+}
 
 if ($PSVersionTable.PSVersion.Major -lt 7) {
-    Write-Error "Error: This script requires PowerShell version 7 or higher."
-    return
+    WriteToLogFile "Powershell Version [ERROR]   : Error: This script requires PowerShell version 7 or higher."
+    exit 1
 }
+else {
+    WriteToLogFile "Powershell Version           : PowerShell version 7 or higher found."
+}
+
+if (-not (InstallFontsIfNeeded)) {
+    # If the function returns $false, exit the script
+    WriteToLogFile "Fonts Check [ERROR]          : Error: Fonts are not visible/installed for ImageMagick to use."
+    exit 1
+}
+else {
+    WriteToLogFile "Fonts Check                  : Fonts visible/installed for ImageMagick to use."
+}
+
+WriteToLogFile "#### PROCESSING POSTERS NOW ####"
 
 #################################
 # Cleanup Folders
@@ -4051,11 +4076,6 @@ Find-Path $DefaultsPath
 Find-Path "$script_path\fonts"
 Find-Path "$script_path\output"
 
-# Call the InstallFontsIfNeeded function
-if (-not (InstallFontsIfNeeded)) {
-    # If the function returns $false, exit the script
-    exit 1
-}
 
 #################################
 # Determine parameters passed from command line
@@ -4128,11 +4148,11 @@ foreach ($param in $args) {
 }
 
 if (!$args) {
-    # ShowFunctions
+    ShowFunctions
     # CreateNetwork
     # CreateYear
     # CreateBased
-    CreateAudioLanguage
+    # CreateAudioLanguage
 }
 
 #######################
@@ -4147,6 +4167,8 @@ Set-Location $script_path
 WriteToLogFile "MonitorProcess               : Waiting for all processes to end..."
 Start-Sleep -Seconds 3
 MonitorProcess -ProcessName "magick.exe"
+WriteToLogFile "#### PROCESSING POSTERS DONE ####"
+
 MoveFiles
 
 #######################
@@ -4174,6 +4196,7 @@ Set-Location $script_path
 WriteToLogFile "#######################"
 WriteToLogFile "# SUMMARY"
 WriteToLogFile "#######################"
+WriteToLogFile "Script Path                  : $script_path"
 WriteToLogFile "Original command line        : $($MyInvocation.Line)"
 WriteToLogFile "Powershell Version           : $pversion"
 WriteToLogFile "Imagemagick                  : $global:magick"
