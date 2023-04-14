@@ -2299,7 +2299,7 @@ Function CreateCountry {
         'ir.png| 1500| IRAN| Iran| #2AAC15',
         'jp.png| 1500| JAPAN| Japan| #4FCF54',
         'kr.png| 1500| KOREA| Korea| #127FFE',
-        'latin america.png| 1500| LATIN AMERICA| Latin America| #3785B6',
+        'latin america.png| 1500| LATIN_AMERICA| Latin America| #3785B6',
         'lk.png| 750| SRI_LANKA| Sri Lanka| #6415FD',
         'lu.png| 750| LUXEMBOURG| Luxembourg| #C90586',
         'lv.png| 1500| LATVIA| Latvia| #5326A3',
@@ -2669,6 +2669,7 @@ Function CreateGenre {
         'Mind-Fuck.png| MIND_FUCK| Mind-Fuck| #619DA2| 1',
         'Mind-Fuck2.png| MIND_F**K| Mind-Fuck2| #619DA2| 1',
         'Mini-Series.png| MINI_SERIES| Mini-Series| #66B7BE| 1',
+        'MMA.png| MMA| MMA| #69E39F| 1',
         'Music.png| MUSIC| Music| #3CC79C| 1',
         'Musical.png| MUSICAL| Musical| #C38CB7| 1',
         'Mystery.png| MYSTERY| Mystery| #867CB5| 1',
@@ -3978,7 +3979,7 @@ Import-YamlModule
 #################################
 # Language Code
 #################################
-$LanguageCodes = @("en", "da", "de", "es", "fr", "it", "pt-br")
+$LanguageCodes = @("en", "da", "de", "es", "fr", "it", "nl", "pt-br")
 $DefaultLanguageCode = "en"
 $LanguageCode = Read-Host "Enter language code ($($LanguageCodes -join ', ')). Press Enter to use the default language code: $DefaultLanguageCode"
 
