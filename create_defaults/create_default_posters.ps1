@@ -1,7 +1,7 @@
 ################################################################################
 # create_default_poster.ps1
-# Date: 2023-01-13
-# Version: 2.0
+# Date: 2023-04-15
+# Version: 3.0
 # Author: bullmoose20
 #
 # DESCRIPTION: 
@@ -3979,7 +3979,7 @@ Import-YamlModule
 #################################
 # Language Code
 #################################
-$LanguageCodes = @("en", "da", "de", "es", "fr", "it", "nl", "pt-br")
+$LanguageCodes = @("en", "da", "de", "es", "fr", "it", "nb_NO", "nl", "pt-br")
 $DefaultLanguageCode = "en"
 $LanguageCode = Read-Host "Enter language code ($($LanguageCodes -join ', ')). Press Enter to use the default language code: $DefaultLanguageCode"
 
