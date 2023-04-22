@@ -3087,7 +3087,7 @@ Function CreateSeparators {
     Set-Location $script_path
     Move-Item -Path output -Destination output-orig
     Find-Path "$script_path\output"
-    $colors = @('amethyst', 'aqua', 'blue', 'forest', 'fuschia', 'gold', 'gray', 'green', 'navy', 'ocean', 'olive', 'orchid', 'orig', 'pink', 'plum', 'purple', 'red', 'rust', 'salmon', 'sand', 'stb', 'tan')
+    $colors = @('amethyst', 'aqua', 'blue', 'forest', 'fuchsia', 'gold', 'gray', 'green', 'navy', 'ocean', 'olive', 'orchid', 'orig', 'pink', 'plum', 'purple', 'red', 'rust', 'salmon', 'sand', 'stb', 'tan')
     foreach ($color in $colors) {
         Find-Path "$script_path\output\$color"
     }
@@ -3826,7 +3826,7 @@ Function Get-Checksum-Files {
     $sep2 = "aqua.png"
     $sep3 = "blue.png"
     $sep4 = "forest.png"
-    $sep5 = "fuschia.png"
+    $sep5 = "fuchsia.png"
     $sep6 = "gold.png"
     $sep7 = "gray.png"
     $sep8 = "green.png"
