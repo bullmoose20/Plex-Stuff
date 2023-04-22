@@ -3087,7 +3087,7 @@ Function CreateSeparators {
     Set-Location $script_path
     Move-Item -Path output -Destination output-orig
     Find-Path "$script_path\output"
-    $colors = @('blue', 'gray', 'red', 'purple', 'green', 'orig', 'stb')
+    $colors = @('amethyst', 'aqua', 'blue', 'forest', 'fuschia', 'gold', 'gray', 'green', 'navy', 'ocean', 'olive', 'orchid', 'orig', 'pink', 'plum', 'purple', 'red', 'rust', 'salmon', 'sand', 'stb', 'tan')
     foreach ($color in $colors) {
         Find-Path "$script_path\output\$color"
     }
@@ -3150,6 +3150,7 @@ Function CreateSeparators {
     }
     LaunchScripts -ScriptPaths $arr
     Move-Item -Path output -Destination separators
+    Copy-Item -Path "@base" -Destination "separators\@base" -Recurse
     Move-Item -Path output-orig -Destination output
 }
 
@@ -3821,13 +3822,28 @@ Function Get-Checksum-Files {
     Set-Location $script_path
     WriteToLogFile "CheckSum Files               : Checking dependency files."
 
-    $sep1 = "blue.png"
-    $sep2 = "gray.png"
-    $sep3 = "green.png"
-    $sep4 = "orig.png"
-    $sep5 = "purple.png"
-    $sep6 = "red.png"
-    $sep7 = "stb.png"
+    $sep1 = "amethyst.png"
+    $sep2 = "aqua.png"
+    $sep3 = "blue.png"
+    $sep4 = "forest.png"
+    $sep5 = "fuschia.png"
+    $sep6 = "gold.png"
+    $sep7 = "gray.png"
+    $sep8 = "green.png"
+    $sep9 = "navy.png"
+    $sep10 = "ocean.png"
+    $sep11 = "olive.png"
+    $sep12 = "orchid.png"
+    $sep13 = "orig.png"
+    $sep14 = "pink.png"
+    $sep15 = "plum.png"
+    $sep16 = "purple.png"
+    $sep17 = "red.png"
+    $sep18 = "rust.png"
+    $sep19 = "salmon.png"
+    $sep20 = "sand.png"
+    $sep21 = "stb.png"
+    $sep22 = "tan.png"
 
     $ttf1 = "Boogaloo-Regular.ttf"
     $ttf2 = "Righteous-Regular.ttf"
@@ -3855,13 +3871,28 @@ Function Get-Checksum-Files {
     
     $trans1 = "transparent.png"
     
-    $expectedChecksum_sep1 = "AB8DBC5FCE661BDFC643F9697EEC1463CD2CDE90E4594B232A6B92C272DE0561"
-    $expectedChecksum_sep2 = "9570B1E86BEC71CAED6DDFD6D2F18023A7C5D408B6A6D5B50C045672D4310772"
-    $expectedChecksum_sep3 = "89951DFC6338ABC64444635F6F2835472418BF779A1EB5C342078AF0B8365F80"
-    $expectedChecksum_sep4 = "98E161CD70C3300D30340257D674FCC18B11FDADEE3FFF9B80D09C4AB09C1483"
-    $expectedChecksum_sep5 = "3768CA736B6BD1CAD0CD02827A6BA7BDBCA2077B1A109802C57144C31B379477"
-    $expectedChecksum_sep6 = "03E9026430C8F0ABD031B608225BF40CB87FD1983899C113E410A511CC5622A7"
-    $expectedChecksum_sep7 = "A01695FAB8646079331811F381A38A529E76AFC31538285E7EE60600CA07ADC1"
+    $expectedChecksum_sep1 = "8FFEF200F9AA2126052684FBAF5BB1B96F402FAF3055532FBBFFCABF610D9573"
+    $expectedChecksum_sep2 = "940E5F5BD81B0C7388BDA0B6E639D59BAEFAABAD78F04F41982440D49BAE8871"
+    $expectedChecksum_sep3 = "AB8DBC5FCE661BDFC643F9697EEC1463CD2CDE90E4594B232A6B92C272DE0561"
+    $expectedChecksum_sep4 = "78DDD1552B477308047A1E6396407B96965F1B90DD738435F92187F02DA60467"
+    $expectedChecksum_sep5 = "F8A173A71758B89D7EE22F04DB570A7D604F1DC5C17B5FD2D8F278C5440E0348"
+    $expectedChecksum_sep6 = "9BB273DE826C9968D3B335701F0DB8C978C371C5ABF5DC1A5E554973BCDD255C"
+    $expectedChecksum_sep7 = "9570B1E86BEC71CAED6DDFD6D2F18023A7C5D408B6A6D5B50C045672D4310772"
+    $expectedChecksum_sep8 = "89951DFC6338ABC64444635F6F2835472418BF779A1EB5C342078AF0B8365F80"
+    $expectedChecksum_sep9 = "FBFBF94423C96410EB65891CB3048B45C60586D52B71DF99550EA738F6D17AE4"
+    $expectedChecksum_sep10 = "0AE3BB7DD7FE7ADDB6F788A49625224082E6DD43D3A7CD6517D15EE984E41021"
+    $expectedChecksum_sep11 = "3B3B74A45A94DCA46BB82F8CAF32E39B12B9D7BF1868B9075E269A221AA3AF9B"
+    $expectedChecksum_sep12 = "926D14FBBF6E113984E2F5D69BEF8620B37E0FF08C6FE4BBCDB5680C6698DEFC"
+    $expectedChecksum_sep13 = "98E161CD70C3300D30340257D674FCC18B11FDADEE3FFF9B80D09C4AB09C1483"
+    $expectedChecksum_sep14 = "E0B6DA722447ABB0BC47DDD93E847B37BCD3D3CA9897DB1818E5616D250DA2DA"
+    $expectedChecksum_sep15 = "D383FCD9E2813144339F3FDE6A048C5A0D00EAA9443019B1B61FB2C24FF9BB2A"
+    $expectedChecksum_sep16 = "3768CA736B6BD1CAD0CD02827A6BA7BDBCA2077B1A109802C57144C31B379477"
+    $expectedChecksum_sep17 = "03E9026430C8F0ABD031B608225BF40CB87FD1983899C113E410A511CC5622A7"
+    $expectedChecksum_sep18 = "5F72369DA3F652388A386D92F96995F1F1819F2B1FBAE90BC68DE049A426B298"
+    $expectedChecksum_sep19 = "9A5E38AA7982846B47E85BF9C4FD99843D26187D37E4301F7A429F37612677C3"
+    $expectedChecksum_sep20 = "4814E8E1E8A0BB65267C4B6B658390BFE79F4E6CFECA57039F98DF19E8658DB9"
+    $expectedChecksum_sep21 = "A01695FAB8646079331811F381A38A529E76AFC31538285E7EE60600CA07ADC1"
+    $expectedChecksum_sep22 = "8B9B71415CE0F8F1B229C2329C70D761DE99100D2FD5C49537B483B8A5A720E1"
 
     $expectedChecksum_ttf1 = "6AA7C9F7096B090A6783E31278ABF907EC84A4BD98F280C925AB033D1FE91EB7"
     $expectedChecksum_ttf2 = "4C3CDC5DE2D70C4EE75FC9C1723A6B8F2D7316F49B383335FD8257A17DD88ADE"
@@ -3899,6 +3930,21 @@ Function Get-Checksum-Files {
     Compare-FileChecksum -Path $script_path\@base\$sep5 -ExpectedChecksum $expectedChecksum_sep5 -failFlag $failFlag
     Compare-FileChecksum -Path $script_path\@base\$sep6 -ExpectedChecksum $expectedChecksum_sep6 -failFlag $failFlag
     Compare-FileChecksum -Path $script_path\@base\$sep7 -ExpectedChecksum $expectedChecksum_sep7 -failFlag $failFlag
+    Compare-FileChecksum -Path $script_path\@base\$sep8 -ExpectedChecksum $expectedChecksum_sep8 -failFlag $failFlag
+    Compare-FileChecksum -Path $script_path\@base\$sep9 -ExpectedChecksum $expectedChecksum_sep9 -failFlag $failFlag
+    Compare-FileChecksum -Path $script_path\@base\$sep10 -ExpectedChecksum $expectedChecksum_sep10 -failFlag $failFlag
+    Compare-FileChecksum -Path $script_path\@base\$sep11 -ExpectedChecksum $expectedChecksum_sep11 -failFlag $failFlag
+    Compare-FileChecksum -Path $script_path\@base\$sep12 -ExpectedChecksum $expectedChecksum_sep12 -failFlag $failFlag
+    Compare-FileChecksum -Path $script_path\@base\$sep13 -ExpectedChecksum $expectedChecksum_sep13 -failFlag $failFlag
+    Compare-FileChecksum -Path $script_path\@base\$sep14 -ExpectedChecksum $expectedChecksum_sep14 -failFlag $failFlag
+    Compare-FileChecksum -Path $script_path\@base\$sep15 -ExpectedChecksum $expectedChecksum_sep15 -failFlag $failFlag
+    Compare-FileChecksum -Path $script_path\@base\$sep16 -ExpectedChecksum $expectedChecksum_sep16 -failFlag $failFlag
+    Compare-FileChecksum -Path $script_path\@base\$sep17 -ExpectedChecksum $expectedChecksum_sep17 -failFlag $failFlag
+    Compare-FileChecksum -Path $script_path\@base\$sep18 -ExpectedChecksum $expectedChecksum_sep18 -failFlag $failFlag
+    Compare-FileChecksum -Path $script_path\@base\$sep19 -ExpectedChecksum $expectedChecksum_sep19 -failFlag $failFlag
+    Compare-FileChecksum -Path $script_path\@base\$sep20 -ExpectedChecksum $expectedChecksum_sep20 -failFlag $failFlag
+    Compare-FileChecksum -Path $script_path\@base\$sep21 -ExpectedChecksum $expectedChecksum_sep21 -failFlag $failFlag
+    Compare-FileChecksum -Path $script_path\@base\$sep22 -ExpectedChecksum $expectedChecksum_sep22 -failFlag $failFlag
     
     Compare-FileChecksum -Path $script_path\fonts\$ttf1 -ExpectedChecksum $expectedChecksum_ttf1 -failFlag $failFlag
     Compare-FileChecksum -Path $script_path\fonts\$ttf2 -ExpectedChecksum $expectedChecksum_ttf2 -failFlag $failFlag
@@ -4153,6 +4199,7 @@ foreach ($param in $args) {
 
 if (!$args) {
     ShowFunctions
+    # CreateSeparators
     # CreateNetwork
     # CreateYear
     # CreateBased
