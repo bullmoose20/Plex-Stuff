@@ -645,7 +645,7 @@ magick $gbcf -set colorspace sRGB $rf -gravity center -geometry +0$logo_offset -
 if ($text -eq "" -or $null -eq $text) {
 }
 else {
-  # Write-Host "magick $nef -gravity center -background None -layers Flatten `( -font $font -pointsize $font_size -weight Thin -fill $font_color -size 1900x1000 -background none caption:$text -trim -gravity center -extent 1900x1000 `) -gravity center -geometry +0$text_offset -composite $nef"
+  #Write-Host "magick $nef -gravity center -background None -layers Flatten `( -font $font -pointsize $font_size -fill $font_color -size 1900x1000 -background none caption:$text -trim -gravity center -extent 1900x1000 `) -gravity center -geometry +0$text_offset -composite $nef"
   magick $nef -gravity center -background None -layers Flatten `( -font $font -pointsize $font_size -fill $font_color -size 1900x1000 -background none caption:"$text" -trim -gravity center -extent 1900x1000 `) -gravity center -geometry +0$text_offset -composite $nef
 }
 
