@@ -6,7 +6,7 @@
 #
 # DESCRIPTION: 
 # This script contains ten functions that are used to create various types of posters. The functions are:
-# CreateAudioLanguage, CreateAwards, CreateChart, CreateCountry, CreateDecade, CreateGenre, CreatePlaylist, CreateSubtitleLanguage, CreateUniverse and CreateYear.
+# CreateAudioLanguage, CreateAwards, CreateChart, CreateCountry, CreateDecade, CreateGenre, CreatePlaylist, CreateSubtitleLanguage, CreateUniverse, CreateYear, and CreateOverlays.
 # The script can be called by providing the name of the functionor aliases you want to run as a command-line argument.
 # AudioLanguage, Awards, Based, Charts, ContentRating, Country, Decades, Franchise, Genres, Network, Playlist, Resolution, Streaming,
 # Studio, Seasonal, Separators, SubtitleLanguages, Universe, Years, All
@@ -3791,6 +3791,28 @@ Function CreateYear {
 
 }
 
+
+################################################################################
+# Function: CreateOverlays
+# Description:  Creates Overlay Icons
+################################################################################
+Function CreateOverlays {
+    Write-Host "Creating Overlays"
+    Set-Location $script_path
+    
+    $directories = @("award", "chart", "content_rating", "country", "franchise", "genre", "network", "playlist", "resolution", "seasonal", "streaming",  "studio", "universe")
+    $sizes = "285x85>"
+    
+    Foreach ($dir in $directories) {
+        $path = Join-Path $script_path $dir
+        $outputPath = Join-Path $path "logos_overlays"
+        $inputPath = Join-Path $script_path "logos_$dir"
+        Find-Path $path
+        Find-Path $outputPath
+        magick mogrify -path $outputPath -resize $sizes (Join-Path $inputPath "*.png")
+    }
+}
+
 ################################################################################
 # Function: MonitorProcess
 # Description: Checks to see if process is running in memory and only exits
@@ -4156,6 +4178,8 @@ foreach ($param in $args) {
         "Genres" { CreateGenre }
         "Network" { CreateNetwork }
         "Networks" { CreateNetwork }
+        "Overlay" { CreateOverlays }
+        "Overlays" { CreateOverlays }
         "Playlist" { CreatePlaylist }
         "Playlists" { CreatePlaylist }
         "Resolution" { CreateResolution }
@@ -4193,6 +4217,7 @@ foreach ($param in $args) {
             CreateSubtitleLanguage
             CreateUniverse
             CreateYear
+            CreateOverlays
         }
         default {
             ShowFunctions
@@ -4202,6 +4227,7 @@ foreach ($param in $args) {
 
 if (!$args) {
     ShowFunctions
+    # CreateOverlays
     # CreateSeparators
     # CreateNetwork
     # CreateYear
