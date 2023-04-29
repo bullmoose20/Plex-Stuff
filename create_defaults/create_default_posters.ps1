@@ -2078,6 +2078,7 @@ Function CreateChart {
         'Apple TV+.png| 1500| TOP_10| apple_top| #494949| 1',
         'Disney+.png| 1500| TOP_10| disney_top| #002CA1| 1',
         'HBO Max.png| 1500| TOP_10| hbo_top| #9015C5| 1',
+        'Max.png| 1500| TOP_10| max_top| #002BE7| 1',
         'IMDb.png| 1500| BOTTOM_RATED| IMDb Bottom Rated| #D7B00B| 1',
         'IMDb.png| 1500| BOX_OFFICE| IMDb Box Office| #D7B00B| 1',
         'IMDb.png| 1500| LOWEST_RATED| IMDb Lowest Rated| #D7B00B| 1',
