@@ -3810,7 +3810,7 @@ Function CreateOverlays {
         $inputPath = Join-Path $script_path "logos_$dir"
         Find-Path $path
         Find-Path $outputPath
-        magick mogrify -path $outputPath -resize $sizes (Join-Path $inputPath "*.png")
+        magick mogrify -colorspace sRGB -strip -trim -path $outputPath -resize $sizes (Join-Path $inputPath "*.png")
     }
 }
 
