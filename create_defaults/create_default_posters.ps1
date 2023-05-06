@@ -3801,7 +3801,7 @@ Function CreateOverlays {
     Write-Host "Creating Overlays"
     Set-Location $script_path
     
-    $directories = @("award", "chart", "content_rating", "country", "franchise", "genre", "network", "playlist", "resolution", "seasonal", "streaming",  "studio", "universe")
+    $directories = @("award", "chart", "content_rating", "country", "franchise", "genre", "network", "playlist", "resolution", "seasonal", "streaming", "studio", "universe")
     $sizes = "285x85>"
     
     Foreach ($dir in $directories) {
