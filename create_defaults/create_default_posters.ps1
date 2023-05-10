@@ -2069,72 +2069,85 @@ Function CreateChart {
     Move-Item -Path output -Destination output-orig
 
     $myArray = @(
-        'Logo| logo_resize| Name| out_name| base_color| ww',
-        'AniDB.png| 1800| POPULAR| AniDB Popular| #FF7E17| 1',
-        'AniList.png| 1500| POPULAR| AniList Popular| #414A81| 1',
-        'AniList.png| 1500| SEASON| AniList Season| #414A81| 1',
-        'AniList.png| 1500| TOP_RATED| AniList Top Rated| #414A81| 1',
-        'AniList.png| 1500| TRENDING| AniList Trending| #414A81| 1',
-        'Apple TV+.png| 1500| TOP_10| apple_top| #494949| 1',
-        'Disney+.png| 1500| TOP_10| disney_top| #002CA1| 1',
-        'HBO Max.png| 1500| TOP_10| hbo_top| #9015C5| 1',
-        'Max.png| 1500| TOP_10| max_top| #002BE7| 1',
-        'IMDb.png| 1500| BOTTOM_RATED| IMDb Bottom Rated| #D7B00B| 1',
-        'IMDb.png| 1500| BOX_OFFICE| IMDb Box Office| #D7B00B| 1',
-        'IMDb.png| 1500| LOWEST_RATED| IMDb Lowest Rated| #D7B00B| 1',
-        'IMDb.png| 1500| POPULAR| IMDb Popular| #D7B00B| 1',
-        'IMDb.png| 1500| TOP_10| imdb_top| #D7B00B| 1',
-        'IMDb.png| 1500| TOP_250| IMDb Top 250| #D7B00B| 1',
-        'MyAnimeList.png| 1500| FAVORITED| MyAnimeList Favorited| #304DA6| 1',
-        'MyAnimeList.png| 1500| POPULAR| MyAnimeList Popular| #304DA6| 1',
-        'MyAnimeList.png| 1500| SEASON| MyAnimeList Season| #304DA6| 1',
-        'MyAnimeList.png| 1500| TOP_AIRING| MyAnimeList Top Airing| #304DA6| 1',
-        'MyAnimeList.png| 1500| TOP_RATED| MyAnimeList Top Rated| #304DA6| 1',
-        'Netflix.png| 1500| TOP_10| netflix_top| #B4121D| 1',
-        'Paramount+.png| 1500| TOP_10| paramount_top| #1641C3| 1',
-        'Pirated.png| 1500| TOP_10_PIRATED| Top 10 Pirated Movies of the Week| #93561D| 1',
-        'Plex.png| 1500| NEW_EPISODES| New Episodes| #DC9924| 1',
-        'Plex.png| 1500| NEW_PREMIERES| New Premieres| #DC9924| 1',
-        'Plex.png| 1500| NEWLY_RELEASED_EPISODES| Newly Released Episodes| #DC9924| 1',
-        'Plex.png| 1500| NEWLY_RELEASED| Newly Released| #DC9924| 1',
-        'Plex.png| 1500| PILOTS| Pilots| #DC9924| 1',
-        'Plex.png| 1500| PLEX_PEOPLE_WATCHING| Plex People Watching| #DC9924| 1',
-        'Plex.png| 1500| PLEX_PILOTS| Plex Pilots| #DC9924| 1',
-        'Plex.png| 1500| PLEX_POPULAR| Plex Popular| #DC9924| 1',
-        'Plex.png| 1500| PLEX_WATCHED| Plex Watched| #DC9924| 1',
-        'Plex.png| 1500| RECENTLY_ADDED| Recently Added| #DC9924| 1',
-        'Plex.png| 1500| RECENTLY_AIRED| Recently Aired| #DC9924| 1',
-        'Prime Video.png| 1500| TOP_10| prime_top| #43ABCE| 1',
-        'StevenLu.png| 1500| STEVENLU''S_POPULAR_MOVIES| StevenLu''s Popular Movies| #1D2D51| 1',
-        'TMDb.png| 1500| AIRING_TODAY| TMDb Airing Today| #062AC8| 1',
-        'TMDb.png| 1500| NOW_PLAYING| TMDb Now Playing| #062AC8| 1',
-        'TMDb.png| 1500| ON_THE_AIR| TMDb On The Air| #062AC8| 1',
-        'TMDb.png| 1500| POPULAR| TMDb Popular| #062AC8| 1',
-        'TMDb.png| 1500| TOP_RATED| TMDb Top Rated| #062AC8| 1',
-        'TMDb.png| 1500| TRENDING| TMDb Trending| #062AC8| 1',
-        'Tautulli.png| 1500| POPULAR| Tautulli Popular| #B9851F| 1',
-        'Tautulli.png| 1500| WATCHED| Tautulli Watched| #B9851F| 1',
-        'Trakt.png| 1500| COLLECTED| Trakt Collected| #CD1A20| 1',
-        'Trakt.png| 1500| NOW_PLAYING| Trakt Now Playing| #CD1A20| 1',
-        'Trakt.png| 1500| POPULAR| Trakt Popular| #CD1A20| 1',
-        'Trakt.png| 1500| RECOMMENDED| Trakt Recommended| #CD1A20| 1',
-        'Trakt.png| 1500| TRENDING| Trakt Trending| #CD1A20| 1',
-        'Trakt.png| 1500| WATCHED| Trakt Watched| #CD1A20| 1',
-        'Trakt.png| 1500| WATCHLIST| Trakt Watchlist| #CD1A20| 1',
-        'css.png| 1500| FAMILIES| Common Sense Selection| #1AA931| 1',
-        'google_play.png| 1500| TOP_10| google_top| #B81282| 1',
-        'hulu.png| 1500| TOP_10| hulu_top| #1BB68A| 1',
-        'itunes.png| 1500| TOP_10| itunes_top| #D500CC| 1',
-        'star_plus.png| 1500| TOP_10| star_plus_top| #4A3159| 1',
-        'vudu.png| 1500| TOP_10| vudu_top| #3567AC| 1'
+        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        'POPULAR| AniDB.png| -500| 1800| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | AniDBPopular| #FF7E17| 1| 1| 0| 1',
+        'POPULAR| AniList.png| -500| 1500| +851| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | AniListPopular| #414A81| 1| 1| 0| 1',
+        'SEASON| AniList.png| -500| 1500| +852| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | AniListSeason| #414A81| 1| 1| 0| 1',
+        'TOP_RATED| AniList.png| -500| 1500| +853| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | AniListTopRated| #414A81| 1| 1| 0| 1',
+        'TRENDING| AniList.png| -500| 1500| +854| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | AniListTrending| #414A81| 1| 1| 0| 1',
+        'TOP_10| Apple TV+.png| -500| 1500| +855| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | apple_top| #494949| 1| 1| 0| 1',
+        'TOP_10| Disney+.png| -500| 1500| +856| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | disney_top| #002CA1| 1| 1| 0| 1',
+        'TOP_10| HBO Max.png| -500| 1500| +857| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | hbo_top| #9015C5| 1| 1| 0| 1',
+        'TOP_10| Max.png| -500| 1500| +858| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | max_top| #002BE7| 1| 1| 0| 1',
+        'BOTTOM_RATED| IMDb.png| -500| 1500| +859| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | IMDbBottomRated| #D7B00B| 1| 1| 0| 1',
+        'BOX_OFFICE| IMDb.png| -500| 1500| +860| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | IMDbBoxOffice| #D7B00B| 1| 1| 0| 1',
+        'LOWEST_RATED| IMDb.png| -500| 1500| +861| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | IMDbLowestRated| #D7B00B| 1| 1| 0| 1',
+        'POPULAR| IMDb.png| -500| 1500| +862| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | IMDbPopular| #D7B00B| 1| 1| 0| 1',
+        'TOP_10| IMDb.png| -500| 1500| +863| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | imdb_top| #D7B00B| 1| 1| 0| 1',
+        'TOP_250| IMDb.png| -500| 1500| +864| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | IMDbTop250| #D7B00B| 1| 1| 0| 1',
+        'FAVORITED| MyAnimeList.png| -500| 1500| +865| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | MyAnimeListFavorited| #304DA6| 1| 1| 0| 1',
+        'POPULAR| MyAnimeList.png| -500| 1500| +866| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | MyAnimeListPopular| #304DA6| 1| 1| 0| 1',
+        'SEASON| MyAnimeList.png| -500| 1500| +867| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | MyAnimeListSeason| #304DA6| 1| 1| 0| 1',
+        'TOP_AIRING| MyAnimeList.png| -500| 1500| +868| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | MyAnimeListTopAiring| #304DA6| 1| 1| 0| 1',
+        'TOP_RATED| MyAnimeList.png| -500| 1500| +869| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | MyAnimeListTopRated| #304DA6| 1| 1| 0| 1',
+        'TOP_10| Netflix.png| -500| 1500| +870| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | netflix_top| #B4121D| 1| 1| 0| 1',
+        'TOP_10| Paramount+.png| -500| 1500| +871| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | paramount_top| #1641C3| 1| 1| 0| 1',
+        'TOP_10_PIRATED| Pirated.png| -500| 1500| +872| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Top10PiratedMoviesoftheWeek| #93561D| 1| 1| 0| 1',
+        'NEW_EPISODES| Plex.png| -500| 1500| +873| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | NewEpisodes| #DC9924| 1| 1| 0| 1',
+        'NEW_PREMIERES| Plex.png| -500| 1500| +874| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | NewPremieres| #DC9924| 1| 1| 0| 1',
+        'NEWLY_RELEASED_EPISODES| Plex.png| -500| 1500| +875| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | NewlyReleasedEpisodes| #DC9924| 1| 1| 0| 1',
+        'NEWLY_RELEASED| Plex.png| -500| 1500| +876| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | NewlyReleased| #DC9924| 1| 1| 0| 1',
+        'PILOTS| Plex.png| -500| 1500| +877| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Pilots| #DC9924| 1| 1| 0| 1',
+        'PLEX_PEOPLE_WATCHING| Plex.png| -500| 1500| +878| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | PlexPeopleWatching| #DC9924| 1| 1| 0| 1',
+        'PLEX_PILOTS| Plex.png| -500| 1500| +879| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | PlexPilots| #DC9924| 1| 1| 0| 1',
+        'PLEX_POPULAR| Plex.png| -500| 1500| +880| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | PlexPopular| #DC9924| 1| 1| 0| 1',
+        'PLEX_WATCHED| Plex.png| -500| 1500| +881| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | PlexWatched| #DC9924| 1| 1| 0| 1',
+        'RECENTLY_ADDED| Plex.png| -500| 1500| +882| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | RecentlyAdded| #DC9924| 1| 1| 0| 1',
+        'RECENTLY_AIRED| Plex.png| -500| 1500| +883| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | RecentlyAired| #DC9924| 1| 1| 0| 1',
+        'TOP_10| Prime Video.png| -500| 1500| +884| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | prime_top| #43ABCE| 1| 1| 0| 1',
+        'STEVENLU''S_POPULAR_MOVIES| StevenLu.png| -500| 1500| +885| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | StevenLu''sPopularMovies| #1D2D51| 1| 1| 0| 1',
+        'AIRING_TODAY| TMDb.png| -500| 1500| +886| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | TMDbAiringToday| #062AC8| 1| 1| 0| 1',
+        'NOW_PLAYING| TMDb.png| -500| 1500| +887| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | TMDbNowPlaying| #062AC8| 1| 1| 0| 1',
+        'ON_THE_AIR| TMDb.png| -500| 1500| +888| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | TMDbOnTheAir| #062AC8| 1| 1| 0| 1',
+        'POPULAR| TMDb.png| -500| 1500| +889| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | TMDbPopular| #062AC8| 1| 1| 0| 1',
+        'TOP_RATED| TMDb.png| -500| 1500| +890| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | TMDbTopRated| #062AC8| 1| 1| 0| 1',
+        'TRENDING| TMDb.png| -500| 1500| +891| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | TMDbTrending| #062AC8| 1| 1| 0| 1',
+        'POPULAR| Tautulli.png| -500| 1500| +892| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | TautulliPopular| #B9851F| 1| 1| 0| 1',
+        'WATCHED| Tautulli.png| -500| 1500| +893| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | TautulliWatched| #B9851F| 1| 1| 0| 1',
+        'COLLECTED| Trakt.png| -500| 1500| +894| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | TraktCollected| #CD1A20| 1| 1| 0| 1',
+        'NOW_PLAYING| Trakt.png| -500| 1500| +895| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | TraktNowPlaying| #CD1A20| 1| 1| 0| 1',
+        'POPULAR| Trakt.png| -500| 1500| +896| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | TraktPopular| #CD1A20| 1| 1| 0| 1',
+        'RECOMMENDED| Trakt.png| -500| 1500| +897| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | TraktRecommended| #CD1A20| 1| 1| 0| 1',
+        'TRENDING| Trakt.png| -500| 1500| +898| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | TraktTrending| #CD1A20| 1| 1| 0| 1',
+        'WATCHED| Trakt.png| -500| 1500| +899| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | TraktWatched| #CD1A20| 1| 1| 0| 1',
+        'WATCHLIST| Trakt.png| -500| 1500| +900| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | TraktWatchlist| #CD1A20| 1| 1| 0| 1',
+        'FAMILIES| css.png| -500| 1500| +901| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | CommonSenseSelection| #1AA931| 1| 1| 0| 1',
+        'TOP_10| google_play.png| -500| 1500| +902| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | google_top| #B81282| 1| 1| 0| 1',
+        'TOP_10| hulu.png| -500| 1500| +903| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | hulu_top| #1BB68A| 1| 1| 0| 1',
+        'TOP_10| itunes.png| -500| 1500| +904| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | itunes_top| #D500CC| 1| 1| 0| 1',
+        'TOP_10| star_plus.png| -500| 1500| +905| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | star_plus_top| #4A3159| 1| 1| 0| 1',
+        'TOP_10| vudu.png| -500| 1500| +906| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | vudu_top| #3567AC| 1| 1| 0| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
+
 
     $arr = @()
     foreach ($item in $myArray) {
-        $value = Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper
+        if ($($item.key_name).ToString() -eq "") {
+            $value = $null
+        }
+        else {
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+        }
         $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_chart\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_chart\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
     }
+
+    # $arr = @()
+    # foreach ($item in $myArray) {
+    #     $value = Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper
+    #     $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+    #     $arr += ".\create_poster.ps1 -logo `"$script_path\logos_chart\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+    # }
     LaunchScripts -ScriptPaths $arr
 
     Move-Item -Path output -Destination chart
@@ -2714,6 +2727,7 @@ Function CreateGenre {
         'Thriller.png| THRILLER| Thriller| #C3602B| 1',
         'Travel.png| TRAVEL| Travel| #B6BA6D| 1',
         'Vampire.png| VAMPIRE| Vampire| #7D2627| 1',
+        'Ufo.png| UFO| Ufo| #529D82 | 1',
         'War & Politics.png| WAR_POLITICS| War & Politics| #4ABF6E| 1',
         'War.png| WAR| War| #63AB62| 1',
         'Western.png| WESTERN| Western| #AD9B6D| 1',
@@ -2751,179 +2765,199 @@ Function CreateNetwork {
     Move-Item -Path output -Destination output-orig
 
     $myArray = @(
-        'Logo| Name| out_name| base_color| ww',
-        'transparent.png| network_kids_other| Other Kids Networks| #FF2000| 1',
-        'transparent.png| network_other| Other Networks| #FF2000| 1'
+        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        'network_kids_other| transparent.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Other Kids Networks| #FF2000| 1| 1| 0| 1',
+        'network_other| transparent.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Other Networks| #FF2000| 1| 1| 0| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
     foreach ($item in $myArray) {
-        $value = (Get-YamlPropertyValue -PropertyPath "collections.$($item.name).name" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+        if ($($item.key_name).ToString() -eq "") {
+            $value = $null
+        }
+        else {
+            $value = (Get-YamlPropertyValue -PropertyPath "collections.$($item.key_name).name" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+        }
         $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-        $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.Logo)`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$value`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+        $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
     }
     LaunchScripts -ScriptPaths $arr
+
+    $myArray = @(
+        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        ' | A&E.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | A&E| #676767| 1| 1| 0| 1',
+        ' | ABC (AU).png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ABC (AU)| #CEC281| 1| 1| 0| 1',
+        ' | ABC (AU).png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ABC TV| #CEC281| 1| 1| 0| 1',
+        ' | ABC Family.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ABC Family| #73D444| 1| 1| 0| 1',
+        ' | ABC Kids.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ABC Kids| #6172B9| 1| 1| 0| 1',
+        ' | ABC.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ABC| #403993| 1| 1| 0| 1',
+        ' | ABS-CBN.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ABS-CBN| #16F67B| 1| 1| 0| 1',
+        ' | Acorn TV.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Acorn TV| #182034| 1| 1| 0| 1',
+        ' | Adult Swim.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Adult Swim| #C0A015| 1| 1| 0| 1',
+        ' | AltBalaji.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | AltBalaji| #00CC30| 1| 1| 0| 1',
+        ' | Amazon Kids+.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Amazon Kids+| #8E2AAF| 1| 1| 0| 1',
+        ' | Amazon.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Amazon| #9B8832| 1| 1| 0| 1',
+        ' | AMC.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | AMC| #4A9472| 1| 1| 0| 1',
+        ' | Animal Planet.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Animal Planet| #4389BA| 1| 1| 0| 1',
+        ' | Antena 3.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Antena 3| #306A94| 1| 1| 0| 1',
+        ' | Apple TV+.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Apple TV+| #313131| 1| 1| 0| 1',
+        ' | ARD.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ARD| #3F76D7| 1| 1| 0| 1',
+        ' | Arte.png| +0| 400| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Arte| #378BC4| 1| 1| 0| 1',
+        ' | AT-X.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | AT-X| #BEDA86| 1| 1| 0| 1',
+        ' | BBC America.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | BBC America| #C83535| 1| 1| 0| 1',
+        ' | BBC Four.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | BBC Four| #02A0D2| 1| 1| 0| 1',
+        ' | BBC One.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | BBC One| #3A38C6| 1| 1| 0| 1',
+        ' | BBC Two.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | BBC Two| #9130B1| 1| 1| 0| 1',
+        ' | BBC.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | BBC| #A24649| 1| 1| 0| 1',
+        ' | BET+.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | BET+| #B3359C| 1| 1| 0| 1',
+        ' | BET.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | BET| #942C2C| 1| 1| 0| 1',
+        ' | bilibili.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | bilibili| #677626| 1| 1| 0| 1',
+        ' | BluTV.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | BluTV| #1E6DA3| 1| 1| 0| 1',
+        ' | Boomerang.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Boomerang| #6190B3| 1| 1| 0| 1',
+        ' | Bravo.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Bravo| #6D6D6D| 1| 1| 0| 1',
+        ' | BritBox.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | BritBox| #198CA8| 1| 1| 0| 1',
+        ' | Canal+.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Canal+| #FB78AE| 1| 1| 0| 1',
+        ' | Cartoon Network.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Cartoon Network| #6084A0| 1| 1| 0| 1',
+        ' | Cartoonito.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Cartoonito| #2D9EB2| 1| 1| 0| 1',
+        ' | CBC.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | CBC Television| #9D3B3F| 1| 1| 0| 1',
+        ' | CBC.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | CBC| #9D3B3F| 1| 1| 0| 1',
+        ' | Cbeebies.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Cbeebies| #AFA619| 1| 1| 0| 1',
+        ' | CBS.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | CBS| #2926C0| 1| 1| 0| 1',
+        ' | Channel 3.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Channel 3| #FF85AF| 1| 1| 0| 1',
+        ' | Channel 4.png| +0| 1000| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Channel 4| #2B297D| 1| 1| 0| 1',
+        ' | Channel 5.png| +0| 1000| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Channel 5| #8C28AD| 1| 1| 0| 1',
+        ' | Cinemax.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Cinemax| #B4AB22| 1| 1| 0| 1',
+        ' | Citytv.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Citytv| #C23B40| 1| 1| 0| 1',
+        ' | CNN.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | CNN| #AE605C| 1| 1| 0| 1',
+        ' | Comedy Central.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Comedy Central| #BFB516| 1| 1| 0| 1',
+        ' | Cooking Channel.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Cooking Channel| #C29B16| 1| 1| 0| 1',
+        ' | Criterion Channel.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Criterion Channel| #810BA7| 1| 1| 0| 1',
+        ' | Crunchyroll.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Crunchyroll| #C9761D| 1| 1| 0| 1',
+        ' | CTV.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | CTV| #1FAA3C| 1| 1| 0| 1',
+        ' | Curiosity Stream.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Curiosity Stream| #BF983F| 1| 1| 0| 1',
+        ' | Dave.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Dave| #32336C| 1| 1| 0| 1',
+        ' | Discovery Kids.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Discovery Kids| #1C7A1E| 1| 1| 0| 1',
+        ' | discovery+.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | discovery+| #2175D9| 1| 1| 0| 1',
+        ' | Discovery.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Discovery| #1E1CBD| 1| 1| 0| 1',
+        ' | Disney Channel.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Disney Channel| #3679C4| 1| 1| 0| 1',
+        ' | Disney Junior.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Disney Junior| #C33B40| 1| 1| 0| 1',
+        ' | Disney XD.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Disney XD| #6BAB6D| 1| 1| 0| 1',
+        ' | Disney+.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Disney+| #0F2FA4| 1| 1| 0| 1',
+        ' | E!.png| +0| 500| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | E!| #BF3137| 1| 1| 0| 1',
+        ' | Epix.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Epix| #8E782B| 1| 1| 0| 1',
+        ' | ESPN.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ESPN| #B82B30| 1| 1| 0| 1',
+        ' | Family Channel.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Family Channel| #3841B6| 1| 1| 0| 1',
+        ' | Food Network.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Food Network| #B97A7C| 1| 1| 0| 1',
+        ' | Fox Kids.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Fox Kids| #B7282D| 1| 1| 0| 1',
+        ' | FOX.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | FOX| #474EAB| 1| 1| 0| 1',
+        ' | Freeform.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Freeform| #3C9C3E| 1| 1| 0| 1',
+        ' | Freevee.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Freevee| #B5CF1B| 1| 1| 0| 1',
+        ' | Fuji TV.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Fuji TV| #29319C| 1| 1| 0| 1',
+        ' | FX.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | FX| #4A51A9| 1| 1| 0| 1',
+        ' | FXX.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | FXX| #5070A7| 1| 1| 0| 1',
+        ' | Game Show Network.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Game Show Network| #BA27BF| 1| 1| 0| 1',
+        ' | Global TV.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Global TV| #409E42| 1| 1| 0| 1',
+        ' | Globoplay.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Globoplay| #775E92| 1| 1| 0| 1',
+        ' | GMA Network.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | GMA Network| #A755A4| 1| 1| 0| 1',
+        ' | Hallmark.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Hallmark| #601CB4| 1| 1| 0| 1',
+        ' | HBO Max.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | HBO Max| #7870B9| 1| 1| 0| 1',
+        ' | HBO.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | HBO| #458EAD| 1| 1| 0| 1',
+        ' | HGTV.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | HGTV| #3CA38F| 1| 1| 0| 1',
+        ' | History.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | History| #A57E2E| 1| 1| 0| 1',
+        ' | Hulu.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Hulu| #1BC073| 1| 1| 0| 1',
+        ' | IFC.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | IFC| #296FB4| 1| 1| 0| 1',
+        ' | IMDb TV.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | IMDb TV| #C1CD2F| 1| 1| 0| 1',
+        ' | Investigation Discovery.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Investigation Discovery| #BD5054| 1| 1| 0| 1',
+        ' | ION Television.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ION Television| #850ECC| 1| 1| 0| 1',
+        ' | iQiyi.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | iQiyi| #F26F4C| 1| 1| 0| 1',
+        ' | ITV.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ITV| #B024B5| 1| 1| 0| 1',
+        ' | KBS2.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | KBS2| #0D197B| 1| 1| 0| 1',
+        ' | Kids WB.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Kids WB| #B52429| 1| 1| 0| 1',
+        ' | Las Estrellas.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Las Estrellas| #DD983B| 1| 1| 0| 1',
+        ' | Lifetime.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Lifetime| #B61F64| 1| 1| 0| 1',
+        ' | MasterClass.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | MasterClass| #4D4D4D| 1| 1| 0| 1',
+        ' | Max.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Max| #002BE7| 1| 1| 0| 1',
+        ' | MBC.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | MBC| #AF1287| 1| 1| 0| 1',
+        ' | MTV.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | MTV| #76A3AF| 1| 1| 0| 1',
+        ' | National Geographic.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | National Geographic| #C6B31B| 1| 1| 0| 1',
+        ' | NBC.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | NBC| #703AAC| 1| 1| 0| 1',
+        ' | Netflix.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Netflix| #B42A33| 1| 1| 0| 1',
+        ' | Nick Jr.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Nick Jr| #4290A4| 1| 1| 0| 1',
+        ' | Nick.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Nick| #B68021| 1| 1| 0| 1',
+        ' | Nickelodeon.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Nickelodeon| #C56A16| 1| 1| 0| 1',
+        ' | Nicktoons.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Nicktoons| #C56B17| 1| 1| 0| 1',
+        ' | Nippon TV.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Nippon TV| #7E180F| 1| 1| 0| 1',
+        ' | Oxygen.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Oxygen| #CBB23E| 1| 1| 0| 1',
+        ' | Paramount Network.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Paramount Network| #9DE60E| 1| 1| 0| 1',
+        ' | Paramount+.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Paramount+| #2A67CC| 1| 1| 0| 1',
+        ' | PBS Kids.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | PBS Kids| #47A149| 1| 1| 0| 1',
+        ' | PBS.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | PBS| #3A4894| 1| 1| 0| 1',
+        ' | Peacock.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Peacock| #DA4428| 1| 1| 0| 1',
+        ' | Prime Video.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Prime Video| #11607E| 1| 1| 0| 1',
+        ' | RTL.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | RTL| #21354A| 1| 1| 0| 1',
+        ' | SBS.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | SBS| #BEBC19| 1| 1| 0| 1',
+        ' | Shahid.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Shahid| #7FEB9A| 1| 1| 0| 1',
+        ' | Showcase.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Showcase| #4D4D4D| 1| 1| 0| 1',
+        ' | Showtime.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Showtime| #C2201F| 1| 1| 0| 1',
+        ' | Shudder.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Shudder| #0D0C89| 1| 1| 0| 1',
+        ' | Sky.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Sky| #BC3272| 1| 1| 0| 1',
+        ' | Smithsonian.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Smithsonian| #303F8F| 1| 1| 0| 1',
+        ' | Spike.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Spike| #ADAE74| 1| 1| 0| 1',
+        ' | Stan.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Stan| #227CC0| 1| 1| 0| 1',
+        ' | Starz.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Starz| #464646| 1| 1| 0| 1',
+        ' | Sundance TV.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Sundance TV| #424242| 1| 1| 0| 1',
+        ' | SVT1.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | SVT1| #94BE7C| 1| 1| 0| 1',
+        ' | Syfy.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Syfy| #BEB42D| 1| 1| 0| 1',
+        ' | TBS.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | TBS| #A139BF| 1| 1| 0| 1',
+        ' | Telemundo.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Telemundo| #407160| 1| 1| 0| 1',
+        ' | Tencent Video.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Tencent Video| #DE90F0| 1| 1| 0| 1',
+        ' | TF1.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | TF1| #43D582| 1| 1| 0| 1',
+        ' | The CW.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | The CW| #397F96| 1| 1| 0| 1',
+        ' | TLC.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | TLC| #BA6C70| 1| 1| 0| 1',
+        ' | TNT.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | TNT| #C1B83A| 1| 1| 0| 1',
+        ' | tokyo mx.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | tokyo mx| #8662EA| 1| 1| 0| 1',
+        ' | Travel Channel.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Travel Channel| #D4FFD9| 1| 1| 0| 1',
+        ' | truTV.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | truTV| #C79F26| 1| 1| 0| 1',
+        ' | Turner Classic Movies.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Turner Classic Movies| #616161| 1| 1| 0| 1',
+        ' | TV 2.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | TV 2| #8040C7| 1| 1| 0| 1',
+        ' | tv asahi.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | tv asahi| #DD1A67| 1| 1| 0| 1',
+        ' | TV Globo.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | TV Globo| #C8A69F| 1| 1| 0| 1',
+        ' | TV Land.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | TV Land| #78AFB4| 1| 1| 0| 1',
+        ' | TV Tokyo.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | TV Tokyo| #EC00E2| 1| 1| 0| 1',
+        ' | TV3.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | TV3| #FACED0| 1| 1| 0| 1',
+        ' | TVB Jade.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | TVB Jade| #C6582F| 1| 1| 0| 1',
+        ' | tving.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | tving| #B2970D| 1| 1| 0| 1',
+        ' | tvN.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | tvN| #510F23| 1| 1| 0| 1',
+        ' | UKTV.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | UKTV| #2EADB1| 1| 1| 0| 1',
+        ' | UniMás.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | UniMás| #3A4669| 1| 1| 0| 1',
+        ' | Universal Kids.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Universal Kids| #2985A1| 1| 1| 0| 1',
+        ' | Univision.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Univision| #28BE59| 1| 1| 0| 1',
+        ' | UPN.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | UPN| #C6864E| 1| 1| 0| 1',
+        ' | USA Network.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | USA Network| #F7EB20| 1| 1| 0| 1',
+        ' | USA.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | USA| #C0565B| 1| 1| 0| 1',
+        ' | VH1.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | VH1| #8E3BB1| 1| 1| 0| 1',
+        ' | Viaplay.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Viaplay| #30F7FB| 1| 1| 0| 1',
+        ' | Vice.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Vice| #D3D3D3| 1| 1| 0| 1',
+        ' | ViuTV.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ViuTV| #D3ADE3| 1| 1| 0| 1',
+        ' | Warner Bros..png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Warner Bros.| #39538F| 1| 1| 0| 1',
+        ' | WE tv.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | WE tv| #15DD51| 1| 1| 0| 1',
+        ' | Youku.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Youku| #42809E| 1| 1| 0| 1',
+        ' | YouTube.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | YouTube| #C51414| 1| 1| 0| 1',
+        ' | ZDF.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ZDF| #C58654| 1| 1| 0| 1',
+        ' | ZEE5.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ZEE5| #8704C1| 1| 1| 0| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
     $arr = @()
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\A&E.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"A&E`" -base_color `"#676767`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\ABC (AU).png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"ABC (AU)`" -base_color `"#CEC281`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\ABC (AU).png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"ABC TV`" -base_color `"#CEC281`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\ABC Family.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"ABC Family`" -base_color `"#73D444`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\ABC Kids.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"ABC Kids`" -base_color `"#6172B9`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\ABC.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"ABC`" -base_color `"#403993`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\ABS-CBN.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"ABS-CBN`" -base_color `"#16F67B`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Acorn TV.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Acorn TV`" -base_color `"#182034`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Adult Swim.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Adult Swim`" -base_color `"#C0A015`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\AltBalaji.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"AltBalaji`" -base_color `"#00CC30`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Amazon Kids+.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Amazon Kids+`" -base_color `"#8E2AAF`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Amazon.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Amazon`" -base_color `"#9B8832`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\AMC.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"AMC`" -base_color `"#4A9472`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Animal Planet.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Animal Planet`" -base_color `"#4389BA`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Antena 3.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Antena 3`" -base_color `"#306A94`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Apple TV+.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Apple TV+`" -base_color `"#313131`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\ARD.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"ARD`" -base_color `"#3F76D7`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Arte.png`" -logo_offset +0 -logo_resize 400 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Arte`" -base_color `"#378BC4`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\AT-X.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"AT-X`" -base_color `"#BEDA86`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\BBC America.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"BBC America`" -base_color `"#C83535`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\BBC Four.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"BBC Four`" -base_color `"#02A0D2`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\BBC One.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"BBC One`" -base_color `"#3A38C6`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\BBC Two.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"BBC Two`" -base_color `"#9130B1`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\BBC.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"BBC`" -base_color `"#A24649`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\BET+.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"BET+`" -base_color `"#B3359C`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\BET.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"BET`" -base_color `"#942C2C`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\bilibili.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"bilibili`" -base_color `"#677626`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\BluTV.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"BluTV`" -base_color `"#1E6DA3`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Boomerang.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Boomerang`" -base_color `"#6190B3`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Bravo.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Bravo`" -base_color `"#6D6D6D`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\BritBox.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"BritBox`" -base_color `"#198CA8`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Canal+.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Canal+`" -base_color `"#FB78AE`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Cartoon Network.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Cartoon Network`" -base_color `"#6084A0`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Cartoonito.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Cartoonito`" -base_color `"#2D9EB2`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\CBC.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"CBC Television`" -base_color `"#9D3B3F`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\CBC.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"CBC`" -base_color `"#9D3B3F`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Cbeebies.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Cbeebies`" -base_color `"#AFA619`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\CBS.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"CBS`" -base_color `"#2926C0`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Channel 3.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Channel 3`" -base_color `"#FF85AF`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Channel 4.png`" -logo_offset +0 -logo_resize 1000 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Channel 4`" -base_color `"#2B297D`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Channel 5.png`" -logo_offset +0 -logo_resize 1000 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Channel 5`" -base_color `"#8C28AD`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Cinemax.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Cinemax`" -base_color `"#B4AB22`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Citytv.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Citytv`" -base_color `"#C23B40`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\CNN.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"CNN`" -base_color `"#AE605C`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Comedy Central.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Comedy Central`" -base_color `"#BFB516`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Cooking Channel.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Cooking Channel`" -base_color `"#C29B16`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Criterion Channel.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Criterion Channel`" -base_color `"#810BA7`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Crunchyroll.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Crunchyroll`" -base_color `"#C9761D`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\CTV.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"CTV`" -base_color `"#1FAA3C`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Curiosity Stream.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Curiosity Stream`" -base_color `"#BF983F`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Dave.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Dave`" -base_color `"#32336C`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Discovery Kids.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Discovery Kids`" -base_color `"#1C7A1E`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\discovery+.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"discovery+`" -base_color `"#2175D9`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Discovery.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Discovery`" -base_color `"#1E1CBD`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Disney Channel.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Disney Channel`" -base_color `"#3679C4`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Disney Junior.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Disney Junior`" -base_color `"#C33B40`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Disney XD.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Disney XD`" -base_color `"#6BAB6D`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Disney+.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Disney+`" -base_color `"#0F2FA4`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\E!.png`" -logo_offset +0 -logo_resize 500 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"E!`" -base_color `"#BF3137`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Epix.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Epix`" -base_color `"#8E782B`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\ESPN.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"ESPN`" -base_color `"#B82B30`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Family Channel.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Family Channel`" -base_color `"#3841B6`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Food Network.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Food Network`" -base_color `"#B97A7C`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Fox Kids.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Fox Kids`" -base_color `"#B7282D`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\FOX.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"FOX`" -base_color `"#474EAB`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Freeform.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Freeform`" -base_color `"#3C9C3E`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Freevee.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Freevee`" -base_color `"#B5CF1B`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Fuji TV.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Fuji TV`" -base_color `"#29319C`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\FX.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"FX`" -base_color `"#4A51A9`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\FXX.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"FXX`" -base_color `"#5070A7`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Game Show Network.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Game Show Network`" -base_color `"#BA27BF`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Global TV.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Global TV`" -base_color `"#409E42`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Globoplay.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Globoplay`" -base_color `"#775E92`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\GMA Network.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"GMA Network`" -base_color `"#A755A4`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Hallmark.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Hallmark`" -base_color `"#601CB4`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\HBO Max.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"HBO Max`" -base_color `"#7870B9`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\HBO.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"HBO`" -base_color `"#458EAD`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\HGTV.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"HGTV`" -base_color `"#3CA38F`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\History.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"History`" -base_color `"#A57E2E`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Hulu.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Hulu`" -base_color `"#1BC073`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\IFC.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"IFC`" -base_color `"#296FB4`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\IMDb TV.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"IMDb TV`" -base_color `"#C1CD2F`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Investigation Discovery.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Investigation Discovery`" -base_color `"#BD5054`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\ION Television.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"ION Television`" -base_color `"#850ECC`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\iQiyi.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"iQiyi`" -base_color `"#F26F4C`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\ITV.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"ITV`" -base_color `"#B024B5`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\KBS2.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"KBS2`" -base_color `"#0D197B`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Kids WB.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Kids WB`" -base_color `"#B52429`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Las Estrellas.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Las Estrellas`" -base_color `"#DD983B`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Lifetime.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Lifetime`" -base_color `"#B61F64`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\MasterClass.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"MasterClass`" -base_color `"#4D4D4D`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Max.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Max`" -base_color `"#002BE7`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\MBC.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"MBC`" -base_color `"#AF1287`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\MTV.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"MTV`" -base_color `"#76A3AF`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\National Geographic.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"National Geographic`" -base_color `"#C6B31B`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\NBC.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"NBC`" -base_color `"#703AAC`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Netflix.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Netflix`" -base_color `"#B42A33`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Nick Jr.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Nick Jr`" -base_color `"#4290A4`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Nick.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Nick`" -base_color `"#B68021`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Nickelodeon.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Nickelodeon`" -base_color `"#C56A16`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Nicktoons.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Nicktoons`" -base_color `"#C56B17`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Nippon TV.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Nippon TV`" -base_color `"#7E180F`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Oxygen.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Oxygen`" -base_color `"#CBB23E`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Paramount Network.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Paramount Network`" -base_color `"#9DE60E`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Paramount+.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Paramount+`" -base_color `"#2A67CC`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\PBS Kids.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"PBS Kids`" -base_color `"#47A149`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\PBS.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"PBS`" -base_color `"#3A4894`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Peacock.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Peacock`" -base_color `"#DA4428`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Prime Video.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Prime Video`" -base_color `"#11607E`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\RTL.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"RTL`" -base_color `"#21354A`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\SBS.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"SBS`" -base_color `"#BEBC19`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Shahid.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Shahid`" -base_color `"#7FEB9A`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Showcase.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Showcase`" -base_color `"#4D4D4D`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Showtime.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Showtime`" -base_color `"#C2201F`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Shudder.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Shudder`" -base_color `"#0D0C89`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Sky.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Sky`" -base_color `"#BC3272`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Smithsonian.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Smithsonian`" -base_color `"#303F8F`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Spike.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Spike`" -base_color `"#ADAE74`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Stan.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Stan`" -base_color `"#227CC0`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Starz.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Starz`" -base_color `"#464646`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Sundance TV.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Sundance TV`" -base_color `"#424242`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\SVT1.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"SVT1`" -base_color `"#94BE7C`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Syfy.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Syfy`" -base_color `"#BEB42D`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\TBS.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"TBS`" -base_color `"#A139BF`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Telemundo.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Telemundo`" -base_color `"#407160`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Tencent Video.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Tencent Video`" -base_color `"#DE90F0`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\TF1.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"TF1`" -base_color `"#43D582`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\The CW.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"The CW`" -base_color `"#397F96`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\TLC.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"TLC`" -base_color `"#BA6C70`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\TNT.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"TNT`" -base_color `"#C1B83A`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\tokyo mx.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"tokyo mx`" -base_color `"#8662EA`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Travel Channel.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Travel Channel`" -base_color `"#D4FFD9`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\truTV.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"truTV`" -base_color `"#C79F26`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Turner Classic Movies.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Turner Classic Movies`" -base_color `"#616161`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\TV 2.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"TV 2`" -base_color `"#8040C7`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\tv asahi.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"tv asahi`" -base_color `"#DD1A67`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\TV Globo.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"TV Globo`" -base_color `"#C8A69F`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\TV Land.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"TV Land`" -base_color `"#78AFB4`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\TV Tokyo.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"TV Tokyo`" -base_color `"#EC00E2`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\TV3.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"TV3`" -base_color `"#FACED0`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\TVB Jade.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"TVB Jade`" -base_color `"#C6582F`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\tving.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"tving`" -base_color `"#B2970D`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\tvN.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"tvN`" -base_color `"#510F23`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\UKTV.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"UKTV`" -base_color `"#2EADB1`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\UniMás.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"UniMás`" -base_color `"#3A4669`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Universal Kids.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Universal Kids`" -base_color `"#2985A1`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Univision.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Univision`" -base_color `"#28BE59`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\UPN.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"UPN`" -base_color `"#C6864E`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\USA Network.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"USA Network`" -base_color `"#F7EB20`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\USA.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"USA`" -base_color `"#C0565B`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\VH1.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"VH1`" -base_color `"#8E3BB1`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Viaplay.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Viaplay`" -base_color `"#30F7FB`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Vice.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Vice`" -base_color `"#D3D3D3`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\ViuTV.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"ViuTV`" -base_color `"#D3ADE3`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Warner Bros..png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Warner Bros.`" -base_color `"#39538F`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\WE tv.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"WE tv`" -base_color `"#15DD51`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\Youku.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Youku`" -base_color `"#42809E`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\YouTube.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"YouTube`" -base_color `"#C51414`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\ZDF.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"ZDF`" -base_color `"#C58654`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\ZEE5.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"ZEE5`" -base_color `"#8704C1`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
+    foreach ($item in $myArray) {
+        if ($($item.key_name).ToString() -eq "") {
+            $value = $null
+        }
+        else {
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+        }
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
+    }
 
     LaunchScripts -ScriptPaths $arr
     Move-Item -Path output -Destination network
