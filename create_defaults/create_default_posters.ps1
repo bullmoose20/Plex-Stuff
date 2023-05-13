@@ -1,7 +1,7 @@
 ################################################################################
 # create_default_poster.ps1
-# Date: 2023-04-15
-# Version: 3.0
+# Date: 2023-05-12
+# Version: 3.1
 # Author: bullmoose20
 #
 # DESCRIPTION: 
@@ -652,7 +652,6 @@ Function CreateAudioLanguage {
     Write-Host "Creating Audio Language"
     Set-Location $script_path
     # Find-Path "$script_path\audio_language"
-    $theFont = "ComfortAa-Medium"
     $theMaxWidth = 1800
     $theMaxHeight = 1000
     $minPointSize = 100
@@ -661,8 +660,8 @@ Function CreateAudioLanguage {
     Move-Item -Path output -Destination output-orig
 
     $myArray = @(
-        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
-        'audio_language_other| transparent.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | other| #FF2000| 1| 1| 0| 1'
+        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        'audio_language_other| transparent.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | other| #FF2000| 1| 1| 0| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
@@ -673,7 +672,7 @@ Function CreateAudioLanguage {
         else {
             $value = (Get-YamlPropertyValue -PropertyPath "collections.$($item.key_name).name" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
         }
-        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
         $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
     }
     LaunchScripts -ScriptPaths $arr
@@ -681,191 +680,191 @@ Function CreateAudioLanguage {
     $pre_value = Get-YamlPropertyValue -PropertyPath "collections.audio_language.name" -ConfigObject $global:ConfigObj -CaseSensitivity Upper
 
     $myArray = @(
-        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
-        'ABKHAZIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ab| #88F678| 1| 1| 0| 1',
-        'AFAR| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | aa| #612A1C| 1| 1| 0| 1',
-        'AFRIKAANS| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | af| #60EC40| 1| 1| 0| 1',
-        'AKAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ak| #021FBC| 1| 1| 0| 1',
-        'ALBANIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | sq| #C5F277| 1| 1| 0| 1',
-        'AMHARIC| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | am| #746BC8| 1| 1| 0| 1',
-        'ARABIC| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ar| #37C768| 1| 1| 0| 1',
-        'ARAGONESE| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | an| #4619FD| 1| 1| 0| 1',
-        'ARMENIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | hy| #5F26E3| 1| 1| 0| 1',
-        'ASSAMESE| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | as| #615C3B| 1| 1| 0| 1',
-        'AVARIC| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | av| #2BCE4A| 1| 1| 0| 1',
-        'AVESTAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ae| #CF6EEA| 1| 1| 0| 1',
-        'AYMARA| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ay| #3D5D3B| 1| 1| 0| 1',
-        'AZERBAIJANI| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | az| #A48C7A| 1| 1| 0| 1',
-        'BAMBARA| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | bm| #C12E3D| 1| 1| 0| 1',
-        'BASHKIR| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ba| #ECD14A| 1| 1| 0| 1',
-        'BASQUE| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | eu| #89679F| 1| 1| 0| 1',
-        'BELARUSIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | be| #1050B0| 1| 1| 0| 1',
-        'BENGALI| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | bn| #EA4C42| 1| 1| 0| 1',
-        'BISLAMA| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | bi| #C39A37| 1| 1| 0| 1',
-        'BOSNIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | bs| #7DE3FE| 1| 1| 0| 1',
-        'BRETON| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | br| #7E1A72| 1| 1| 0| 1',
-        'BULGARIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | bg| #D5442A| 1| 1| 0| 1',
-        'BURMESE| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | my| #9E5CF0| 1| 1| 0| 1',
-        'CATALAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ca| #99BC95| 1| 1| 0| 1',
-        'CENTRAL_KHMER| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | km| #6ABDD6| 1| 1| 0| 1',
-        'CHAMORRO| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ch| #22302F| 1| 1| 0| 1',
-        'CHECHEN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ce| #83E832| 1| 1| 0| 1',
-        'CHICHEWA| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ny| #03E31C| 1| 1| 0| 1',
-        'CHINESE| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | zh| #40EA69| 1| 1| 0| 1',
-        'CHURCH_SLAVIC| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | cu| #C76DC2| 1| 1| 0| 1',
-        'CHUVASH| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | cv| #920F92| 1| 1| 0| 1',
-        'CORNISH| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | kw| #55137D| 1| 1| 0| 1',
-        'CORSICAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | co| #C605DC| 1| 1| 0| 1',
-        'CREE| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | cr| #75D7F3| 1| 1| 0| 1',
-        'CROATIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | hr| #AB48D3| 1| 1| 0| 1',
-        'CZECH| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | cs| #7804BB| 1| 1| 0| 1',
-        'DANISH| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | da| #87A5BE| 1| 1| 0| 1',
-        'DIVEHI| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | dv| #FA57EC| 1| 1| 0| 1',
-        'DUTCH| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | nl| #74352E| 1| 1| 0| 1',
-        'DZONGKHA| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | dz| #F7C931| 1| 1| 0| 1',
-        'ENGLISH| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | en| #DD4A2F| 1| 1| 0| 1',
-        'ESPERANTO| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | eo| #B65ADE| 1| 1| 0| 1',
-        'ESTONIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | et| #AF1569| 1| 1| 0| 1',
-        'EWE| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ee| #2B7E43| 1| 1| 0| 1',
-        'FAROESE| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | fo| #507CCC| 1| 1| 0| 1',
-        'FIJIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | fj| #7083F9| 1| 1| 0| 1',
-        'FILIPINO| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | fil| #8BEF80| 1| 1| 0| 1',
-        'FINNISH| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | fi| #9229A6| 1| 1| 0| 1',
-        'FRENCH| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | fr| #4111A0| 1| 1| 0| 1',
-        'FULAH| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ff| #649BA7| 1| 1| 0| 1',
-        'GAELIC| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | gd| #FBFEC1| 1| 1| 0| 1',
-        'GALICIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | gl| #DB6769| 1| 1| 0| 1',
-        'GANDA| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | lg| #C71A50| 1| 1| 0| 1',
-        'GEORGIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ka| #8517C8| 1| 1| 0| 1',
-        'GERMAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | de| #4F5FDC| 1| 1| 0| 1',
-        'GREEK| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | el| #49B49A| 1| 1| 0| 1',
-        'GUARANI| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | gn| #EDB51C| 1| 1| 0| 1',
-        'GUJARATI| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | gu| #BDF7FF| 1| 1| 0| 1',
-        'HAITIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ht| #466EB6| 1| 1| 0| 1',
-        'HAUSA| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ha| #A949D2| 1| 1| 0| 1',
-        'HEBREW| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | he| #E9C58A| 1| 1| 0| 1',
-        'HERERO| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | hz| #E9DF57| 1| 1| 0| 1',
-        'HINDI| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | hi| #77775B| 1| 1| 0| 1',
-        'HIRI_MOTU| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ho| #3BB41B| 1| 1| 0| 1',
-        'HUNGARIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | hu| #111457| 1| 1| 0| 1',
-        'ICELANDIC| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | is| #0ACE8F| 1| 1| 0| 1',
-        'IDO| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | io| #75CA6C| 1| 1| 0| 1',
-        'IGBO| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ig| #757EDE| 1| 1| 0| 1',
-        'INDONESIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | id| #52E822| 1| 1| 0| 1',
-        'INTERLINGUA| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ia| #7F9248| 1| 1| 0| 1',
-        'INTERLINGUE| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ie| #8F802C| 1| 1| 0| 1',
-        'INUKTITUT| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | iu| #43C3B0| 1| 1| 0| 1',
-        'INUPIAQ| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ik| #ECF371| 1| 1| 0| 1',
-        'IRISH| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ga| #FB7078| 1| 1| 0| 1',
-        'ITALIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | it| #95B5DF| 1| 1| 0| 1',
-        'JAPANESE| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ja| #5D776B| 1| 1| 0| 1',
-        'JAVANESE| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | jv| #5014C5| 1| 1| 0| 1',
-        'KALAALLISUT| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | kl| #050CF3| 1| 1| 0| 1',
-        'KANNADA| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | kn| #440B43| 1| 1| 0| 1',
-        'KANURI| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | kr| #4F2AAC| 1| 1| 0| 1',
-        'KASHMIRI| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ks| #842C02| 1| 1| 0| 1',
-        'KAZAKH| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | kk| #665F3D| 1| 1| 0| 1',
-        'KIKUYU| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ki| #315679| 1| 1| 0| 1',
-        'KINYARWANDA| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | rw| #CE1391| 1| 1| 0| 1',
-        'KIRGHIZ| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ky| #5F0D23| 1| 1| 0| 1',
-        'KOMI| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | kv| #9B06C3| 1| 1| 0| 1',
-        'KONGO| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | kg| #74BC47| 1| 1| 0| 1',
-        'KOREAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ko| #F5C630| 1| 1| 0| 1',
-        'KUANYAMA| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | kj| #D8CB60| 1| 1| 0| 1',
-        'KURDISH| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ku| #467330| 1| 1| 0| 1',
-        'LAO| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | lo| #DD3B78| 1| 1| 0| 1',
-        'LATIN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | la| #A73376| 1| 1| 0| 1',
-        'LATVIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | lv| #A65EC1| 1| 1| 0| 1',
-        'LIMBURGAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | li| #13C252| 1| 1| 0| 1',
-        'LINGALA| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ln| #BBEE5B| 1| 1| 0| 1',
-        'LITHUANIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | lt| #E89C3E| 1| 1| 0| 1',
-        'LUBA-KATANGA| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | lu| #4E97F3| 1| 1| 0| 1',
-        'LUXEMBOURGISH| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | lb| #4738EE| 1| 1| 0| 1',
-        'MACEDONIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | mk| #B69974| 1| 1| 0| 1',
-        'MALAGASY| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | mg| #29D850| 1| 1| 0| 1',
-        'MALAY| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ms| #A74139| 1| 1| 0| 1',
-        'MALAYALAM| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ml| #FD4C87| 1| 1| 0| 1',
-        'MALTESE| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | mt| #D6EE0B| 1| 1| 0| 1',
-        'MANX| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | gv| #3F83E9| 1| 1| 0| 1',
-        'MAORI| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | mi| #8339FD| 1| 1| 0| 1',
-        'MARATHI| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | mr| #93DEF1| 1| 1| 0| 1',
-        'MARSHALLESE| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | mh| #11DB75| 1| 1| 0| 1',
-        'MONGOLIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | mn| #A107D9| 1| 1| 0| 1',
-        'NAURU| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | na| #7A0925| 1| 1| 0| 1',
-        'NAVAJO| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | nv| #48F865| 1| 1| 0| 1',
-        'NDONGA| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ng| #83538B| 1| 1| 0| 1',
-        'NEPALI| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ne| #5A15FC| 1| 1| 0| 1',
-        'NORTH_NDEBELE| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | nd| #A1533B| 1| 1| 0| 1',
-        'NORTHERN_SAMI| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | se| #AAD61B| 1| 1| 0| 1',
-        'NORWEGIAN_BOKMÅL| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | nb| #0AEB4A| 1| 1| 0| 1',
-        'NORWEGIAN_NYNORSK| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | nn| #278B62| 1| 1| 0| 1',
-        'NORWEGIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | no| #13FF63| 1| 1| 0| 1',
-        'OCCITAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | oc| #B5B607| 1| 1| 0| 1',
-        'OJIBWA| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | oj| #100894| 1| 1| 0| 1',
-        'ORIYA| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | or| #0198FF| 1| 1| 0| 1',
-        'OROMO| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | om| #351BD8| 1| 1| 0| 1',
-        'OSSETIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | os| #BF715E| 1| 1| 0| 1',
-        'PALI| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | pi| #BEB3FA| 1| 1| 0| 1',
-        'PASHTO| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ps| #A4236C| 1| 1| 0| 1',
-        'PERSIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | fa| #68A38E| 1| 1| 0| 1',
-        'POLISH| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | pl| #D4F797| 1| 1| 0| 1',
-        'PORTUGUESE| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | pt| #71D659| 1| 1| 0| 1',
-        'PUNJABI| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | pa| #14F788| 1| 1| 0| 1',
-        'QUECHUA| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | qu| #268110| 1| 1| 0| 1',
-        'ROMANIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ro| #06603F| 1| 1| 0| 1',
-        'ROMANSH| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | rm| #3A73F3| 1| 1| 0| 1',
-        'RUNDI| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | rn| #715E84| 1| 1| 0| 1',
-        'RUSSIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ru| #DB77DA| 1| 1| 0| 1',
-        'SAMOAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | sm| #A26738| 1| 1| 0| 1',
-        'SANGO| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | sg| #CA1C7E| 1| 1| 0| 1',
-        'SANSKRIT| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | sa| #CF9C76| 1| 1| 0| 1',
-        'SARDINIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | sc| #28AF67| 1| 1| 0| 1',
-        'SERBIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | sr| #FB3F2C| 1| 1| 0| 1',
-        'SHONA| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | sn| #40F3EC| 1| 1| 0| 1',
-        'SICHUAN_YI| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ii| #FA3474| 1| 1| 0| 1',
-        'SINDHI| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | sd| #62D1BE| 1| 1| 0| 1',
-        'SINHALA| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | si| #24787A| 1| 1| 0| 1',
-        'SLOVAK| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | sk| #66104F| 1| 1| 0| 1',
-        'SLOVENIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | sl| #6F79E6| 1| 1| 0| 1',
-        'SOMALI| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | so| #A36185| 1| 1| 0| 1',
-        'SOUTH_NDEBELE| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | nr| #8090E5| 1| 1| 0| 1',
-        'SOUTHERN_SOTHO| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | st| #4C3417| 1| 1| 0| 1',
-        'SPANISH| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | es| #7842AE| 1| 1| 0| 1',
-        'SUNDANESE| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | su| #B2D05B| 1| 1| 0| 1',
-        'SWAHILI| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | sw| #D32F20| 1| 1| 0| 1',
-        'SWATI| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ss| #AA196D| 1| 1| 0| 1',
-        'SWEDISH| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | sv| #0EC5A2| 1| 1| 0| 1',
-        'TAGALOG| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | tl| #C9DDAC| 1| 1| 0| 1',
-        'TAHITIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ty| #32009D| 1| 1| 0| 1',
-        'TAJIK| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | tg| #100ECF| 1| 1| 0| 1',
-        'TAMIL| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ta| #E71FAE| 1| 1| 0| 1',
-        'TATAR| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | tt| #C17483| 1| 1| 0| 1',
-        'TELUGU| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | te| #E34ABD| 1| 1| 0| 1',
-        'THAI| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | th| #3FB501| 1| 1| 0| 1',
-        'TIBETAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | bo| #FF2496| 1| 1| 0| 1',
-        'TIGRINYA| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ti| #9074F0| 1| 1| 0| 1',
-        'TONGA| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | to| #B3259E| 1| 1| 0| 1',
-        'TSONGA| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ts| #12687C| 1| 1| 0| 1',
-        'TSWANA| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | tn| #DA3E89| 1| 1| 0| 1',
-        'TURKISH| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | tr| #A08D29| 1| 1| 0| 1',
-        'TURKMEN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | tk| #E70267| 1| 1| 0| 1',
-        'TWI| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | tw| #8A6C0F| 1| 1| 0| 1',
-        'UIGHUR| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ug| #79BC21| 1| 1| 0| 1',
-        'UKRAINIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | uk| #EB60E9| 1| 1| 0| 1',
-        'URDU| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ur| #57E09D| 1| 1| 0| 1',
-        'UZBEK| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | uz| #4341F3| 1| 1| 0| 1',
-        'VENDA| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ve| #4780ED| 1| 1| 0| 1',
-        'VIETNAMESE| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | vi| #90A301| 1| 1| 0| 1',
-        'VOLAPÜK| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | vo| #77D574| 1| 1| 0| 1',
-        'WALLOON| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | wa| #BD440A| 1| 1| 0| 1',
-        'WELSH| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | cy| #45E39C| 1| 1| 0| 1',
-        'WESTERN_FRISIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | fy| #01F471| 1| 1| 0| 1',
-        'WOLOF| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | wo| #BDD498| 1| 1| 0| 1',
-        'XHOSA| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | xh| #0C6D9C| 1| 1| 0| 1',
-        'YIDDISH| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | yi| #111D14| 1| 1| 0| 1',
-        'YORUBA| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | yo| #E815FF| 1| 1| 0| 1',
-        'ZHUANG| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | za| #C62A89| 1| 1| 0| 1',
-        'ZULU| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | zu| #0049F8| 1| 1| 0| 1'
+        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        'ABKHAZIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ab| #88F678| 1| 1| 0| 1',
+        'AFAR| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | aa| #612A1C| 1| 1| 0| 1',
+        'AFRIKAANS| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | af| #60EC40| 1| 1| 0| 1',
+        'AKAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ak| #021FBC| 1| 1| 0| 1',
+        'ALBANIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | sq| #C5F277| 1| 1| 0| 1',
+        'AMHARIC| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | am| #746BC8| 1| 1| 0| 1',
+        'ARABIC| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ar| #37C768| 1| 1| 0| 1',
+        'ARAGONESE| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | an| #4619FD| 1| 1| 0| 1',
+        'ARMENIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hy| #5F26E3| 1| 1| 0| 1',
+        'ASSAMESE| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | as| #615C3B| 1| 1| 0| 1',
+        'AVARIC| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | av| #2BCE4A| 1| 1| 0| 1',
+        'AVESTAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ae| #CF6EEA| 1| 1| 0| 1',
+        'AYMARA| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ay| #3D5D3B| 1| 1| 0| 1',
+        'AZERBAIJANI| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | az| #A48C7A| 1| 1| 0| 1',
+        'BAMBARA| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | bm| #C12E3D| 1| 1| 0| 1',
+        'BASHKIR| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ba| #ECD14A| 1| 1| 0| 1',
+        'BASQUE| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | eu| #89679F| 1| 1| 0| 1',
+        'BELARUSIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | be| #1050B0| 1| 1| 0| 1',
+        'BENGALI| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | bn| #EA4C42| 1| 1| 0| 1',
+        'BISLAMA| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | bi| #C39A37| 1| 1| 0| 1',
+        'BOSNIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | bs| #7DE3FE| 1| 1| 0| 1',
+        'BRETON| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | br| #7E1A72| 1| 1| 0| 1',
+        'BULGARIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | bg| #D5442A| 1| 1| 0| 1',
+        'BURMESE| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | my| #9E5CF0| 1| 1| 0| 1',
+        'CATALAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ca| #99BC95| 1| 1| 0| 1',
+        'CENTRAL_KHMER| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | km| #6ABDD6| 1| 1| 0| 1',
+        'CHAMORRO| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ch| #22302F| 1| 1| 0| 1',
+        'CHECHEN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ce| #83E832| 1| 1| 0| 1',
+        'CHICHEWA| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ny| #03E31C| 1| 1| 0| 1',
+        'CHINESE| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | zh| #40EA69| 1| 1| 0| 1',
+        'CHURCH_SLAVIC| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | cu| #C76DC2| 1| 1| 0| 1',
+        'CHUVASH| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | cv| #920F92| 1| 1| 0| 1',
+        'CORNISH| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | kw| #55137D| 1| 1| 0| 1',
+        'CORSICAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | co| #C605DC| 1| 1| 0| 1',
+        'CREE| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | cr| #75D7F3| 1| 1| 0| 1',
+        'CROATIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hr| #AB48D3| 1| 1| 0| 1',
+        'CZECH| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | cs| #7804BB| 1| 1| 0| 1',
+        'DANISH| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | da| #87A5BE| 1| 1| 0| 1',
+        'DIVEHI| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | dv| #FA57EC| 1| 1| 0| 1',
+        'DUTCH| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | nl| #74352E| 1| 1| 0| 1',
+        'DZONGKHA| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | dz| #F7C931| 1| 1| 0| 1',
+        'ENGLISH| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | en| #DD4A2F| 1| 1| 0| 1',
+        'ESPERANTO| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | eo| #B65ADE| 1| 1| 0| 1',
+        'ESTONIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | et| #AF1569| 1| 1| 0| 1',
+        'EWE| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ee| #2B7E43| 1| 1| 0| 1',
+        'FAROESE| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | fo| #507CCC| 1| 1| 0| 1',
+        'FIJIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | fj| #7083F9| 1| 1| 0| 1',
+        'FILIPINO| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | fil| #8BEF80| 1| 1| 0| 1',
+        'FINNISH| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | fi| #9229A6| 1| 1| 0| 1',
+        'FRENCH| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | fr| #4111A0| 1| 1| 0| 1',
+        'FULAH| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ff| #649BA7| 1| 1| 0| 1',
+        'GAELIC| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | gd| #FBFEC1| 1| 1| 0| 1',
+        'GALICIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | gl| #DB6769| 1| 1| 0| 1',
+        'GANDA| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | lg| #C71A50| 1| 1| 0| 1',
+        'GEORGIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ka| #8517C8| 1| 1| 0| 1',
+        'GERMAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | de| #4F5FDC| 1| 1| 0| 1',
+        'GREEK| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | el| #49B49A| 1| 1| 0| 1',
+        'GUARANI| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | gn| #EDB51C| 1| 1| 0| 1',
+        'GUJARATI| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | gu| #BDF7FF| 1| 1| 0| 1',
+        'HAITIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ht| #466EB6| 1| 1| 0| 1',
+        'HAUSA| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ha| #A949D2| 1| 1| 0| 1',
+        'HEBREW| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | he| #E9C58A| 1| 1| 0| 1',
+        'HERERO| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hz| #E9DF57| 1| 1| 0| 1',
+        'HINDI| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hi| #77775B| 1| 1| 0| 1',
+        'HIRI_MOTU| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ho| #3BB41B| 1| 1| 0| 1',
+        'HUNGARIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hu| #111457| 1| 1| 0| 1',
+        'ICELANDIC| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | is| #0ACE8F| 1| 1| 0| 1',
+        'IDO| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | io| #75CA6C| 1| 1| 0| 1',
+        'IGBO| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ig| #757EDE| 1| 1| 0| 1',
+        'INDONESIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | id| #52E822| 1| 1| 0| 1',
+        'INTERLINGUA| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ia| #7F9248| 1| 1| 0| 1',
+        'INTERLINGUE| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ie| #8F802C| 1| 1| 0| 1',
+        'INUKTITUT| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | iu| #43C3B0| 1| 1| 0| 1',
+        'INUPIAQ| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ik| #ECF371| 1| 1| 0| 1',
+        'IRISH| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ga| #FB7078| 1| 1| 0| 1',
+        'ITALIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | it| #95B5DF| 1| 1| 0| 1',
+        'JAPANESE| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ja| #5D776B| 1| 1| 0| 1',
+        'JAVANESE| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | jv| #5014C5| 1| 1| 0| 1',
+        'KALAALLISUT| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | kl| #050CF3| 1| 1| 0| 1',
+        'KANNADA| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | kn| #440B43| 1| 1| 0| 1',
+        'KANURI| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | kr| #4F2AAC| 1| 1| 0| 1',
+        'KASHMIRI| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ks| #842C02| 1| 1| 0| 1',
+        'KAZAKH| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | kk| #665F3D| 1| 1| 0| 1',
+        'KIKUYU| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ki| #315679| 1| 1| 0| 1',
+        'KINYARWANDA| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | rw| #CE1391| 1| 1| 0| 1',
+        'KIRGHIZ| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ky| #5F0D23| 1| 1| 0| 1',
+        'KOMI| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | kv| #9B06C3| 1| 1| 0| 1',
+        'KONGO| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | kg| #74BC47| 1| 1| 0| 1',
+        'KOREAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ko| #F5C630| 1| 1| 0| 1',
+        'KUANYAMA| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | kj| #D8CB60| 1| 1| 0| 1',
+        'KURDISH| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ku| #467330| 1| 1| 0| 1',
+        'LAO| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | lo| #DD3B78| 1| 1| 0| 1',
+        'LATIN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | la| #A73376| 1| 1| 0| 1',
+        'LATVIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | lv| #A65EC1| 1| 1| 0| 1',
+        'LIMBURGAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | li| #13C252| 1| 1| 0| 1',
+        'LINGALA| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ln| #BBEE5B| 1| 1| 0| 1',
+        'LITHUANIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | lt| #E89C3E| 1| 1| 0| 1',
+        'LUBA-KATANGA| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | lu| #4E97F3| 1| 1| 0| 1',
+        'LUXEMBOURGISH| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | lb| #4738EE| 1| 1| 0| 1',
+        'MACEDONIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | mk| #B69974| 1| 1| 0| 1',
+        'MALAGASY| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | mg| #29D850| 1| 1| 0| 1',
+        'MALAY| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ms| #A74139| 1| 1| 0| 1',
+        'MALAYALAM| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ml| #FD4C87| 1| 1| 0| 1',
+        'MALTESE| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | mt| #D6EE0B| 1| 1| 0| 1',
+        'MANX| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | gv| #3F83E9| 1| 1| 0| 1',
+        'MAORI| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | mi| #8339FD| 1| 1| 0| 1',
+        'MARATHI| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | mr| #93DEF1| 1| 1| 0| 1',
+        'MARSHALLESE| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | mh| #11DB75| 1| 1| 0| 1',
+        'MONGOLIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | mn| #A107D9| 1| 1| 0| 1',
+        'NAURU| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | na| #7A0925| 1| 1| 0| 1',
+        'NAVAJO| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | nv| #48F865| 1| 1| 0| 1',
+        'NDONGA| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ng| #83538B| 1| 1| 0| 1',
+        'NEPALI| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ne| #5A15FC| 1| 1| 0| 1',
+        'NORTH_NDEBELE| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | nd| #A1533B| 1| 1| 0| 1',
+        'NORTHERN_SAMI| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | se| #AAD61B| 1| 1| 0| 1',
+        'NORWEGIAN_BOKMÅL| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | nb| #0AEB4A| 1| 1| 0| 1',
+        'NORWEGIAN_NYNORSK| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | nn| #278B62| 1| 1| 0| 1',
+        'NORWEGIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | no| #13FF63| 1| 1| 0| 1',
+        'OCCITAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | oc| #B5B607| 1| 1| 0| 1',
+        'OJIBWA| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | oj| #100894| 1| 1| 0| 1',
+        'ORIYA| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | or| #0198FF| 1| 1| 0| 1',
+        'OROMO| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | om| #351BD8| 1| 1| 0| 1',
+        'OSSETIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | os| #BF715E| 1| 1| 0| 1',
+        'PALI| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | pi| #BEB3FA| 1| 1| 0| 1',
+        'PASHTO| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ps| #A4236C| 1| 1| 0| 1',
+        'PERSIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | fa| #68A38E| 1| 1| 0| 1',
+        'POLISH| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | pl| #D4F797| 1| 1| 0| 1',
+        'PORTUGUESE| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | pt| #71D659| 1| 1| 0| 1',
+        'PUNJABI| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | pa| #14F788| 1| 1| 0| 1',
+        'QUECHUA| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | qu| #268110| 1| 1| 0| 1',
+        'ROMANIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ro| #06603F| 1| 1| 0| 1',
+        'ROMANSH| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | rm| #3A73F3| 1| 1| 0| 1',
+        'RUNDI| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | rn| #715E84| 1| 1| 0| 1',
+        'RUSSIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ru| #DB77DA| 1| 1| 0| 1',
+        'SAMOAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | sm| #A26738| 1| 1| 0| 1',
+        'SANGO| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | sg| #CA1C7E| 1| 1| 0| 1',
+        'SANSKRIT| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | sa| #CF9C76| 1| 1| 0| 1',
+        'SARDINIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | sc| #28AF67| 1| 1| 0| 1',
+        'SERBIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | sr| #FB3F2C| 1| 1| 0| 1',
+        'SHONA| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | sn| #40F3EC| 1| 1| 0| 1',
+        'SICHUAN_YI| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ii| #FA3474| 1| 1| 0| 1',
+        'SINDHI| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | sd| #62D1BE| 1| 1| 0| 1',
+        'SINHALA| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | si| #24787A| 1| 1| 0| 1',
+        'SLOVAK| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | sk| #66104F| 1| 1| 0| 1',
+        'SLOVENIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | sl| #6F79E6| 1| 1| 0| 1',
+        'SOMALI| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | so| #A36185| 1| 1| 0| 1',
+        'SOUTH_NDEBELE| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | nr| #8090E5| 1| 1| 0| 1',
+        'SOUTHERN_SOTHO| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | st| #4C3417| 1| 1| 0| 1',
+        'SPANISH| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | es| #7842AE| 1| 1| 0| 1',
+        'SUNDANESE| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | su| #B2D05B| 1| 1| 0| 1',
+        'SWAHILI| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | sw| #D32F20| 1| 1| 0| 1',
+        'SWATI| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ss| #AA196D| 1| 1| 0| 1',
+        'SWEDISH| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | sv| #0EC5A2| 1| 1| 0| 1',
+        'TAGALOG| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | tl| #C9DDAC| 1| 1| 0| 1',
+        'TAHITIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ty| #32009D| 1| 1| 0| 1',
+        'TAJIK| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | tg| #100ECF| 1| 1| 0| 1',
+        'TAMIL| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ta| #E71FAE| 1| 1| 0| 1',
+        'TATAR| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | tt| #C17483| 1| 1| 0| 1',
+        'TELUGU| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | te| #E34ABD| 1| 1| 0| 1',
+        'THAI| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | th| #3FB501| 1| 1| 0| 1',
+        'TIBETAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | bo| #FF2496| 1| 1| 0| 1',
+        'TIGRINYA| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ti| #9074F0| 1| 1| 0| 1',
+        'TONGA| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | to| #B3259E| 1| 1| 0| 1',
+        'TSONGA| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ts| #12687C| 1| 1| 0| 1',
+        'TSWANA| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | tn| #DA3E89| 1| 1| 0| 1',
+        'TURKISH| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | tr| #A08D29| 1| 1| 0| 1',
+        'TURKMEN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | tk| #E70267| 1| 1| 0| 1',
+        'TWI| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | tw| #8A6C0F| 1| 1| 0| 1',
+        'UIGHUR| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ug| #79BC21| 1| 1| 0| 1',
+        'UKRAINIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | uk| #EB60E9| 1| 1| 0| 1',
+        'URDU| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ur| #57E09D| 1| 1| 0| 1',
+        'UZBEK| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | uz| #4341F3| 1| 1| 0| 1',
+        'VENDA| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ve| #4780ED| 1| 1| 0| 1',
+        'VIETNAMESE| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | vi| #90A301| 1| 1| 0| 1',
+        'VOLAPÜK| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | vo| #77D574| 1| 1| 0| 1',
+        'WALLOON| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | wa| #BD440A| 1| 1| 0| 1',
+        'WELSH| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | cy| #45E39C| 1| 1| 0| 1',
+        'WESTERN_FRISIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | fy| #01F471| 1| 1| 0| 1',
+        'WOLOF| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | wo| #BDD498| 1| 1| 0| 1',
+        'XHOSA| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | xh| #0C6D9C| 1| 1| 0| 1',
+        'YIDDISH| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | yi| #111D14| 1| 1| 0| 1',
+        'YORUBA| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | yo| #E815FF| 1| 1| 0| 1',
+        'ZHUANG| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | za| #C62A89| 1| 1| 0| 1',
+        'ZULU| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | zu| #0049F8| 1| 1| 0| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
@@ -876,7 +875,7 @@ Function CreateAudioLanguage {
         else {
             $value = Set-TextBetweenDelimiters -InputString $pre_value -ReplacementString (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
         }
-        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
         $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
     }
     LaunchScripts -ScriptPaths $arr
@@ -924,7 +923,7 @@ Function CreateAwards {
         else {
             $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
         }
-        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
         $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
     }
     LaunchScripts -ScriptPaths $arr
@@ -938,7 +937,7 @@ Function CreateAwards {
     foreach ($item in $myArray) {
         for ($i = 1947; $i -lt 2030; $i++) {
             $value = $i
-            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
             $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
@@ -955,7 +954,7 @@ Function CreateAwards {
         for ($i = 1947; $i -lt 2030; $i++) {
             $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
             $value = "$value $i"
-            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
             $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
@@ -972,7 +971,7 @@ Function CreateAwards {
         for ($i = 1947; $i -lt 2030; $i++) {
             $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
             $value = "$value $i"
-            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
             $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
@@ -989,7 +988,7 @@ Function CreateAwards {
         for ($i = 1947; $i -lt 2030; $i++) {
             $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
             $value = "$value $i"
-            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
             $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
@@ -1017,7 +1016,7 @@ Function CreateAwards {
         else {
             $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
         }
-        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
         $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
     }
     LaunchScripts -ScriptPaths $arr
@@ -1031,7 +1030,7 @@ Function CreateAwards {
     foreach ($item in $myArray) {
         for ($i = 1951; $i -lt 2030; $i++) {
             $value = $i
-            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
             $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
@@ -1048,7 +1047,7 @@ Function CreateAwards {
         for ($i = 1951; $i -lt 2030; $i++) {
             $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
             $value = "$value $i"
-            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
             $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
@@ -1065,7 +1064,7 @@ Function CreateAwards {
         for ($i = 1951; $i -lt 2030; $i++) {
             $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
             $value = "$value $i"
-            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
             $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
@@ -1082,7 +1081,7 @@ Function CreateAwards {
         for ($i = 1951; $i -lt 2030; $i++) {
             $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
             $value = "$value $i"
-            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
             $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
@@ -1110,7 +1109,7 @@ Function CreateAwards {
         else {
             $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
         }
-        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
         $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
     }
     LaunchScripts -ScriptPaths $arr
@@ -1124,7 +1123,7 @@ Function CreateAwards {
     foreach ($item in $myArray) {
         for ($i = 1938; $i -lt 2030; $i++) {
             $value = $i
-            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
             $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
@@ -1141,7 +1140,7 @@ Function CreateAwards {
         for ($i = 1938; $i -lt 2030; $i++) {
             $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
             $value = "$value $i"
-            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
             $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
@@ -1158,7 +1157,7 @@ Function CreateAwards {
         for ($i = 1938; $i -lt 2030; $i++) {
             $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
             $value = "$value $i"
-            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
             $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
@@ -1175,7 +1174,7 @@ Function CreateAwards {
         for ($i = 1938; $i -lt 2030; $i++) {
             $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
             $value = "$value $i"
-            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
             $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
@@ -1203,7 +1202,7 @@ Function CreateAwards {
         else {
             $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
         }
-        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
         $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
     }
     LaunchScripts -ScriptPaths $arr
@@ -1217,7 +1216,7 @@ Function CreateAwards {
     foreach ($item in $myArray) {
         for ($i = 1976; $i -lt 2030; $i++) {
             $value = $i
-            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
             $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
@@ -1234,7 +1233,7 @@ Function CreateAwards {
         for ($i = 1976; $i -lt 2030; $i++) {
             $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
             $value = "$value $i"
-            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
             $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
@@ -1251,7 +1250,7 @@ Function CreateAwards {
         for ($i = 1976; $i -lt 2030; $i++) {
             $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
             $value = "$value $i"
-            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
             $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
@@ -1268,7 +1267,7 @@ Function CreateAwards {
         for ($i = 1976; $i -lt 2030; $i++) {
             $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
             $value = "$value $i"
-            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
             $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
@@ -1296,7 +1295,7 @@ Function CreateAwards {
         else {
             $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
         }
-        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
         $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
     }
     LaunchScripts -ScriptPaths $arr
@@ -1310,7 +1309,7 @@ Function CreateAwards {
     foreach ($item in $myArray) {
         for ($i = 1929; $i -lt 2030; $i++) {
             $value = $i
-            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
             $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
@@ -1327,7 +1326,7 @@ Function CreateAwards {
         for ($i = 1929; $i -lt 2030; $i++) {
             $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
             $value = "$value $i"
-            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
             $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
@@ -1344,7 +1343,7 @@ Function CreateAwards {
         for ($i = 1929; $i -lt 2030; $i++) {
             $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
             $value = "$value $i"
-            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
             $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
@@ -1361,7 +1360,7 @@ Function CreateAwards {
         for ($i = 1929; $i -lt 2030; $i++) {
             $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
             $value = "$value $i"
-            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
             $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
@@ -1389,7 +1388,7 @@ Function CreateAwards {
         else {
             $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
         }
-        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
         $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
     }
     LaunchScripts -ScriptPaths $arr
@@ -1403,7 +1402,7 @@ Function CreateAwards {
     foreach ($item in $myArray) {
         for ($i = 1947; $i -lt 2030; $i++) {
             $value = $i
-            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
             $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
@@ -1420,7 +1419,7 @@ Function CreateAwards {
         for ($i = 1947; $i -lt 2030; $i++) {
             $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
             $value = "$value $i"
-            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
             $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
@@ -1437,7 +1436,7 @@ Function CreateAwards {
         for ($i = 1947; $i -lt 2030; $i++) {
             $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
             $value = "$value $i"
-            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
             $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
@@ -1454,7 +1453,7 @@ Function CreateAwards {
         for ($i = 1947; $i -lt 2030; $i++) {
             $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
             $value = "$value $i"
-            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
             $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
@@ -1482,7 +1481,7 @@ Function CreateAwards {
         else {
             $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
         }
-        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
         $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
     }
     LaunchScripts -ScriptPaths $arr
@@ -1496,7 +1495,7 @@ Function CreateAwards {
     foreach ($item in $myArray) {
         for ($i = 1943; $i -lt 2030; $i++) {
             $value = $i
-            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
             $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
@@ -1513,7 +1512,7 @@ Function CreateAwards {
         for ($i = 1943; $i -lt 2030; $i++) {
             $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
             $value = "$value $i"
-            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
             $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
@@ -1530,7 +1529,7 @@ Function CreateAwards {
         for ($i = 1943; $i -lt 2030; $i++) {
             $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
             $value = "$value $i"
-            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
             $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
@@ -1547,7 +1546,7 @@ Function CreateAwards {
         for ($i = 1943; $i -lt 2030; $i++) {
             $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
             $value = "$value $i"
-            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
             $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
@@ -1575,7 +1574,7 @@ Function CreateAwards {
         else {
             $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
         }
-        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
         $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
     }
     LaunchScripts -ScriptPaths $arr
@@ -1589,7 +1588,7 @@ Function CreateAwards {
     foreach ($item in $myArray) {
         for ($i = 1927; $i -lt 2030; $i++) {
             $value = $i
-            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
             $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
@@ -1606,7 +1605,7 @@ Function CreateAwards {
         for ($i = 1927; $i -lt 2030; $i++) {
             $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
             $value = "$value $i"
-            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
             $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
@@ -1623,7 +1622,7 @@ Function CreateAwards {
         for ($i = 1927; $i -lt 2030; $i++) {
             $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
             $value = "$value $i"
-            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
             $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
@@ -1640,7 +1639,7 @@ Function CreateAwards {
         for ($i = 1927; $i -lt 2030; $i++) {
             $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
             $value = "$value $i"
-            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
             $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
@@ -1668,7 +1667,7 @@ Function CreateAwards {
         else {
             $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
         }
-        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
         $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
     }
     LaunchScripts -ScriptPaths $arr
@@ -1682,7 +1681,7 @@ Function CreateAwards {
     foreach ($item in $myArray) {
         for ($i = 1980; $i -lt 2030; $i++) {
             $value = $i
-            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
             $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
@@ -1699,7 +1698,7 @@ Function CreateAwards {
         for ($i = 1980; $i -lt 2030; $i++) {
             $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
             $value = "$value $i"
-            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
             $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
@@ -1716,7 +1715,7 @@ Function CreateAwards {
         for ($i = 1980; $i -lt 2030; $i++) {
             $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
             $value = "$value $i"
-            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
             $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
@@ -1733,7 +1732,7 @@ Function CreateAwards {
         for ($i = 1980; $i -lt 2030; $i++) {
             $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
             $value = "$value $i"
-            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
             $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
@@ -1761,7 +1760,7 @@ Function CreateAwards {
         else {
             $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
         }
-        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
         $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
     }
     LaunchScripts -ScriptPaths $arr
@@ -1775,7 +1774,7 @@ Function CreateAwards {
     foreach ($item in $myArray) {
         for ($i = 1986; $i -lt 2030; $i++) {
             $value = $i
-            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
             $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
@@ -1792,7 +1791,7 @@ Function CreateAwards {
         for ($i = 1986; $i -lt 2030; $i++) {
             $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
             $value = "$value $i"
-            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
             $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
@@ -1809,7 +1808,7 @@ Function CreateAwards {
         for ($i = 1986; $i -lt 2030; $i++) {
             $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
             $value = "$value $i"
-            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
             $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
@@ -1826,7 +1825,7 @@ Function CreateAwards {
         for ($i = 1986; $i -lt 2030; $i++) {
             $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
             $value = "$value $i"
-            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
             $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
@@ -1855,7 +1854,7 @@ Function CreateAwards {
         else {
             $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
         }
-        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
         $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
     }
     LaunchScripts -ScriptPaths $arr
@@ -1869,7 +1868,7 @@ Function CreateAwards {
     foreach ($item in $myArray) {
         for ($i = 1978; $i -lt 2030; $i++) {
             $value = $i
-            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
             $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
@@ -1886,7 +1885,7 @@ Function CreateAwards {
         for ($i = 1978; $i -lt 2030; $i++) {
             $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
             $value = "$value $i"
-            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
             $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
@@ -1903,7 +1902,7 @@ Function CreateAwards {
         for ($i = 1978; $i -lt 2030; $i++) {
             $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
             $value = "$value $i"
-            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
             $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
@@ -1920,7 +1919,7 @@ Function CreateAwards {
         for ($i = 1978; $i -lt 2030; $i++) {
             $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
             $value = "$value $i"
-            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
             $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
@@ -1948,7 +1947,7 @@ Function CreateAwards {
         else {
             $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
         }
-        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
         $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
     }
     LaunchScripts -ScriptPaths $arr
@@ -1962,7 +1961,7 @@ Function CreateAwards {
     foreach ($item in $myArray) {
         for ($i = 1932; $i -lt 2030; $i++) {
             $value = $i
-            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
             $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
@@ -1979,7 +1978,7 @@ Function CreateAwards {
         for ($i = 1932; $i -lt 2030; $i++) {
             $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
             $value = "$value $i"
-            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
             $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
@@ -1996,7 +1995,7 @@ Function CreateAwards {
         for ($i = 1932; $i -lt 2030; $i++) {
             $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
             $value = "$value $i"
-            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
             $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
@@ -2013,7 +2012,7 @@ Function CreateAwards {
         for ($i = 1932; $i -lt 2030; $i++) {
             $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
             $value = "$value $i"
-            $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
             $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
@@ -2034,7 +2033,6 @@ Function CreateBased {
     Write-Host `"Creating Based Posters`"
     Set-Location $script_path
     # Find-Path `"$script_path\based`"
-    $theFont = "ComfortAa-Medium"
     $theMaxWidth = 1800
     $theMaxHeight = 1000
     $minPointSize = 100
@@ -2043,21 +2041,26 @@ Function CreateBased {
     Move-Item -Path output -Destination output-orig
 
     $myArray = @(
-        'Name| out_name| base_color| other_setting',
-        'BASED_ON_A_BOOK| Book| #131CA1| NA',
-        'BASED_ON_A_COMIC| Comic| #7856EF| NA',
-        'BASED_ON_A_TRUE_STORY| True Story| #BC0638| NA',
-        'BASED_ON_A_VIDEO_GAME| Video Game| #38CC66| NA'
+        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        'BASED_ON_A_BOOK| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Book| #131CA1| 1| 1| 0| 1',
+        'BASED_ON_A_COMIC| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Comic| #7856EF| 1| 1| 0| 1',
+        'BASED_ON_A_TRUE_STORY| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | True Story| #BC0638| 1| 1| 0| 1',
+        'BASED_ON_A_VIDEO_GAME| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Video Game| #38CC66| 1| 1| 0| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
     
     $arr = @()
     foreach ($item in $myArray) {
-        $value = Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper
-        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-        $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$value`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
+        if ($($item.key_name).ToString() -eq "") {
+            $value = $null
+        }
+        else {
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+        }
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
     }
-
     LaunchScripts -ScriptPaths $arr
+
     Move-Item -Path output -Destination based
     Move-Item -Path output-orig -Destination output
 }
@@ -2070,7 +2073,6 @@ Function CreateChart {
     Write-Host "Creating Chart"
     Set-Location $script_path
     # Find-Path "$script_path\chart"
-    $theFont = "ComfortAa-Medium"
     $theMaxWidth = 1500
     $theMaxHeight = 1000
     $minPointSize = 100
@@ -2079,64 +2081,64 @@ Function CreateChart {
     Move-Item -Path output -Destination output-orig
 
     $myArray = @(
-        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
-        'POPULAR| AniDB.png| -500| 1800| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | AniDB Popular| #FF7E17| 1| 1| 0| 1',
-        'POPULAR| AniList.png| -500| 1500| +851| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | AniList Popular| #414A81| 1| 1| 0| 1',
-        'SEASON| AniList.png| -500| 1500| +852| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | AniList Season| #414A81| 1| 1| 0| 1',
-        'TOP_RATED| AniList.png| -500| 1500| +853| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | AniList Top Rated| #414A81| 1| 1| 0| 1',
-        'TRENDING| AniList.png| -500| 1500| +854| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | AniList Trending| #414A81| 1| 1| 0| 1',
-        'TOP_10| Apple TV+.png| -500| 1500| +855| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | apple_top| #494949| 1| 1| 0| 1',
-        'TOP_10| Disney+.png| -500| 1500| +856| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | disney_top| #002CA1| 1| 1| 0| 1',
-        'TOP_10| HBO Max.png| -500| 1500| +857| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | hbo_top| #9015C5| 1| 1| 0| 1',
-        'TOP_10| Max.png| -500| 1500| +858| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | max_top| #002BE7| 1| 1| 0| 1',
-        'BOTTOM_RATED| IMDb.png| -500| 1500| +859| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | IMDb Bottom Rated| #D7B00B| 1| 1| 0| 1',
-        'BOX_OFFICE| IMDb.png| -500| 1500| +860| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | IMDb Box Office| #D7B00B| 1| 1| 0| 1',
-        'LOWEST_RATED| IMDb.png| -500| 1500| +861| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | IMDb Lowest Rated| #D7B00B| 1| 1| 0| 1',
-        'POPULAR| IMDb.png| -500| 1500| +862| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | IMDb Popular| #D7B00B| 1| 1| 0| 1',
-        'TOP_10| IMDb.png| -500| 1500| +863| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | imdb_top| #D7B00B| 1| 1| 0| 1',
-        'TOP_250| IMDb.png| -500| 1500| +864| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | IMDb Top 250| #D7B00B| 1| 1| 0| 1',
-        'FAVORITED| MyAnimeList.png| -500| 1500| +865| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | MyAnimeList Favorited| #304DA6| 1| 1| 0| 1',
-        'POPULAR| MyAnimeList.png| -500| 1500| +866| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | MyAnimeList Popular| #304DA6| 1| 1| 0| 1',
-        'SEASON| MyAnimeList.png| -500| 1500| +867| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | MyAnimeList Season| #304DA6| 1| 1| 0| 1',
-        'TOP_AIRING| MyAnimeList.png| -500| 1500| +868| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | MyAnimeList Top Airing| #304DA6| 1| 1| 0| 1',
-        'TOP_RATED| MyAnimeList.png| -500| 1500| +869| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | MyAnimeList Top Rated| #304DA6| 1| 1| 0| 1',
-        'TOP_10| Netflix.png| -500| 1500| +870| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | netflix_top| #B4121D| 1| 1| 0| 1',
-        'TOP_10| Paramount+.png| -500| 1500| +871| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | paramount_top| #1641C3| 1| 1| 0| 1',
-        'TOP_10_PIRATED| Pirated.png| -500| 1500| +872| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Top 10 Pirated Movies of the Week| #93561D| 1| 1| 0| 1',
-        'NEW_EPISODES| Plex.png| -500| 1500| +873| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | New Episodes| #DC9924| 1| 1| 0| 1',
-        'NEW_PREMIERES| Plex.png| -500| 1500| +874| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | New Premieres| #DC9924| 1| 1| 0| 1',
-        'NEWLY_RELEASED_EPISODES| Plex.png| -500| 1500| +875| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Newly Released Episodes| #DC9924| 1| 1| 0| 1',
-        'NEWLY_RELEASED| Plex.png| -500| 1500| +876| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Newly Released| #DC9924| 1| 1| 0| 1',
-        'PILOTS| Plex.png| -500| 1500| +877| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Pilots| #DC9924| 1| 1| 0| 1',
-        'PLEX_PEOPLE_WATCHING| Plex.png| -500| 1500| +878| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Plex People Watching| #DC9924| 1| 1| 0| 1',
-        'PLEX_PILOTS| Plex.png| -500| 1500| +879| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Plex Pilots| #DC9924| 1| 1| 0| 1',
-        'PLEX_POPULAR| Plex.png| -500| 1500| +880| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Plex Popular| #DC9924| 1| 1| 0| 1',
-        'PLEX_WATCHED| Plex.png| -500| 1500| +881| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Plex Watched| #DC9924| 1| 1| 0| 1',
-        'RECENTLY_ADDED| Plex.png| -500| 1500| +882| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Recently Added| #DC9924| 1| 1| 0| 1',
-        'RECENTLY_AIRED| Plex.png| -500| 1500| +883| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Recently Aired| #DC9924| 1| 1| 0| 1',
-        'TOP_10| Prime Video.png| -500| 1500| +884| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | prime_top| #43ABCE| 1| 1| 0| 1',
-        'STEVENLU''S_POPULAR_MOVIES| StevenLu.png| -500| 1500| +885| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | StevenLu''s Popular Movies| #1D2D51| 1| 1| 0| 1',
-        'AIRING_TODAY| TMDb.png| -500| 1500| +886| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | TMDb Airing Today| #062AC8| 1| 1| 0| 1',
-        'NOW_PLAYING| TMDb.png| -500| 1500| +887| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | TMDb Now Playing| #062AC8| 1| 1| 0| 1',
-        'ON_THE_AIR| TMDb.png| -500| 1500| +888| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | TMDb On The Air| #062AC8| 1| 1| 0| 1',
-        'POPULAR| TMDb.png| -500| 1500| +889| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | TMDb Popular| #062AC8| 1| 1| 0| 1',
-        'TOP_RATED| TMDb.png| -500| 1500| +890| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | TMDb Top Rated| #062AC8| 1| 1| 0| 1',
-        'TRENDING| TMDb.png| -500| 1500| +891| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | TMDb Trending| #062AC8| 1| 1| 0| 1',
-        'POPULAR| Tautulli.png| -500| 1500| +892| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Tautulli Popular| #B9851F| 1| 1| 0| 1',
-        'WATCHED| Tautulli.png| -500| 1500| +893| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Tautulli Watched| #B9851F| 1| 1| 0| 1',
-        'COLLECTED| Trakt.png| -500| 1500| +894| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Trakt Collected| #CD1A20| 1| 1| 0| 1',
-        'NOW_PLAYING| Trakt.png| -500| 1500| +895| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Trakt Now Playing| #CD1A20| 1| 1| 0| 1',
-        'POPULAR| Trakt.png| -500| 1500| +896| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Trakt Popular| #CD1A20| 1| 1| 0| 1',
-        'RECOMMENDED| Trakt.png| -500| 1500| +897| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Trakt Recommended| #CD1A20| 1| 1| 0| 1',
-        'TRENDING| Trakt.png| -500| 1500| +898| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Trakt Trending| #CD1A20| 1| 1| 0| 1',
-        'WATCHED| Trakt.png| -500| 1500| +899| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Trakt Watched| #CD1A20| 1| 1| 0| 1',
-        'WATCHLIST| Trakt.png| -500| 1500| +900| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Trakt Watchlist| #CD1A20| 1| 1| 0| 1',
-        'FAMILIES| css.png| -500| 1500| +901| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Common Sense Selection| #1AA931| 1| 1| 0| 1',
-        'TOP_10| google_play.png| -500| 1500| +902| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | google_top| #B81282| 1| 1| 0| 1',
-        'TOP_10| hulu.png| -500| 1500| +903| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | hulu_top| #1BB68A| 1| 1| 0| 1',
-        'TOP_10| itunes.png| -500| 1500| +904| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | itunes_top| #D500CC| 1| 1| 0| 1',
-        'TOP_10| star_plus.png| -500| 1500| +905| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | star_plus_top| #4A3159| 1| 1| 0| 1',
-        'TOP_10| vudu.png| -500| 1500| +906| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | vudu_top| #3567AC| 1| 1| 0| 1'
+        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        'POPULAR| AniDB.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | AniDB Popular| #FF7E17| 1| 1| 0| 1',
+        'POPULAR| AniList.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | AniList Popular| #414A81| 1| 1| 0| 1',
+        'SEASON| AniList.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | AniList Season| #414A81| 1| 1| 0| 1',
+        'TOP_RATED| AniList.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | AniList Top Rated| #414A81| 1| 1| 0| 1',
+        'TRENDING| AniList.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | AniList Trending| #414A81| 1| 1| 0| 1',
+        'TOP_10| Apple TV+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | apple_top| #494949| 1| 1| 0| 1',
+        'TOP_10| Disney+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | disney_top| #002CA1| 1| 1| 0| 1',
+        'TOP_10| HBO Max.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hbo_top| #9015C5| 1| 1| 0| 1',
+        'TOP_10| Max.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | max_top| #002BE7| 1| 1| 0| 1',
+        'BOTTOM_RATED| IMDb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | IMDb Bottom Rated| #D7B00B| 1| 1| 0| 1',
+        'BOX_OFFICE| IMDb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | IMDb Box Office| #D7B00B| 1| 1| 0| 1',
+        'LOWEST_RATED| IMDb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | IMDb Lowest Rated| #D7B00B| 1| 1| 0| 1',
+        'POPULAR| IMDb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | IMDb Popular| #D7B00B| 1| 1| 0| 1',
+        'TOP_10| IMDb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | imdb_top| #D7B00B| 1| 1| 0| 1',
+        'TOP_250| IMDb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | IMDb Top 250| #D7B00B| 1| 1| 0| 1',
+        'FAVORITED| MyAnimeList.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | MyAnimeList Favorited| #304DA6| 1| 1| 0| 1',
+        'POPULAR| MyAnimeList.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | MyAnimeList Popular| #304DA6| 1| 1| 0| 1',
+        'SEASON| MyAnimeList.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | MyAnimeList Season| #304DA6| 1| 1| 0| 1',
+        'TOP_AIRING| MyAnimeList.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | MyAnimeList Top Airing| #304DA6| 1| 1| 0| 1',
+        'TOP_RATED| MyAnimeList.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | MyAnimeList Top Rated| #304DA6| 1| 1| 0| 1',
+        'TOP_10| Netflix.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | netflix_top| #B4121D| 1| 1| 0| 1',
+        'TOP_10| Paramount+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | paramount_top| #1641C3| 1| 1| 0| 1',
+        'TOP_10_PIRATED| Pirated.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Top 10 Pirated Movies of the Week| #93561D| 1| 1| 0| 1',
+        'NEW_EPISODES| Plex.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | New Episodes| #DC9924| 1| 1| 0| 1',
+        'NEW_PREMIERES| Plex.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | New Premieres| #DC9924| 1| 1| 0| 1',
+        'NEWLY_RELEASED_EPISODES| Plex.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Newly Released Episodes| #DC9924| 1| 1| 0| 1',
+        'NEWLY_RELEASED| Plex.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Newly Released| #DC9924| 1| 1| 0| 1',
+        'PILOTS| Plex.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Pilots| #DC9924| 1| 1| 0| 1',
+        'PLEX_PEOPLE_WATCHING| Plex.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Plex People Watching| #DC9924| 1| 1| 0| 1',
+        'PLEX_PILOTS| Plex.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Plex Pilots| #DC9924| 1| 1| 0| 1',
+        'PLEX_POPULAR| Plex.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Plex Popular| #DC9924| 1| 1| 0| 1',
+        'PLEX_WATCHED| Plex.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Plex Watched| #DC9924| 1| 1| 0| 1',
+        'RECENTLY_ADDED| Plex.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Recently Added| #DC9924| 1| 1| 0| 1',
+        'RECENTLY_AIRED| Plex.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Recently Aired| #DC9924| 1| 1| 0| 1',
+        'TOP_10| Prime Video.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | prime_top| #43ABCE| 1| 1| 0| 1',
+        'STEVENLU''S_POPULAR_MOVIES| StevenLu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | StevenLu''s Popular Movies| #1D2D51| 1| 1| 0| 1',
+        'AIRING_TODAY| TMDb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | TMDb Airing Today| #062AC8| 1| 1| 0| 1',
+        'NOW_PLAYING| TMDb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | TMDb Now Playing| #062AC8| 1| 1| 0| 1',
+        'ON_THE_AIR| TMDb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | TMDb On The Air| #062AC8| 1| 1| 0| 1',
+        'POPULAR| TMDb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | TMDb Popular| #062AC8| 1| 1| 0| 1',
+        'TOP_RATED| TMDb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | TMDb Top Rated| #062AC8| 1| 1| 0| 1',
+        'TRENDING| TMDb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | TMDb Trending| #062AC8| 1| 1| 0| 1',
+        'POPULAR| Tautulli.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Tautulli Popular| #B9851F| 1| 1| 0| 1',
+        'WATCHED| Tautulli.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Tautulli Watched| #B9851F| 1| 1| 0| 1',
+        'COLLECTED| Trakt.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Trakt Collected| #CD1A20| 1| 1| 0| 1',
+        'NOW_PLAYING| Trakt.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Trakt Now Playing| #CD1A20| 1| 1| 0| 1',
+        'POPULAR| Trakt.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Trakt Popular| #CD1A20| 1| 1| 0| 1',
+        'RECOMMENDED| Trakt.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Trakt Recommended| #CD1A20| 1| 1| 0| 1',
+        'TRENDING| Trakt.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Trakt Trending| #CD1A20| 1| 1| 0| 1',
+        'WATCHED| Trakt.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Trakt Watched| #CD1A20| 1| 1| 0| 1',
+        'WATCHLIST| Trakt.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Trakt Watchlist| #CD1A20| 1| 1| 0| 1',
+        'FAMILIES| css.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Common Sense Selection| #1AA931| 1| 1| 0| 1',
+        'TOP_10| google_play.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | google_top| #B81282| 1| 1| 0| 1',
+        'TOP_10| hulu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hulu_top| #1BB68A| 1| 1| 0| 1',
+        'TOP_10| itunes.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | itunes_top| #D500CC| 1| 1| 0| 1',
+        'TOP_10| star_plus.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | star_plus_top| #4A3159| 1| 1| 0| 1',
+        'TOP_10| vudu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | vudu_top| #3567AC| 1| 1| 0| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
@@ -2147,7 +2149,7 @@ Function CreateChart {
         else {
             $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
         }
-        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
         $arr += ".\create_poster.ps1 -logo `"$script_path\logos_chart\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
     }
     LaunchScripts -ScriptPaths $arr
@@ -2166,83 +2168,134 @@ Function CreateContentRating {
     Write-Host "Creating ContentRating"
     Set-Location $script_path
     # Find-Path "$script_path\content_rating"
-    $theFont = "ComfortAa-Medium"
     $theMaxWidth = 1800
     $theMaxHeight = 1000
     $minPointSize = 100
     $maxPointSize = 250
 
+    $logo_offset = -500
+    $logo_resize = 1800
+    $text_offset = +850
+    $font = "ComfortAa-Medium"
+    $font_color = "#FFFFFF"
+    $border = 0
+    $border_width = 15
+    $border_color = "#FFFFFF"
+    $avg_color_image = ""
+    $base_color = ""
+    $gradient = 1
+    $clean = 1
+    $avg_color = 0
+    $white_wash = 1
+
     Move-Item -Path output -Destination output-orig
 
     $myArray = @(
-        'Logo| Name| out_name| base_color| ww',
-        'transparent.png| content_ratings_other| other| #FF2000| 1'
+        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        'content_ratings_other| transparent.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | other| #FF2000| 1| 1| 0| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
     foreach ($item in $myArray) {
-        $value = (Get-YamlPropertyValue -PropertyPath "collections.$($item.name).name" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
-        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-        $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.Logo)`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$value`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
+        if ($($item.key_name).ToString() -eq "") {
+            $value = $null
+        }
+        else {
+            $value = (Get-YamlPropertyValue -PropertyPath "collections.$($item.key_name).name" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+        }
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
     }
     LaunchScripts -ScriptPaths $arr
 
     Move-Item -Path output -Destination content_rating
-    
+
+    $base_color = "#1AA931"
     $arr = @()
     for ($i = 1; $i -lt 19; $i++) {
         $value = (Get-YamlPropertyValue -PropertyPath "key_names.age" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
         $value = "$value $i+"
-        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_content_rating\cs.png`" -logo_offset -500 -logo_resize $theMaxWidth -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"#1AA931`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_content_rating\cs.png`" -logo_offset $logo_offset -logo_resize $logo_resize -text `"$value`" -text_offset $text_offset -font `"$font`" -font_size $optimalFontSize -font_color `"$font_color`" -border $border -border_width $border_width -border_color `"$border_color`" -avg_color_image `"$avg_color_image`" -out_name `"$i`" -base_color `"$base_color`" -gradient $gradient -avg_color $avg_color -clean $clean -white_wash $white_wash"
     }
     $value = (Get-YamlPropertyValue -PropertyPath "key_names.NOT_RATED" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
-    $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_content_rating\cs.png`" -logo_offset -500 -logo_resize $theMaxWidth -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"NR`" -base_color `"#1AA931`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
+    $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_content_rating\cs.png`" -logo_offset $logo_offset -logo_resize $logo_resize -text `"$value`" -text_offset $text_offset -font `"$font`" -font_size $optimalFontSize -font_color `"$font_color`" -border $border -border_width $border_width -border_color `"$border_color`" -avg_color_image `"$avg_color_image`" -out_name `"$i`" -base_color `"$base_color`" -gradient $gradient -avg_color $avg_color -clean $clean -white_wash $white_wash"
     LaunchScripts -ScriptPaths $arr
 
     Move-Item -Path output -Destination content_rating\cs
     
     $content_rating = "G", "PG", "PG-13", "R", "R+", "Rx"
+    $base_color = "#2444D1"
     $arr = @()
     foreach ( $cr in $content_rating ) { 
         $value = (Get-YamlPropertyValue -PropertyPath "key_names.RATED" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
         $value = "$value $cr"
-        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_content_rating\mal.png`" -logo_offset -500 -logo_resize $theMaxWidth -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$cr`" -base_color `"#2444D1`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_content_rating\mal.png`" -logo_offset $logo_offset -logo_resize $logo_resize -text `"$value`" -text_offset $text_offset -font `"$font`" -font_size $optimalFontSize -font_color `"$font_color`" -border $border -border_width $border_width -border_color `"$border_color`" -avg_color_image `"$avg_color_image`" -out_name `"$cr`" -base_color `"$base_color`" -gradient $gradient -avg_color $avg_color -clean $clean -white_wash $white_wash"
     }
     $value = (Get-YamlPropertyValue -PropertyPath "key_names.NOT_RATED" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
-    $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_content_rating\mal.png`" -logo_offset -500 -logo_resize $theMaxWidth -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"NR`" -base_color `"#2444D1`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
+    $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_content_rating\mal.png`" -logo_offset $logo_offset -logo_resize $logo_resize -text `"$value`" -text_offset $text_offset -font `"$font`" -font_size $optimalFontSize -font_color `"$font_color`" -border $border -border_width $border_width -border_color `"$border_color`" -avg_color_image `"$avg_color_image`" -out_name `"$cr`" -base_color `"$base_color`" -gradient $gradient -avg_color $avg_color -clean $clean -white_wash $white_wash"
     LaunchScripts -ScriptPaths $arr
     
     Move-Item -Path output -Destination content_rating\mal
     
+    $myArray = @(
+        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        '| uk12.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | 12| #FF7D13| 1| 1| 0| 1',
+        '| uk12A.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | 12A| #FF7D13| 1| 1| 0| 1',
+        '| uk15.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | 15| #FC4E93| 1| 1| 0| 1',
+        '| uk18.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | 18| #DC0A0B| 1| 1| 0| 1',
+        '| uknr.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | NR| #0E84A3| 1| 1| 0| 1',
+        '| ukpg.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | PG| #FBAE00| 1| 1| 0| 1',
+        '| ukr18.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | R18| #016ED3| 1| 1| 0| 1',
+        '| uku.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | U| #0BC700| 1| 1| 0| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+    
     $arr = @()
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_content_rating\uk12.png`" -logo_offset +0 -logo_resize 1500 -text `"`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"12`" -base_color `"#FF7D13`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_content_rating\uk12A.png`" -logo_offset +0 -logo_resize 1500 -text `"`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"12A`" -base_color `"#FF7D13`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_content_rating\uk15.png`" -logo_offset +0 -logo_resize 1500 -text `"`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"15`" -base_color `"#FC4E93`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_content_rating\uk18.png`" -logo_offset +0 -logo_resize 1500 -text `"`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"18`" -base_color `"#DC0A0B`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_content_rating\uknr.png`" -logo_offset +0 -logo_resize 1500 -text `"`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"NR`" -base_color `"#0E84A3`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_content_rating\ukpg.png`" -logo_offset +0 -logo_resize 1500 -text `"`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"PG`" -base_color `"#FBAE00`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_content_rating\ukr18.png`" -logo_offset +0 -logo_resize 1500 -text `"`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"R18`" -base_color `"#016ED3`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_content_rating\uku.png`" -logo_offset +0 -logo_resize 1500 -text `"`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"U`" -base_color `"#0BC700`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
+    foreach ($item in $myArray) {
+        if ($($item.key_name).ToString() -eq "") {
+            $value = $null
+        }
+        else {
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+        }
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_content_rating\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
+    }
     LaunchScripts -ScriptPaths $arr
+
     Move-Item -Path output -Destination content_rating\uk
 
+    $myArray = @(
+        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        '| usg.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | G| #79EF06| 1| 1| 0| 1',
+        '| usnc17.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | NC-17| #EE45A4| 1| 1| 0| 1',
+        '| usnr.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | NR| #0E84A3| 1| 1| 0| 1',
+        '| uspg.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | PG| #918CE2| 1| 1| 0| 1',
+        '| uspg13.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | PG-13| #A124CC| 1| 1| 0| 1',
+        '| usr.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | R| #FB5226| 1| 1| 0| 1',
+        '| ustv14.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | TV-14| #C29CC1| 1| 1| 0| 1',
+        '| ustvg.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | TV-G| #98A5BB| 1| 1| 0| 1',
+        '| ustvma.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | TV-MA| #DB8689| 1| 1| 0| 1',
+        '| ustvpg.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | TV-PG| #5B0EFD| 1| 1| 0| 1',
+        '| ustvy.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | TV-Y| #3EB3C1| 1| 1| 0| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+    
     $arr = @()
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_content_rating\usg.png`" -logo_offset +0 -logo_resize 1500 -text `"`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"G`" -base_color `"#79EF06`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_content_rating\usnc17.png`" -logo_offset +0 -logo_resize 1500 -text `"`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"NC-17`" -base_color `"#EE45A4`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_content_rating\usnr.png`" -logo_offset +0 -logo_resize 1500 -text `"`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"NR`" -base_color `"#0E84A3`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_content_rating\uspg.png`" -logo_offset +0 -logo_resize 1500 -text `"`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"PG`" -base_color `"#918CE2`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_content_rating\uspg13.png`" -logo_offset +0 -logo_resize 1500 -text `"`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"PG-13`" -base_color `"#A124CC`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_content_rating\usr.png`" -logo_offset +0 -logo_resize 1500 -text `"`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"R`" -base_color `"#FB5226`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_content_rating\ustv14.png`" -logo_offset +0 -logo_resize 1500 -text `"`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"TV-14`" -base_color `"#C29CC1`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_content_rating\ustvg.png`" -logo_offset +0 -logo_resize 1500 -text `"`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"TV-G`" -base_color `"#98A5BB`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_content_rating\ustvma.png`" -logo_offset +0 -logo_resize 1500 -text `"`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"TV-MA`" -base_color `"#DB8689`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_content_rating\ustvpg.png`" -logo_offset +0 -logo_resize 1500 -text `"`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"TV-PG`" -base_color `"#5B0EFD`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_content_rating\ustvy.png`" -logo_offset +0 -logo_resize 1500 -text `"`" -text_offset +850 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"TV-Y`" -base_color `"#3EB3C1`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
+    foreach ($item in $myArray) {
+        if ($($item.key_name).ToString() -eq "") {
+            $value = $null
+        }
+        else {
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+        }
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_content_rating\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
+    }
     LaunchScripts -ScriptPaths $arr
+
     Move-Item -Path output -Destination content_rating\us
     Copy-Item -Path logos_content_rating -Destination content_rating\logos -Recurse
     Move-Item -Path output-orig -Destination output
@@ -2256,7 +2309,6 @@ Function CreateCountry {
     Write-Host "Creating Country"
     Set-Location $script_path
     Find-Path "$script_path\country"
-    $theFont = "ComfortAa-Medium"
     $theMaxWidth = 1800
     $theMaxHeight = 1000
     $minPointSize = 100
@@ -2265,8 +2317,8 @@ Function CreateCountry {
     Move-Item -Path output -Destination output-orig
 
     $myArray = @(
-        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
-        'country_other| transparent.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Other Countries| #FF2000| 1| 1| 0| 1'
+        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        'country_other| transparent.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Other Countries| #FF2000| 1| 1| 0| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
@@ -2277,81 +2329,81 @@ Function CreateCountry {
         else {
             $value = (Get-YamlPropertyValue -PropertyPath "collections.$($item.key_name).name" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
         }
-        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
         $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
     }
     LaunchScripts -ScriptPaths $arr
 
     $myArray = @(
-        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
-        'UNITED_ARAB_EMIRATES| ae.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | United Arab Emirates| #BC9C16| 1| 1| 0| 0',
-        'ARGENTINA| ar.png| -500| 750| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Argentina| #F05610| 1| 1| 0| 0',
-        'AUSTRIA| at.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Austria| #F5E6AE| 1| 1| 0| 0',
-        'AUSTRALIA| au.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Australia| #D5237B| 1| 1| 0| 0',
-        'BELGIUM| be.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Belgium| #AC98DB| 1| 1| 0| 0',
-        'BULGARIA| bg.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Bulgaria| #79AB96| 1| 1| 0| 0',
-        'BRAZIL| br.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Brazil| #EE9DA9| 1| 1| 0| 0',
-        'BAHAMAS| bs.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Bahamas| #F6CDF0| 1| 1| 0| 0',
-        'CANADA| ca.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Canada| #32DE58| 1| 1| 0| 0',
-        'SWITZERLAND| ch.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Switzerland| #5803F1| 1| 1| 0| 0',
-        'CHILE| cl.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Chile| #AAC41F| 1| 1| 0| 0',
-        'CHINA| cn.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | China| #902A62| 1| 1| 0| 0',
-        'COSTA_RICA| cr.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Costa Rica| #41F306| 1| 1| 0| 0',
-        'CZECH_REPUBLIC| cz.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Czech Republic| #9ECE8F| 1| 1| 0| 0',
-        'GERMANY| de.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Germany| #97FDAE| 1| 1| 0| 0',
-        'DENMARK| dk.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Denmark| #685ECB| 1| 1| 0| 0',
-        'DOMINICAN_REPUBLIC| do.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Dominican Republic| #83F0A2| 1| 1| 0| 0',
-        'ESTONIA| ee.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Estonia| #5145DA| 1| 1| 0| 0',
-        'EGYPT| eg.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Egypt| #86B137| 1| 1| 0| 0',
-        'SPAIN| es.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Spain| #99DA4B| 1| 1| 0| 0',
-        'FINLAND| fi.png| -500| 750| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Finland| #856518| 1| 1| 0| 0',
-        'FRANCE| fr.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | France| #D0404D| 1| 1| 0| 0',
-        'UNITED_KINGDOM| gb.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | United Kingdom| #C7B89D| 1| 1| 0| 0',
-        'GREECE| gr.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Greece| #431832| 1| 1| 0| 0',
-        'HONG_KONG| hk.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Hong Kong| #F6B541| 1| 1| 0| 0',
-        'CROATIA| hr.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Croatia| #62BF53| 1| 1| 0| 0',
-        'HUNGARY| hu.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Hungary| #E5983C| 1| 1| 0| 0',
-        'INDONESIA| id.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Indonesia| #3E33E4| 1| 1| 0| 0',
-        'IRELAND| ie.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Ireland| #C6377E| 1| 1| 0| 0',
-        'ISRAEL| il.png| -500| 650| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Israel| #41E0A9| 1| 1| 0| 0',
-        'INDIA| in.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | India| #A6404A| 1| 1| 0| 0',
-        'ICELAND| is.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Iceland| #CE31A0| 1| 1| 0| 0',
-        'ITALY| it.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Italy| #57B9BF| 1| 1| 0| 0',
-        'IRAN| ir.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Iran| #2AAC15| 1| 1| 0| 0',
-        'JAPAN| jp.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Japan| #4FCF54| 1| 1| 0| 0',
-        'KOREA| kr.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Korea| #127FFE| 1| 1| 0| 0',
-        'LATIN_AMERICA| latin america.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Latin America| #3785B6| 1| 1| 0| 0',
-        'SRI_LANKA| lk.png| -500| 750| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Sri Lanka| #6415FD| 1| 1| 0| 0',
-        'LUXEMBOURG| lu.png| -500| 750| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Luxembourg| #C90586| 1| 1| 0| 0',
-        'LATVIA| lv.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Latvia| #5326A3| 1| 1| 0| 0',
-        'MOROCCO| ma.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Morocco| #B28BDC| 1| 1| 0| 0',
-        'MEXICO| mx.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Mexico| #964F76| 1| 1| 0| 0',
-        'MALAYSIA| my.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Malaysia| #9630B4| 1| 1| 0| 0',
-        'NETHERLANDS| nl.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Netherlands| #B14FAA| 1| 1| 0| 0',
-        'NORWAY| no.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Norway| #AC320E| 1| 1| 0| 0',
-        'NORDIC| nordic.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Nordic| #A12398| 1| 1| 0| 0',
-        'NEPAL| np.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Nepal| #3F847B| 1| 1| 0| 0',
-        'NEW_ZEALAND| nz.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | New Zealand| #E0A486| 1| 1| 0| 0',
-        'PANAMA| pa.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Panama| #417818| 1| 1| 0| 0',
-        'PERU| pe.png| -500| 750| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Peru| #803704| 1| 1| 0| 0',
-        'PHILIPPINES| ph.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Philippines| #2DF423| 1| 1| 0| 0',
-        'PAKISTAN| pk.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Pakistan| #6FF34E| 1| 1| 0| 0',
-        'POLAND| pl.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Poland| #BAF6C2| 1| 1| 0| 0',
-        'PORTUGAL| pt.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Portugal| #A1DE3F| 1| 1| 0| 0',
-        'QATAR| qa.png| -500| 750| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Qatar| #4C1FCC| 1| 1| 0| 0',
-        'ROMANIA| ro.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Romania| #ABD0CF| 1| 1| 0| 0',
-        'SERBIA| rs.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Serbia| #7E0D8E| 1| 1| 0| 0',
-        'RUSSIA| ru.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Russia| #97D820| 1| 1| 0| 0',
-        'SAUDI_ARABIA| sa.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Saudi Arabia| #D34B83| 1| 1| 0| 0',
-        'SWEDEN| se.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Sweden| #E3C61A| 1| 1| 0| 0',
-        'SINGAPORE| sg.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Singapore| #0328DB| 1| 1| 0| 0',
-        'THAILAND| th.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Thailand| #32DBD9| 1| 1| 0| 0',
-        'TURKEY| tr.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Turkey| #CD90D1| 1| 1| 0| 0',
-        'TAIWAN| tw.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Taiwan| #ABE3E0| 1| 1| 0| 0',
-        'UKRAINE| ua.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Ukraine| #1640B6| 1| 1| 0| 0',
-        'UNITED_STATES_OF_AMERICA| us.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | United States of America| #D2A345| 1| 1| 0| 0',
-        'VIETNAM| vn.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Vietnam| #19156E| 1| 1| 0| 0',
-        'SOUTH_AFRICA| za.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | South Africa| #E7BB4A| 1| 1| 0| 0'
+        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        'UNITED_ARAB_EMIRATES| ae.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | United Arab Emirates| #BC9C16| 1| 1| 0| 0',
+        'ARGENTINA| ar.png| -500| 750| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Argentina| #F05610| 1| 1| 0| 0',
+        'AUSTRIA| at.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Austria| #F5E6AE| 1| 1| 0| 0',
+        'AUSTRALIA| au.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Australia| #D5237B| 1| 1| 0| 0',
+        'BELGIUM| be.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Belgium| #AC98DB| 1| 1| 0| 0',
+        'BULGARIA| bg.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Bulgaria| #79AB96| 1| 1| 0| 0',
+        'BRAZIL| br.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Brazil| #EE9DA9| 1| 1| 0| 0',
+        'BAHAMAS| bs.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Bahamas| #F6CDF0| 1| 1| 0| 0',
+        'CANADA| ca.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Canada| #32DE58| 1| 1| 0| 0',
+        'SWITZERLAND| ch.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Switzerland| #5803F1| 1| 1| 0| 0',
+        'CHILE| cl.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Chile| #AAC41F| 1| 1| 0| 0',
+        'CHINA| cn.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | China| #902A62| 1| 1| 0| 0',
+        'COSTA_RICA| cr.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Costa Rica| #41F306| 1| 1| 0| 0',
+        'CZECH_REPUBLIC| cz.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Czech Republic| #9ECE8F| 1| 1| 0| 0',
+        'GERMANY| de.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Germany| #97FDAE| 1| 1| 0| 0',
+        'DENMARK| dk.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Denmark| #685ECB| 1| 1| 0| 0',
+        'DOMINICAN_REPUBLIC| do.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Dominican Republic| #83F0A2| 1| 1| 0| 0',
+        'ESTONIA| ee.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Estonia| #5145DA| 1| 1| 0| 0',
+        'EGYPT| eg.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Egypt| #86B137| 1| 1| 0| 0',
+        'SPAIN| es.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Spain| #99DA4B| 1| 1| 0| 0',
+        'FINLAND| fi.png| -500| 750| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Finland| #856518| 1| 1| 0| 0',
+        'FRANCE| fr.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | France| #D0404D| 1| 1| 0| 0',
+        'UNITED_KINGDOM| gb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | United Kingdom| #C7B89D| 1| 1| 0| 0',
+        'GREECE| gr.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Greece| #431832| 1| 1| 0| 0',
+        'HONG_KONG| hk.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Hong Kong| #F6B541| 1| 1| 0| 0',
+        'CROATIA| hr.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Croatia| #62BF53| 1| 1| 0| 0',
+        'HUNGARY| hu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Hungary| #E5983C| 1| 1| 0| 0',
+        'INDONESIA| id.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Indonesia| #3E33E4| 1| 1| 0| 0',
+        'IRELAND| ie.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Ireland| #C6377E| 1| 1| 0| 0',
+        'ISRAEL| il.png| -500| 650| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Israel| #41E0A9| 1| 1| 0| 0',
+        'INDIA| in.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | India| #A6404A| 1| 1| 0| 0',
+        'ICELAND| is.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Iceland| #CE31A0| 1| 1| 0| 0',
+        'ITALY| it.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Italy| #57B9BF| 1| 1| 0| 0',
+        'IRAN| ir.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Iran| #2AAC15| 1| 1| 0| 0',
+        'JAPAN| jp.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Japan| #4FCF54| 1| 1| 0| 0',
+        'KOREA| kr.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Korea| #127FFE| 1| 1| 0| 0',
+        'LATIN_AMERICA| latin america.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Latin America| #3785B6| 1| 1| 0| 0',
+        'SRI_LANKA| lk.png| -500| 750| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Sri Lanka| #6415FD| 1| 1| 0| 0',
+        'LUXEMBOURG| lu.png| -500| 750| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Luxembourg| #C90586| 1| 1| 0| 0',
+        'LATVIA| lv.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Latvia| #5326A3| 1| 1| 0| 0',
+        'MOROCCO| ma.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Morocco| #B28BDC| 1| 1| 0| 0',
+        'MEXICO| mx.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Mexico| #964F76| 1| 1| 0| 0',
+        'MALAYSIA| my.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Malaysia| #9630B4| 1| 1| 0| 0',
+        'NETHERLANDS| nl.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Netherlands| #B14FAA| 1| 1| 0| 0',
+        'NORWAY| no.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Norway| #AC320E| 1| 1| 0| 0',
+        'NORDIC| nordic.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Nordic| #A12398| 1| 1| 0| 0',
+        'NEPAL| np.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Nepal| #3F847B| 1| 1| 0| 0',
+        'NEW_ZEALAND| nz.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | New Zealand| #E0A486| 1| 1| 0| 0',
+        'PANAMA| pa.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Panama| #417818| 1| 1| 0| 0',
+        'PERU| pe.png| -500| 750| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Peru| #803704| 1| 1| 0| 0',
+        'PHILIPPINES| ph.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Philippines| #2DF423| 1| 1| 0| 0',
+        'PAKISTAN| pk.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Pakistan| #6FF34E| 1| 1| 0| 0',
+        'POLAND| pl.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Poland| #BAF6C2| 1| 1| 0| 0',
+        'PORTUGAL| pt.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Portugal| #A1DE3F| 1| 1| 0| 0',
+        'QATAR| qa.png| -500| 750| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Qatar| #4C1FCC| 1| 1| 0| 0',
+        'ROMANIA| ro.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Romania| #ABD0CF| 1| 1| 0| 0',
+        'SERBIA| rs.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Serbia| #7E0D8E| 1| 1| 0| 0',
+        'RUSSIA| ru.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Russia| #97D820| 1| 1| 0| 0',
+        'SAUDI_ARABIA| sa.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Saudi Arabia| #D34B83| 1| 1| 0| 0',
+        'SWEDEN| se.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Sweden| #E3C61A| 1| 1| 0| 0',
+        'SINGAPORE| sg.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Singapore| #0328DB| 1| 1| 0| 0',
+        'THAILAND| th.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Thailand| #32DBD9| 1| 1| 0| 0',
+        'TURKEY| tr.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Turkey| #CD90D1| 1| 1| 0| 0',
+        'TAIWAN| tw.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Taiwan| #ABE3E0| 1| 1| 0| 0',
+        'UKRAINE| ua.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Ukraine| #1640B6| 1| 1| 0| 0',
+        'UNITED_STATES_OF_AMERICA| us.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | United States of America| #D2A345| 1| 1| 0| 0',
+        'VIETNAM| vn.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Vietnam| #19156E| 1| 1| 0| 0',
+        'SOUTH_AFRICA| za.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | South Africa| #E7BB4A| 1| 1| 0| 0'
     ) | ConvertFrom-Csv -Delimiter '|'
     
     $arr = @()
@@ -2362,7 +2414,7 @@ Function CreateCountry {
         else {
             $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
         }
-        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
         $arr += ".\create_poster.ps1 -logo `"$script_path\logos_country\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
     }
     LaunchScripts -ScriptPaths $arr
@@ -2370,75 +2422,75 @@ Function CreateCountry {
     Move-Item -Path output -Destination country\color
 
     $myArray = @(
-        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
-        'UNITED_ARAB_EMIRATES| ae.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | United Arab Emirates| #BC9C16| 1| 1| 0| 1',
-        'ARGENTINA| ar.png| -500| 750| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Argentina| #F05610| 1| 1| 0| 1',
-        'AUSTRIA| at.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Austria| #F5E6AE| 1| 1| 0| 1',
-        'AUSTRALIA| au.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Australia| #D5237B| 1| 1| 0| 1',
-        'BELGIUM| be.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Belgium| #AC98DB| 1| 1| 0| 1',
-        'BULGARIA| bg.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Bulgaria| #79AB96| 1| 1| 0| 1',
-        'BRAZIL| br.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Brazil| #EE9DA9| 1| 1| 0| 1',
-        'BAHAMAS| bs.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Bahamas| #F6CDF0| 1| 1| 0| 1',
-        'CANADA| ca.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Canada| #32DE58| 1| 1| 0| 1',
-        'SWITZERLAND| ch.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Switzerland| #5803F1| 1| 1| 0| 1',
-        'CHILE| cl.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Chile| #AAC41F| 1| 1| 0| 1',
-        'CHINA| cn.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | China| #902A62| 1| 1| 0| 1',
-        'COSTA_RICA| cr.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Costa Rica| #41F306| 1| 1| 0| 1',
-        'CZECH_REPUBLIC| cz.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Czech Republic| #9ECE8F| 1| 1| 0| 1',
-        'GERMANY| de.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Germany| #97FDAE| 1| 1| 0| 1',
-        'DENMARK| dk.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Denmark| #685ECB| 1| 1| 0| 1',
-        'DOMINICAN_REPUBLIC| do.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Dominican Republic| #83F0A2| 1| 1| 0| 1',
-        'ESTONIA| ee.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Estonia| #5145DA| 1| 1| 0| 1',
-        'EGYPT| eg.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Egypt| #86B137| 1| 1| 0| 1',
-        'SPAIN| es.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Spain| #99DA4B| 1| 1| 0| 1',
-        'FINLAND| fi.png| -500| 750| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Finland| #856518| 1| 1| 0| 1',
-        'FRANCE| fr.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | France| #D0404D| 1| 1| 0| 1',
-        'UNITED_KINGDOM| gb.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | United Kingdom| #C7B89D| 1| 1| 0| 1',
-        'GREECE| gr.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Greece| #431832| 1| 1| 0| 1',
-        'HONG_KONG| hk.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Hong Kong| #F6B541| 1| 1| 0| 1',
-        'CROATIA| hr.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Croatia| #62BF53| 1| 1| 0| 1',
-        'HUNGARY| hu.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Hungary| #E5983C| 1| 1| 0| 1',
-        'INDONESIA| id.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Indonesia| #3E33E4| 1| 1| 0| 1',
-        'IRELAND| ie.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Ireland| #C6377E| 1| 1| 0| 1',
-        'ISRAEL| il.png| -500| 650| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Israel| #41E0A9| 1| 1| 0| 1',
-        'INDIA| in.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | India| #A6404A| 1| 1| 0| 1',
-        'ICELAND| is.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Iceland| #CE31A0| 1| 1| 0| 1',
-        'ITALY| it.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Italy| #57B9BF| 1| 1| 0| 1',
-        'IRAN| ir.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Iran| #2AAC15| 1| 1| 0| 1',
-        'JAPAN| jp.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Japan| #4FCF54| 1| 1| 0| 1',
-        'KOREA| kr.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Korea| #127FFE| 1| 1| 0| 1',
-        'LATIN_AMERICA| latin america.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Latin America| #3785B6| 1| 1| 0| 1',
-        'SRI_LANKA| lk.png| -500| 750| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Sri Lanka| #6415FD| 1| 1| 0| 1',
-        'LUXEMBOURG| lu.png| -500| 750| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Luxembourg| #C90586| 1| 1| 0| 1',
-        'LATVIA| lv.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Latvia| #5326A3| 1| 1| 0| 1',
-        'MOROCCO| ma.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Morocco| #B28BDC| 1| 1| 0| 1',
-        'MEXICO| mx.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Mexico| #964F76| 1| 1| 0| 1',
-        'MALAYSIA| my.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Malaysia| #9630B4| 1| 1| 0| 1',
-        'NETHERLANDS| nl.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Netherlands| #B14FAA| 1| 1| 0| 1',
-        'NORWAY| no.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Norway| #AC320E| 1| 1| 0| 1',
-        'NORDIC| nordic.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Nordic| #A12398| 1| 1| 0| 1',
-        'NEPAL| np.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Nepal| #3F847B| 1| 1| 0| 1',
-        'NEW_ZEALAND| nz.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | New Zealand| #E0A486| 1| 1| 0| 1',
-        'PANAMA| pa.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Panama| #417818| 1| 1| 0| 1',
-        'PERU| pe.png| -500| 750| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Peru| #803704| 1| 1| 0| 1',
-        'PHILIPPINES| ph.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Philippines| #2DF423| 1| 1| 0| 1',
-        'PAKISTAN| pk.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Pakistan| #6FF34E| 1| 1| 0| 1',
-        'POLAND| pl.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Poland| #BAF6C2| 1| 1| 0| 1',
-        'PORTUGAL| pt.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Portugal| #A1DE3F| 1| 1| 0| 1',
-        'QATAR| qa.png| -500| 750| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Qatar| #4C1FCC| 1| 1| 0| 1',
-        'ROMANIA| ro.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Romania| #ABD0CF| 1| 1| 0| 1',
-        'SERBIA| rs.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Serbia| #7E0D8E| 1| 1| 0| 1',
-        'RUSSIA| ru.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Russia| #97D820| 1| 1| 0| 1',
-        'SAUDI_ARABIA| sa.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Saudi Arabia| #D34B83| 1| 1| 0| 1',
-        'SWEDEN| se.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Sweden| #E3C61A| 1| 1| 0| 1',
-        'SINGAPORE| sg.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Singapore| #0328DB| 1| 1| 0| 1',
-        'THAILAND| th.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Thailand| #32DBD9| 1| 1| 0| 1',
-        'TURKEY| tr.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Turkey| #CD90D1| 1| 1| 0| 1',
-        'TAIWAN| tw.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Taiwan| #ABE3E0| 1| 1| 0| 1',
-        'UKRAINE| ua.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Ukraine| #1640B6| 1| 1| 0| 1',
-        'UNITED_STATES_OF_AMERICA| us.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | United States of America| #D2A345| 1| 1| 0| 1',
-        'VIETNAM| vn.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Vietnam| #19156E| 1| 1| 0| 1',
-        'SOUTH_AFRICA| za.png| -500| 1500| +850| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | South Africa| #E7BB4A| 1| 1| 0| 1'
+        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        'UNITED_ARAB_EMIRATES| ae.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | United Arab Emirates| #BC9C16| 1| 1| 0| 1',
+        'ARGENTINA| ar.png| -500| 750| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Argentina| #F05610| 1| 1| 0| 1',
+        'AUSTRIA| at.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Austria| #F5E6AE| 1| 1| 0| 1',
+        'AUSTRALIA| au.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Australia| #D5237B| 1| 1| 0| 1',
+        'BELGIUM| be.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Belgium| #AC98DB| 1| 1| 0| 1',
+        'BULGARIA| bg.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Bulgaria| #79AB96| 1| 1| 0| 1',
+        'BRAZIL| br.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Brazil| #EE9DA9| 1| 1| 0| 1',
+        'BAHAMAS| bs.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Bahamas| #F6CDF0| 1| 1| 0| 1',
+        'CANADA| ca.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Canada| #32DE58| 1| 1| 0| 1',
+        'SWITZERLAND| ch.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Switzerland| #5803F1| 1| 1| 0| 1',
+        'CHILE| cl.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Chile| #AAC41F| 1| 1| 0| 1',
+        'CHINA| cn.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | China| #902A62| 1| 1| 0| 1',
+        'COSTA_RICA| cr.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Costa Rica| #41F306| 1| 1| 0| 1',
+        'CZECH_REPUBLIC| cz.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Czech Republic| #9ECE8F| 1| 1| 0| 1',
+        'GERMANY| de.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Germany| #97FDAE| 1| 1| 0| 1',
+        'DENMARK| dk.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Denmark| #685ECB| 1| 1| 0| 1',
+        'DOMINICAN_REPUBLIC| do.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Dominican Republic| #83F0A2| 1| 1| 0| 1',
+        'ESTONIA| ee.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Estonia| #5145DA| 1| 1| 0| 1',
+        'EGYPT| eg.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Egypt| #86B137| 1| 1| 0| 1',
+        'SPAIN| es.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Spain| #99DA4B| 1| 1| 0| 1',
+        'FINLAND| fi.png| -500| 750| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Finland| #856518| 1| 1| 0| 1',
+        'FRANCE| fr.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | France| #D0404D| 1| 1| 0| 1',
+        'UNITED_KINGDOM| gb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | United Kingdom| #C7B89D| 1| 1| 0| 1',
+        'GREECE| gr.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Greece| #431832| 1| 1| 0| 1',
+        'HONG_KONG| hk.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Hong Kong| #F6B541| 1| 1| 0| 1',
+        'CROATIA| hr.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Croatia| #62BF53| 1| 1| 0| 1',
+        'HUNGARY| hu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Hungary| #E5983C| 1| 1| 0| 1',
+        'INDONESIA| id.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Indonesia| #3E33E4| 1| 1| 0| 1',
+        'IRELAND| ie.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Ireland| #C6377E| 1| 1| 0| 1',
+        'ISRAEL| il.png| -500| 650| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Israel| #41E0A9| 1| 1| 0| 1',
+        'INDIA| in.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | India| #A6404A| 1| 1| 0| 1',
+        'ICELAND| is.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Iceland| #CE31A0| 1| 1| 0| 1',
+        'ITALY| it.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Italy| #57B9BF| 1| 1| 0| 1',
+        'IRAN| ir.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Iran| #2AAC15| 1| 1| 0| 1',
+        'JAPAN| jp.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Japan| #4FCF54| 1| 1| 0| 1',
+        'KOREA| kr.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Korea| #127FFE| 1| 1| 0| 1',
+        'LATIN_AMERICA| latin america.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Latin America| #3785B6| 1| 1| 0| 1',
+        'SRI_LANKA| lk.png| -500| 750| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Sri Lanka| #6415FD| 1| 1| 0| 1',
+        'LUXEMBOURG| lu.png| -500| 750| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Luxembourg| #C90586| 1| 1| 0| 1',
+        'LATVIA| lv.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Latvia| #5326A3| 1| 1| 0| 1',
+        'MOROCCO| ma.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Morocco| #B28BDC| 1| 1| 0| 1',
+        'MEXICO| mx.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Mexico| #964F76| 1| 1| 0| 1',
+        'MALAYSIA| my.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Malaysia| #9630B4| 1| 1| 0| 1',
+        'NETHERLANDS| nl.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Netherlands| #B14FAA| 1| 1| 0| 1',
+        'NORWAY| no.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Norway| #AC320E| 1| 1| 0| 1',
+        'NORDIC| nordic.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Nordic| #A12398| 1| 1| 0| 1',
+        'NEPAL| np.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Nepal| #3F847B| 1| 1| 0| 1',
+        'NEW_ZEALAND| nz.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | New Zealand| #E0A486| 1| 1| 0| 1',
+        'PANAMA| pa.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Panama| #417818| 1| 1| 0| 1',
+        'PERU| pe.png| -500| 750| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Peru| #803704| 1| 1| 0| 1',
+        'PHILIPPINES| ph.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Philippines| #2DF423| 1| 1| 0| 1',
+        'PAKISTAN| pk.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Pakistan| #6FF34E| 1| 1| 0| 1',
+        'POLAND| pl.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Poland| #BAF6C2| 1| 1| 0| 1',
+        'PORTUGAL| pt.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Portugal| #A1DE3F| 1| 1| 0| 1',
+        'QATAR| qa.png| -500| 750| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Qatar| #4C1FCC| 1| 1| 0| 1',
+        'ROMANIA| ro.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Romania| #ABD0CF| 1| 1| 0| 1',
+        'SERBIA| rs.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Serbia| #7E0D8E| 1| 1| 0| 1',
+        'RUSSIA| ru.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Russia| #97D820| 1| 1| 0| 1',
+        'SAUDI_ARABIA| sa.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Saudi Arabia| #D34B83| 1| 1| 0| 1',
+        'SWEDEN| se.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Sweden| #E3C61A| 1| 1| 0| 1',
+        'SINGAPORE| sg.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Singapore| #0328DB| 1| 1| 0| 1',
+        'THAILAND| th.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Thailand| #32DBD9| 1| 1| 0| 1',
+        'TURKEY| tr.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Turkey| #CD90D1| 1| 1| 0| 1',
+        'TAIWAN| tw.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Taiwan| #ABE3E0| 1| 1| 0| 1',
+        'UKRAINE| ua.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Ukraine| #1640B6| 1| 1| 0| 1',
+        'UNITED_STATES_OF_AMERICA| us.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | United States of America| #D2A345| 1| 1| 0| 1',
+        'VIETNAM| vn.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Vietnam| #19156E| 1| 1| 0| 1',
+        'SOUTH_AFRICA| za.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | South Africa| #E7BB4A| 1| 1| 0| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
@@ -2449,14 +2501,14 @@ Function CreateCountry {
         else {
             $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
         }
-        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
         $arr += ".\create_poster.ps1 -logo `"$script_path\logos_country\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
     }
     LaunchScripts -ScriptPaths $arr
 
     $myArray = @(
-        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
-        'country_other| transparent.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Other Countries| #FF2000| 1| 1| 0| 1'
+        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        'country_other| transparent.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Other Countries| #FF2000| 1| 1| 0| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
@@ -2467,7 +2519,7 @@ Function CreateCountry {
         else {
             $value = (Get-YamlPropertyValue -PropertyPath "collections.$($item.key_name).name" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
         }
-        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
         $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
     }
     LaunchScripts -ScriptPaths $arr
@@ -2496,51 +2548,55 @@ Function CreateDecade {
     $maxPointSize = 250
 
     $myArray = @(
-        'Logo| Name| out_name| base_color| ww',
-        'transparent.png| decade_other| other| #FF2000| 1'
+        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        'decade_other| transparent.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | other| #FF2000| 1| 1| 0| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
     foreach ($item in $myArray) {
-        $value = (Get-YamlPropertyValue -PropertyPath "collections.$($item.name).name" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
-        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-        $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.Logo)`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$value`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
+        if ($($item.key_name).ToString() -eq "") {
+            $value = $null
+        }
+        else {
+            $value = (Get-YamlPropertyValue -PropertyPath "collections.$($item.key_name).name" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+        }
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
     }
     LaunchScripts -ScriptPaths $arr
 
-    # $theFont = "ComfortAa-Medium"
     $theMaxWidth = 1900
     $theMaxHeight = 550
     $minPointSize = 250
     $maxPointSize = 1000
 
     $myArray = @(
-        'Name| out_name| base_color| font_name| font_size',
-        '1880s| 1880| #44EF10| Rye-Regular| 453',
-        '1890s| 1890| #44EF10| Limelight-Regular| 453',
-        '1900s| 1900| #44EF10| BoecklinsUniverse| 453',
-        '1910s| 1910| #44EF10| UnifrakturCook| 700',
-        '1920s| 1920| #44EF10| Trochut| 500',
-        '1930s| 1930| #44EF10| Righteous| 500',
-        '1940s| 1940| #44EF10| Yesteryear| 700',
-        '1950s| 1950| #44EF10| Cherry-Cream-Soda-Regular| 500',
-        '1960s| 1960| #44EF10| Boogaloo-Regular| 500',
-        '1970s| 1970| #44EF10| Monoton| 500',
-        '1980s| 1980| #44EF10| Press-Start-2P| 300',
-        '1990s| 1990| #44EF10| Jura-Bold| 500',
-        '2000s| 2000| #44EF10| Special-Elite-Regular| 500',
-        '2010s| 2010| #44EF10| Barlow-Regular| 500',
-        '2020s| 2020| #44EF10| Helvetica-Bold| 500'
+        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        '1880s| transparent.png| +0| 0| +0| Rye-Regular| 453| #FFFFFF| 0| 15| #FFFFFF| | 1880| #44EF10| 1| 1| 0| 1',
+        '1890s| transparent.png| +0| 0| +0| Limelight-Regular| 453| #FFFFFF| 0| 15| #FFFFFF| | 1890| #44EF10| 1| 1| 0| 1',
+        '1900s| transparent.png| +0| 0| +0| BoecklinsUniverse| 453| #FFFFFF| 0| 15| #FFFFFF| | 1900| #44EF10| 1| 1| 0| 1',
+        '1910s| transparent.png| +0| 0| +0| UnifrakturCook| 700| #FFFFFF| 0| 15| #FFFFFF| | 1910| #44EF10| 1| 1| 0| 1',
+        '1920s| transparent.png| +0| 0| +0| Trochut| 500| #FFFFFF| 0| 15| #FFFFFF| | 1920| #44EF10| 1| 1| 0| 1',
+        '1930s| transparent.png| +0| 0| +0| Righteous| 500| #FFFFFF| 0| 15| #FFFFFF| | 1930| #44EF10| 1| 1| 0| 1',
+        '1940s| transparent.png| +0| 0| +0| Yesteryear| 700| #FFFFFF| 0| 15| #FFFFFF| | 1940| #44EF10| 1| 1| 0| 1',
+        '1950s| transparent.png| +0| 0| +0| Cherry-Cream-Soda-Regular| 500| #FFFFFF| 0| 15| #FFFFFF| | 1950| #44EF10| 1| 1| 0| 1',
+        '1960s| transparent.png| +0| 0| +0| Boogaloo-Regular| 500| #FFFFFF| 0| 15| #FFFFFF| | 1960| #44EF10| 1| 1| 0| 1',
+        '1970s| transparent.png| +0| 0| +0| Monoton| 500| #FFFFFF| 0| 15| #FFFFFF| | 1970| #44EF10| 1| 1| 0| 1',
+        '1980s| transparent.png| +0| 0| +0| Press-Start-2P| 300| #FFFFFF| 0| 15| #FFFFFF| | 1980| #44EF10| 1| 1| 0| 1',
+        '1990s| transparent.png| +0| 0| +0| Jura-Bold| 500| #FFFFFF| 0| 15| #FFFFFF| | 1990| #44EF10| 1| 1| 0| 1',
+        '2000s| transparent.png| +0| 0| +0| Special-Elite-Regular| 500| #FFFFFF| 0| 15| #FFFFFF| | 2000| #44EF10| 1| 1| 0| 1',
+        '2010s| transparent.png| +0| 0| +0| Barlow-Regular| 500| #FFFFFF| 0| 15| #FFFFFF| | 2010| #44EF10| 1| 1| 0| 1',
+        '2020s| transparent.png| +0| 0| +0| Helvetica-Bold| 500| #FFFFFF| 0| 15| #FFFFFF| | 2020| #44EF10| 1| 1| 0| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
     
     $arr = @()
     foreach ($item in $myArray) {
-        $value = $($item.Name)
-        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font_name) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $($item.font_size)
-        $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$value`" -text_offset +0 -font `"$($item.font_name)`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
+        $value = $($item.key_name)
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $($item.font_size)
+        $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
     }
-
     LaunchScripts -ScriptPaths $arr
+
     WriteToLogFile "MonitorProcess               : Waiting for all processes to end before continuing..."
     Start-Sleep -Seconds 3
     MonitorProcess -ProcessName "magick.exe"
@@ -2558,7 +2614,7 @@ Function CreateDecade {
     $arr = @()
     for ($i = 1880; $i -lt 2030; $i += 10) {
         $value = $pre_value
-        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
         $arr += ".\create_poster.ps1 -logo `"$script_path\decade\$i.jpg`" -logo_offset +0 -logo_resize 2000 -text `"$value`" -text_offset -400 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"#FFFFFF`" -gradient 1 -avg_color 0 -clean 1 -white_wash 0"
     }
     LaunchScripts -ScriptPaths $arr
@@ -2578,114 +2634,130 @@ Function CreateFranchise {
     Set-Location $script_path
     # Find-Path "$script_path\franchise"
     Move-Item -Path output -Destination output-orig
+
+    $myArray = @(
+        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        '| 28 Days Weeks Later.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | 28 Days Weeks Later| #B93033| 1| 1| 0| 0',
+        '| 9-1-1.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | 9-1-1| #C62B2B| 1| 1| 0| 1',
+        '| A Nightmare on Elm Street.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | A Nightmare on Elm Street| #BE3C3E| 1| 1| 0| 1',
+        '| Alien Predator.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Alien Predator| #1EAC1B| 1| 1| 0| 1',
+        '| Alien.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Alien| #18BC56| 1| 1| 0| 1',
+        '| American Pie.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | American Pie| #C24940| 1| 1| 0| 1',
+        '| Anaconda.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Anaconda| #A42E2D| 1| 1| 0| 1',
+        '| Angels In The.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Angels In The| #4869BD| 1| 1| 0| 1',
+        '| Appleseed.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Appleseed| #986E22| 1| 1| 0| 1',
+        '| Archie Comics.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Archie Comics| #DFB920| 1| 1| 0| 1',
+        '| Arrowverse.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Arrowverse| #2B8F40| 1| 1| 0| 1',
+        '| Barbershop.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Barbershop| #2399AF| 1| 1| 0| 1',
+        '| Batman.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Batman| #525252| 1| 1| 0| 1',
+        '| Bourne.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Bourne| #383838| 1| 1| 0| 0',
+        '| Charlie Brown.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Charlie Brown| #C8BF2B| 1| 1| 0| 1',
+        '| Cloverfield.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Cloverfield| #0E1672| 1| 1| 0| 1',
+        '| Cornetto Trilogy.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Cornetto Trilogy| #6C9134| 1| 1| 0| 1',
+        '| CSI.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | CSI| #969322| 1| 1| 0| 1',
+        '| DC Super Hero Girls.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | DC Super Hero Girls| #299CB1| 1| 1| 0| 1',
+        '| DC Universe.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | DC Universe| #213DB6| 1| 1| 0| 1',
+        '| Deadpool.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Deadpool| #BD393C| 1| 1| 0| 1',
+        '| Despicable Me.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Despicable Me| #C77344| 1| 1| 0| 1',
+        '| Doctor Who.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Doctor Who| #1C38B4| 1| 1| 0| 1',
+        '| Escape From.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Escape From| #B82026| 1| 1| 0| 1',
+        '| Fantastic Beasts.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Fantastic Beasts| #9E972B| 1| 1| 0| 1',
+        '| Fast & Furious.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Fast & Furious| #8432C4| 1| 1| 0| 1',
+        '| FBI.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | FBI| #FFD32C| 1| 1| 0| 1',
+        '| Final Fantasy.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Final Fantasy| #86969F| 1| 1| 0| 1',
+        '| Friday the 13th.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Friday the 13th| #B9242A| 1| 1| 0| 1',
+        '| Frozen.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Frozen| #2A5994| 1| 1| 0| 1',
+        '| Garfield.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Garfield| #C28117| 1| 1| 0| 1',
+        '| Ghostbusters.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Ghostbusters| #414141| 1| 1| 0| 1',
+        '| Godzilla (Heisei).png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Godzilla (Heisei)| #BFB330| 1| 1| 0| 1',
+        '| Godzilla (Showa).png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Godzilla (Showa)| #BDB12A| 1| 1| 0| 1',
+        '| Godzilla.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Godzilla| #B82737| 1| 1| 0| 1',
+        '| Halloween.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Halloween| #BB2D22| 1| 1| 0| 1',
+        '| Halo.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Halo| #556A92| 1| 1| 0| 1',
+        '| Hannibal Lecter.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Hannibal Lecter| #383838| 1| 1| 0| 1',
+        '| Harry Potter.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Harry Potter| #9D9628| 1| 1| 0| 1',
+        '| Has Fallen.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Has Fallen| #3B3B3B| 1| 1| 0| 1',
+        '| Ice Age.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Ice Age| #5EA0BB| 1| 1| 0| 1',
+        '| In Association with Marvel.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | In Association with Marvel| #C42424| 1| 1| 0| 1',
+        '| Indiana Jones.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Indiana Jones| #D97724| 1| 1| 0| 1',
+        '| IP Man.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | IP Man| #8D7E63| 1| 1| 0| 0',
+        '| James Bond 007.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | James Bond 007| #414141| 1| 1| 0| 1',
+        '| Jurassic Park.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Jurassic Park| #902E32| 1| 1| 0| 1',
+        '| Karate Kid.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Karate Kid| #AC6822| 1| 1| 0| 1',
+        '| Law & Order.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Law & Order| #5B87AB| 1| 1| 0| 1',
+        '| Lord of the Rings.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Lord of the Rings| #C38B27| 1| 1| 0| 1',
+        '| Madagascar.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Madagascar| #AD8F27| 1| 1| 0| 1',
+        '| Marvel Cinematic Universe.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Marvel Cinematic Universe| #AD2B2B| 1| 1| 0| 1',
+        '| Marx Brothers.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Marx Brothers| #347294| 1| 1| 0| 1',
+        '| Middle Earth.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Middle Earth| #C28A25| 1| 1| 0| 1',
+        '| Mission Impossible.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Mission Impossible| #BF1616| 1| 1| 0| 1',
+        '| Monty Python.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Monty Python| #B61C22| 1| 1| 0| 1',
+        '| Mortal Kombat.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Mortal Kombat| #BA4D29| 1| 1| 0| 1',
+        '| Mothra.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Mothra| #9C742A| 1| 1| 0| 1',
+        '| NCIS.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | NCIS| #AC605F| 1| 1| 0| 1',
+        '| One Chicago.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | One Chicago| #BE7C30| 1| 1| 0| 1',
+        '| Oz.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Oz| #AD8F27| 1| 1| 0| 1',
+        '| Pet Sematary.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Pet Sematary| #B71F25| 1| 1| 0| 1',
+        '| Pirates of the Caribbean.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Pirates of the Caribbean| #7F6936| 1| 1| 0| 1',
+        '| Planet of the Apes.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Planet of the Apes| #4E4E4E| 1| 1| 0| 1',
+        '| Pokémon.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Pokémon| #FECA06| 1| 1| 0| 1',
+        '| Power Rangers.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Power Rangers| #24AA60| 1| 1| 0| 1',
+        '| Pretty Little Liars.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Pretty Little Liars| #BD0F0F| 1| 1| 0| 1',
+        '| Resident Evil Biohazard.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Resident Evil Biohazard| #930B0B| 1| 1| 0| 1',
+        '| Resident Evil.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Resident Evil| #940E0F| 1| 1| 0| 1',
+        '| Rocky Creed.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Rocky Creed| #C52A2A| 1| 1| 0| 1',
+        '| Rocky.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Rocky| #C22121| 1| 1| 0| 1',
+        '| RuPaul''s Drag Race.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | RuPaul''s Drag Race| #FF5757| 1| 1| 0| 1',
+        '| Scooby-Doo!.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Scooby-Doo!| #5F3879| 1| 1| 0| 1',
+        '| Shaft.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Shaft| #382637| 1| 1| 0| 1',
+        '| Shrek.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Shrek| #3DB233| 1| 1| 0| 1',
+        '| Spider-Man.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Spider-Man| #C11B1B| 1| 1| 0| 1',
+        '| Star Trek Alternate Reality.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Star Trek Alternate Reality| #C78639| 1| 1| 0| 1',
+        '| Star Trek The Next Generation.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Star Trek The Next Generation| #B7AE4C| 1| 1| 0| 1',
+        '| Star Trek The Original Series.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Star Trek The Original Series| #BB5353| 1| 1| 0| 1',
+        '| Star Trek.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Star Trek| #C2A533| 1| 1| 0| 1',
+        '| Star Wars Legends.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Star Wars Legends| #BAA416| 1| 1| 0| 1',
+        '| Star Wars Skywalker Saga.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Star Wars Skywalker Saga| #5C5C5C| 1| 1| 0| 1',
+        '| Star Wars.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Star Wars| #C2A21B| 1| 1| 0| 1',
+        '| Stargate.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Stargate| #6C73A1| 1| 1| 0| 1',
+        '| Street Fighter.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Street Fighter| #C5873F| 1| 1| 0| 1',
+        '| Superman.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Superman| #C34544| 1| 1| 0| 1',
+        '| Teenage Mutant Ninja Turtles.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Teenage Mutant Ninja Turtles| #78A82E| 1| 1| 0| 1',
+        '| The Hunger Games.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | The Hunger Games| #619AB5| 1| 1| 0| 1',
+        '| The Man With No Name.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | The Man With No Name| #9A7B40| 1| 1| 0| 1',
+        '| The Mummy.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | The Mummy| #C28A25| 1| 1| 0| 1',
+        '| The Real Housewives.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | The Real Housewives| #400EA4| 1| 1| 0| 1',
+        '| The Rookie.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | The Rookie| #DC5A2B| 1| 1| 0| 1',
+        '| The Texas Chainsaw Massacre.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | The Texas Chainsaw Massacre| #B15253| 1| 1| 0| 1',
+        '| The Three Stooges.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | The Three Stooges| #B9532A| 1| 1| 0| 1',
+        '| The Twilight Zone.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | The Twilight Zone| #16245F| 1| 1| 0| 1',
+        '| The Walking Dead.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | The Walking Dead| #797F48| 1| 1| 0| 1',
+        '| Tom and Jerry.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Tom and Jerry| #B9252B| 1| 1| 0| 1',
+        '| Tomb Raider.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Tomb Raider| #620D0E| 1| 1| 0| 1',
+        '| Toy Story.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Toy Story| #CEB423| 1| 1| 0| 1',
+        '| Transformers.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Transformers| #B02B2B| 1| 1| 0| 1',
+        '| Tron.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Tron| #5798B2| 1| 1| 0| 1',
+        '| Twilight.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Twilight| #3B3B3B| 1| 1| 0| 1',
+        '| Unbreakable.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Unbreakable| #445DBB| 1| 1| 0| 1',
+        '| Wallace & Gromit.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Wallace & Gromit| #BA2A20| 1| 1| 0| 1',
+        '| Wizarding World.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Wizarding World| #7B7A33| 1| 1| 0| 1',
+        '| X-Men.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | X-Men| #636363| 1| 1| 0| 1',
+        '| Yellowstone.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Yellowstone| #441515| 1| 1| 0| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
     $arr = @()
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\28 Days Weeks Later.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"28 Days Weeks Later`" -base_color `"#B93033`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\9-1-1.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"9-1-1`" -base_color `"#C62B2B`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\A Nightmare on Elm Street.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"A Nightmare on Elm Street`" -base_color `"#BE3C3E`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Alien Predator.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Alien Predator`" -base_color `"#1EAC1B`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Alien.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Alien`" -base_color `"#18BC56`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\American Pie.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"American Pie`" -base_color `"#C24940`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Anaconda.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Anaconda`" -base_color `"#A42E2D`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Angels In The.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Angels In The`" -base_color `"#4869BD`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Appleseed.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Appleseed`" -base_color `"#986E22`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Archie Comics.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Archie Comics`" -base_color `"#DFB920`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Arrowverse.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Arrowverse`" -base_color `"#2B8F40`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Barbershop.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Barbershop`" -base_color `"#2399AF`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Batman.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Batman`" -base_color `"#525252`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Bourne.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Bourne`" -base_color `"#383838`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Charlie Brown.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Charlie Brown`" -base_color `"#C8BF2B`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Cloverfield.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Cloverfield`" -base_color `"#0E1672`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Cornetto Trilogy.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Cornetto Trilogy`" -base_color `"#6C9134`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\CSI.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"CSI`" -base_color `"#969322`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\DC Super Hero Girls.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"DC Super Hero Girls`" -base_color `"#299CB1`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\DC Universe.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"DC Universe`" -base_color `"#213DB6`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Deadpool.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Deadpool`" -base_color `"#BD393C`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Despicable Me.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Despicable Me`" -base_color `"#C77344`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Doctor Who.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Doctor Who`" -base_color `"#1C38B4`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Escape From.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Escape From`" -base_color `"#B82026`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Fantastic Beasts.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Fantastic Beasts`" -base_color `"#9E972B`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Fast & Furious.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Fast & Furious`" -base_color `"#8432C4`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\FBI.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"FBI`" -base_color `"#FFD32C`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Final Fantasy.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Final Fantasy`" -base_color `"#86969F`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Friday the 13th.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Friday the 13th`" -base_color `"#B9242A`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Frozen.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Frozen`" -base_color `"#2A5994`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Garfield.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Garfield`" -base_color `"#C28117`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Ghostbusters.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Ghostbusters`" -base_color `"#414141`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Godzilla (Heisei).png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Godzilla (Heisei)`" -base_color `"#BFB330`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Godzilla (Showa).png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Godzilla (Showa)`" -base_color `"#BDB12A`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Godzilla.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Godzilla`" -base_color `"#B82737`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Halloween.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Halloween`" -base_color `"#BB2D22`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Halo.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Halo`" -base_color `"#556A92`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Hannibal Lecter.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Hannibal Lecter`" -base_color `"#383838`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Harry Potter.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Harry Potter`" -base_color `"#9D9628`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Has Fallen.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Has Fallen`" -base_color `"#3B3B3B`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Ice Age.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Ice Age`" -base_color `"#5EA0BB`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\In Association with Marvel.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"In Association with Marvel`" -base_color `"#C42424`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Indiana Jones.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Indiana Jones`" -base_color `"#D97724`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\IP Man.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"IP Man`" -base_color `"#8D7E63`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\James Bond 007.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"James Bond 007`" -base_color `"#414141`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Jurassic Park.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Jurassic Park`" -base_color `"#902E32`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Karate Kid.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Karate Kid`" -base_color `"#AC6822`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Law & Order.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Law & Order`" -base_color `"#5B87AB`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Lord of the Rings.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Lord of the Rings`" -base_color `"#C38B27`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Madagascar.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Madagascar`" -base_color `"#AD8F27`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Marvel Cinematic Universe.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Marvel Cinematic Universe`" -base_color `"#AD2B2B`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Marx Brothers.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Marx Brothers`" -base_color `"#347294`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Middle Earth.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Middle Earth`" -base_color `"#C28A25`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Mission Impossible.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Mission Impossible`" -base_color `"#BF1616`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Monty Python.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Monty Python`" -base_color `"#B61C22`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Mortal Kombat.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Mortal Kombat`" -base_color `"#BA4D29`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Mothra.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Mothra`" -base_color `"#9C742A`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\NCIS.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"NCIS`" -base_color `"#AC605F`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\One Chicago.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"One Chicago`" -base_color `"#BE7C30`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Oz.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Oz`" -base_color `"#AD8F27`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Pet Sematary.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Pet Sematary`" -base_color `"#B71F25`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Pirates of the Caribbean.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Pirates of the Caribbean`" -base_color `"#7F6936`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Planet of the Apes.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Planet of the Apes`" -base_color `"#4E4E4E`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Pokémon.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Pokémon`" -base_color `"#FECA06`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Power Rangers.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Power Rangers`" -base_color `"#24AA60`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Pretty Little Liars.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Pretty Little Liars`" -base_color `"#BD0F0F`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Resident Evil Biohazard.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Resident Evil Biohazard`" -base_color `"#930B0B`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Resident Evil.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Resident Evil`" -base_color `"#940E0F`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Rocky Creed.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Rocky Creed`" -base_color `"#C52A2A`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Rocky.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Rocky`" -base_color `"#C22121`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\RuPaul's Drag Race.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"RuPaul's Drag Race`" -base_color `"#FF5757`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Scooby-Doo!.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Scooby-Doo!`" -base_color `"#5F3879`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Shaft.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Shaft`" -base_color `"#382637`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Shrek.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Shrek`" -base_color `"#3DB233`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Spider-Man.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Spider-Man`" -base_color `"#C11B1B`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Star Trek Alternate Reality.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Star Trek Alternate Reality`" -base_color `"#C78639`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Star Trek The Next Generation.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Star Trek The Next Generation`" -base_color `"#B7AE4C`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Star Trek The Original Series.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Star Trek The Original Series`" -base_color `"#BB5353`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Star Trek.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Star Trek`" -base_color `"#C2A533`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Star Wars Legends.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Star Wars Legends`" -base_color `"#BAA416`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Star Wars Skywalker Saga.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Star Wars Skywalker Saga`" -base_color `"#5C5C5C`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Star Wars.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Star Wars`" -base_color `"#C2A21B`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Stargate.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Stargate`" -base_color `"#6C73A1`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Street Fighter.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Street Fighter`" -base_color `"#C5873F`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Superman.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Superman`" -base_color `"#C34544`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Teenage Mutant Ninja Turtles.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Teenage Mutant Ninja Turtles`" -base_color `"#78A82E`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\The Hunger Games.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"The Hunger Games`" -base_color `"#619AB5`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\The Man With No Name.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"The Man With No Name`" -base_color `"#9A7B40`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\The Mummy.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"The Mummy`" -base_color `"#C28A25`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\The Real Housewives.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"The Real Housewives`" -base_color `"#400EA4`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\The Rookie.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"The Rookie`" -base_color `"#DC5A2B`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\The Texas Chainsaw Massacre.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"The Texas Chainsaw Massacre`" -base_color `"#B15253`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\The Three Stooges.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"The Three Stooges`" -base_color `"#B9532A`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\The Twilight Zone.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"The Twilight Zone`" -base_color `"#16245F`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\The Walking Dead.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"The Walking Dead`" -base_color `"#797F48`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Tom and Jerry.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Tom and Jerry`" -base_color `"#B9252B`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Tomb Raider.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Tomb Raider`" -base_color `"#620D0E`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Toy Story.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Toy Story`" -base_color `"#CEB423`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Transformers.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Transformers`" -base_color `"#B02B2B`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Tron.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Tron`" -base_color `"#5798B2`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Twilight.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Twilight`" -base_color `"#3B3B3B`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Unbreakable.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Unbreakable`" -base_color `"#445DBB`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Wallace & Gromit.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Wallace & Gromit`" -base_color `"#BA2A20`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Wizarding World.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Wizarding World`" -base_color `"#7B7A33`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\X-Men.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"X-Men`" -base_color `"#636363`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\Yellowstone.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Yellowstone`" -base_color `"#441515`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
+    foreach ($item in $myArray) {
+        if ($($item.key_name).ToString() -eq "") {
+            $value = $null
+        }
+        else {
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+        }
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_franchise\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
+    }
     LaunchScripts -ScriptPaths $arr
+
     Move-Item -Path output -Destination franchise
     Copy-Item -Path logos_franchise -Destination franchise\logos -Recurse
     Move-Item -Path output-orig -Destination output
@@ -2700,7 +2772,6 @@ Function CreateGenre {
     Write-Host "Creating Genre"
     Set-Location $script_path
     # Find-Path "$script_path\genre"
-    $theFont = "ComfortAa-Medium"
     $theMaxWidth = 1800
     $theMaxHeight = 1000
     $minPointSize = 100
@@ -2709,133 +2780,249 @@ Function CreateGenre {
     Move-Item -Path output -Destination output-orig
 
     $myArray = @(
-        'Logo| Name| out_name| base_color| ww',
-        'transparent.png| genre_other| other| #FF2000| 1'
+        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        'genre_other| transparent.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | other| #FF2000| 1| 1| 0| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
     foreach ($item in $myArray) {
-        $value = (Get-YamlPropertyValue -PropertyPath "collections.$($item.name).name" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
-        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-        $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.Logo)`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$value`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
+        if ($($item.key_name).ToString() -eq "") {
+            $value = $null
+        }
+        else {
+            $value = (Get-YamlPropertyValue -PropertyPath "collections.$($item.key_name).name" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+        }
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
     }
     LaunchScripts -ScriptPaths $arr
 
     $myArray = @(
-        'Logo| Name| out_name| base_color| ww',
-        'Action & adventure.png| ACTION_ADVENTURE| Action & adventure| #65AEA5| 1',
-        'Action.png| ACTION| Action| #387DBF| 1',
-        'Adult.png| ADULT| Adult| #D02D2D| 1',
-        'Adventure.png| ADVENTURE| Adventure| #40B997| 1',
-        'Animation.png| ANIMATION| Animation| #9035BE| 1',
-        'Anime.png| ANIME| Anime| #41A4BE| 1',
-        'APAC month.png| ASIAN_AMERICAN_PACIFIC_ISLANDER_HERITAGE_MONTH| APAC month| #0EC26B| 1',
-        'Assassin.png| ASSASSIN| Assasin| #C52124| 1',
-        'Biography.png| BIOGRAPHY| Biography| #C1A13E| 1',
-        'Biopic.png| BIOPIC| Biopic| #C1A13E| 1',
-        'Black History.png| BLACK_HISTORY_MONTH| Black History| #D86820| 0',
-        'Black History2.png| BLACK_HISTORY_MONTH| Black History2| #D86820| 1',
-        'Boys Love.png| BOYS_LOVE| Boys Love| #85ADAC| 1',
-        'Cars.png| CARS| Cars| #7B36D2| 1',
-        'Children.png| CHILDREN| Children| #9C42C2| 1',
-        'Comedy.png| COMEDY| Comedy| #B7363E| 1',
-        'Competition.png| COMPETITION| Competition| #55BF48| 1',
-        'Con Artist.png| CON_ARTIST| Con Artist| #C7A5A1| 1',
-        'Creature Horror.png| CREATURE_HORROR| Creature Horror| #AD8603| 1',
-        'Crime.png| CRIME| Crime| #888888| 1',
-        'Demons.png| DEMONS| Demons| #9A2A2A| 1',
-        'Disabilities.png| DAY_OF_PERSONS_WITH_DISABILITIES| Disabilities| #40B9FE| 1',
-        'Documentary.png| DOCUMENTARY| Documentary| #2C4FA8| 1',
-        'Drama.png| DRAMA| Drama| #A22C2C| 1',
-        'Ecchi.png| ECCHI| Ecchi| #C592C0| 1',
-        'Erotica.png| EROTICA| Erotica| #CA9FC9| 1',
-        'Family.png| FAMILY| Family| #BABA6C| 1',
-        'Fantasy.png| FANTASY| Fantasy| #CC2BC6| 1',
-        'Film Noir.png| FILM_NOIR| Film Noir| #5B5B5B| 1',
-        'Food.png| FOOD| Food| #A145C1| 1',
-        'Found Footage Horror.png| FOUND_FOOTAGE_HORROR| Found Footage Horror| #2C3B08| 1',
-        'Game Show.png| GAME_SHOW| Game Show| #32D184| 1',
-        'Game.png| GAME| Game| #70BD98| 1',
-        'Gangster.png| GANGSTER| Gangster| #77ACBD| 1',
-        'Girls Love.png| GIRLS_LOVE| Girls Love| #AC86AD| 1',
-        'Gourmet.png| GOURMET| Gourmet| #83AC8F| 1',
-        'Harem.png| HAREM| Harem| #7DB0C5| 1',
-        'Heist.png| HEIST| Heist| #4281C9| 1',
-        'Hentai.png| HENTAI| Hentai| #B274BF| 1',
-        'History.png| HISTORY| History| #B7A95D| 1',
-        'Home and Garden.png| HOME_AND_GARDEN| Home and Garden| #8CC685| 1',
-        'Horror.png| HORROR| Horror| #B94948| 1',
-        'Indie.png| INDIE| Indie| #BB7493| 1',
-        'Kids.png| KIDS| Kids| #9F40C6| 1',
-        'LatinX Month.png| LATINX_HERITAGE_MONTH| LatinX| #FF5F5F| 1',
-        'LGBTQ+.png| LGBTQ| LGBTQ+| #BD86C4| 1',
-        'LGBTQ+ Month.png| LGBTQ_PRIDE_MONTH| LGBTQ+ Month| #FF3B3C| 1',
-        'Martial Arts.png| MARTIAL_ARTS| Martial Arts| #777777| 1',
-        'Mecha.png| MECHA| Mecha| #8B8B8B| 1',
-        'Military.png| MILITARY| Military| #87552F| 1',
-        'Mind-Bend.png| MIND_BEND| Mind-Bend| #619DA2| 1',
-        'Mind-Fuck.png| MIND_FUCK| Mind-Fuck| #619DA2| 1',
-        'Mind-Fuck2.png| MIND_F**K| Mind-Fuck2| #619DA2| 1',
-        'Mini-Series.png| MINI_SERIES| Mini-Series| #66B7BE| 1',
-        'MMA.png| MMA| MMA| #69E39F| 1',
-        'Music.png| MUSIC| Music| #3CC79C| 1',
-        'Musical.png| MUSICAL| Musical| #C38CB7| 1',
-        'Mystery.png| MYSTERY| Mystery| #867CB5| 1',
-        'News & Politics.png| NEWS_POLITICS| News & Politics| #C83131| 1',
-        'News.png| NEWS| News| #C83131| 1',
-        'Outdoor Adventure.png| OUTDOOR_ADVENTURE| Outdoor Adventure| #56C89C| 1',
-        'Parody.png| PARODY| Parody| #83A9A2| 1',
-        'Police.png| POLICE| Police| #262398| 1',
-        'Politics.png| POLITICS| Politics| #3F5FC0| 1',
-        'Psychedelic.png| PSYCHEDELIC| Psychedelic| #E973F6| 0',
-        'Psychological Horror.png| PSYCHOLOGICAL_HORROR| Psychological Horror| #AC5969| 1',
-        'Psychological.png| PSYCHOLOGICAL| Psychological| #C79367| 1',
-        'Reality.png| REALITY| Reality| #7CB6AE| 1',
-        'Romance.png| ROMANCE| Romance| #B6398E| 1',
-        'Romantic Comedy.png| ROMANTIC_COMEDY| Romantic Comedy| #B2445D| 1',
-        'Romantic Drama.png| ROMANTIC_DRAMA| Romantic Drama| #AB89C0| 1',
-        'Samurai.png| SAMURAI| Samurai| #C0C282| 1',
-        'School.png| SCHOOL| School| #4DC369| 1',
-        'Sci-Fi & Fantasy.png| SCI-FI_&_FANTASY| Sci-Fi & Fantasy| #9254BA| 1',
-        'Science Fiction.png| SCIENCE_FICTION| Science Fiction| #545FBA| 1',
-        'Serial Killer.png| SERIAL_KILLER| Serial Killer| #163F56| 1',
-        'Short.png| SHORT| Short| #BCBB7B| 1',
-        'Shoujo.png| SHOUJO| Shoujo| #89529D| 1',
-        'Shounen.png| SHOUNEN| Shounen| #505E99| 1',
-        'Slasher.png| SLASHER| Slasher| #B75157| 1',
-        'Slice of Life.png| SLICE_OF_LIFE| Slice of Life| #C696C4| 1',
-        'Soap.png| SOAP| Soap| #AF7CC0| 1',
-        'Space.png| SPACE| Space| #A793C1| 1',
-        'Sport.png| SPORT| Sport| #587EB1| 1',
-        'Spy.png| SPY| Spy| #B7D99F| 1',
-        'Stand-Up Comedy.png| STAND-UP_COMEDY| Stand-Up Comedy| #CF8A49| 1',
-        'Stoner Comedy.png| STONER_COMEDY| Stoner Comedy| #79D14D| 1',
-        'Super Power.png| SUPER_POWER| Super Power| #279552| 1',
-        'Superhero.png| SUPERHERO| Superhero| #DA8536| 1',
-        'Supernatural.png| SUPERNATURAL| Supernatural| #262693| 1',
-        'Survival.png| SURVIVAL| Survival| #434447| 1',
-        'Suspense.png| SUSPENSE| Suspense| #AE5E37| 1',
-        'Sword & Sorcery.png| SWORD_SORCERY| Sword & Sorcery| #B44FBA| 1',
-        'TV Movie.png| TV_MOVIE| TV Movie| #85A5B4| 1',
-        'Talk Show.png| TALK_SHOW| Talk Show| #82A2B5| 1',
-        'Thriller.png| THRILLER| Thriller| #C3602B| 1',
-        'Travel.png| TRAVEL| Travel| #B6BA6D| 1',
-        'Vampire.png| VAMPIRE| Vampire| #7D2627| 1',
-        'Ufo.png| UFO| Ufo| #529D82 | 1',
-        'War & Politics.png| WAR_POLITICS| War & Politics| #4ABF6E| 1',
-        'War.png| WAR| War| #63AB62| 1',
-        'Western.png| WESTERN| Western| #AD9B6D| 1',
-        'Womens History.png| WOMENS_HISTORY_MONTH| Womens Month| #874E83| 1',
-        'Zombie Horror.png| ZOMBIE_HORROR| Zombie Horror| #909513| 1'
+        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        'ACTION_ADVENTURE| Action & adventure.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Action & adventure| #65AEA5| 1| 1| 0| 1',
+        'ACTION| Action.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Action| #387DBF| 1| 1| 0| 1',
+        'ADULT| Adult.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Adult| #D02D2D| 1| 1| 0| 1',
+        'ADVENTURE| Adventure.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Adventure| #40B997| 1| 1| 0| 1',
+        'ANIMATION| Animation.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Animation| #9035BE| 1| 1| 0| 1',
+        'ANIME| Anime.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Anime| #41A4BE| 1| 1| 0| 1',
+        'ASIAN_AMERICAN_PACIFIC_ISLANDER_HERITAGE_MONTH| APAC month.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | APAC month| #0EC26B| 1| 1| 0| 1',
+        'ASSASSIN| Assassin.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Assasin| #C52124| 1| 1| 0| 1',
+        'BIOGRAPHY| Biography.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Biography| #C1A13E| 1| 1| 0| 1',
+        'BIOPIC| Biopic.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Biopic| #C1A13E| 1| 1| 0| 1',
+        'BLACK_HISTORY_MONTH| Black History.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Black History| #D86820| 1| 1| 0| 0',
+        'BLACK_HISTORY_MONTH| Black History2.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Black History2| #D86820| 1| 1| 0| 1',
+        'BOYS_LOVE| Boys Love.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Boys Love| #85ADAC| 1| 1| 0| 1',
+        'CARS| Cars.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Cars| #7B36D2| 1| 1| 0| 1',
+        'CHILDREN| Children.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Children| #9C42C2| 1| 1| 0| 1',
+        'COMEDY| Comedy.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Comedy| #B7363E| 1| 1| 0| 1',
+        'COMPETITION| Competition.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Competition| #55BF48| 1| 1| 0| 1',
+        'CON_ARTIST| Con Artist.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Con Artist| #C7A5A1| 1| 1| 0| 1',
+        'CREATURE_HORROR| Creature Horror.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Creature Horror| #AD8603| 1| 1| 0| 1',
+        'CRIME| Crime.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Crime| #888888| 1| 1| 0| 1',
+        'DEMONS| Demons.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Demons| #9A2A2A| 1| 1| 0| 1',
+        'DAY_OF_PERSONS_WITH_DISABILITIES| Disabilities.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Disabilities| #40B9FE| 1| 1| 0| 1',
+        'DOCUMENTARY| Documentary.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Documentary| #2C4FA8| 1| 1| 0| 1',
+        'DRAMA| Drama.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Drama| #A22C2C| 1| 1| 0| 1',
+        'ECCHI| Ecchi.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Ecchi| #C592C0| 1| 1| 0| 1',
+        'EROTICA| Erotica.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Erotica| #CA9FC9| 1| 1| 0| 1',
+        'FAMILY| Family.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Family| #BABA6C| 1| 1| 0| 1',
+        'FANTASY| Fantasy.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Fantasy| #CC2BC6| 1| 1| 0| 1',
+        'FILM_NOIR| Film Noir.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Film Noir| #5B5B5B| 1| 1| 0| 1',
+        'FOOD| Food.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Food| #A145C1| 1| 1| 0| 1',
+        'FOUND_FOOTAGE_HORROR| Found Footage Horror.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Found Footage Horror| #2C3B08| 1| 1| 0| 1',
+        'GAME_SHOW| Game Show.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Game Show| #32D184| 1| 1| 0| 1',
+        'GAME| Game.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Game| #70BD98| 1| 1| 0| 1',
+        'GANGSTER| Gangster.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Gangster| #77ACBD| 1| 1| 0| 1',
+        'GIRLS_LOVE| Girls Love.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Girls Love| #AC86AD| 1| 1| 0| 1',
+        'GOURMET| Gourmet.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Gourmet| #83AC8F| 1| 1| 0| 1',
+        'HAREM| Harem.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Harem| #7DB0C5| 1| 1| 0| 1',
+        'HEIST| Heist.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Heist| #4281C9| 1| 1| 0| 1',
+        'HENTAI| Hentai.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Hentai| #B274BF| 1| 1| 0| 1',
+        'HISTORY| History.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | History| #B7A95D| 1| 1| 0| 1',
+        'HOME_AND_GARDEN| Home and Garden.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Home and Garden| #8CC685| 1| 1| 0| 1',
+        'HORROR| Horror.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Horror| #B94948| 1| 1| 0| 1',
+        'INDIE| Indie.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Indie| #BB7493| 1| 1| 0| 1',
+        'KIDS| Kids.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Kids| #9F40C6| 1| 1| 0| 1',
+        'LATINX_HERITAGE_MONTH| LatinX Month.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | LatinX| #FF5F5F| 1| 1| 0| 1',
+        'LGBTQ| LGBTQ+.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | LGBTQ+| #BD86C4| 1| 1| 0| 1',
+        'LGBTQ_PRIDE_MONTH| LGBTQ+ Month.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | LGBTQ+ Month| #FF3B3C| 1| 1| 0| 1',
+        'MARTIAL_ARTS| Martial Arts.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Martial Arts| #777777| 1| 1| 0| 1',
+        'MECHA| Mecha.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Mecha| #8B8B8B| 1| 1| 0| 1',
+        'MILITARY| Military.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Military| #87552F| 1| 1| 0| 1',
+        'MIND_BEND| Mind-Bend.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Mind-Bend| #619DA2| 1| 1| 0| 1',
+        'MIND_FUCK| Mind-Fuck.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Mind-Fuck| #619DA2| 1| 1| 0| 1',
+        'MIND_F**K| Mind-Fuck2.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Mind-Fuck2| #619DA2| 1| 1| 0| 1',
+        'MINI_SERIES| Mini-Series.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Mini-Series| #66B7BE| 1| 1| 0| 1',
+        'MMA| MMA.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | MMA| #69E39F| 1| 1| 0| 1',
+        'MUSIC| Music.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Music| #3CC79C| 1| 1| 0| 1',
+        'MUSICAL| Musical.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Musical| #C38CB7| 1| 1| 0| 1',
+        'MYSTERY| Mystery.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Mystery| #867CB5| 1| 1| 0| 1',
+        'NEWS_POLITICS| News & Politics.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | News & Politics| #C83131| 1| 1| 0| 1',
+        'NEWS| News.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | News| #C83131| 1| 1| 0| 1',
+        'OUTDOOR_ADVENTURE| Outdoor Adventure.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Outdoor Adventure| #56C89C| 1| 1| 0| 1',
+        'PARODY| Parody.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Parody| #83A9A2| 1| 1| 0| 1',
+        'POLICE| Police.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Police| #262398| 1| 1| 0| 1',
+        'POLITICS| Politics.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Politics| #3F5FC0| 1| 1| 0| 1',
+        'PSYCHEDELIC| Psychedelic.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Psychedelic| #E973F6| 1| 1| 0| 0',
+        'PSYCHOLOGICAL_HORROR| Psychological Horror.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Psychological Horror| #AC5969| 1| 1| 0| 1',
+        'PSYCHOLOGICAL| Psychological.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Psychological| #C79367| 1| 1| 0| 1',
+        'REALITY| Reality.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Reality| #7CB6AE| 1| 1| 0| 1',
+        'ROMANCE| Romance.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Romance| #B6398E| 1| 1| 0| 1',
+        'ROMANTIC_COMEDY| Romantic Comedy.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Romantic Comedy| #B2445D| 1| 1| 0| 1',
+        'ROMANTIC_DRAMA| Romantic Drama.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Romantic Drama| #AB89C0| 1| 1| 0| 1',
+        'SAMURAI| Samurai.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Samurai| #C0C282| 1| 1| 0| 1',
+        'SCHOOL| School.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | School| #4DC369| 1| 1| 0| 1',
+        'SCI-FI_&_FANTASY| Sci-Fi & Fantasy.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Sci-Fi & Fantasy| #9254BA| 1| 1| 0| 1',
+        'SCIENCE_FICTION| Science Fiction.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Science Fiction| #545FBA| 1| 1| 0| 1',
+        'SERIAL_KILLER| Serial Killer.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Serial Killer| #163F56| 1| 1| 0| 1',
+        'SHORT| Short.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Short| #BCBB7B| 1| 1| 0| 1',
+        'SHOUJO| Shoujo.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Shoujo| #89529D| 1| 1| 0| 1',
+        'SHOUNEN| Shounen.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Shounen| #505E99| 1| 1| 0| 1',
+        'SLASHER| Slasher.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Slasher| #B75157| 1| 1| 0| 1',
+        'SLICE_OF_LIFE| Slice of Life.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Slice of Life| #C696C4| 1| 1| 0| 1',
+        'SOAP| Soap.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Soap| #AF7CC0| 1| 1| 0| 1',
+        'SPACE| Space.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Space| #A793C1| 1| 1| 0| 1',
+        'SPORT| Sport.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Sport| #587EB1| 1| 1| 0| 1',
+        'SPY| Spy.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Spy| #B7D99F| 1| 1| 0| 1',
+        'STAND-UP_COMEDY| Stand-Up Comedy.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Stand-Up Comedy| #CF8A49| 1| 1| 0| 1',
+        'STONER_COMEDY| Stoner Comedy.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Stoner Comedy| #79D14D| 1| 1| 0| 1',
+        'SUPER_POWER| Super Power.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Super Power| #279552| 1| 1| 0| 1',
+        'SUPERHERO| Superhero.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Superhero| #DA8536| 1| 1| 0| 1',
+        'SUPERNATURAL| Supernatural.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Supernatural| #262693| 1| 1| 0| 1',
+        'SURVIVAL| Survival.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Survival| #434447| 1| 1| 0| 1',
+        'SUSPENSE| Suspense.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Suspense| #AE5E37| 1| 1| 0| 1',
+        'SWORD_SORCERY| Sword & Sorcery.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Sword & Sorcery| #B44FBA| 1| 1| 0| 1',
+        'TV_MOVIE| TV Movie.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | TV Movie| #85A5B4| 1| 1| 0| 1',
+        'TALK_SHOW| Talk Show.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Talk Show| #82A2B5| 1| 1| 0| 1',
+        'THRILLER| Thriller.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Thriller| #C3602B| 1| 1| 0| 1',
+        'TRAVEL| Travel.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Travel| #B6BA6D| 1| 1| 0| 1',
+        'VAMPIRE| Vampire.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Vampire| #7D2627| 1| 1| 0| 1',
+        'UFO| Ufo.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Ufo| #529D82| 1| 1| 0| 1',
+        'WAR_POLITICS| War & Politics.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | War & Politics| #4ABF6E| 1| 1| 0| 1',
+        'WAR| War.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | War| #63AB62| 1| 1| 0| 1',
+        'WESTERN| Western.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Western| #AD9B6D| 1| 1| 0| 1',
+        'WOMENS_HISTORY_MONTH| Womens History.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Womens Month| #874E83| 1| 1| 0| 1',
+        'ZOMBIE_HORROR| Zombie Horror.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Zombie Horror| #909513| 1| 1| 0| 1'
+        #         'Logo| Name| out_name| base_color| ww',
+        # 'Action & adventure.png| ACTION_ADVENTURE| Action & adventure| #65AEA5| 1',
+        # 'Action.png| ACTION| Action| #387DBF| 1',
+        # 'Adult.png| ADULT| Adult| #D02D2D| 1',
+        # 'Adventure.png| ADVENTURE| Adventure| #40B997| 1',
+        # 'Animation.png| ANIMATION| Animation| #9035BE| 1',
+        # 'Anime.png| ANIME| Anime| #41A4BE| 1',
+        # 'APAC month.png| ASIAN_AMERICAN_PACIFIC_ISLANDER_HERITAGE_MONTH| APAC month| #0EC26B| 1',
+        # 'Assassin.png| ASSASSIN| Assasin| #C52124| 1',
+        # 'Biography.png| BIOGRAPHY| Biography| #C1A13E| 1',
+        # 'Biopic.png| BIOPIC| Biopic| #C1A13E| 1',
+        # 'Black History.png| BLACK_HISTORY_MONTH| Black History| #D86820| 0',
+        # 'Black History2.png| BLACK_HISTORY_MONTH| Black History2| #D86820| 1',
+        # 'Boys Love.png| BOYS_LOVE| Boys Love| #85ADAC| 1',
+        # 'Cars.png| CARS| Cars| #7B36D2| 1',
+        # 'Children.png| CHILDREN| Children| #9C42C2| 1',
+        # 'Comedy.png| COMEDY| Comedy| #B7363E| 1',
+        # 'Competition.png| COMPETITION| Competition| #55BF48| 1',
+        # 'Con Artist.png| CON_ARTIST| Con Artist| #C7A5A1| 1',
+        # 'Creature Horror.png| CREATURE_HORROR| Creature Horror| #AD8603| 1',
+        # 'Crime.png| CRIME| Crime| #888888| 1',
+        # 'Demons.png| DEMONS| Demons| #9A2A2A| 1',
+        # 'Disabilities.png| DAY_OF_PERSONS_WITH_DISABILITIES| Disabilities| #40B9FE| 1',
+        # 'Documentary.png| DOCUMENTARY| Documentary| #2C4FA8| 1',
+        # 'Drama.png| DRAMA| Drama| #A22C2C| 1',
+        # 'Ecchi.png| ECCHI| Ecchi| #C592C0| 1',
+        # 'Erotica.png| EROTICA| Erotica| #CA9FC9| 1',
+        # 'Family.png| FAMILY| Family| #BABA6C| 1',
+        # 'Fantasy.png| FANTASY| Fantasy| #CC2BC6| 1',
+        # 'Film Noir.png| FILM_NOIR| Film Noir| #5B5B5B| 1',
+        # 'Food.png| FOOD| Food| #A145C1| 1',
+        # 'Found Footage Horror.png| FOUND_FOOTAGE_HORROR| Found Footage Horror| #2C3B08| 1',
+        # 'Game Show.png| GAME_SHOW| Game Show| #32D184| 1',
+        # 'Game.png| GAME| Game| #70BD98| 1',
+        # 'Gangster.png| GANGSTER| Gangster| #77ACBD| 1',
+        # 'Girls Love.png| GIRLS_LOVE| Girls Love| #AC86AD| 1',
+        # 'Gourmet.png| GOURMET| Gourmet| #83AC8F| 1',
+        # 'Harem.png| HAREM| Harem| #7DB0C5| 1',
+        # 'Heist.png| HEIST| Heist| #4281C9| 1',
+        # 'Hentai.png| HENTAI| Hentai| #B274BF| 1',
+        # 'History.png| HISTORY| History| #B7A95D| 1',
+        # 'Home and Garden.png| HOME_AND_GARDEN| Home and Garden| #8CC685| 1',
+        # 'Horror.png| HORROR| Horror| #B94948| 1',
+        # 'Indie.png| INDIE| Indie| #BB7493| 1',
+        # 'Kids.png| KIDS| Kids| #9F40C6| 1',
+        # 'LatinX Month.png| LATINX_HERITAGE_MONTH| LatinX| #FF5F5F| 1',
+        # 'LGBTQ+.png| LGBTQ| LGBTQ+| #BD86C4| 1',
+        # 'LGBTQ+ Month.png| LGBTQ_PRIDE_MONTH| LGBTQ+ Month| #FF3B3C| 1',
+        # 'Martial Arts.png| MARTIAL_ARTS| Martial Arts| #777777| 1',
+        # 'Mecha.png| MECHA| Mecha| #8B8B8B| 1',
+        # 'Military.png| MILITARY| Military| #87552F| 1',
+        # 'Mind-Bend.png| MIND_BEND| Mind-Bend| #619DA2| 1',
+        # 'Mind-Fuck.png| MIND_FUCK| Mind-Fuck| #619DA2| 1',
+        # 'Mind-Fuck2.png| MIND_F**K| Mind-Fuck2| #619DA2| 1',
+        # 'Mini-Series.png| MINI_SERIES| Mini-Series| #66B7BE| 1',
+        # 'MMA.png| MMA| MMA| #69E39F| 1',
+        # 'Music.png| MUSIC| Music| #3CC79C| 1',
+        # 'Musical.png| MUSICAL| Musical| #C38CB7| 1',
+        # 'Mystery.png| MYSTERY| Mystery| #867CB5| 1',
+        # 'News & Politics.png| NEWS_POLITICS| News & Politics| #C83131| 1',
+        # 'News.png| NEWS| News| #C83131| 1',
+        # 'Outdoor Adventure.png| OUTDOOR_ADVENTURE| Outdoor Adventure| #56C89C| 1',
+        # 'Parody.png| PARODY| Parody| #83A9A2| 1',
+        # 'Police.png| POLICE| Police| #262398| 1',
+        # 'Politics.png| POLITICS| Politics| #3F5FC0| 1',
+        # 'Psychedelic.png| PSYCHEDELIC| Psychedelic| #E973F6| 0',
+        # 'Psychological Horror.png| PSYCHOLOGICAL_HORROR| Psychological Horror| #AC5969| 1',
+        # 'Psychological.png| PSYCHOLOGICAL| Psychological| #C79367| 1',
+        # 'Reality.png| REALITY| Reality| #7CB6AE| 1',
+        # 'Romance.png| ROMANCE| Romance| #B6398E| 1',
+        # 'Romantic Comedy.png| ROMANTIC_COMEDY| Romantic Comedy| #B2445D| 1',
+        # 'Romantic Drama.png| ROMANTIC_DRAMA| Romantic Drama| #AB89C0| 1',
+        # 'Samurai.png| SAMURAI| Samurai| #C0C282| 1',
+        # 'School.png| SCHOOL| School| #4DC369| 1',
+        # 'Sci-Fi & Fantasy.png| SCI-FI_&_FANTASY| Sci-Fi & Fantasy| #9254BA| 1',
+        # 'Science Fiction.png| SCIENCE_FICTION| Science Fiction| #545FBA| 1',
+        # 'Serial Killer.png| SERIAL_KILLER| Serial Killer| #163F56| 1',
+        # 'Short.png| SHORT| Short| #BCBB7B| 1',
+        # 'Shoujo.png| SHOUJO| Shoujo| #89529D| 1',
+        # 'Shounen.png| SHOUNEN| Shounen| #505E99| 1',
+        # 'Slasher.png| SLASHER| Slasher| #B75157| 1',
+        # 'Slice of Life.png| SLICE_OF_LIFE| Slice of Life| #C696C4| 1',
+        # 'Soap.png| SOAP| Soap| #AF7CC0| 1',
+        # 'Space.png| SPACE| Space| #A793C1| 1',
+        # 'Sport.png| SPORT| Sport| #587EB1| 1',
+        # 'Spy.png| SPY| Spy| #B7D99F| 1',
+        # 'Stand-Up Comedy.png| STAND-UP_COMEDY| Stand-Up Comedy| #CF8A49| 1',
+        # 'Stoner Comedy.png| STONER_COMEDY| Stoner Comedy| #79D14D| 1',
+        # 'Super Power.png| SUPER_POWER| Super Power| #279552| 1',
+        # 'Superhero.png| SUPERHERO| Superhero| #DA8536| 1',
+        # 'Supernatural.png| SUPERNATURAL| Supernatural| #262693| 1',
+        # 'Survival.png| SURVIVAL| Survival| #434447| 1',
+        # 'Suspense.png| SUSPENSE| Suspense| #AE5E37| 1',
+        # 'Sword & Sorcery.png| SWORD_SORCERY| Sword & Sorcery| #B44FBA| 1',
+        # 'TV Movie.png| TV_MOVIE| TV Movie| #85A5B4| 1',
+        # 'Talk Show.png| TALK_SHOW| Talk Show| #82A2B5| 1',
+        # 'Thriller.png| THRILLER| Thriller| #C3602B| 1',
+        # 'Travel.png| TRAVEL| Travel| #B6BA6D| 1',
+        # 'Vampire.png| VAMPIRE| Vampire| #7D2627| 1',
+        # 'Ufo.png| UFO| Ufo| #529D82 | 1',
+        # 'War & Politics.png| WAR_POLITICS| War & Politics| #4ABF6E| 1',
+        # 'War.png| WAR| War| #63AB62| 1',
+        # 'Western.png| WESTERN| Western| #AD9B6D| 1',
+        # 'Womens History.png| WOMENS_HISTORY_MONTH| Womens Month| #874E83| 1',
+        # 'Zombie Horror.png| ZOMBIE_HORROR| Zombie Horror| #909513| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
     foreach ($item in $myArray) {
-        $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
-        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_genre\$($item.Logo)`" -logo_offset -500 -logo_resize $theMaxWidth -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+        if ($($item.key_name).ToString() -eq "") {
+            $value = $null
+        }
+        else {
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+        }
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_genre\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
     }
     LaunchScripts -ScriptPaths $arr
+
     Move-Item -Path output -Destination genre
     Copy-Item -Path logos_genre -Destination genre\logos -Recurse
     Move-Item -Path output-orig -Destination output
@@ -2850,7 +3037,6 @@ Function CreateNetwork {
     Write-Host "Creating Network"
     Set-Location $script_path
     # Find-Path "$script_path\network"
-    $theFont = "ComfortAa-Medium"
     $theMaxWidth = 1800
     $theMaxHeight = 1000
     $minPointSize = 100
@@ -2859,9 +3045,9 @@ Function CreateNetwork {
     Move-Item -Path output -Destination output-orig
 
     $myArray = @(
-        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
-        'network_kids_other| transparent.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Other Kids Networks| #FF2000| 1| 1| 0| 1',
-        'network_other| transparent.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Other Networks| #FF2000| 1| 1| 0| 1'
+        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        'network_kids_other| transparent.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Other Kids Networks| #FF2000| 1| 1| 0| 1',
+        'network_other| transparent.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Other Networks| #FF2000| 1| 1| 0| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
@@ -2872,173 +3058,173 @@ Function CreateNetwork {
         else {
             $value = (Get-YamlPropertyValue -PropertyPath "collections.$($item.key_name).name" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
         }
-        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
         $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
     }
     LaunchScripts -ScriptPaths $arr
 
     $myArray = @(
-        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
-        ' | A&E.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | A&E| #676767| 1| 1| 0| 1',
-        ' | ABC (AU).png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ABC (AU)| #CEC281| 1| 1| 0| 1',
-        ' | ABC (AU).png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ABC TV| #CEC281| 1| 1| 0| 1',
-        ' | ABC Family.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ABC Family| #73D444| 1| 1| 0| 1',
-        ' | ABC Kids.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ABC Kids| #6172B9| 1| 1| 0| 1',
-        ' | ABC.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ABC| #403993| 1| 1| 0| 1',
-        ' | ABS-CBN.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ABS-CBN| #16F67B| 1| 1| 0| 1',
-        ' | Acorn TV.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Acorn TV| #182034| 1| 1| 0| 1',
-        ' | Adult Swim.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Adult Swim| #C0A015| 1| 1| 0| 1',
-        ' | AltBalaji.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | AltBalaji| #00CC30| 1| 1| 0| 1',
-        ' | Amazon Kids+.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Amazon Kids+| #8E2AAF| 1| 1| 0| 1',
-        ' | Amazon.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Amazon| #9B8832| 1| 1| 0| 1',
-        ' | AMC.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | AMC| #4A9472| 1| 1| 0| 1',
-        ' | Animal Planet.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Animal Planet| #4389BA| 1| 1| 0| 1',
-        ' | Antena 3.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Antena 3| #306A94| 1| 1| 0| 1',
-        ' | Apple TV+.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Apple TV+| #313131| 1| 1| 0| 1',
-        ' | ARD.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ARD| #3F76D7| 1| 1| 0| 1',
-        ' | Arte.png| +0| 400| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Arte| #378BC4| 1| 1| 0| 1',
-        ' | AT-X.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | AT-X| #BEDA86| 1| 1| 0| 1',
-        ' | BBC America.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | BBC America| #C83535| 1| 1| 0| 1',
-        ' | BBC Four.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | BBC Four| #02A0D2| 1| 1| 0| 1',
-        ' | BBC One.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | BBC One| #3A38C6| 1| 1| 0| 1',
-        ' | BBC Two.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | BBC Two| #9130B1| 1| 1| 0| 1',
-        ' | BBC.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | BBC| #A24649| 1| 1| 0| 1',
-        ' | BET+.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | BET+| #B3359C| 1| 1| 0| 1',
-        ' | BET.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | BET| #942C2C| 1| 1| 0| 1',
-        ' | bilibili.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | bilibili| #677626| 1| 1| 0| 1',
-        ' | BluTV.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | BluTV| #1E6DA3| 1| 1| 0| 1',
-        ' | Boomerang.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Boomerang| #6190B3| 1| 1| 0| 1',
-        ' | Bravo.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Bravo| #6D6D6D| 1| 1| 0| 1',
-        ' | BritBox.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | BritBox| #198CA8| 1| 1| 0| 1',
-        ' | Canal+.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Canal+| #FB78AE| 1| 1| 0| 1',
-        ' | Cartoon Network.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Cartoon Network| #6084A0| 1| 1| 0| 1',
-        ' | Cartoonito.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Cartoonito| #2D9EB2| 1| 1| 0| 1',
-        ' | CBC.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | CBC Television| #9D3B3F| 1| 1| 0| 1',
-        ' | CBC.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | CBC| #9D3B3F| 1| 1| 0| 1',
-        ' | Cbeebies.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Cbeebies| #AFA619| 1| 1| 0| 1',
-        ' | CBS.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | CBS| #2926C0| 1| 1| 0| 1',
-        ' | Channel 3.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Channel 3| #FF85AF| 1| 1| 0| 1',
-        ' | Channel 4.png| +0| 1000| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Channel 4| #2B297D| 1| 1| 0| 1',
-        ' | Channel 5.png| +0| 1000| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Channel 5| #8C28AD| 1| 1| 0| 1',
-        ' | Cinemax.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Cinemax| #B4AB22| 1| 1| 0| 1',
-        ' | Citytv.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Citytv| #C23B40| 1| 1| 0| 1',
-        ' | CNN.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | CNN| #AE605C| 1| 1| 0| 1',
-        ' | Comedy Central.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Comedy Central| #BFB516| 1| 1| 0| 1',
-        ' | Cooking Channel.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Cooking Channel| #C29B16| 1| 1| 0| 1',
-        ' | Criterion Channel.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Criterion Channel| #810BA7| 1| 1| 0| 1',
-        ' | Crunchyroll.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Crunchyroll| #C9761D| 1| 1| 0| 1',
-        ' | CTV.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | CTV| #1FAA3C| 1| 1| 0| 1',
-        ' | Curiosity Stream.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Curiosity Stream| #BF983F| 1| 1| 0| 1',
-        ' | Dave.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Dave| #32336C| 1| 1| 0| 1',
-        ' | Discovery Kids.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Discovery Kids| #1C7A1E| 1| 1| 0| 1',
-        ' | discovery+.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | discovery+| #2175D9| 1| 1| 0| 1',
-        ' | Discovery.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Discovery| #1E1CBD| 1| 1| 0| 1',
-        ' | Disney Channel.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Disney Channel| #3679C4| 1| 1| 0| 1',
-        ' | Disney Junior.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Disney Junior| #C33B40| 1| 1| 0| 1',
-        ' | Disney XD.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Disney XD| #6BAB6D| 1| 1| 0| 1',
-        ' | Disney+.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Disney+| #0F2FA4| 1| 1| 0| 1',
-        ' | E!.png| +0| 500| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | E!| #BF3137| 1| 1| 0| 1',
-        ' | Epix.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Epix| #8E782B| 1| 1| 0| 1',
-        ' | ESPN.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ESPN| #B82B30| 1| 1| 0| 1',
-        ' | Family Channel.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Family Channel| #3841B6| 1| 1| 0| 1',
-        ' | Food Network.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Food Network| #B97A7C| 1| 1| 0| 1',
-        ' | Fox Kids.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Fox Kids| #B7282D| 1| 1| 0| 1',
-        ' | FOX.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | FOX| #474EAB| 1| 1| 0| 1',
-        ' | Freeform.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Freeform| #3C9C3E| 1| 1| 0| 1',
-        ' | Freevee.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Freevee| #B5CF1B| 1| 1| 0| 1',
-        ' | Fuji TV.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Fuji TV| #29319C| 1| 1| 0| 1',
-        ' | FX.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | FX| #4A51A9| 1| 1| 0| 1',
-        ' | FXX.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | FXX| #5070A7| 1| 1| 0| 1',
-        ' | Game Show Network.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Game Show Network| #BA27BF| 1| 1| 0| 1',
-        ' | Global TV.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Global TV| #409E42| 1| 1| 0| 1',
-        ' | Globoplay.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Globoplay| #775E92| 1| 1| 0| 1',
-        ' | GMA Network.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | GMA Network| #A755A4| 1| 1| 0| 1',
-        ' | Hallmark.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Hallmark| #601CB4| 1| 1| 0| 1',
-        ' | HBO Max.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | HBO Max| #7870B9| 1| 1| 0| 1',
-        ' | HBO.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | HBO| #458EAD| 1| 1| 0| 1',
-        ' | HGTV.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | HGTV| #3CA38F| 1| 1| 0| 1',
-        ' | History.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | History| #A57E2E| 1| 1| 0| 1',
-        ' | Hulu.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Hulu| #1BC073| 1| 1| 0| 1',
-        ' | IFC.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | IFC| #296FB4| 1| 1| 0| 1',
-        ' | IMDb TV.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | IMDb TV| #C1CD2F| 1| 1| 0| 1',
-        ' | Investigation Discovery.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Investigation Discovery| #BD5054| 1| 1| 0| 1',
-        ' | ION Television.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ION Television| #850ECC| 1| 1| 0| 1',
-        ' | iQiyi.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | iQiyi| #F26F4C| 1| 1| 0| 1',
-        ' | ITV.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ITV| #B024B5| 1| 1| 0| 1',
-        ' | KBS2.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | KBS2| #0D197B| 1| 1| 0| 1',
-        ' | Kids WB.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Kids WB| #B52429| 1| 1| 0| 1',
-        ' | Las Estrellas.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Las Estrellas| #DD983B| 1| 1| 0| 1',
-        ' | Lifetime.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Lifetime| #B61F64| 1| 1| 0| 1',
-        ' | MasterClass.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | MasterClass| #4D4D4D| 1| 1| 0| 1',
-        ' | Max.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Max| #002BE7| 1| 1| 0| 1',
-        ' | MBC.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | MBC| #AF1287| 1| 1| 0| 1',
-        ' | MTV.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | MTV| #76A3AF| 1| 1| 0| 1',
-        ' | National Geographic.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | National Geographic| #C6B31B| 1| 1| 0| 1',
-        ' | NBC.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | NBC| #703AAC| 1| 1| 0| 1',
-        ' | Netflix.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Netflix| #B42A33| 1| 1| 0| 1',
-        ' | Nick Jr.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Nick Jr| #4290A4| 1| 1| 0| 1',
-        ' | Nick.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Nick| #B68021| 1| 1| 0| 1',
-        ' | Nickelodeon.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Nickelodeon| #C56A16| 1| 1| 0| 1',
-        ' | Nicktoons.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Nicktoons| #C56B17| 1| 1| 0| 1',
-        ' | Nippon TV.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Nippon TV| #7E180F| 1| 1| 0| 1',
-        ' | Oxygen.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Oxygen| #CBB23E| 1| 1| 0| 1',
-        ' | Paramount Network.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Paramount Network| #9DE60E| 1| 1| 0| 1',
-        ' | Paramount+.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Paramount+| #2A67CC| 1| 1| 0| 1',
-        ' | PBS Kids.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | PBS Kids| #47A149| 1| 1| 0| 1',
-        ' | PBS.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | PBS| #3A4894| 1| 1| 0| 1',
-        ' | Peacock.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Peacock| #DA4428| 1| 1| 0| 1',
-        ' | Prime Video.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Prime Video| #11607E| 1| 1| 0| 1',
-        ' | RTL.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | RTL| #21354A| 1| 1| 0| 1',
-        ' | SBS.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | SBS| #BEBC19| 1| 1| 0| 1',
-        ' | Shahid.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Shahid| #7FEB9A| 1| 1| 0| 1',
-        ' | Showcase.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Showcase| #4D4D4D| 1| 1| 0| 1',
-        ' | Showtime.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Showtime| #C2201F| 1| 1| 0| 1',
-        ' | Shudder.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Shudder| #0D0C89| 1| 1| 0| 1',
-        ' | Sky.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Sky| #BC3272| 1| 1| 0| 1',
-        ' | Smithsonian.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Smithsonian| #303F8F| 1| 1| 0| 1',
-        ' | Spike.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Spike| #ADAE74| 1| 1| 0| 1',
-        ' | Stan.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Stan| #227CC0| 1| 1| 0| 1',
-        ' | Starz.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Starz| #464646| 1| 1| 0| 1',
-        ' | Sundance TV.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Sundance TV| #424242| 1| 1| 0| 1',
-        ' | SVT1.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | SVT1| #94BE7C| 1| 1| 0| 1',
-        ' | Syfy.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Syfy| #BEB42D| 1| 1| 0| 1',
-        ' | TBS.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | TBS| #A139BF| 1| 1| 0| 1',
-        ' | Telemundo.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Telemundo| #407160| 1| 1| 0| 1',
-        ' | Tencent Video.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Tencent Video| #DE90F0| 1| 1| 0| 1',
-        ' | TF1.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | TF1| #43D582| 1| 1| 0| 1',
-        ' | The CW.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | The CW| #397F96| 1| 1| 0| 1',
-        ' | TLC.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | TLC| #BA6C70| 1| 1| 0| 1',
-        ' | TNT.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | TNT| #C1B83A| 1| 1| 0| 1',
-        ' | tokyo mx.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | tokyo mx| #8662EA| 1| 1| 0| 1',
-        ' | Travel Channel.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Travel Channel| #D4FFD9| 1| 1| 0| 1',
-        ' | truTV.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | truTV| #C79F26| 1| 1| 0| 1',
-        ' | Turner Classic Movies.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Turner Classic Movies| #616161| 1| 1| 0| 1',
-        ' | TV 2.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | TV 2| #8040C7| 1| 1| 0| 1',
-        ' | tv asahi.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | tv asahi| #DD1A67| 1| 1| 0| 1',
-        ' | TV Globo.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | TV Globo| #C8A69F| 1| 1| 0| 1',
-        ' | TV Land.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | TV Land| #78AFB4| 1| 1| 0| 1',
-        ' | TV Tokyo.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | TV Tokyo| #EC00E2| 1| 1| 0| 1',
-        ' | TV3.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | TV3| #FACED0| 1| 1| 0| 1',
-        ' | TVB Jade.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | TVB Jade| #C6582F| 1| 1| 0| 1',
-        ' | tving.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | tving| #B2970D| 1| 1| 0| 1',
-        ' | tvN.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | tvN| #510F23| 1| 1| 0| 1',
-        ' | UKTV.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | UKTV| #2EADB1| 1| 1| 0| 1',
-        ' | UniMás.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | UniMás| #3A4669| 1| 1| 0| 1',
-        ' | Universal Kids.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Universal Kids| #2985A1| 1| 1| 0| 1',
-        ' | Univision.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Univision| #28BE59| 1| 1| 0| 1',
-        ' | UPN.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | UPN| #C6864E| 1| 1| 0| 1',
-        ' | USA Network.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | USA Network| #F7EB20| 1| 1| 0| 1',
-        ' | USA.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | USA| #C0565B| 1| 1| 0| 1',
-        ' | VH1.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | VH1| #8E3BB1| 1| 1| 0| 1',
-        ' | Viaplay.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Viaplay| #30F7FB| 1| 1| 0| 1',
-        ' | Vice.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Vice| #D3D3D3| 1| 1| 0| 1',
-        ' | ViuTV.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ViuTV| #D3ADE3| 1| 1| 0| 1',
-        ' | Warner Bros..png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Warner Bros.| #39538F| 1| 1| 0| 1',
-        ' | WE tv.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | WE tv| #15DD51| 1| 1| 0| 1',
-        ' | Youku.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | Youku| #42809E| 1| 1| 0| 1',
-        ' | YouTube.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | YouTube| #C51414| 1| 1| 0| 1',
-        ' | ZDF.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ZDF| #C58654| 1| 1| 0| 1',
-        ' | ZEE5.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ZEE5| #8704C1| 1| 1| 0| 1'
+        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        ' | A&E.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | A&E| #676767| 1| 1| 0| 1',
+        ' | ABC (AU).png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ABC (AU)| #CEC281| 1| 1| 0| 1',
+        ' | ABC (AU).png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ABC TV| #CEC281| 1| 1| 0| 1',
+        ' | ABC Family.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ABC Family| #73D444| 1| 1| 0| 1',
+        ' | ABC Kids.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ABC Kids| #6172B9| 1| 1| 0| 1',
+        ' | ABC.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ABC| #403993| 1| 1| 0| 1',
+        ' | ABS-CBN.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ABS-CBN| #16F67B| 1| 1| 0| 1',
+        ' | Acorn TV.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Acorn TV| #182034| 1| 1| 0| 1',
+        ' | Adult Swim.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Adult Swim| #C0A015| 1| 1| 0| 1',
+        ' | AltBalaji.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | AltBalaji| #00CC30| 1| 1| 0| 1',
+        ' | Amazon Kids+.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Amazon Kids+| #8E2AAF| 1| 1| 0| 1',
+        ' | Amazon.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Amazon| #9B8832| 1| 1| 0| 1',
+        ' | AMC.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | AMC| #4A9472| 1| 1| 0| 1',
+        ' | Animal Planet.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Animal Planet| #4389BA| 1| 1| 0| 1',
+        ' | Antena 3.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Antena 3| #306A94| 1| 1| 0| 1',
+        ' | Apple TV+.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Apple TV+| #313131| 1| 1| 0| 1',
+        ' | ARD.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ARD| #3F76D7| 1| 1| 0| 1',
+        ' | Arte.png| +0| 400| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Arte| #378BC4| 1| 1| 0| 1',
+        ' | AT-X.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | AT-X| #BEDA86| 1| 1| 0| 1',
+        ' | BBC America.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | BBC America| #C83535| 1| 1| 0| 1',
+        ' | BBC Four.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | BBC Four| #02A0D2| 1| 1| 0| 1',
+        ' | BBC One.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | BBC One| #3A38C6| 1| 1| 0| 1',
+        ' | BBC Two.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | BBC Two| #9130B1| 1| 1| 0| 1',
+        ' | BBC.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | BBC| #A24649| 1| 1| 0| 1',
+        ' | BET+.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | BET+| #B3359C| 1| 1| 0| 1',
+        ' | BET.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | BET| #942C2C| 1| 1| 0| 1',
+        ' | bilibili.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | bilibili| #677626| 1| 1| 0| 1',
+        ' | BluTV.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | BluTV| #1E6DA3| 1| 1| 0| 1',
+        ' | Boomerang.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Boomerang| #6190B3| 1| 1| 0| 1',
+        ' | Bravo.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Bravo| #6D6D6D| 1| 1| 0| 1',
+        ' | BritBox.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | BritBox| #198CA8| 1| 1| 0| 1',
+        ' | Canal+.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Canal+| #FB78AE| 1| 1| 0| 1',
+        ' | Cartoon Network.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Cartoon Network| #6084A0| 1| 1| 0| 1',
+        ' | Cartoonito.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Cartoonito| #2D9EB2| 1| 1| 0| 1',
+        ' | CBC.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | CBC Television| #9D3B3F| 1| 1| 0| 1',
+        ' | CBC.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | CBC| #9D3B3F| 1| 1| 0| 1',
+        ' | Cbeebies.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Cbeebies| #AFA619| 1| 1| 0| 1',
+        ' | CBS.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | CBS| #2926C0| 1| 1| 0| 1',
+        ' | Channel 3.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Channel 3| #FF85AF| 1| 1| 0| 1',
+        ' | Channel 4.png| +0| 1000| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Channel 4| #2B297D| 1| 1| 0| 1',
+        ' | Channel 5.png| +0| 1000| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Channel 5| #8C28AD| 1| 1| 0| 1',
+        ' | Cinemax.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Cinemax| #B4AB22| 1| 1| 0| 1',
+        ' | Citytv.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Citytv| #C23B40| 1| 1| 0| 1',
+        ' | CNN.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | CNN| #AE605C| 1| 1| 0| 1',
+        ' | Comedy Central.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Comedy Central| #BFB516| 1| 1| 0| 1',
+        ' | Cooking Channel.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Cooking Channel| #C29B16| 1| 1| 0| 1',
+        ' | Criterion Channel.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Criterion Channel| #810BA7| 1| 1| 0| 1',
+        ' | Crunchyroll.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Crunchyroll| #C9761D| 1| 1| 0| 1',
+        ' | CTV.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | CTV| #1FAA3C| 1| 1| 0| 1',
+        ' | Curiosity Stream.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Curiosity Stream| #BF983F| 1| 1| 0| 1',
+        ' | Dave.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Dave| #32336C| 1| 1| 0| 1',
+        ' | Discovery Kids.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Discovery Kids| #1C7A1E| 1| 1| 0| 1',
+        ' | discovery+.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | discovery+| #2175D9| 1| 1| 0| 1',
+        ' | Discovery.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Discovery| #1E1CBD| 1| 1| 0| 1',
+        ' | Disney Channel.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Disney Channel| #3679C4| 1| 1| 0| 1',
+        ' | Disney Junior.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Disney Junior| #C33B40| 1| 1| 0| 1',
+        ' | Disney XD.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Disney XD| #6BAB6D| 1| 1| 0| 1',
+        ' | Disney+.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Disney+| #0F2FA4| 1| 1| 0| 1',
+        ' | E!.png| +0| 500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | E!| #BF3137| 1| 1| 0| 1',
+        ' | Epix.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Epix| #8E782B| 1| 1| 0| 1',
+        ' | ESPN.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ESPN| #B82B30| 1| 1| 0| 1',
+        ' | Family Channel.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Family Channel| #3841B6| 1| 1| 0| 1',
+        ' | Food Network.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Food Network| #B97A7C| 1| 1| 0| 1',
+        ' | Fox Kids.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Fox Kids| #B7282D| 1| 1| 0| 1',
+        ' | FOX.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | FOX| #474EAB| 1| 1| 0| 1',
+        ' | Freeform.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Freeform| #3C9C3E| 1| 1| 0| 1',
+        ' | Freevee.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Freevee| #B5CF1B| 1| 1| 0| 1',
+        ' | Fuji TV.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Fuji TV| #29319C| 1| 1| 0| 1',
+        ' | FX.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | FX| #4A51A9| 1| 1| 0| 1',
+        ' | FXX.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | FXX| #5070A7| 1| 1| 0| 1',
+        ' | Game Show Network.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Game Show Network| #BA27BF| 1| 1| 0| 1',
+        ' | Global TV.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Global TV| #409E42| 1| 1| 0| 1',
+        ' | Globoplay.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Globoplay| #775E92| 1| 1| 0| 1',
+        ' | GMA Network.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | GMA Network| #A755A4| 1| 1| 0| 1',
+        ' | Hallmark.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Hallmark| #601CB4| 1| 1| 0| 1',
+        ' | HBO Max.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | HBO Max| #7870B9| 1| 1| 0| 1',
+        ' | HBO.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | HBO| #458EAD| 1| 1| 0| 1',
+        ' | HGTV.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | HGTV| #3CA38F| 1| 1| 0| 1',
+        ' | History.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | History| #A57E2E| 1| 1| 0| 1',
+        ' | Hulu.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Hulu| #1BC073| 1| 1| 0| 1',
+        ' | IFC.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | IFC| #296FB4| 1| 1| 0| 1',
+        ' | IMDb TV.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | IMDb TV| #C1CD2F| 1| 1| 0| 1',
+        ' | Investigation Discovery.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Investigation Discovery| #BD5054| 1| 1| 0| 1',
+        ' | ION Television.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ION Television| #850ECC| 1| 1| 0| 1',
+        ' | iQiyi.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | iQiyi| #F26F4C| 1| 1| 0| 1',
+        ' | ITV.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ITV| #B024B5| 1| 1| 0| 1',
+        ' | KBS2.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | KBS2| #0D197B| 1| 1| 0| 1',
+        ' | Kids WB.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Kids WB| #B52429| 1| 1| 0| 1',
+        ' | Las Estrellas.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Las Estrellas| #DD983B| 1| 1| 0| 1',
+        ' | Lifetime.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Lifetime| #B61F64| 1| 1| 0| 1',
+        ' | MasterClass.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | MasterClass| #4D4D4D| 1| 1| 0| 1',
+        ' | Max.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Max| #002BE7| 1| 1| 0| 1',
+        ' | MBC.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | MBC| #AF1287| 1| 1| 0| 1',
+        ' | MTV.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | MTV| #76A3AF| 1| 1| 0| 1',
+        ' | National Geographic.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | National Geographic| #C6B31B| 1| 1| 0| 1',
+        ' | NBC.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | NBC| #703AAC| 1| 1| 0| 1',
+        ' | Netflix.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Netflix| #B42A33| 1| 1| 0| 1',
+        ' | Nick Jr.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Nick Jr| #4290A4| 1| 1| 0| 1',
+        ' | Nick.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Nick| #B68021| 1| 1| 0| 1',
+        ' | Nickelodeon.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Nickelodeon| #C56A16| 1| 1| 0| 1',
+        ' | Nicktoons.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Nicktoons| #C56B17| 1| 1| 0| 1',
+        ' | Nippon TV.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Nippon TV| #7E180F| 1| 1| 0| 1',
+        ' | Oxygen.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Oxygen| #CBB23E| 1| 1| 0| 1',
+        ' | Paramount Network.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Paramount Network| #9DE60E| 1| 1| 0| 1',
+        ' | Paramount+.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Paramount+| #2A67CC| 1| 1| 0| 1',
+        ' | PBS Kids.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | PBS Kids| #47A149| 1| 1| 0| 1',
+        ' | PBS.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | PBS| #3A4894| 1| 1| 0| 1',
+        ' | Peacock.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Peacock| #DA4428| 1| 1| 0| 1',
+        ' | Prime Video.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Prime Video| #11607E| 1| 1| 0| 1',
+        ' | RTL.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | RTL| #21354A| 1| 1| 0| 1',
+        ' | SBS.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | SBS| #BEBC19| 1| 1| 0| 1',
+        ' | Shahid.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Shahid| #7FEB9A| 1| 1| 0| 1',
+        ' | Showcase.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Showcase| #4D4D4D| 1| 1| 0| 1',
+        ' | Showtime.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Showtime| #C2201F| 1| 1| 0| 1',
+        ' | Shudder.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Shudder| #0D0C89| 1| 1| 0| 1',
+        ' | Sky.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Sky| #BC3272| 1| 1| 0| 1',
+        ' | Smithsonian.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Smithsonian| #303F8F| 1| 1| 0| 1',
+        ' | Spike.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Spike| #ADAE74| 1| 1| 0| 1',
+        ' | Stan.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Stan| #227CC0| 1| 1| 0| 1',
+        ' | Starz.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Starz| #464646| 1| 1| 0| 1',
+        ' | Sundance TV.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Sundance TV| #424242| 1| 1| 0| 1',
+        ' | SVT1.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | SVT1| #94BE7C| 1| 1| 0| 1',
+        ' | Syfy.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Syfy| #BEB42D| 1| 1| 0| 1',
+        ' | TBS.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | TBS| #A139BF| 1| 1| 0| 1',
+        ' | Telemundo.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Telemundo| #407160| 1| 1| 0| 1',
+        ' | Tencent Video.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Tencent Video| #DE90F0| 1| 1| 0| 1',
+        ' | TF1.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | TF1| #43D582| 1| 1| 0| 1',
+        ' | The CW.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | The CW| #397F96| 1| 1| 0| 1',
+        ' | TLC.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | TLC| #BA6C70| 1| 1| 0| 1',
+        ' | TNT.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | TNT| #C1B83A| 1| 1| 0| 1',
+        ' | tokyo mx.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | tokyo mx| #8662EA| 1| 1| 0| 1',
+        ' | Travel Channel.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Travel Channel| #D4FFD9| 1| 1| 0| 1',
+        ' | truTV.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | truTV| #C79F26| 1| 1| 0| 1',
+        ' | Turner Classic Movies.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Turner Classic Movies| #616161| 1| 1| 0| 1',
+        ' | TV 2.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | TV 2| #8040C7| 1| 1| 0| 1',
+        ' | tv asahi.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | tv asahi| #DD1A67| 1| 1| 0| 1',
+        ' | TV Globo.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | TV Globo| #C8A69F| 1| 1| 0| 1',
+        ' | TV Land.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | TV Land| #78AFB4| 1| 1| 0| 1',
+        ' | TV Tokyo.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | TV Tokyo| #EC00E2| 1| 1| 0| 1',
+        ' | TV3.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | TV3| #FACED0| 1| 1| 0| 1',
+        ' | TVB Jade.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | TVB Jade| #C6582F| 1| 1| 0| 1',
+        ' | tving.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | tving| #B2970D| 1| 1| 0| 1',
+        ' | tvN.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | tvN| #510F23| 1| 1| 0| 1',
+        ' | UKTV.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | UKTV| #2EADB1| 1| 1| 0| 1',
+        ' | UniMás.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | UniMás| #3A4669| 1| 1| 0| 1',
+        ' | Universal Kids.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Universal Kids| #2985A1| 1| 1| 0| 1',
+        ' | Univision.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Univision| #28BE59| 1| 1| 0| 1',
+        ' | UPN.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | UPN| #C6864E| 1| 1| 0| 1',
+        ' | USA Network.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | USA Network| #F7EB20| 1| 1| 0| 1',
+        ' | USA.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | USA| #C0565B| 1| 1| 0| 1',
+        ' | VH1.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | VH1| #8E3BB1| 1| 1| 0| 1',
+        ' | Viaplay.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Viaplay| #30F7FB| 1| 1| 0| 1',
+        ' | Vice.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Vice| #D3D3D3| 1| 1| 0| 1',
+        ' | ViuTV.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ViuTV| #D3ADE3| 1| 1| 0| 1',
+        ' | Warner Bros..png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Warner Bros.| #39538F| 1| 1| 0| 1',
+        ' | WE tv.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | WE tv| #15DD51| 1| 1| 0| 1',
+        ' | Youku.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Youku| #42809E| 1| 1| 0| 1',
+        ' | YouTube.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | YouTube| #C51414| 1| 1| 0| 1',
+        ' | ZDF.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ZDF| #C58654| 1| 1| 0| 1',
+        ' | ZEE5.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ZEE5| #8704C1| 1| 1| 0| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
@@ -3049,7 +3235,7 @@ Function CreateNetwork {
         else {
             $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
         }
-        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
         $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
     }
 
@@ -3068,7 +3254,6 @@ Function CreatePlaylist {
     Write-Host "Creating Playlist"
     Set-Location $script_path
     # Find-Path "$script_path\playlist"
-    $theFont = "Bebas-Regular"
     $theMaxWidth = 1600
     $theMaxHeight = 1000
     $minPointSize = 100
@@ -3077,24 +3262,30 @@ Function CreatePlaylist {
     Move-Item -Path output -Destination output-orig
 
     $myArray = @(
-        'Logo| Name| out_name| base_color| ww',
-        'Arrowverse.png| TIMELINE_ORDER| Arrowverse (Timeline Order)| #2B8F40| 1',
-        'DragonBall.png| TIMELINE_ORDER| Dragon Ball (Timeline Order)| #E39D30| 1',
-        'Marvel Cinematic Universe.png| TIMELINE_ORDER| Marvel Cinematic Universe (Timeline Order)| #AD2B2B| 1',
-        'Star Trek.png| TIMELINE_ORDER| Star Trek (Timeline Order)| #0193DD| 1',
-        'Pokémon.png| TIMELINE_ORDER| Pokémon (Timeline Order)| #FECA06| 1',
-        'dca.png| TIMELINE_ORDER| DC Animated Universe (Timeline Order)| #2832C4| 1',
-        'X-men.png| TIMELINE_ORDER| X-Men (Timeline Order)| #636363| 1',
-        'Star Wars The Clone Wars.png| TIMELINE_ORDER| Star Wars The Clone Wars (Timeline Order)| #ED1C24| 1',
-        'Star Wars.png| TIMELINE_ORDER| Star Wars (Timeline Order)| #F8C60A| 1'
+        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        'TIMELINE_ORDER| Arrowverse.png| -200| 1600| +450| Bebas-Regular| | #FFFFFF| 0| 15| #FFFFFF| | Arrowverse (Timeline Order)| #2B8F40| 1| 1| 0| 1',
+        'TIMELINE_ORDER| DragonBall.png| -200| 1600| +450| Bebas-Regular| | #FFFFFF| 0| 15| #FFFFFF| | Dragon Ball (Timeline Order)| #E39D30| 1| 1| 0| 1',
+        'TIMELINE_ORDER| Marvel Cinematic Universe.png| -200| 1600| +450| Bebas-Regular| | #FFFFFF| 0| 15| #FFFFFF| | Marvel Cinematic Universe (Timeline Order)| #AD2B2B| 1| 1| 0| 1',
+        'TIMELINE_ORDER| Star Trek.png| -200| 1600| +450| Bebas-Regular| | #FFFFFF| 0| 15| #FFFFFF| | Star Trek (Timeline Order)| #0193DD| 1| 1| 0| 1',
+        'TIMELINE_ORDER| Pokémon.png| -200| 1600| +450| Bebas-Regular| | #FFFFFF| 0| 15| #FFFFFF| | Pokémon (Timeline Order)| #FECA06| 1| 1| 0| 1',
+        'TIMELINE_ORDER| dca.png| -200| 1600| +450| Bebas-Regular| | #FFFFFF| 0| 15| #FFFFFF| | DC Animated Universe (Timeline Order)| #2832C4| 1| 1| 0| 1',
+        'TIMELINE_ORDER| X-men.png| -200| 1600| +450| Bebas-Regular| | #FFFFFF| 0| 15| #FFFFFF| | X-Men (Timeline Order)| #636363| 1| 1| 0| 1',
+        'TIMELINE_ORDER| Star Wars The Clone Wars.png| -200| 1600| +450| Bebas-Regular| | #FFFFFF| 0| 15| #FFFFFF| | Star Wars The Clone Wars (Timeline Order)| #ED1C24| 1| 1| 0| 1',
+        'TIMELINE_ORDER| Star Wars.png| -200| 1600| +450| Bebas-Regular| | #FFFFFF| 0| 15| #FFFFFF| | Star Wars (Timeline Order)| #F8C60A| 1| 1| 0| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
-    
+
     $arr = @()
     foreach ($item in $myArray) {
-        $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
-        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_playlist\$($item.Logo)`" -logo_offset -200 -logo_resize $theMaxWidth -text `"$value`" -text_offset +450 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+        if ($($item.key_name).ToString() -eq "") {
+            $value = $null
+        }
+        else {
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+        }
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_playlist\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
     }
+
     LaunchScripts -ScriptPaths $arr
 
     Move-Item -Path output -Destination playlist
@@ -3110,7 +3301,6 @@ Function CreateResolution {
     Write-Host "Creating Resolution"
     Set-Location $script_path
     # Find-Path "$script_path\resolution"
-    $theFont = "ComfortAa-Medium"
     $theMaxWidth = 1800
     $theMaxHeight = 1000
     $minPointSize = 100
@@ -3119,45 +3309,93 @@ Function CreateResolution {
     Move-Item -Path output -Destination output-orig
 
     $myArray = @(
-        'Logo| Name| out_name| base_color| ww',
-        'transparent.png| resolutions_other| other| #FF2000| 1'
+        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        'resolutions_other| transparent.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | other| #FF2000| 1| 1| 0| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
     foreach ($item in $myArray) {
-        $value = (Get-YamlPropertyValue -PropertyPath "collections.$($item.name).name" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
-        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-        $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.Logo)`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$value`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+        if ($($item.key_name).ToString() -eq "") {
+            $value = $null
+        }
+        else {
+            $value = (Get-YamlPropertyValue -PropertyPath "collections.$($item.key_name).name" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+        }
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
     }
     LaunchScripts -ScriptPaths $arr
 
-    $arr = @()
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_resolution\4K.png`" -logo_offset +0 -logo_resize 1800 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"4k`" -base_color `"#8A46CF`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_resolution\8K.png`" -logo_offset +0 -logo_resize 1800 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"8k`" -base_color `"#95BCDC`"-gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_resolution\144p.png`" -logo_offset +0 -logo_resize 1800 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"144`" -base_color `"#F0C5E5`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_resolution\240p.png`" -logo_offset +0 -logo_resize 1800 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"240`" -base_color `"#DFA172`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_resolution\360p.png`" -logo_offset +0 -logo_resize 1800 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"360`" -base_color `"#6D3FDC`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_resolution\480p.png`" -logo_offset +0 -logo_resize 1800 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"480`" -base_color `"#3996D3`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_resolution\576p.png`" -logo_offset +0 -logo_resize 1800 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"576`" -base_color `"#DED1B2`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_resolution\720p.png`" -logo_offset +0 -logo_resize 1800 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"720`" -base_color `"#30DC76`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_resolution\1080p.png`" -logo_offset +0 -logo_resize 1800 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"1080`" -base_color `"#D60C0C`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    LaunchScripts -ScriptPaths $arr
-    Move-Item -Path output -Destination resolution
-    
+    $myArray = @(
+        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        '| 4K.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | 4k| #8A46CF| 1| 1| 0| 1',
+        '| 8K.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | 8k| #95BCDC| 1| 1| 0| 1',
+        '| 144p.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | 144| #F0C5E5| 1| 1| 0| 1',
+        '| 240p.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | 240| #DFA172| 1| 1| 0| 1',
+        '| 360p.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | 360| #6D3FDC| 1| 1| 0| 1',
+        '| 480p.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | 480| #3996D3| 1| 1| 0| 1',
+        '| 576p.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | 576| #DED1B2| 1| 1| 0| 1',
+        '| 720p.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | 720| #30DC76| 1| 1| 0| 1',
+        '| 1080p.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | 1080| #D60C0C| 1| 1| 0| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
+
     $arr = @()
     foreach ($item in $myArray) {
-        $value = (Get-YamlPropertyValue -PropertyPath "collections.$($item.name).name" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
-        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-        $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.Logo)`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$value`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+        if ($($item.key_name).ToString() -eq "") {
+            $value = $null
+        }
+        else {
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+        }
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_resolution\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
+    }
+
+    LaunchScripts -ScriptPaths $arr
+
+    Move-Item -Path output -Destination resolution
+    
+    $myArray = @(
+        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        'resolutions_other| transparent.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | other| #FF2000| 1| 1| 0| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        if ($($item.key_name).ToString() -eq "") {
+            $value = $null
+        }
+        else {
+            $value = (Get-YamlPropertyValue -PropertyPath "collections.$($item.key_name).name" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+        }
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
     }
     LaunchScripts -ScriptPaths $arr
 
+    $myArray = @(
+        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        '| ultrahd.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | ultrahd| #8A46CF| 1| 1| 0| 1',
+        '| sd.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | sd| #95BCDC| 1| 1| 0| 1',
+        '| hdready.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | hdready| #F0C5E5| 1| 1| 0| 1',
+        '| fullhd.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | fullhd| #DFA172| 1| 1| 0| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
     $arr = @()
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_resolution\ultrahd.png`" -logo_offset +0 -logo_resize 1800 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"4k`" -base_color `"#8A46CF`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_resolution\sd.png`" -logo_offset +0 -logo_resize 1800 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"480`" -base_color `"#3996D3`"-gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_resolution\hdready.png`" -logo_offset +0 -logo_resize 1800 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"720`" -base_color `"#30DC76`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_resolution\fullhd.png`" -logo_offset +0 -logo_resize 1800 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"1080`" -base_color `"#D60C0C`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
+    foreach ($item in $myArray) {
+        if ($($item.key_name).ToString() -eq "") {
+            $value = $null
+        }
+        else {
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+        }
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_resolution\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
+    }
+
     LaunchScripts -ScriptPaths $arr
+
     Move-Item -Path output -Destination resolution\standards
     Copy-Item -Path logos_resolution -Destination resolution\logos -Recurse
     Move-Item -Path output-orig -Destination output
@@ -3173,36 +3411,42 @@ Function CreateSeasonal {
     Set-Location $script_path
     # Find-Path "$script_path\seasonal"
     Move-Item -Path output -Destination output-orig
-    $theFont = "ComfortAa-Medium"
     $theMaxWidth = 1800
     $theMaxHeight = 1000
     $minPointSize = 100
     $maxPointSize = 250
 
     $myArray = @(
-        'Logo| Name| out_name| base_color| ww',
-        '420.png| 4/20| 420| #43C32F| 1',
-        'christmas.png| CHRISTMAS| christmas| #D52414| 1',
-        'easter.png| EASTER| easter| #46D69D| 1',
-        'father.png| FATHERS_DAY| father| #7CDA83| 1',
-        'halloween.png| HALLOWEEN| halloween| #DA8B25| 1',
-        'independence.png| INDEPENDENCE_DAY| independence| #2931CB| 1',
-        'labor.png| LABOR_DAY| labor| #DA5C5E| 1',
-        'memorial.png| MEMORIAL_DAY| memorial| #917C5C| 1',
-        'mother.png| MOTHERS_DAY| mother| #DB81D6| 1',
-        'patrick.png| ST_PATRICKS_DAY| patrick| #26A53E| 1',
-        'thanksgiving.png| THANKSGIVING| thanksgiving| #A1841E| 1',
-        'valentine.png| VALENTINES_DAY| valentine| #D12AAE| 1',
-        'years.png| NEW_YEAR| years| #444444| 1'
+        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        '4/20| 420.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | 420| #43C32F| 1| 1| 0| 1',
+        'CHRISTMAS| christmas.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | christmas| #D52414| 1| 1| 0| 1',
+        'EASTER| easter.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | easter| #46D69D| 1| 1| 0| 1',
+        'FATHERS_DAY| father.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | father| #7CDA83| 1| 1| 0| 1',
+        'HALLOWEEN| halloween.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | halloween| #DA8B25| 1| 1| 0| 1',
+        'INDEPENDENCE_DAY| independence.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | independence| #2931CB| 1| 1| 0| 1',
+        'LABOR_DAY| labor.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | labor| #DA5C5E| 1| 1| 0| 1',
+        'MEMORIAL_DAY| memorial.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | memorial| #917C5C| 1| 1| 0| 1',
+        'MOTHERS_DAY| mother.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | mother| #DB81D6| 1| 1| 0| 1',
+        'ST_PATRICKS_DAY| patrick.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | patrick| #26A53E| 1| 1| 0| 1',
+        'THANKSGIVING| thanksgiving.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | thanksgiving| #A1841E| 1| 1| 0| 1',
+        'VALENTINES_DAY| valentine.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | valentine| #D12AAE| 1| 1| 0| 1',
+        'NEW_YEAR| years.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | years| #444444| 1| 1| 0| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
-    
+
     $arr = @()
     foreach ($item in $myArray) {
-        $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
-        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_seasonal\$($item.Logo)`" -logo_offset -500 -logo_resize $theMaxWidth -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+        if ($($item.key_name).ToString() -eq "") {
+            $value = $null
+        }
+        else {
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+        }
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_seasonal\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
     }
+
     LaunchScripts -ScriptPaths $arr
+
     Move-Item -Path output -Destination seasonal
     Copy-Item -Path logos_seasonal -Destination seasonal\logos -Recurse
     Move-Item -Path output-orig -Destination output
@@ -3228,55 +3472,54 @@ Function CreateSeparators {
     .\create_poster.ps1 -logo "$script_path\logos_chart\Plex.png" -logo_offset -500 -logo_resize 1500 -text "$value" -text_offset +850 -font "ComfortAa-Medium" -font_size 195 -font_color "#FFFFFF" -border 0 -border_width 15 -border_color "#FFFFFF" -avg_color_image "" -out_name "collectionless" -base_color "#DC9924" -gradient 1 -avg_color 0 -clean 1 -white_wash 1
     Move-Item -Path $script_path\output\collectionless.jpg -Destination $script_path\collectionless.jpg
 
-    $theFont = "ComfortAa-Medium"
     $theMaxWidth = 1900
     $theMaxHeight = 1000
     $minPointSize = 100
     $maxPointSize = 203
 
     $myArray = @(
-        'Name| out_name| base_color| other_setting',
-        'COLLECTIONLESS| collectionless| #FFFFFF| NA',
-        'ACTOR| actor| #FFFFFF| NA',
-        'AUDIO_LANGUAGE| audio_language| #FFFFFF| NA',
-        'AWARD| award| #FFFFFF| NA',
-        'CHART| chart| #FFFFFF| NA',
-        'CONTENT_RATINGS| content_rating| #FFFFFF| NA',
-        'COUNTRY| country| #FFFFFF| NA',
-        'DECADE| decade| #FFFFFF| NA',
-        'DIRECTOR| director| #FFFFFF| NA',
-        'FRANCHISE| franchise| #FFFFFF| NA',
-        'GENRE| genre| #FFFFFF| NA',
-        'KIDS_NETWORK| network_kids| #FFFFFF| NA',
-        'MOVIE_CHART| movie_chart| #FFFFFF| NA',
-        'NETWORK| network| #FFFFFF| NA',
-        'PERSONAL| personal| #FFFFFF| NA',
-        'PRODUCER| producer| #FFFFFF| NA',
-        'RESOLUTION| resolution| #FFFFFF| NA',
-        'SEASONAL| seasonal| #FFFFFF| NA',
-        'STREAMING| streaming| #FFFFFF| NA',
-        'STUDIO_ANIMATION| studio_animation| #FFFFFF| NA',
-        'STUDIO| studio| #FFFFFF| NA',
-        'SUBTITLE| subtitle_language| #FFFFFF| NA',
-        'TV_CHART| tv_chart| #FFFFFF| NA',
-        'UK_NETWORK| network_uk| #FFFFFF| NA',
-        'UK_STREAMING| streaming_uk| #FFFFFF| NA',
-        'UNIVERSE| universe| #FFFFFF| NA',
-        'US_NETWORK| network_us| #FFFFFF| NA',
-        'US_STREAMING| streaming_us| #FFFFFF| NA',
-        'WRITER| writer| #FFFFFF| NA',
-        'YEAR| year| #FFFFFF| NA',
-        'BASED_ON| based| #FFFFFF| NA'
+        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        'COLLECTIONLESS| | +0| 2000| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | collectionless| | 0| 1| 0| 0',
+        'ACTOR| | +0| 2000| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | actor| | 0| 1| 0| 0',
+        'AUDIO_LANGUAGE| | +0| 2000| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | audio_language| | 0| 1| 0| 0',
+        'AWARD| | +0| 2000| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | award| | 0| 1| 0| 0',
+        'CHART| | +0| 2000| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | chart| | 0| 1| 0| 0',
+        'CONTENT_RATINGS| | +0| 2000| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | content_rating| | 0| 1| 0| 0',
+        'COUNTRY| | +0| 2000| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | country| | 0| 1| 0| 0',
+        'DECADE| | +0| 2000| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | decade| | 0| 1| 0| 0',
+        'DIRECTOR| | +0| 2000| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | director| | 0| 1| 0| 0',
+        'FRANCHISE| | +0| 2000| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | franchise| | 0| 1| 0| 0',
+        'GENRE| | +0| 2000| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | genre| | 0| 1| 0| 0',
+        'KIDS_NETWORK| | +0| 2000| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | network_kids| | 0| 1| 0| 0',
+        'MOVIE_CHART| | +0| 2000| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | movie_chart| | 0| 1| 0| 0',
+        'NETWORK| | +0| 2000| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | network| | 0| 1| 0| 0',
+        'PERSONAL| | +0| 2000| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | personal| | 0| 1| 0| 0',
+        'PRODUCER| | +0| 2000| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | producer| | 0| 1| 0| 0',
+        'RESOLUTION| | +0| 2000| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | resolution| | 0| 1| 0| 0',
+        'SEASONAL| | +0| 2000| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | seasonal| | 0| 1| 0| 0',
+        'STREAMING| | +0| 2000| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | streaming| | 0| 1| 0| 0',
+        'STUDIO_ANIMATION| | +0| 2000| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | studio_animation| | 0| 1| 0| 0',
+        'STUDIO| | +0| 2000| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | studio| | 0| 1| 0| 0',
+        'SUBTITLE| | +0| 2000| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | subtitle_language| | 0| 1| 0| 0',
+        'TV_CHART| | +0| 2000| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | tv_chart| | 0| 1| 0| 0',
+        'UK_NETWORK| | +0| 2000| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | network_uk| | 0| 1| 0| 0',
+        'UK_STREAMING| | +0| 2000| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | streaming_uk| | 0| 1| 0| 0',
+        'UNIVERSE| | +0| 2000| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | universe| | 0| 1| 0| 0',
+        'US_NETWORK| | +0| 2000| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | network_us| | 0| 1| 0| 0',
+        'US_STREAMING| | +0| 2000| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | streaming_us| | 0| 1| 0| 0',
+        'WRITER| | +0| 2000| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | writer| | 0| 1| 0| 0',
+        'YEAR| | +0| 2000| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | year| | 0| 1| 0| 0',
+        'BASED_ON| | +0| 2000| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | based| | 0| 1| 0| 0'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $pre_value = Get-YamlPropertyValue -PropertyPath "collections.separator.name" -ConfigObject $global:ConfigObj -CaseSensitivity Upper
 
     $arr = @()
     foreach ($item in $myArray) {
-        $value = Set-TextBetweenDelimiters -InputString $pre_value -ReplacementString (Get-YamlPropertyValue -PropertyPath "key_names.$($item.Name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
-        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $value = Set-TextBetweenDelimiters -InputString $pre_value -ReplacementString (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
         foreach ($color in $colors) {
-            $arr += ".\create_poster.ps1 -logo `"$script_path\@base\$color.png`" -logo_offset +0 -logo_resize 2000 -text `"$value`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"\$color\$($item.out_name)`" -base_color `"#FFFFFF`" -gradient 0 -avg_color 0 -clean 1 -white_wash 0"
+            $arr += ".\create_poster.ps1 -logo `"$script_path\@base\$color.png`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"\$color\$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
         }
     }
     LaunchScripts -ScriptPaths $arr
@@ -3294,29 +3537,45 @@ Function CreateStreaming {
     Set-Location $script_path
     # Find-Path "$script_path\streaming"
     Move-Item -Path output -Destination output-orig
+
+    $myArray = @(
+        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        '| All 4.png| +0| 1000| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | All 4| #14AE9A| 1| 1| 0| 1',
+        '| Apple TV+.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Apple TV+| #494949| 1| 1| 0| 1',
+        '| BET+.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | BET+| #B3359C| 1| 1| 0| 1',
+        '| BritBox.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | BritBox| #198CA8| 1| 1| 0| 1',
+        '| crave.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | crave| #29C2F1| 1| 1| 0| 1',
+        '| Crunchyroll.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Crunchyroll| #C9761D| 1| 1| 0| 1',
+        '| discovery+.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | discovery+| #2175D9| 1| 1| 0| 1',
+        '| Disney+.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Disney+| #0F2FA4| 1| 1| 0| 1',
+        '| Funimation.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Funimation| #513790| 1| 1| 0| 1',
+        '| hayu.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | hayu| #C9516D| 1| 1| 0| 1',
+        '| HBO Max.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | HBO Max| #7870B9| 1| 1| 0| 1',
+        '| Hulu.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Hulu| #1BC073| 1| 1| 0| 1',
+        '| Max.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Max| #002BE7| 1| 1| 0| 1',
+        '| My 5.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | My 5| #426282| 1| 1| 0| 1',
+        '| Netflix.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Netflix| #B42A33| 1| 1| 0| 1',
+        '| NOW.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | NOW| #215659| 1| 1| 0| 1',
+        '| Paramount+.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Paramount+| #2A67CC| 1| 1| 0| 1',
+        '| Peacock.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Peacock| #DA4428| 1| 1| 0| 1',
+        '| Prime Video.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Prime Video| #11607E| 1| 1| 0| 1',
+        '| Quibi.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Quibi| #AB5E73| 1| 1| 0| 1',
+        '| Showtime.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Showtime| #BC1818| 1| 1| 0| 1',
+        '| Stan.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Stan| #227CC0| 1| 1| 0| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
     $arr = @()
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_streaming\All 4.png`" -logo_offset +0 -logo_resize 1000 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"All 4`" -base_color `"#14AE9A`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_streaming\Apple TV+.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Apple TV+`" -base_color `"#494949`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_streaming\BET+.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"BET+`" -base_color `"#B3359C`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_streaming\BritBox.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"BritBox`" -base_color `"#198CA8`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_streaming\crave.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"crave`" -base_color `"#29C2F1`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_streaming\Crunchyroll.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Crunchyroll`" -base_color `"#C9761D`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_streaming\discovery+.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"discovery+`" -base_color `"#2175D9`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_streaming\Disney+.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Disney+`" -base_color `"#0F2FA4`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_streaming\Funimation.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Funimation`" -base_color `"#513790`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_streaming\hayu.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"hayu`" -base_color `"#C9516D`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_streaming\HBO Max.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"HBO Max`" -base_color `"#7870B9`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_streaming\Hulu.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Hulu`" -base_color `"#1BC073`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_streaming\Max.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Max`" -base_color `"#002BE7`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_streaming\My 5.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"My 5`" -base_color `"#426282`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_streaming\Netflix.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Netflix`" -base_color `"#B42A33`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_streaming\NOW.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"NOW`" -base_color `"#215659`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_streaming\Paramount+.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Paramount+`" -base_color `"#2A67CC`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_streaming\Peacock.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Peacock`" -base_color `"#DA4428`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_streaming\Prime Video.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Prime Video`" -base_color `"#11607E`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_streaming\Quibi.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Quibi`" -base_color `"#AB5E73`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_streaming\Showtime.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Showtime`" -base_color `"#BC1818`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_streaming\Stan.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Stan`" -base_color `"#227CC0`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
+    foreach ($item in $myArray) {
+        if ($($item.key_name).ToString() -eq "") {
+            $value = $null
+        }
+        else {
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+        }
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_streaming\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
+    }
+
     LaunchScripts -ScriptPaths $arr
     Move-Item -Path output -Destination streaming
     Copy-Item -Path logos_streaming -Destination streaming\logos -Recurse
@@ -3331,7 +3590,6 @@ Function CreateStudio {
     Write-Host "Creating Studio"
     Set-Location $script_path
     # Find-Path "$script_path\studio"
-    $theFont = "ComfortAa-Medium"
     $theMaxWidth = 1800
     $theMaxHeight = 1000
     $minPointSize = 100
@@ -3340,252 +3598,272 @@ Function CreateStudio {
     Move-Item -Path output -Destination output-orig
 
     $myArray = @(
-        'Logo| Name| out_name| base_color| ww',
-        'transparent.png| studio_animation_other| other_animation| #FF2000| 1',
-        'transparent.png| studio_other| other| #FF2000| 1'
+        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        'studio_animation_other| transparent.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | other_animation| #FF2000| 1| 1| 0| 1',
+        'studio_other| transparent.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | other| #FF2000| 1| 1| 0| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
     foreach ($item in $myArray) {
-        $value = (Get-YamlPropertyValue -PropertyPath "collections.$($item.name).name" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
-        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
-        $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.Logo)`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$value`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+        if ($($item.key_name).ToString() -eq "") {
+            $value = $null
+        }
+        else {
+            $value = (Get-YamlPropertyValue -PropertyPath "collections.$($item.key_name).name" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+        }
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
     }
     LaunchScripts -ScriptPaths $arr
 
+    $myArray = @(
+        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        '| 20th Century Animation.png| +0| 1500| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | 20th Century Animation| #9F3137| 1| 1| 0| 1',
+        '| 20th Century Studios.png| +0| 1500| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | 20th Century Studios| #3387C6| 1| 1| 0| 1',
+        '| 8bit.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | 8bit| #365F71| 1| 1| 0| 0',
+        '| A-1 Pictures.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | A-1 Pictures| #5776A8| 1| 1| 0| 0',
+        '| A.C.G.T..png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | A.C.G.T.| #9C46DE| 1| 1| 0| 0',
+        '| Acca effe.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Acca effe| #1485D0| 1| 1| 0| 0',
+        '| Actas.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Actas| #C9C4FF| 1| 1| 0| 0',
+        '| AIC.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | AIC Spirits| #6DF7FB| 1| 1| 0| 0',
+        '| Ajia-Do.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Ajia-Do| #665AC4| 1| 1| 0| 0',
+        '| Akatsuki.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Akatsuki| #8CC0AE| 1| 1| 0| 0',
+        '| Amazon Studios.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Amazon Studios| #D28109| 1| 1| 0| 1',
+        '| Amblin Entertainment.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Amblin Entertainment| #394E76| 1| 1| 0| 1',
+        '| Animation Do.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Animation Do| #408FE3| 1| 1| 0| 0',
+        '| Ankama.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Ankama| #CD717E| 1| 1| 0| 0',
+        '| APPP.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | APPP| #4D4AAD| 1| 1| 0| 0',
+        '| Arms.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Arms| #50A8C3| 1| 1| 0| 0',
+        '| Artland.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Artland| #6157CB| 1| 1| 0| 0',
+        '| Artmic.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Artmic| #7381BE| 1| 1| 0| 0',
+        '| Arvo Animation.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Arvo Animation| #6117D1| 1| 1| 0| 0',
+        '| Asahi Production.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Asahi Production| #BC9A43| 1| 1| 0| 0',
+        '| Ashi Productions.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Ashi Productions| #6AB420| 1| 1| 0| 0',
+        '| asread..png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | asread.| #6CCDB4| 1| 1| 0| 0',
+        '| AtelierPontdarc.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | AtelierPontdarc| #CD0433| 1| 1| 0| 0',
+        '| B.CMAY PICTURES.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | B.CMAY PICTURES| #873E7F| 1| 1| 0| 0',
+        '| Bakken Record.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Bakken Record| #4B3EDE| 1| 1| 0| 0',
+        '| Bandai Namco Pictures.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Bandai Namco Pictures| #4FC739| 1| 1| 0| 0',
+        '| Bardel Entertainment.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Bardel Entertainment| #5009A5| 1| 1| 0| 0',
+        '| Bee Train.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Bee Train| #804F23| 1| 1| 0| 0',
+        '| Bibury Animation Studios.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Bibury Animation Studios| #A7FAAA| 1| 1| 0| 0',
+        '| bilibili.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | bilibili| #E85486| 1| 1| 0| 0',
+        '| Blade.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Blade| #17D53B| 1| 1| 0| 0',
+        '| Blue Sky Studios.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Blue Sky Studios| #1E4678| 1| 1| 0| 1',
+        '| Blumhouse Productions.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Blumhouse Productions| #353535| 1| 1| 0| 1',
+        '| Bones.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Bones| #C4AE14| 1| 1| 0| 0',
+        '| Brain''s Base.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Brain''s Base| #8A530E| 1| 1| 0| 0',
+        '| Bridge.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Bridge| #F0FF7F| 1| 1| 0| 0',
+        '| C-Station.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | C-Station| #B40C76| 1| 1| 0| 0',
+        '| C2C.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | C2C| #320AE4| 1| 1| 0| 0',
+        '| Chernin Entertainment.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Chernin Entertainment| #3D4A64| 1| 1| 0| 1',
+        '| Children''s Playground Entertainment.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Children''s Playground Entertainment| #151126| 1| 1| 0| 0',
+        '| Cloud Hearts.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Cloud Hearts| #47EBDC| 1| 1| 0| 0',
+        '| Clover Works.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Clover Works| #B9556C| 1| 1| 0| 0',
+        '| CloverWorks.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | CloverWorks| #6D578F| 1| 1| 0| 0',
+        '| Colored Pencil Animation.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Colored Pencil Animation| #FB6DFD| 1| 1| 0| 0',
+        '| Columbia Pictures.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Columbia Pictures| #329763| 1| 1| 0| 1',
+        '| CoMix Wave Films.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | CoMix Wave Films| #715AD3| 1| 1| 0| 0',
+        '| Connect.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Connect| #2B3FA4| 1| 1| 0| 0',
+        '| Constantin Film.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Constantin Film| #343B44| 1| 1| 0| 1',
+        '| Craftar Studios.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Craftar Studios| #362BFF| 1| 1| 0| 0',
+        '| Creators in Pack.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Creators in Pack| #6057C4| 1| 1| 0| 0',
+        '| CygamesPictures.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | CygamesPictures| #8C5677| 1| 1| 0| 0',
+        '| David Production.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | David Production| #AB104E| 1| 1| 0| 0',
+        '| Diomedéa.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Diomedéa| #E6A604| 1| 1| 0| 0',
+        '| DLE.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | DLE| #65450D| 1| 1| 0| 0',
+        '| Doga Kobo.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Doga Kobo| #BD0F0F| 1| 1| 0| 0',
+        '| domerica.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | domerica| #4CC65F| 1| 1| 0| 0',
+        '| DreamWorks Animation.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | DreamWorks Animation| #3D6FBA| 1| 1| 0| 1',
+        '| DreamWorks Studios.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | DreamWorks Studios| #2F508F| 1| 1| 0| 1',
+        '| Drive.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Drive| #C80A46| 1| 1| 0| 0',
+        '| EMT Squared.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | EMT Squared| #62F7A1| 1| 1| 0| 0',
+        '| Encourage Films.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Encourage Films| #357C76| 1| 1| 0| 0',
+        '| ENGI.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | ENGI| #B5D798| 1| 1| 0| 0',
+        '| feel..png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | feel.| #9268C7| 1| 1| 0| 0',
+        '| Felix Film.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Felix Film| #7B2557| 1| 1| 0| 0',
+        '| Fenz.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Fenz| #A6AD7F| 1| 1| 0| 0',
+        '| Fortiche Production.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Fortiche Production| #63505B| 1| 1| 0| 0',
+        '| Frederator Studios.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Frederator Studios| #10DF97| 1| 1| 0| 0',
+        '| Gainax.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Gainax| #A73034| 1| 1| 0| 1',
+        '| Gallop.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Gallop| #5EC0A0| 1| 1| 0| 0',
+        '| Geek Toys.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Geek Toys| #5B5757| 1| 1| 0| 0',
+        '| Gekkou.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Gekkou| #02AB76| 1| 1| 0| 0',
+        '| Gemba.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Gemba| #BEE8C2| 1| 1| 0| 0',
+        '| GENCO.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | GENCO| #705D63| 1| 1| 0| 0',
+        '| Geno Studio.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Geno Studio| #D504AB| 1| 1| 0| 0',
+        '| GoHands.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | GoHands| #A683DD| 1| 1| 0| 0',
+        '| Gonzo.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Gonzo| #C92A69| 1| 1| 0| 0',
+        '| Graphinica.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Graphinica| #935FBB| 1| 1| 0| 0',
+        '| GrindStone Entertainment Group.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | GrindStone Entertainment Group| #B66736| 1| 1| 0| 1',
+        '| Group Tac.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Group Tac| #157DB4| 1| 1| 0| 0',
+        '| Hal Film Maker.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Hal Film Maker| #E085A4| 1| 1| 0| 0',
+        '| Haoliners Animation League.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Haoliners Animation League| #A616E8| 1| 1| 0| 0',
+        '| Happy Madison Productions.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Happy Madison Productions| #278761| 1| 1| 0| 1',
+        '| Hoods Entertainment.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Hoods Entertainment| #F5F5D1| 1| 1| 0| 0',
+        '| Hotline.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Hotline| #45AB9A| 1| 1| 0| 0',
+        '| Illumination Entertainment.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Illumination Entertainment| #C7C849| 1| 1| 0| 1',
+        '| Imagin.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Imagin| #241EFD| 1| 1| 0| 0',
+        '| Ingenious Media.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Ingenious Media| #729A3B| 1| 1| 0| 1',
+        '| J.C.Staff.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | J.C.Staff| #986BF3| 1| 1| 0| 0',
+        '| Jumondou.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Jumondou| #AA58AA| 1| 1| 0| 0',
+        '| Kadokawa.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Kadokawa| #648E1A| 1| 1| 0| 0',
+        '| Khara.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Khara| #538150| 1| 1| 0| 0',
+        '| Kinema Citrus.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Kinema Citrus| #87A92B| 1| 1| 0| 0',
+        '| Kyoto Animation.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Kyoto Animation| #1C4744| 1| 1| 0| 0',
+        '| Lan Studio.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Lan Studio| #989DED| 1| 1| 0| 0',
+        '| LandQ Studio.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | LandQ Studio| #4667C3| 1| 1| 0| 0',
+        '| Lay-duce.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Lay-duce| #0A1988| 1| 1| 0| 0',
+        '| Legendary Pictures.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Legendary Pictures| #303841| 1| 1| 0| 1',
+        '| Legendary Television.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Legendary Television| #2E63F4| 1| 1| 0| 0',
+        '| Lerche.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Lerche| #D42DAE| 1| 1| 0| 0',
+        '| LIDENFILMS.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | LIDENFILMS| #EF8907| 1| 1| 0| 0',
+        '| Lionsgate.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Lionsgate| #7D22A3| 1| 1| 0| 1',
+        '| Lucasfilm Ltd.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Lucasfilm Ltd| #22669B| 1| 1| 0| 1',
+        '| M.S.C.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | M.S.C| #44FD9A| 1| 1| 0| 0',
+        '| Madhouse.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Madhouse| #C58E2C| 1| 1| 0| 0',
+        '| Magic Bus.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Magic Bus| #732AF6| 1| 1| 0| 0',
+        '| Maho Film.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Maho Film| #B95BEB| 1| 1| 0| 0',
+        '| Malevolent Films.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Malevolent Films| #5A6B7B| 1| 1| 0| 1',
+        '| Manglobe.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Manglobe| #085B61| 1| 1| 0| 0',
+        '| MAPPA.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | MAPPA| #376430| 1| 1| 0| 1',
+        '| Marvel Animation.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Marvel Animation| #BE2B2F| 1| 1| 0| 1',
+        '| Marvel Studios.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Marvel Studios| #A61B1F| 1| 1| 0| 1',
+        '| Metro-Goldwyn-Mayer.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Metro-Goldwyn-Mayer| #A48221| 1| 1| 0| 1',
+        '| Millennium Films.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Millennium Films| #911213| 1| 1| 0| 1',
+        '| Millepensee.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Millepensee| #7D9EAC| 1| 1| 0| 0',
+        '| Miramax.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Miramax| #344B75| 1| 1| 0| 1',
+        '| Namu Animation.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Namu Animation| #FDD8D9| 1| 1| 0| 0',
+        '| NAZ.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | NAZ| #476C7A| 1| 1| 0| 0',
+        '| New Line Cinema.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | New Line Cinema| #67857E| 1| 1| 0| 1',
+        '| Nexus.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Nexus| #F8D946| 1| 1| 0| 0',
+        '| Nickelodeon Animation Studio.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Nickelodeon Animation Studio| #5E9BFB| 1| 1| 0| 0',
+        '| Nippon Animation.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Nippon Animation| #4A688B| 1| 1| 0| 0',
+        '| Nomad.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Nomad| #9FE1BF| 1| 1| 0| 0',
+        '| Nut.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Nut| #0DAB93| 1| 1| 0| 0',
+        '| Okuruto Noboru.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Okuruto Noboru| #88B27E| 1| 1| 0| 0',
+        '| OLM.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | OLM| #98FA51| 1| 1| 0| 0',
+        '| Orange.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Orange| #C4BEF5| 1| 1| 0| 0',
+        '| Ordet.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Ordet| #0EEEF6| 1| 1| 0| 0',
+        '| Original Film.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Original Film| #364B61| 1| 1| 0| 1',
+        '| Orion Pictures.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Orion Pictures| #6E6E6E| 1| 1| 0| 1',
+        '| OZ.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | OZ| #2EF68F| 1| 1| 0| 0',
+        '| P.A. Works.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | P.A. Works| #C15D16| 1| 1| 0| 1',
+        '| P.I.C.S..png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | P.I.C.S.| #A63FA8| 1| 1| 0| 0',
+        '| Paramount Animation.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Paramount Animation| #3254B1| 1| 1| 0| 1',
+        '| Paramount Pictures.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Paramount Pictures| #5D94B4| 1| 1| 0| 1',
+        '| Passione.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Passione| #970A59| 1| 1| 0| 0',
+        '| Pb Animation Co. Ltd.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Pb Animation Co. Ltd| #003EB9| 1| 1| 0| 0',
+        '| Pierrot.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Pierrot| #C1CFBC| 1| 1| 0| 0',
+        '| Pine Jam.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Pine Jam| #4C9C3F| 1| 1| 0| 0',
+        '| Pixar Animation Studios.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Pixar Animation Studios| #1668B0| 1| 1| 0| 1',
+        '| Pixar.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Pixar| #2A58C6| 1| 1| 0| 1',
+        '| PlanB Entertainment.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | PlanB Entertainment| #9084B5| 1| 1| 0| 1',
+        '| Platinum Vision.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Platinum Vision| #70A8B4| 1| 1| 0| 0',
+        '| Polygon Pictures.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Polygon Pictures| #741E67| 1| 1| 0| 0',
+        '| Pony Canyon.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Pony Canyon| #EECA46| 1| 1| 0| 0',
+        '| Powerhouse Animation Studios.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Powerhouse Animation Studios| #42A545| 1| 1| 0| 0',
+        '| PRA.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | PRA| #DFA26E| 1| 1| 0| 0',
+        '| Production +h..png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Production +h.| #FC07C6| 1| 1| 0| 0',
+        '| Production I.G.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Production I.G| #8843C2| 1| 1| 0| 1',
+        '| Production IMS.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Production IMS| #169AB7| 1| 1| 0| 0',
+        '| Production Reed.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Production Reed| #92F588| 1| 1| 0| 0',
+        '| Project No.9.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Project No.9| #FDC471| 1| 1| 0| 0',
+        '| Quad.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Quad| #0CA0BE| 1| 1| 0| 0',
+        '| Radix.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Radix| #1F2D33| 1| 1| 0| 0',
+        '| Red Dog Culture House.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Red Dog Culture House| #46FDF5| 1| 1| 0| 0',
+        '| Revoroot.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Revoroot| #E8DEB3| 1| 1| 0| 0',
+        '| Saetta.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Saetta| #46476A| 1| 1| 0| 0',
+        '| SANZIGEN.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | SANZIGEN| #068509| 1| 1| 0| 0',
+        '| Satelight.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Satelight| #D1B2CD| 1| 1| 0| 0',
+        '| Science SARU.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Science SARU| #6948C1| 1| 1| 0| 0',
+        '| Sentai Filmworks.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Sentai Filmworks| #E00604| 1| 1| 0| 0',
+        '| Seven Arcs.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Seven Arcs| #7B82BA| 1| 1| 0| 0',
+        '| Shaft.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Shaft| #2BA8A4| 1| 1| 0| 1',
+        '| Shin-Ei Animation.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Shin-Ei Animation| #422A12| 1| 1| 0| 0',
+        '| Shogakukan.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Shogakukan| #739D5A| 1| 1| 0| 0',
+        '| Shuka.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Shuka| #925BD1| 1| 1| 0| 0',
+        '| Signal.MD.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Signal.MD| #F95874| 1| 1| 0| 0',
+        '| SILVER LINK..png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | SILVER LINK.| #06FF01| 1| 1| 0| 0',
+        '| Silver Link.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Silver Link| #747474| 1| 1| 0| 0',
+        '| Sony Pictures Animation.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Sony Pictures Animation| #498BA9| 1| 1| 0| 1',
+        '| Sony Pictures.png| +0| 1200| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Sony Pictures| #943EBD| 1| 1| 0| 1',
+        '| Staple Entertainment.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Staple Entertainment| #E1EB06| 1| 1| 0| 0',
+        '| Studio 3Hz.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Studio 3Hz| #F7F5BC| 1| 1| 0| 0',
+        '| Studio A-CAT.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Studio A-CAT| #049ABA| 1| 1| 0| 0',
+        '| Studio Bind.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Studio Bind| #E20944| 1| 1| 0| 0',
+        '| Studio Blanc..png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Studio Blanc.| #6308CC| 1| 1| 0| 0',
+        '| Studio Chizu.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Studio Chizu| #68ACAA| 1| 1| 0| 0',
+        '| Studio Comet.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Studio Comet| #2D1337| 1| 1| 0| 0',
+        '| Studio DEEN.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Studio DEEN| #3A6EA8| 1| 1| 0| 1',
+        '| Studio Dragon.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Studio Dragon| #3ECAF1| 1| 1| 0| 0',
+        '| Studio Elle.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Studio Elle| #511DD7| 1| 1| 0| 0',
+        '| Studio Flad.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Studio Flad| #996396| 1| 1| 0| 0',
+        '| Studio Ghibli.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Studio Ghibli| #AB2F46| 1| 1| 0| 1',
+        '| Studio Gokumi.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Studio Gokumi| #D9C7A0| 1| 1| 0| 0',
+        '| Studio Guts.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Studio Guts| #832A64| 1| 1| 0| 0',
+        '| Studio Hibari.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Studio Hibari| #4F9E24| 1| 1| 0| 0',
+        '| Studio Kafka.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Studio Kafka| #7A2917| 1| 1| 0| 0',
+        '| Studio Kai.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Studio Kai| #CA3EC8| 1| 1| 0| 0',
+        '| Studio Mir.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Studio Mir| #723564| 1| 1| 0| 0',
+        '| studio MOTHER.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | studio MOTHER| #203953| 1| 1| 0| 0',
+        '| Studio Palette.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Studio Palette| #5A17AC| 1| 1| 0| 0',
+        '| Studio Pierrot.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Studio Pierrot| #459A73| 1| 1| 0| 1',
+        '| Studio Rikka.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Studio Rikka| #DB5318| 1| 1| 0| 0',
+        '| Studio Signpost.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Studio Signpost| #597F70| 1| 1| 0| 0',
+        '| Studio VOLN.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Studio VOLN| #6FDDE8| 1| 1| 0| 0',
+        '| STUDIO4°C.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | STUDIO4°C| #33352C| 1| 1| 0| 0',
+        '| Summit Entertainment.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Summit Entertainment| #3898B6| 1| 1| 0| 1',
+        '| Sunrise Beyond.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Sunrise Beyond| #F6E84F| 1| 1| 0| 0',
+        '| Sunrise.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Sunrise| #864B89| 1| 1| 0| 0',
+        '| SynergySP.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | SynergySP| #0E82C8| 1| 1| 0| 0',
+        '| Tatsunoko Production.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Tatsunoko Production| #5A76B8| 1| 1| 0| 0',
+        '| Telecom Animation Film.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Telecom Animation Film| #2F562B| 1| 1| 0| 0',
+        '| Tezuka Productions.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Tezuka Productions| #10259A| 1| 1| 0| 0',
+        '| Titmouse.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Titmouse| #E5DCBD| 1| 1| 0| 0',
+        '| TMS Entertainment.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | TMS Entertainment| #68B823| 1| 1| 0| 0',
+        '| TNK.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | TNK| #B7D0AF| 1| 1| 0| 0',
+        '| Toei Animation.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Toei Animation| #63A2B1| 1| 1| 0| 0',
+        '| Topcraft.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Topcraft| #285732| 1| 1| 0| 0',
+        '| Triangle Staff.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Triangle Staff| #F01AFA| 1| 1| 0| 0',
+        '| Trigger.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Trigger| #5C5C5C| 1| 1| 0| 0',
+        '| TROYCA.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | TROYCA| #2F562B| 1| 1| 0| 0',
+        '| TYO Animations.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | TYO Animations| #83CC1D| 1| 1| 0| 0',
+        '| Typhoon Graphics.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Typhoon Graphics| #C84B2E| 1| 1| 0| 0',
+        '| Ufotable.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Ufotable| #BF1717| 1| 1| 0| 0',
+        '| Universal Animation Studios.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Universal Animation Studios| #B6322D| 1| 1| 0| 1',
+        '| Universal Pictures.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Universal Pictures| #207AAB| 1| 1| 0| 1',
+        '| V1 Studio.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | V1 Studio| #961982| 1| 1| 0| 0',
+        '| Village Roadshow Pictures.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Village Roadshow Pictures| #A76B29| 1| 1| 0| 1',
+        '| W-Toon Studio.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | W-Toon Studio| #F329FE| 1| 1| 0| 0',
+        '| Walt Disney Animation Studios.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Walt Disney Animation Studios| #1290C0| 1| 1| 0| 1',
+        '| Walt Disney Pictures.png| +0| 1300| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Walt Disney Pictures| #2944AA| 1| 1| 0| 1',
+        '| Warner Animation Group.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Warner Animation Group| #92171E| 1| 1| 0| 1',
+        '| Warner Bros. Pictures.png| +0| 1200| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Warner Bros. Pictures| #39538F| 1| 1| 0| 1',
+        '| Wawayu Animation.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Wawayu Animation| #EB7786| 1| 1| 0| 0',
+        '| White Fox.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | White Fox| #A86633| 1| 1| 0| 0',
+        '| Wit Studio.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Wit Studio| #1F3BB6| 1| 1| 0| 0',
+        '| Wolfsbane.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Wolfsbane| #8E7689| 1| 1| 0| 0',
+        '| Xebec.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Xebec| #75BF81| 1| 1| 0| 0',
+        '| Yokohama Animation Lab.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Yokohama Animation Lab| #2C3961| 1| 1| 0| 0',
+        '| Yostar Pictures.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Yostar Pictures| #9A3DC1| 1| 1| 0| 0',
+        '| Yumeta Company.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Yumeta Company| #945E75| 1| 1| 0| 0',
+        '| Zero-G.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Zero-G| #460961| 1| 1| 0| 0',
+        '| Zexcs.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Zexcs| #E60CB2| 1| 1| 0| 0'    
+    ) | ConvertFrom-Csv -Delimiter '|'
+
     $arr = @()
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\20th Century Animation.png`" -logo_offset +0 -logo_resize 1500 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"20th Century Animation`" -base_color `"#9F3137`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\20th Century Studios.png`" -logo_offset +0 -logo_resize 1500 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"20th Century Studios`" -base_color `"#3387C6`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\8bit.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"8bit`" -base_color `"#365F71`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\A-1 Pictures.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"A-1 Pictures`" -base_color `"#5776A8`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\A.C.G.T..png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"A.C.G.T.`" -base_color `"#9C46DE`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Acca effe.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Acca effe`" -base_color `"#1485D0`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Actas.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Actas`" -base_color `"#C9C4FF`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\AIC.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"AIC Spirits`" -base_color `"#6DF7FB`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Ajia-Do.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Ajia-Do`" -base_color `"#665AC4`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Akatsuki.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Akatsuki`" -base_color `"#8CC0AE`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Amazon Studios.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Amazon Studios`" -base_color `"#D28109`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Amblin Entertainment.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Amblin Entertainment`" -base_color `"#394E76`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Animation Do.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Animation Do`" -base_color `"#408FE3`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Ankama.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Ankama`" -base_color `"#CD717E`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\APPP.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"APPP`" -base_color `"#4D4AAD`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Arms.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Arms`" -base_color `"#50A8C3`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Artland.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Artland`" -base_color `"#6157CB`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Artmic.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Artmic`" -base_color `"#7381BE`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Arvo Animation.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Arvo Animation`" -base_color `"#6117D1`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Asahi Production.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Asahi Production`" -base_color `"#BC9A43`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Ashi Productions.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Ashi Productions`" -base_color `"#6AB420`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\asread..png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"asread.`" -base_color `"#6CCDB4`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\AtelierPontdarc.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"AtelierPontdarc`" -base_color `"#CD0433`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\B.CMAY PICTURES.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"B.CMAY PICTURES`" -base_color `"#873E7F`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Bakken Record.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Bakken Record`" -base_color `"#4B3EDE`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Bandai Namco Pictures.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Bandai Namco Pictures`" -base_color `"#4FC739`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Bardel Entertainment.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Bardel Entertainment`" -base_color `"#5009A5`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Bee Train.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Bee Train`" -base_color `"#804F23`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Bibury Animation Studios.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Bibury Animation Studios`" -base_color `"#A7FAAA`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\bilibili.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"bilibili`" -base_color `"#E85486`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Blade.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Blade`" -base_color `"#17D53B`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Blue Sky Studios.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Blue Sky Studios`" -base_color `"#1E4678`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Blumhouse Productions.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Blumhouse Productions`" -base_color `"#353535`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Bones.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Bones`" -base_color `"#C4AE14`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Brain's Base.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Brain's Base`" -base_color `"#8A530E`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Bridge.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Bridge`" -base_color `"#F0FF7F`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\C-Station.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"C-Station`" -base_color `"#B40C76`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\C2C.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"C2C`" -base_color `"#320AE4`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Chernin Entertainment.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Chernin Entertainment`" -base_color `"#3D4A64`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Children's Playground Entertainment.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Children's Playground Entertainment`" -base_color `"#151126`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Cloud Hearts.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Cloud Hearts`" -base_color `"#47EBDC`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Clover Works.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Clover Works`" -base_color `"#B9556C`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\CloverWorks.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"CloverWorks`" -base_color `"#6D578F`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Colored Pencil Animation.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Colored Pencil Animation`" -base_color `"#FB6DFD`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Columbia Pictures.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Columbia Pictures`" -base_color `"#329763`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\CoMix Wave Films.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"CoMix Wave Films`" -base_color `"#715AD3`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Connect.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Connect`" -base_color `"#2B3FA4`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Constantin Film.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Constantin Film`" -base_color `"#343B44`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Craftar Studios.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Craftar Studios`" -base_color `"#362BFF`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Creators in Pack.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Creators in Pack`" -base_color `"#6057C4`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\CygamesPictures.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"CygamesPictures`" -base_color `"#8C5677`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\David Production.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"David Production`" -base_color `"#AB104E`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Diomedéa.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Diomedéa`" -base_color `"#E6A604`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\DLE.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"DLE`" -base_color `"#65450D`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Doga Kobo.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Doga Kobo`" -base_color `"#BD0F0F`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\domerica.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"domerica`" -base_color `"#4CC65F`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\DreamWorks Animation.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"DreamWorks Animation`" -base_color `"#3D6FBA`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\DreamWorks Studios.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"DreamWorks Studios`" -base_color `"#2F508F`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Drive.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Drive`" -base_color `"#C80A46`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\EMT Squared.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"EMT Squared`" -base_color `"#62F7A1`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Encourage Films.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Encourage Films`" -base_color `"#357C76`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\ENGI.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"ENGI`" -base_color `"#B5D798`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\feel..png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"feel.`" -base_color `"#9268C7`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Felix Film.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Felix Film`" -base_color `"#7B2557`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Fenz.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Fenz`" -base_color `"#A6AD7F`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Fortiche Production.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Fortiche Production`" -base_color `"#63505B`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Frederator Studios.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Frederator Studios`" -base_color `"#10DF97`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Gainax.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Gainax`" -base_color `"#A73034`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Gallop.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Gallop`" -base_color `"#5EC0A0`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Geek Toys.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Geek Toys`" -base_color `"#5B5757`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Gekkou.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Gekkou`" -base_color `"#02AB76`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Gemba.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Gemba`" -base_color `"#BEE8C2`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\GENCO.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"GENCO`" -base_color `"#705D63`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Geno Studio.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Geno Studio`" -base_color `"#D504AB`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\GoHands.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"GoHands`" -base_color `"#A683DD`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Gonzo.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Gonzo`" -base_color `"#C92A69`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Graphinica.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Graphinica`" -base_color `"#935FBB`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\GrindStone Entertainment Group.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"GrindStone Entertainment Group`" -base_color `"#B66736`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Group Tac.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Group Tac`" -base_color `"#157DB4`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Hal Film Maker.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Hal Film Maker`" -base_color `"#E085A4`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Haoliners Animation League.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Haoliners Animation League`" -base_color `"#A616E8`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Happy Madison Productions.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Happy Madison Productions`" -base_color `"#278761`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Hoods Entertainment.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Hoods Entertainment`" -base_color `"#F5F5D1`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Hotline.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Hotline`" -base_color `"#45AB9A`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Illumination Entertainment.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Illumination Entertainment`" -base_color `"#C7C849`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Imagin.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Imagin`" -base_color `"#241EFD`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Ingenious Media.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Ingenious Media`" -base_color `"#729A3B`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\J.C.Staff.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"J.C.Staff`" -base_color `"#986BF3`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Jumondou.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Jumondou`" -base_color `"#AA58AA`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Kadokawa.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Kadokawa`" -base_color `"#648E1A`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Khara.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Khara`" -base_color `"#538150`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Kinema Citrus.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Kinema Citrus`" -base_color `"#87A92B`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Kyoto Animation.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Kyoto Animation`" -base_color `"#1C4744`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Lan Studio.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Lan Studio`" -base_color `"#989DED`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\LandQ Studio.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"LandQ Studio`" -base_color `"#4667C3`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Lay-duce.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Lay-duce`" -base_color `"#0A1988`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Legendary Pictures.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Legendary Pictures`" -base_color `"#303841`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Legendary Television.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Legendary Television`" -base_color `"#2E63F4`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Lerche.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Lerche`" -base_color `"#D42DAE`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\LIDENFILMS.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"LIDENFILMS`" -base_color `"#EF8907`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Lionsgate.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Lionsgate`" -base_color `"#7D22A3`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Lucasfilm Ltd.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Lucasfilm Ltd`" -base_color `"#22669B`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\M.S.C.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"M.S.C`" -base_color `"#44FD9A`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Madhouse.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Madhouse`" -base_color `"#C58E2C`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Magic Bus.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Magic Bus`" -base_color `"#732AF6`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Maho Film.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Maho Film`" -base_color `"#B95BEB`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Malevolent Films.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Malevolent Films`" -base_color `"#5A6B7B`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Manglobe.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Manglobe`" -base_color `"#085B61`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\MAPPA.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"MAPPA`" -base_color `"#376430`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Marvel Animation.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Marvel Animation`" -base_color `"#BE2B2F`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Marvel Studios.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Marvel Studios`" -base_color `"#A61B1F`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Metro-Goldwyn-Mayer.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Metro-Goldwyn-Mayer`" -base_color `"#A48221`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Millennium Films.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Millennium Films`" -base_color `"#911213`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Millepensee.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Millepensee`" -base_color `"#7D9EAC`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Miramax.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Miramax`" -base_color `"#344B75`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Namu Animation.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Namu Animation`" -base_color `"#FDD8D9`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\NAZ.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"NAZ`" -base_color `"#476C7A`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\New Line Cinema.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"New Line Cinema`" -base_color `"#67857E`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Nexus.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Nexus`" -base_color `"#F8D946`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Nickelodeon Animation Studio.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Nickelodeon Animation Studio`" -base_color `"#5E9BFB`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Nippon Animation.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Nippon Animation`" -base_color `"#4A688B`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Nomad.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Nomad`" -base_color `"#9FE1BF`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Nut.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Nut`" -base_color `"#0DAB93`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Okuruto Noboru.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Okuruto Noboru`" -base_color `"#88B27E`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\OLM.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"OLM`" -base_color `"#98FA51`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Orange.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Orange`" -base_color `"#C4BEF5`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Ordet.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Ordet`" -base_color `"#0EEEF6`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Original Film.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Original Film`" -base_color `"#364B61`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Orion Pictures.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Orion Pictures`" -base_color `"#6E6E6E`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\OZ.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"OZ`" -base_color `"#2EF68F`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\P.A. Works.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"P.A. Works`" -base_color `"#C15D16`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\P.I.C.S..png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"P.I.C.S.`" -base_color `"#A63FA8`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Paramount Animation.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Paramount Animation`" -base_color `"#3254B1`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Paramount Pictures.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Paramount Pictures`" -base_color `"#5D94B4`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Passione.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Passione`" -base_color `"#970A59`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Pb Animation Co. Ltd.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Pb Animation Co. Ltd`" -base_color `"#003EB9`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Pierrot.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Pierrot`" -base_color `"#C1CFBC`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Pine Jam.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Pine Jam`" -base_color `"#4C9C3F`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Pixar Animation Studios.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Pixar Animation Studios`" -base_color `"#1668B0`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Pixar.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Pixar`" -base_color `"#2A58C6`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\PlanB Entertainment.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"PlanB Entertainment`" -base_color `"#9084B5`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Platinum Vision.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Platinum Vision`" -base_color `"#70A8B4`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Polygon Pictures.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Polygon Pictures`" -base_color `"#741E67`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Pony Canyon.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Pony Canyon`" -base_color `"#EECA46`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Powerhouse Animation Studios.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Powerhouse Animation Studios`" -base_color `"#42A545`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\PRA.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"PRA`" -base_color `"#DFA26E`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Production +h..png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Production +h.`" -base_color `"#FC07C6`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Production I.G.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Production I.G`" -base_color `"#8843C2`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Production IMS.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Production IMS`" -base_color `"#169AB7`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Production Reed.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Production Reed`" -base_color `"#92F588`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Project No.9.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Project No.9`" -base_color `"#FDC471`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Quad.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Quad`" -base_color `"#0CA0BE`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Radix.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Radix`" -base_color `"#1F2D33`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Red Dog Culture House.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Red Dog Culture House`" -base_color `"#46FDF5`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Revoroot.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Revoroot`" -base_color `"#E8DEB3`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Saetta.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Saetta`" -base_color `"#46476A`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\SANZIGEN.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"SANZIGEN`" -base_color `"#068509`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Satelight.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Satelight`" -base_color `"#D1B2CD`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Science SARU.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Science SARU`" -base_color `"#6948C1`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Sentai Filmworks.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Sentai Filmworks`" -base_color `"#E00604`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Seven Arcs.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Seven Arcs`" -base_color `"#7B82BA`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Shaft.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Shaft`" -base_color `"#2BA8A4`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Shin-Ei Animation.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Shin-Ei Animation`" -base_color `"#422A12`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Shogakukan.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Shogakukan`" -base_color `"#739D5A`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Shuka.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Shuka`" -base_color `"#925BD1`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Signal.MD.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Signal.MD`" -base_color `"#F95874`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\SILVER LINK..png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"SILVER LINK.`" -base_color `"#06FF01`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Silver Link.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Silver Link`" -base_color `"#747474`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Sony Pictures Animation.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Sony Pictures Animation`" -base_color `"#498BA9`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Sony Pictures.png`" -logo_offset +0 -logo_resize 1200 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Sony Pictures`" -base_color `"#943EBD`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Staple Entertainment.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Staple Entertainment`" -base_color `"#E1EB06`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Studio 3Hz.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Studio 3Hz`" -base_color `"#F7F5BC`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Studio A-CAT.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Studio A-CAT`" -base_color `"#049ABA`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Studio Bind.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Studio Bind`" -base_color `"#E20944`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Studio Blanc..png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Studio Blanc.`" -base_color `"#6308CC`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Studio Chizu.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Studio Chizu`" -base_color `"#68ACAA`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Studio Comet.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Studio Comet`" -base_color `"#2D1337`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Studio DEEN.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Studio DEEN`" -base_color `"#3A6EA8`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Studio Dragon.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Studio Dragon`" -base_color `"#3ECAF1`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Studio Elle.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Studio Elle`" -base_color `"#511DD7`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Studio Flad.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Studio Flad`" -base_color `"#996396`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Studio Ghibli.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Studio Ghibli`" -base_color `"#AB2F46`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Studio Gokumi.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Studio Gokumi`" -base_color `"#D9C7A0`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Studio Guts.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Studio Guts`" -base_color `"#832A64`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Studio Hibari.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Studio Hibari`" -base_color `"#4F9E24`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Studio Kafka.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Studio Kafka`" -base_color `"#7A2917`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Studio Kai.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Studio Kai`" -base_color `"#CA3EC8`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Studio Mir.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Studio Mir`" -base_color `"#723564`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\studio MOTHER.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"studio MOTHER`" -base_color `"#203953`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Studio Palette.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Studio Palette`" -base_color `"#5A17AC`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Studio Pierrot.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Studio Pierrot`" -base_color `"#459A73`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Studio Rikka.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Studio Rikka`" -base_color `"#DB5318`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Studio Signpost.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Studio Signpost`" -base_color `"#597F70`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Studio VOLN.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Studio VOLN`" -base_color `"#6FDDE8`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\STUDIO4°C.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"STUDIO4°C`" -base_color `"#33352C`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Summit Entertainment.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Summit Entertainment`" -base_color `"#3898B6`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Sunrise Beyond.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Sunrise Beyond`" -base_color `"#F6E84F`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Sunrise.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Sunrise`" -base_color `"#864B89`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\SynergySP.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"SynergySP`" -base_color `"#0E82C8`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Tatsunoko Production.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Tatsunoko Production`" -base_color `"#5A76B8`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Telecom Animation Film.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Telecom Animation Film`" -base_color `"#2F562B`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Tezuka Productions.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Tezuka Productions`" -base_color `"#10259A`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Titmouse.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Titmouse`" -base_color `"#E5DCBD`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\TMS Entertainment.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"TMS Entertainment`" -base_color `"#68B823`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\TNK.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"TNK`" -base_color `"#B7D0AF`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Toei Animation.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Toei Animation`" -base_color `"#63A2B1`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Topcraft.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Topcraft`" -base_color `"#285732`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Triangle Staff.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Triangle Staff`" -base_color `"#F01AFA`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Trigger.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Trigger`" -base_color `"#5C5C5C`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\TROYCA.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"TROYCA`" -base_color `"#2F562B`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\TYO Animations.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"TYO Animations`" -base_color `"#83CC1D`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Typhoon Graphics.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Typhoon Graphics`" -base_color `"#C84B2E`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Ufotable.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Ufotable`" -base_color `"#BF1717`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Universal Animation Studios.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Universal Animation Studios`" -base_color `"#B6322D`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Universal Pictures.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Universal Pictures`" -base_color `"#207AAB`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\V1 Studio.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"V1 Studio`" -base_color `"#961982`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Village Roadshow Pictures.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Village Roadshow Pictures`" -base_color `"#A76B29`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\W-Toon Studio.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"W-Toon Studio`" -base_color `"#F329FE`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Walt Disney Animation Studios.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Walt Disney Animation Studios`" -base_color `"#1290C0`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Walt Disney Pictures.png`" -logo_offset +0 -logo_resize 1300 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Walt Disney Pictures`" -base_color `"#2944AA`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Warner Animation Group.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Warner Animation Group`" -base_color `"#92171E`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Warner Bros. Pictures.png`" -logo_offset +0 -logo_resize 1200 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Warner Bros. Pictures`" -base_color `"#39538F`" -gradient 1 -clean 1 -avg_color 0 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Wawayu Animation.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Wawayu Animation`" -base_color `"#EB7786`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\White Fox.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"White Fox`" -base_color `"#A86633`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Wit Studio.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Wit Studio`" -base_color `"#1F3BB6`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Wolfsbane.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Wolfsbane`" -base_color `"#8E7689`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Xebec.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Xebec`" -base_color `"#75BF81`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Yokohama Animation Lab.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Yokohama Animation Lab`" -base_color `"#2C3961`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Yostar Pictures.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Yostar Pictures`" -base_color `"#9A3DC1`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Yumeta Company.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Yumeta Company`" -base_color `"#945E75`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Zero-G.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Zero-G`" -base_color `"#460961`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\Zexcs.png`" -logo_offset +0 -logo_resize 1600 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"Zexcs`" -base_color `"#E60CB2`" -gradient 1 -clean 1 -avg_color 0 -white_wash 0"
+    foreach ($item in $myArray) {
+        if ($($item.key_name).ToString() -eq "") {
+            $value = $null
+        }
+        else {
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+        }
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
+    }
+    
     LaunchScripts -ScriptPaths $arr
     Move-Item -Path output -Destination studio
     Copy-Item -Path logos_studio -Destination studio\logos -Recurse
@@ -3600,7 +3878,6 @@ Function CreateSubtitleLanguage {
     Write-Host `"Creating Subtitle Language`"
     Set-Location $script_path
     # Find-Path `"$script_path\subtitle_language`"
-    $theFont = "ComfortAa-Medium"
     $theMaxWidth = 1800
     $theMaxHeight = 1000
     $minPointSize = 100
@@ -3609,8 +3886,8 @@ Function CreateSubtitleLanguage {
     Move-Item -Path output -Destination output-orig
 
     $myArray = @(
-        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
-        'subtitle_language_other| transparent.png| +0| 1600| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | other| #FF2000| 1| 1| 0| 1'
+        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        'subtitle_language_other| transparent.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | other| #FF2000| 1| 1| 0| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
@@ -3621,7 +3898,7 @@ Function CreateSubtitleLanguage {
         else {
             $value = (Get-YamlPropertyValue -PropertyPath "collections.$($item.key_name).name" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
         }
-        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
         $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
     }
     LaunchScripts -ScriptPaths $arr
@@ -3629,191 +3906,191 @@ Function CreateSubtitleLanguage {
     $pre_value = Get-YamlPropertyValue -PropertyPath "collections.subtitle_language.name" -ConfigObject $global:ConfigObj -CaseSensitivity Upper
 
     $myArray = @(
-        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
-        'ABKHAZIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ab| #88F678| 1| 1| 0| 1',
-        'AFAR| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | aa| #612A1C| 1| 1| 0| 1',
-        'AFRIKAANS| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | af| #60EC40| 1| 1| 0| 1',
-        'AKAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ak| #021FBC| 1| 1| 0| 1',
-        'ALBANIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | sq| #C5F277| 1| 1| 0| 1',
-        'AMHARIC| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | am| #746BC8| 1| 1| 0| 1',
-        'ARABIC| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ar| #37C768| 1| 1| 0| 1',
-        'ARAGONESE| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | an| #4619FD| 1| 1| 0| 1',
-        'ARMENIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | hy| #5F26E3| 1| 1| 0| 1',
-        'ASSAMESE| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | as| #615C3B| 1| 1| 0| 1',
-        'AVARIC| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | av| #2BCE4A| 1| 1| 0| 1',
-        'AVESTAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ae| #CF6EEA| 1| 1| 0| 1',
-        'AYMARA| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ay| #3D5D3B| 1| 1| 0| 1',
-        'AZERBAIJANI| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | az| #A48C7A| 1| 1| 0| 1',
-        'BAMBARA| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | bm| #C12E3D| 1| 1| 0| 1',
-        'BASHKIR| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ba| #ECD14A| 1| 1| 0| 1',
-        'BASQUE| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | eu| #89679F| 1| 1| 0| 1',
-        'BELARUSIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | be| #1050B0| 1| 1| 0| 1',
-        'BENGALI| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | bn| #EA4C42| 1| 1| 0| 1',
-        'BISLAMA| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | bi| #C39A37| 1| 1| 0| 1',
-        'BOSNIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | bs| #7DE3FE| 1| 1| 0| 1',
-        'BRETON| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | br| #7E1A72| 1| 1| 0| 1',
-        'BULGARIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | bg| #D5442A| 1| 1| 0| 1',
-        'BURMESE| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | my| #9E5CF0| 1| 1| 0| 1',
-        'CATALAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ca| #99BC95| 1| 1| 0| 1',
-        'CENTRAL_KHMER| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | km| #6ABDD6| 1| 1| 0| 1',
-        'CHAMORRO| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ch| #22302F| 1| 1| 0| 1',
-        'CHECHEN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ce| #83E832| 1| 1| 0| 1',
-        'CHICHEWA| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ny| #03E31C| 1| 1| 0| 1',
-        'CHINESE| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | zh| #40EA69| 1| 1| 0| 1',
-        'CHURCH_SLAVIC| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | cu| #C76DC2| 1| 1| 0| 1',
-        'CHUVASH| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | cv| #920F92| 1| 1| 0| 1',
-        'CORNISH| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | kw| #55137D| 1| 1| 0| 1',
-        'CORSICAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | co| #C605DC| 1| 1| 0| 1',
-        'CREE| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | cr| #75D7F3| 1| 1| 0| 1',
-        'CROATIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | hr| #AB48D3| 1| 1| 0| 1',
-        'CZECH| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | cs| #7804BB| 1| 1| 0| 1',
-        'DANISH| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | da| #87A5BE| 1| 1| 0| 1',
-        'DIVEHI| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | dv| #FA57EC| 1| 1| 0| 1',
-        'DUTCH| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | nl| #74352E| 1| 1| 0| 1',
-        'DZONGKHA| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | dz| #F7C931| 1| 1| 0| 1',
-        'ENGLISH| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | en| #DD4A2F| 1| 1| 0| 1',
-        'ESPERANTO| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | eo| #B65ADE| 1| 1| 0| 1',
-        'ESTONIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | et| #AF1569| 1| 1| 0| 1',
-        'EWE| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ee| #2B7E43| 1| 1| 0| 1',
-        'FAROESE| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | fo| #507CCC| 1| 1| 0| 1',
-        'FIJIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | fj| #7083F9| 1| 1| 0| 1',
-        'FILIPINO| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | fil| #8BEF80| 1| 1| 0| 1',
-        'FINNISH| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | fi| #9229A6| 1| 1| 0| 1',
-        'FRENCH| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | fr| #4111A0| 1| 1| 0| 1',
-        'FULAH| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ff| #649BA7| 1| 1| 0| 1',
-        'GAELIC| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | gd| #FBFEC1| 1| 1| 0| 1',
-        'GALICIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | gl| #DB6769| 1| 1| 0| 1',
-        'GANDA| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | lg| #C71A50| 1| 1| 0| 1',
-        'GEORGIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ka| #8517C8| 1| 1| 0| 1',
-        'GERMAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | de| #4F5FDC| 1| 1| 0| 1',
-        'GREEK| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | el| #49B49A| 1| 1| 0| 1',
-        'GUARANI| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | gn| #EDB51C| 1| 1| 0| 1',
-        'GUJARATI| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | gu| #BDF7FF| 1| 1| 0| 1',
-        'HAITIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ht| #466EB6| 1| 1| 0| 1',
-        'HAUSA| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ha| #A949D2| 1| 1| 0| 1',
-        'HEBREW| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | he| #E9C58A| 1| 1| 0| 1',
-        'HERERO| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | hz| #E9DF57| 1| 1| 0| 1',
-        'HINDI| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | hi| #77775B| 1| 1| 0| 1',
-        'HIRI_MOTU| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ho| #3BB41B| 1| 1| 0| 1',
-        'HUNGARIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | hu| #111457| 1| 1| 0| 1',
-        'ICELANDIC| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | is| #0ACE8F| 1| 1| 0| 1',
-        'IDO| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | io| #75CA6C| 1| 1| 0| 1',
-        'IGBO| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ig| #757EDE| 1| 1| 0| 1',
-        'INDONESIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | id| #52E822| 1| 1| 0| 1',
-        'INTERLINGUA| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ia| #7F9248| 1| 1| 0| 1',
-        'INTERLINGUE| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ie| #8F802C| 1| 1| 0| 1',
-        'INUKTITUT| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | iu| #43C3B0| 1| 1| 0| 1',
-        'INUPIAQ| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ik| #ECF371| 1| 1| 0| 1',
-        'IRISH| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ga| #FB7078| 1| 1| 0| 1',
-        'ITALIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | it| #95B5DF| 1| 1| 0| 1',
-        'JAPANESE| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ja| #5D776B| 1| 1| 0| 1',
-        'JAVANESE| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | jv| #5014C5| 1| 1| 0| 1',
-        'KALAALLISUT| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | kl| #050CF3| 1| 1| 0| 1',
-        'KANNADA| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | kn| #440B43| 1| 1| 0| 1',
-        'KANURI| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | kr| #4F2AAC| 1| 1| 0| 1',
-        'KASHMIRI| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ks| #842C02| 1| 1| 0| 1',
-        'KAZAKH| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | kk| #665F3D| 1| 1| 0| 1',
-        'KIKUYU| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ki| #315679| 1| 1| 0| 1',
-        'KINYARWANDA| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | rw| #CE1391| 1| 1| 0| 1',
-        'KIRGHIZ| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ky| #5F0D23| 1| 1| 0| 1',
-        'KOMI| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | kv| #9B06C3| 1| 1| 0| 1',
-        'KONGO| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | kg| #74BC47| 1| 1| 0| 1',
-        'KOREAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ko| #F5C630| 1| 1| 0| 1',
-        'KUANYAMA| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | kj| #D8CB60| 1| 1| 0| 1',
-        'KURDISH| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ku| #467330| 1| 1| 0| 1',
-        'LAO| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | lo| #DD3B78| 1| 1| 0| 1',
-        'LATIN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | la| #A73376| 1| 1| 0| 1',
-        'LATVIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | lv| #A65EC1| 1| 1| 0| 1',
-        'LIMBURGAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | li| #13C252| 1| 1| 0| 1',
-        'LINGALA| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ln| #BBEE5B| 1| 1| 0| 1',
-        'LITHUANIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | lt| #E89C3E| 1| 1| 0| 1',
-        'LUBA-KATANGA| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | lu| #4E97F3| 1| 1| 0| 1',
-        'LUXEMBOURGISH| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | lb| #4738EE| 1| 1| 0| 1',
-        'MACEDONIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | mk| #B69974| 1| 1| 0| 1',
-        'MALAGASY| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | mg| #29D850| 1| 1| 0| 1',
-        'MALAY| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ms| #A74139| 1| 1| 0| 1',
-        'MALAYALAM| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ml| #FD4C87| 1| 1| 0| 1',
-        'MALTESE| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | mt| #D6EE0B| 1| 1| 0| 1',
-        'MANX| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | gv| #3F83E9| 1| 1| 0| 1',
-        'MAORI| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | mi| #8339FD| 1| 1| 0| 1',
-        'MARATHI| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | mr| #93DEF1| 1| 1| 0| 1',
-        'MARSHALLESE| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | mh| #11DB75| 1| 1| 0| 1',
-        'MONGOLIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | mn| #A107D9| 1| 1| 0| 1',
-        'NAURU| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | na| #7A0925| 1| 1| 0| 1',
-        'NAVAJO| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | nv| #48F865| 1| 1| 0| 1',
-        'NDONGA| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ng| #83538B| 1| 1| 0| 1',
-        'NEPALI| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ne| #5A15FC| 1| 1| 0| 1',
-        'NORTH_NDEBELE| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | nd| #A1533B| 1| 1| 0| 1',
-        'NORTHERN_SAMI| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | se| #AAD61B| 1| 1| 0| 1',
-        'NORWEGIAN_BOKMÅL| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | nb| #0AEB4A| 1| 1| 0| 1',
-        'NORWEGIAN_NYNORSK| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | nn| #278B62| 1| 1| 0| 1',
-        'NORWEGIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | no| #13FF63| 1| 1| 0| 1',
-        'OCCITAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | oc| #B5B607| 1| 1| 0| 1',
-        'OJIBWA| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | oj| #100894| 1| 1| 0| 1',
-        'ORIYA| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | or| #0198FF| 1| 1| 0| 1',
-        'OROMO| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | om| #351BD8| 1| 1| 0| 1',
-        'OSSETIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | os| #BF715E| 1| 1| 0| 1',
-        'PALI| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | pi| #BEB3FA| 1| 1| 0| 1',
-        'PASHTO| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ps| #A4236C| 1| 1| 0| 1',
-        'PERSIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | fa| #68A38E| 1| 1| 0| 1',
-        'POLISH| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | pl| #D4F797| 1| 1| 0| 1',
-        'PORTUGUESE| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | pt| #71D659| 1| 1| 0| 1',
-        'PUNJABI| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | pa| #14F788| 1| 1| 0| 1',
-        'QUECHUA| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | qu| #268110| 1| 1| 0| 1',
-        'ROMANIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ro| #06603F| 1| 1| 0| 1',
-        'ROMANSH| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | rm| #3A73F3| 1| 1| 0| 1',
-        'RUNDI| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | rn| #715E84| 1| 1| 0| 1',
-        'RUSSIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ru| #DB77DA| 1| 1| 0| 1',
-        'SAMOAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | sm| #A26738| 1| 1| 0| 1',
-        'SANGO| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | sg| #CA1C7E| 1| 1| 0| 1',
-        'SANSKRIT| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | sa| #CF9C76| 1| 1| 0| 1',
-        'SARDINIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | sc| #28AF67| 1| 1| 0| 1',
-        'SERBIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | sr| #FB3F2C| 1| 1| 0| 1',
-        'SHONA| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | sn| #40F3EC| 1| 1| 0| 1',
-        'SICHUAN_YI| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ii| #FA3474| 1| 1| 0| 1',
-        'SINDHI| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | sd| #62D1BE| 1| 1| 0| 1',
-        'SINHALA| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | si| #24787A| 1| 1| 0| 1',
-        'SLOVAK| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | sk| #66104F| 1| 1| 0| 1',
-        'SLOVENIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | sl| #6F79E6| 1| 1| 0| 1',
-        'SOMALI| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | so| #A36185| 1| 1| 0| 1',
-        'SOUTH_NDEBELE| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | nr| #8090E5| 1| 1| 0| 1',
-        'SOUTHERN_SOTHO| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | st| #4C3417| 1| 1| 0| 1',
-        'SPANISH| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | es| #7842AE| 1| 1| 0| 1',
-        'SUNDANESE| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | su| #B2D05B| 1| 1| 0| 1',
-        'SWAHILI| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | sw| #D32F20| 1| 1| 0| 1',
-        'SWATI| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ss| #AA196D| 1| 1| 0| 1',
-        'SWEDISH| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | sv| #0EC5A2| 1| 1| 0| 1',
-        'TAGALOG| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | tl| #C9DDAC| 1| 1| 0| 1',
-        'TAHITIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ty| #32009D| 1| 1| 0| 1',
-        'TAJIK| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | tg| #100ECF| 1| 1| 0| 1',
-        'TAMIL| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ta| #E71FAE| 1| 1| 0| 1',
-        'TATAR| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | tt| #C17483| 1| 1| 0| 1',
-        'TELUGU| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | te| #E34ABD| 1| 1| 0| 1',
-        'THAI| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | th| #3FB501| 1| 1| 0| 1',
-        'TIBETAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | bo| #FF2496| 1| 1| 0| 1',
-        'TIGRINYA| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ti| #9074F0| 1| 1| 0| 1',
-        'TONGA| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | to| #B3259E| 1| 1| 0| 1',
-        'TSONGA| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ts| #12687C| 1| 1| 0| 1',
-        'TSWANA| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | tn| #DA3E89| 1| 1| 0| 1',
-        'TURKISH| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | tr| #A08D29| 1| 1| 0| 1',
-        'TURKMEN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | tk| #E70267| 1| 1| 0| 1',
-        'TWI| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | tw| #8A6C0F| 1| 1| 0| 1',
-        'UIGHUR| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ug| #79BC21| 1| 1| 0| 1',
-        'UKRAINIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | uk| #EB60E9| 1| 1| 0| 1',
-        'URDU| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ur| #57E09D| 1| 1| 0| 1',
-        'UZBEK| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | uz| #4341F3| 1| 1| 0| 1',
-        'VENDA| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | ve| #4780ED| 1| 1| 0| 1',
-        'VIETNAMESE| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | vi| #90A301| 1| 1| 0| 1',
-        'VOLAPÜK| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | vo| #77D574| 1| 1| 0| 1',
-        'WALLOON| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | wa| #BD440A| 1| 1| 0| 1',
-        'WELSH| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | cy| #45E39C| 1| 1| 0| 1',
-        'WESTERN_FRISIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | fy| #01F471| 1| 1| 0| 1',
-        'WOLOF| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | wo| #BDD498| 1| 1| 0| 1',
-        'XHOSA| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | xh| #0C6D9C| 1| 1| 0| 1',
-        'YIDDISH| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | yi| #111D14| 1| 1| 0| 1',
-        'YORUBA| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | yo| #E815FF| 1| 1| 0| 1',
-        'ZHUANG| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | za| #C62A89| 1| 1| 0| 1',
-        'ZULU| transparent.png| +0| 0| +0| ComfortAa-Medium| #FFFFFF| 0| 15| #FFFFFF| | zu| #0049F8| 1| 1| 0| 1'
+        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        'ABKHAZIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ab| #88F678| 1| 1| 0| 1',
+        'AFAR| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | aa| #612A1C| 1| 1| 0| 1',
+        'AFRIKAANS| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | af| #60EC40| 1| 1| 0| 1',
+        'AKAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ak| #021FBC| 1| 1| 0| 1',
+        'ALBANIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | sq| #C5F277| 1| 1| 0| 1',
+        'AMHARIC| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | am| #746BC8| 1| 1| 0| 1',
+        'ARABIC| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ar| #37C768| 1| 1| 0| 1',
+        'ARAGONESE| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | an| #4619FD| 1| 1| 0| 1',
+        'ARMENIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hy| #5F26E3| 1| 1| 0| 1',
+        'ASSAMESE| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | as| #615C3B| 1| 1| 0| 1',
+        'AVARIC| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | av| #2BCE4A| 1| 1| 0| 1',
+        'AVESTAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ae| #CF6EEA| 1| 1| 0| 1',
+        'AYMARA| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ay| #3D5D3B| 1| 1| 0| 1',
+        'AZERBAIJANI| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | az| #A48C7A| 1| 1| 0| 1',
+        'BAMBARA| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | bm| #C12E3D| 1| 1| 0| 1',
+        'BASHKIR| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ba| #ECD14A| 1| 1| 0| 1',
+        'BASQUE| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | eu| #89679F| 1| 1| 0| 1',
+        'BELARUSIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | be| #1050B0| 1| 1| 0| 1',
+        'BENGALI| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | bn| #EA4C42| 1| 1| 0| 1',
+        'BISLAMA| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | bi| #C39A37| 1| 1| 0| 1',
+        'BOSNIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | bs| #7DE3FE| 1| 1| 0| 1',
+        'BRETON| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | br| #7E1A72| 1| 1| 0| 1',
+        'BULGARIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | bg| #D5442A| 1| 1| 0| 1',
+        'BURMESE| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | my| #9E5CF0| 1| 1| 0| 1',
+        'CATALAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ca| #99BC95| 1| 1| 0| 1',
+        'CENTRAL_KHMER| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | km| #6ABDD6| 1| 1| 0| 1',
+        'CHAMORRO| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ch| #22302F| 1| 1| 0| 1',
+        'CHECHEN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ce| #83E832| 1| 1| 0| 1',
+        'CHICHEWA| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ny| #03E31C| 1| 1| 0| 1',
+        'CHINESE| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | zh| #40EA69| 1| 1| 0| 1',
+        'CHURCH_SLAVIC| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | cu| #C76DC2| 1| 1| 0| 1',
+        'CHUVASH| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | cv| #920F92| 1| 1| 0| 1',
+        'CORNISH| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | kw| #55137D| 1| 1| 0| 1',
+        'CORSICAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | co| #C605DC| 1| 1| 0| 1',
+        'CREE| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | cr| #75D7F3| 1| 1| 0| 1',
+        'CROATIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hr| #AB48D3| 1| 1| 0| 1',
+        'CZECH| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | cs| #7804BB| 1| 1| 0| 1',
+        'DANISH| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | da| #87A5BE| 1| 1| 0| 1',
+        'DIVEHI| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | dv| #FA57EC| 1| 1| 0| 1',
+        'DUTCH| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | nl| #74352E| 1| 1| 0| 1',
+        'DZONGKHA| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | dz| #F7C931| 1| 1| 0| 1',
+        'ENGLISH| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | en| #DD4A2F| 1| 1| 0| 1',
+        'ESPERANTO| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | eo| #B65ADE| 1| 1| 0| 1',
+        'ESTONIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | et| #AF1569| 1| 1| 0| 1',
+        'EWE| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ee| #2B7E43| 1| 1| 0| 1',
+        'FAROESE| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | fo| #507CCC| 1| 1| 0| 1',
+        'FIJIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | fj| #7083F9| 1| 1| 0| 1',
+        'FILIPINO| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | fil| #8BEF80| 1| 1| 0| 1',
+        'FINNISH| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | fi| #9229A6| 1| 1| 0| 1',
+        'FRENCH| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | fr| #4111A0| 1| 1| 0| 1',
+        'FULAH| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ff| #649BA7| 1| 1| 0| 1',
+        'GAELIC| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | gd| #FBFEC1| 1| 1| 0| 1',
+        'GALICIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | gl| #DB6769| 1| 1| 0| 1',
+        'GANDA| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | lg| #C71A50| 1| 1| 0| 1',
+        'GEORGIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ka| #8517C8| 1| 1| 0| 1',
+        'GERMAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | de| #4F5FDC| 1| 1| 0| 1',
+        'GREEK| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | el| #49B49A| 1| 1| 0| 1',
+        'GUARANI| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | gn| #EDB51C| 1| 1| 0| 1',
+        'GUJARATI| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | gu| #BDF7FF| 1| 1| 0| 1',
+        'HAITIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ht| #466EB6| 1| 1| 0| 1',
+        'HAUSA| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ha| #A949D2| 1| 1| 0| 1',
+        'HEBREW| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | he| #E9C58A| 1| 1| 0| 1',
+        'HERERO| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hz| #E9DF57| 1| 1| 0| 1',
+        'HINDI| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hi| #77775B| 1| 1| 0| 1',
+        'HIRI_MOTU| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ho| #3BB41B| 1| 1| 0| 1',
+        'HUNGARIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hu| #111457| 1| 1| 0| 1',
+        'ICELANDIC| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | is| #0ACE8F| 1| 1| 0| 1',
+        'IDO| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | io| #75CA6C| 1| 1| 0| 1',
+        'IGBO| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ig| #757EDE| 1| 1| 0| 1',
+        'INDONESIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | id| #52E822| 1| 1| 0| 1',
+        'INTERLINGUA| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ia| #7F9248| 1| 1| 0| 1',
+        'INTERLINGUE| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ie| #8F802C| 1| 1| 0| 1',
+        'INUKTITUT| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | iu| #43C3B0| 1| 1| 0| 1',
+        'INUPIAQ| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ik| #ECF371| 1| 1| 0| 1',
+        'IRISH| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ga| #FB7078| 1| 1| 0| 1',
+        'ITALIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | it| #95B5DF| 1| 1| 0| 1',
+        'JAPANESE| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ja| #5D776B| 1| 1| 0| 1',
+        'JAVANESE| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | jv| #5014C5| 1| 1| 0| 1',
+        'KALAALLISUT| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | kl| #050CF3| 1| 1| 0| 1',
+        'KANNADA| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | kn| #440B43| 1| 1| 0| 1',
+        'KANURI| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | kr| #4F2AAC| 1| 1| 0| 1',
+        'KASHMIRI| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ks| #842C02| 1| 1| 0| 1',
+        'KAZAKH| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | kk| #665F3D| 1| 1| 0| 1',
+        'KIKUYU| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ki| #315679| 1| 1| 0| 1',
+        'KINYARWANDA| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | rw| #CE1391| 1| 1| 0| 1',
+        'KIRGHIZ| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ky| #5F0D23| 1| 1| 0| 1',
+        'KOMI| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | kv| #9B06C3| 1| 1| 0| 1',
+        'KONGO| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | kg| #74BC47| 1| 1| 0| 1',
+        'KOREAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ko| #F5C630| 1| 1| 0| 1',
+        'KUANYAMA| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | kj| #D8CB60| 1| 1| 0| 1',
+        'KURDISH| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ku| #467330| 1| 1| 0| 1',
+        'LAO| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | lo| #DD3B78| 1| 1| 0| 1',
+        'LATIN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | la| #A73376| 1| 1| 0| 1',
+        'LATVIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | lv| #A65EC1| 1| 1| 0| 1',
+        'LIMBURGAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | li| #13C252| 1| 1| 0| 1',
+        'LINGALA| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ln| #BBEE5B| 1| 1| 0| 1',
+        'LITHUANIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | lt| #E89C3E| 1| 1| 0| 1',
+        'LUBA-KATANGA| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | lu| #4E97F3| 1| 1| 0| 1',
+        'LUXEMBOURGISH| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | lb| #4738EE| 1| 1| 0| 1',
+        'MACEDONIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | mk| #B69974| 1| 1| 0| 1',
+        'MALAGASY| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | mg| #29D850| 1| 1| 0| 1',
+        'MALAY| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ms| #A74139| 1| 1| 0| 1',
+        'MALAYALAM| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ml| #FD4C87| 1| 1| 0| 1',
+        'MALTESE| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | mt| #D6EE0B| 1| 1| 0| 1',
+        'MANX| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | gv| #3F83E9| 1| 1| 0| 1',
+        'MAORI| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | mi| #8339FD| 1| 1| 0| 1',
+        'MARATHI| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | mr| #93DEF1| 1| 1| 0| 1',
+        'MARSHALLESE| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | mh| #11DB75| 1| 1| 0| 1',
+        'MONGOLIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | mn| #A107D9| 1| 1| 0| 1',
+        'NAURU| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | na| #7A0925| 1| 1| 0| 1',
+        'NAVAJO| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | nv| #48F865| 1| 1| 0| 1',
+        'NDONGA| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ng| #83538B| 1| 1| 0| 1',
+        'NEPALI| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ne| #5A15FC| 1| 1| 0| 1',
+        'NORTH_NDEBELE| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | nd| #A1533B| 1| 1| 0| 1',
+        'NORTHERN_SAMI| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | se| #AAD61B| 1| 1| 0| 1',
+        'NORWEGIAN_BOKMÅL| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | nb| #0AEB4A| 1| 1| 0| 1',
+        'NORWEGIAN_NYNORSK| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | nn| #278B62| 1| 1| 0| 1',
+        'NORWEGIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | no| #13FF63| 1| 1| 0| 1',
+        'OCCITAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | oc| #B5B607| 1| 1| 0| 1',
+        'OJIBWA| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | oj| #100894| 1| 1| 0| 1',
+        'ORIYA| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | or| #0198FF| 1| 1| 0| 1',
+        'OROMO| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | om| #351BD8| 1| 1| 0| 1',
+        'OSSETIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | os| #BF715E| 1| 1| 0| 1',
+        'PALI| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | pi| #BEB3FA| 1| 1| 0| 1',
+        'PASHTO| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ps| #A4236C| 1| 1| 0| 1',
+        'PERSIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | fa| #68A38E| 1| 1| 0| 1',
+        'POLISH| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | pl| #D4F797| 1| 1| 0| 1',
+        'PORTUGUESE| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | pt| #71D659| 1| 1| 0| 1',
+        'PUNJABI| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | pa| #14F788| 1| 1| 0| 1',
+        'QUECHUA| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | qu| #268110| 1| 1| 0| 1',
+        'ROMANIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ro| #06603F| 1| 1| 0| 1',
+        'ROMANSH| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | rm| #3A73F3| 1| 1| 0| 1',
+        'RUNDI| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | rn| #715E84| 1| 1| 0| 1',
+        'RUSSIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ru| #DB77DA| 1| 1| 0| 1',
+        'SAMOAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | sm| #A26738| 1| 1| 0| 1',
+        'SANGO| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | sg| #CA1C7E| 1| 1| 0| 1',
+        'SANSKRIT| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | sa| #CF9C76| 1| 1| 0| 1',
+        'SARDINIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | sc| #28AF67| 1| 1| 0| 1',
+        'SERBIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | sr| #FB3F2C| 1| 1| 0| 1',
+        'SHONA| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | sn| #40F3EC| 1| 1| 0| 1',
+        'SICHUAN_YI| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ii| #FA3474| 1| 1| 0| 1',
+        'SINDHI| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | sd| #62D1BE| 1| 1| 0| 1',
+        'SINHALA| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | si| #24787A| 1| 1| 0| 1',
+        'SLOVAK| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | sk| #66104F| 1| 1| 0| 1',
+        'SLOVENIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | sl| #6F79E6| 1| 1| 0| 1',
+        'SOMALI| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | so| #A36185| 1| 1| 0| 1',
+        'SOUTH_NDEBELE| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | nr| #8090E5| 1| 1| 0| 1',
+        'SOUTHERN_SOTHO| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | st| #4C3417| 1| 1| 0| 1',
+        'SPANISH| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | es| #7842AE| 1| 1| 0| 1',
+        'SUNDANESE| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | su| #B2D05B| 1| 1| 0| 1',
+        'SWAHILI| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | sw| #D32F20| 1| 1| 0| 1',
+        'SWATI| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ss| #AA196D| 1| 1| 0| 1',
+        'SWEDISH| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | sv| #0EC5A2| 1| 1| 0| 1',
+        'TAGALOG| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | tl| #C9DDAC| 1| 1| 0| 1',
+        'TAHITIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ty| #32009D| 1| 1| 0| 1',
+        'TAJIK| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | tg| #100ECF| 1| 1| 0| 1',
+        'TAMIL| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ta| #E71FAE| 1| 1| 0| 1',
+        'TATAR| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | tt| #C17483| 1| 1| 0| 1',
+        'TELUGU| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | te| #E34ABD| 1| 1| 0| 1',
+        'THAI| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | th| #3FB501| 1| 1| 0| 1',
+        'TIBETAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | bo| #FF2496| 1| 1| 0| 1',
+        'TIGRINYA| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ti| #9074F0| 1| 1| 0| 1',
+        'TONGA| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | to| #B3259E| 1| 1| 0| 1',
+        'TSONGA| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ts| #12687C| 1| 1| 0| 1',
+        'TSWANA| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | tn| #DA3E89| 1| 1| 0| 1',
+        'TURKISH| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | tr| #A08D29| 1| 1| 0| 1',
+        'TURKMEN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | tk| #E70267| 1| 1| 0| 1',
+        'TWI| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | tw| #8A6C0F| 1| 1| 0| 1',
+        'UIGHUR| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ug| #79BC21| 1| 1| 0| 1',
+        'UKRAINIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | uk| #EB60E9| 1| 1| 0| 1',
+        'URDU| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ur| #57E09D| 1| 1| 0| 1',
+        'UZBEK| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | uz| #4341F3| 1| 1| 0| 1',
+        'VENDA| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ve| #4780ED| 1| 1| 0| 1',
+        'VIETNAMESE| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | vi| #90A301| 1| 1| 0| 1',
+        'VOLAPÜK| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | vo| #77D574| 1| 1| 0| 1',
+        'WALLOON| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | wa| #BD440A| 1| 1| 0| 1',
+        'WELSH| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | cy| #45E39C| 1| 1| 0| 1',
+        'WESTERN_FRISIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | fy| #01F471| 1| 1| 0| 1',
+        'WOLOF| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | wo| #BDD498| 1| 1| 0| 1',
+        'XHOSA| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | xh| #0C6D9C| 1| 1| 0| 1',
+        'YIDDISH| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | yi| #111D14| 1| 1| 0| 1',
+        'YORUBA| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | yo| #E815FF| 1| 1| 0| 1',
+        'ZHUANG| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | za| #C62A89| 1| 1| 0| 1',
+        'ZULU| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | zu| #0049F8| 1| 1| 0| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
@@ -3824,7 +4101,7 @@ Function CreateSubtitleLanguage {
         else {
             $value = Set-TextBetweenDelimiters -InputString $pre_value -ReplacementString (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
         }
-        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
         $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
     }
     LaunchScripts -ScriptPaths $arr
@@ -3842,25 +4119,41 @@ Function CreateUniverse {
     Set-Location $script_path
     # Find-Path "$script_path\universe"
     Move-Item -Path output -Destination output-orig    
+
+    $myArray = @(
+        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        '| askew.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | askew| #0F66AD| 1| 1| 0| 1',
+        '| avp.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | avp| #2FC926| 1| 1| 0| 1',
+        '| arrow.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | arrow| #03451A| 1| 1| 0| 1',
+        '| dca.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | dca| #2832C5| 1| 1| 0| 1',
+        '| dcu.png| +0| 1500| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | dcu| #2832C4| 1| 1| 0| 1',
+        '| fast.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | fast| #7F1FC8| 1| 1| 0| 1',
+        '| marvel.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | marvel| #ED171F| 1| 1| 0| 1',
+        '| mcu.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | mcu| #C62D21| 1| 1| 0| 1',
+        '| middle.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | middle| #D79C2B| 1| 1| 0| 1',
+        '| mummy.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | mummy| #DBA02F| 1| 1| 0| 1',
+        '| rocky.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | rocky| #CC1F10| 1| 1| 0| 1',
+        '| star.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | star| #FFD64F| 1| 1| 0| 1',
+        '| star (1).png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | star (1)| #F2DC1D| 1| 1| 0| 1',
+        '| starsky.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | starsky| #0595FB| 1| 1| 0| 1',
+        '| trek.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | trek| #ffe15f| 1| 1| 0| 1',
+        '| wizard.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | wizard| #878536| 1| 1| 0| 1',
+        '| xmen.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | xmen| #636363| 1| 1| 0| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
     $arr = @()
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_universe\askew.png`" -logo_offset +0 -logo_resize 1800 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"askew`" -base_color `"#0F66AD`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_universe\avp.png`" -logo_offset +0 -logo_resize 1800 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"avp`" -base_color `"#2FC926`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_universe\arrow.png`" -logo_offset +0 -logo_resize 1800 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"arrow`" -base_color `"#03451A`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_universe\dca.png`" -logo_offset +0 -logo_resize 1800 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"dca`" -base_color `"#2832C5`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_universe\dcu.png`" -logo_offset +0 -logo_resize 1500 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"dcu`" -base_color `"#2832C4`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_universe\fast.png`" -logo_offset +0 -logo_resize 1800 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"fast`" -base_color `"#7F1FC8`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_universe\marvel.png`" -logo_offset +0 -logo_resize 1800 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"marvel`" -base_color `"#ED171F`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_universe\mcu.png`" -logo_offset +0 -logo_resize 1800 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"mcu`" -base_color `"#C62D21`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_universe\middle.png`" -logo_offset +0 -logo_resize 1800 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"middle`" -base_color `"#D79C2B`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_universe\mummy.png`" -logo_offset +0 -logo_resize 1800 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"mummy`" -base_color `"#DBA02F`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_universe\rocky.png`" -logo_offset +0 -logo_resize 1800 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"rocky`" -base_color `"#CC1F10`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_universe\star.png`" -logo_offset +0 -logo_resize 1800 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"star`" -base_color `"#FFD64F`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_universe\star (1).png`" -logo_offset +0 -logo_resize 1800 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"star (1)`" -base_color `"#F2DC1D`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_universe\starsky.png`" -logo_offset +0 -logo_resize 1800 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"starsky`" -base_color `"#0595FB`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_universe\trek.png`" -logo_offset +0 -logo_resize 1800 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"trek`" -base_color `"#ffe15f`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_universe\wizard.png`" -logo_offset +0 -logo_resize 1800 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"wizard`" -base_color `"#878536`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
-    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_universe\xmen.png`" -logo_offset +0 -logo_resize 1800 -text `"`" -text_offset +0 -font `"ComfortAa-Medium`" -font_size 250 -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"xmen`" -base_color `"#636363`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
+    foreach ($item in $myArray) {
+        if ($($item.key_name).ToString() -eq "") {
+            $value = $null
+        }
+        else {
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+        }
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_universe\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
+    }
     LaunchScripts -ScriptPaths $arr
+    
     Move-Item -Path output -Destination universe
     Copy-Item -Path logos_universe -Destination universe\logos -Recurse
     Move-Item -Path output-orig -Destination output
@@ -3893,7 +4186,7 @@ Function CreateYear {
     $arr = @()
     foreach ($item in $myArray) {
         $value = (Get-YamlPropertyValue -PropertyPath "collections.$($item.name).name" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
-        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
         $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.Logo)`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$value`" -text_offset +0 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     }
     LaunchScripts -ScriptPaths $arr
@@ -4062,7 +4355,7 @@ Function CreateYear {
     $arr = @()
     foreach ($item in $myArray) {
         $value = $($item.Name)
-        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font_name) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $($item.font_size)
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $($item.font_size)
         $arr += ".\create_poster.ps1 -logo `"$script_path\transparent.png`" -logo_offset +0 -logo_resize $theMaxWidth -text `"$value`" -text_offset +0 -font `"$($item.font_name)`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash 1"
     }
 
@@ -4084,7 +4377,7 @@ Function CreateYear {
     $arr = @()
     for ($i = 1880; $i -lt 2030; $i++) {
         $value = $pre_value
-        $optimalFontSize = Get-OptimalPointSize -text $value -font $theFont -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
         $arr += ".\create_poster.ps1 -logo `"$script_path\year\$i.jpg`" -logo_offset +0 -logo_resize 2000 -text `"$value`" -text_offset -400 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"#FFFFFF`" -gradient 1 -avg_color 0 -clean 1 -white_wash 0"
     }
     LaunchScripts -ScriptPaths $arr
@@ -4531,12 +4824,13 @@ foreach ($param in $args) {
 
 if (!$args) {
     # ShowFunctions
+    CreateResolution
     # CreateOverlays
     # CreateSeparators
     # CreateNetwork
     # CreateYear
     # CreateBased
-    CreateAudioLanguage
+    # CreateAudioLanguage
 }
 
 #######################
