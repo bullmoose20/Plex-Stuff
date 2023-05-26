@@ -3331,6 +3331,7 @@ Function CreateSeasonal {
         'ST_PATRICKS_DAY| patrick.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | patrick| #26A53E| 1| 1| 0| 1',
         'THANKSGIVING| thanksgiving.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | thanksgiving| #A1841E| 1| 1| 0| 1',
         'VALENTINES_DAY| valentine.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | valentine| #D12AAE| 1| 1| 0| 1',
+        'VETERANS_DAY| veteran.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| #B6AD93| veteran| | 1| 1| 0| 1',
         'NEW_YEAR| years.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | years| #444444| 1| 1| 0| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
