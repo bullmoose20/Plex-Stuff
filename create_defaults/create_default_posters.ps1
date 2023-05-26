@@ -3331,7 +3331,7 @@ Function CreateSeasonal {
         'ST_PATRICKS_DAY| patrick.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | patrick| #26A53E| 1| 1| 0| 1',
         'THANKSGIVING| thanksgiving.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | thanksgiving| #A1841E| 1| 1| 0| 1',
         'VALENTINES_DAY| valentine.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | valentine| #D12AAE| 1| 1| 0| 1',
-        'VETERANS_DAY| veteran.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| #B6AD93| veteran| | 1| 1| 0| 1',
+        'VETERANS_DAY| veteran.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | veteran| #B6AD93| 1| 1| 0| 1',
         'NEW_YEAR| years.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | years| #444444| 1| 1| 0| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
@@ -4302,9 +4302,21 @@ Function CreateOverlays {
     Write-Host "Creating Overlays"
     Set-Location $script_path
     
-    $directories = @("award", "chart", "content_rating", "country", "franchise", "genre", "network", "playlist", "resolution", "seasonal", "streaming", "studio", "universe")
+    $directories = @("award", "chart", "content_rating", "country", "franchise", "network", "playlist", "resolution", "streaming", "studio", "universe")
+    $directories_no_trim = @("genre", "seasonal")
     $sizes = "285x85>"
     
+    Foreach ($dir in $directories_no_trim) {
+        $path = Join-Path $script_path $dir
+        $outputPath = Join-Path $path "logos_overlays"
+        $inputPath = Join-Path $script_path "logos_$dir"
+        Find-Path $path
+        Find-Path $outputPath
+        $joinpath = (Join-Path $inputPath "*.png")
+        WriteToLogFile "Resizing overlays            : magick mogrify -colorspace sRGB -strip -path $outputPath -resize $sizes $joinpath"
+        magick mogrify -colorspace sRGB -strip -path $outputPath -resize $sizes $joinpath
+    }
+
     Foreach ($dir in $directories) {
         $path = Join-Path $script_path $dir
         $outputPath = Join-Path $path "logos_overlays"
