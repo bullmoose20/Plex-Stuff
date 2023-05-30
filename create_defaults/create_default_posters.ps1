@@ -3678,7 +3678,6 @@ Function CreateStudio {
         '| Laura Ziskin Productions.png| 0| 1600| 0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF|  | Laura Ziskin Productions| #82883F| 1| 1| 0| 0',
         '| Lay-duce.png| 0| 1600| 0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF|  | Lay-duce| #0A1988| 1| 1| 0| 0',
         '| Legendary Pictures.png| 0| 1600| 0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF|  | Legendary Pictures| #303841| 1| 1| 0| 0',
-        '| Legendary Television.png| 0| 1600| 0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF|  | Legendary Television| #2E63F4| 1| 1| 0| 0',
         '| Lerche.png| 0| 1600| 0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF|  | Lerche| #D42DAE| 1| 1| 0| 0',
         '| Let''s Not Turn This Into a Whole Big Production.png| 0| 1600| 0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF|  | Let''s Not Turn This Into a Whole Big Production| #7597E6| 1| 1| 0| 0',
         '| LIDENFILMS.png| 0| 1600| 0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF|  | LIDENFILMS| #EF8907| 1| 1| 0| 0',
@@ -3846,7 +3845,6 @@ Function CreateStudio {
         '| Warner Animation Group.png| 0| 1600| 0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF|  | Warner Animation Group| #92171E| 1| 1| 0| 0',
         '| Warner Bros. Pictures.png| 0| 1200| 0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF|  | Warner Bros. Pictures| #39538F| 1| 1| 0| 0',
         '| Warner Bros. Television.png| 0| 1600| 0| ComfortAa-Medium| 359| #FFFFFF| 0| 15| #FFFFFF|  | Warner Bros. Television| #B65CF3| 1| 1| 0| 0',
-        '| Warner Bros.png| 0| 1600| 0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF|  | Warner Bros| #0DB4ED| 1| 1| 0| 0',
         '| Wawayu Animation.png| 0| 1600| 0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF|  | Wawayu Animation| #EB7786| 1| 1| 0| 0',
         '| Wayfare Entertainment.png| 0| 1600| 0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF|  | Wayfare Entertainment| #4FD631| 1| 1| 0| 0',
         '| White Fox.png| 0| 1600| 0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF|  | White Fox| #A86633| 1| 1| 0| 0',
@@ -3858,7 +3856,7 @@ Function CreateStudio {
         '| Yostar Pictures.png| 0| 1600| 0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF|  | Yostar Pictures| #9A3DC1| 1| 1| 0| 0',
         '| Yumeta Company.png| 0| 1600| 0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF|  | Yumeta Company| #945E75| 1| 1| 0| 0',
         '| Zero-G.png| 0| 1600| 0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF|  | Zero-G| #460961| 1| 1| 0| 0',
-        '| Zexcs.png| 0| 1600| 0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF|  | Zexcs| #E60CB2| 1| 1| 0| 0'                                                        
+        '| Zexcs.png| 0| 1600| 0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF|  | Zexcs| #E60CB2| 1| 1| 0| 0'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
