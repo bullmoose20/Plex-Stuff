@@ -16,6 +16,8 @@
 # font must be installed on system and visible by Imagemagick. Make sure that you install the ttf font for ALL users as an admin so ImageMagick has access to the font when running (r-click on font Install for ALL Users in Windows)
 # Powershell security settings: https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_execution_policies?view=powershell-7.2
 #
+# multi-lingual font that supports arabic - Cairo-Regular
+#
 # EXAMPLES:
 # You can run the script by providing the name of the function you want to run as a command-line argument:
 # create_default_posters.ps1 AudioLanguage 
@@ -4671,7 +4673,7 @@ Import-YamlModule
 #################################
 # Language Code
 #################################
-$LanguageCodes = @("en", "da", "de", "es", "fr", "it", "nb_NO", "nl", "pt-br")
+$LanguageCodes = @("ar","en", "da", "de", "es", "fr", "it", "nb_NO", "nl", "pt-br")
 $DefaultLanguageCode = "en"
 $LanguageCode = Read-Host "Enter language code ($($LanguageCodes -join ', ')). Press Enter to use the default language code: $DefaultLanguageCode"
 
@@ -4847,8 +4849,8 @@ foreach ($param in $args) {
 }
 
 if (!$args) {
-    # ShowFunctions
-    CreateAwards
+    ShowFunctions
+    # CreateAwards
     # CreateResolution
     # CreateOverlays
     # CreateSeparators
