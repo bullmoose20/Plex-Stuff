@@ -3652,6 +3652,7 @@ Function CreateStudio {
         '| Grindstone Entertainment Group.png| 0| 1600| 0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF|  | Grindstone Entertainment Group| #B66736| 1| 1| 0| 0',
         '| Group Tac.png| 0| 1600| 0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF|  | Group Tac| #157DB4| 1| 1| 0| 0',
         '| Hal Film Maker.png| 0| 1600| 0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF|  | Hal Film Maker| #E085A4| 1| 1| 0| 0',
+        '| Hallmark.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF|  | Hallmark| #601CB4| 1| 1| 0| 0',
         '| Haoliners Animation League.png| 0| 1600| 0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF|  | Haoliners Animation League| #A616E8| 1| 1| 0| 0',
         '| Happy Madison Productions.png| 0| 1600| 0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF|  | Happy Madison Productions| #278761| 1| 1| 0| 0',
         '| Hartswood Films.png| 0| 1600| 0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF|  | Hartswood Films| #904D79| 1| 1| 0| 0',
