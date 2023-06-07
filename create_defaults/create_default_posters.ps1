@@ -3846,7 +3846,7 @@ Function CreateStudio {
         '| Walt Disney Animation Studios.png| 0| 1600| 0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF|  | Walt Disney Animation Studios| #1290C0| 1| 1| 0| 0',
         '| Walt Disney Pictures.png| 0| 1300| 0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF|  | Walt Disney Pictures| #2944AA| 1| 1| 0| 0',
         '| Warner Animation Group.png| 0| 1600| 0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF|  | Warner Animation Group| #2C80EE| 1| 1| 0| 0'
-        '| Warner Bros. Pictures.png| 0| 1200| 0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF|  | Warner Bros. Pictures| #39538F| 1| 1| 0| 0',
+        '| Warner Bros. Pictures.png| 0| 1600| 0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF|  | Warner Bros. Pictures| #39538F| 1| 1| 0| 0',
         '| Warner Bros. Television.png| 0| 1600| 0| ComfortAa-Medium| 359| #FFFFFF| 0| 15| #FFFFFF|  | Warner Bros. Television| #B65CF3| 1| 1| 0| 0',
         '| Wawayu Animation.png| 0| 1600| 0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF|  | Wawayu Animation| #EB7786| 1| 1| 0| 0',
         '| Wayfare Entertainment.png| 0| 1600| 0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF|  | Wayfare Entertainment| #4FD631| 1| 1| 0| 0',
@@ -4410,8 +4410,8 @@ Function CreateOverlays {
     Write-Host "Creating Overlays"
     Set-Location $script_path
     
-    $directories = @("award", "chart", "content_rating", "country", "franchise", "network", "playlist", "resolution", "streaming", "studio", "universe")
-    $directories_no_trim = @("genre", "seasonal")
+    $directories = @("award", "chart", "content_rating", "country", "franchise", "network", "playlist", "resolution", "streaming", "universe")
+    $directories_no_trim = @("genre", "seasonal", "studio")
     $sizes = "285x85>"
     
     Foreach ($dir in $directories_no_trim) {
