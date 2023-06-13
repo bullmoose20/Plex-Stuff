@@ -3860,7 +3860,7 @@ Function CreateStudio {
         '| W. Chump and Sons.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF|  | W. Chump and Sons| #0125F4| 1| 1| 0| 0',
         '| Walt Disney Animation Studios.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF|  | Walt Disney Animation Studios| #1290C0| 1| 1| 0| 0',
         '| Walt Disney Pictures.png| 0| 1300| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF|  | Walt Disney Pictures| #2944AA| 1| 1| 0| 0',
-        '| Warner Animation Group.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF|  | Warner Animation Group| #2C80EE| 1| 1| 0| 0'
+        '| Warner Animation Group.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF|  | Warner Animation Group| #2C80EE| 1| 1| 0| 0',
         '| Warner Bros. Pictures.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF|  | Warner Bros. Pictures| #39538F| 1| 1| 0| 0',
         '| Warner Bros. Television.png| +0| 1600| +0| ComfortAa-Medium| 359| #FFFFFF| 0| 15| #FFFFFF|  | Warner Bros. Television| #B65CF3| 1| 1| 0| 0',
         '| Wawayu Animation.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF|  | Wawayu Animation| #EB7786| 1| 1| 0| 0',
@@ -3869,7 +3869,7 @@ Function CreateStudio {
         '| Wiedemann & Berg Television.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF|  | Wiedemann & Berg Television| #9A2F9F| 1| 1| 0| 0',
         '| Wit Studio.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF|  | Wit Studio| #1F3BB6| 1| 1| 0| 0',
         '| Wolfsbane.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF|  | Wolfsbane| #8E7689| 1| 1| 0| 0',
-        '| Xebec.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF|  | Xebec| #051D31| 1| 1| 0| 0'
+        '| Xebec.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF|  | Xebec| #051D31| 1| 1| 0| 0',
         '| Yokohama Animation Lab.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF|  | Yokohama Animation Lab| #2C3961| 1| 1| 0| 0',
         '| Yostar Pictures.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF|  | Yostar Pictures| #9A3DC1| 1| 1| 0| 0',
         '| Yumeta Company.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF|  | Yumeta Company| #945E75| 1| 1| 0| 0',
@@ -4934,7 +4934,13 @@ Get-ChildItem -Recurse $DefaultsPath -Name -File | ForEach-Object { '"{0}"' -f $
 # Count [ERROR] lines
 #######################
 $errorCount1 = (Get-Content $scriptLog | Select-String -Pattern "\[ERROR\]" | Measure-Object).Count
-$errorCount2 = (Get-Content $scriptLog2 | Select-String -Pattern "\[ERROR\]" | Measure-Object).Count
+
+if (Test-Path -Path $scriptLog2) {
+    $errorCount2 = (Get-Content $scriptLog2 | Select-String -Pattern "\[ERROR\]" | Measure-Object).Count
+}
+else {
+    $errorCount2 = 0
+}
 
 #######################
 # SUMMARY
