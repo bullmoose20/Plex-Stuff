@@ -3859,7 +3859,7 @@ Function CreateStudio {
         '| W-Toon Studio.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF|  | W-Toon Studio| #9EAFE3| 1| 1| 0| 0',
         '| W. Chump and Sons.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF|  | W. Chump and Sons| #0125F4| 1| 1| 0| 0',
         '| Walt Disney Animation Studios.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF|  | Walt Disney Animation Studios| #1290C0| 1| 1| 0| 0',
-        '| Walt Disney Pictures.png| 0| 1300| 0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF|  | Walt Disney Pictures| #2944AA| 1| 1| 0| 0',
+        '| Walt Disney Pictures.png| 0| 1300| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF|  | Walt Disney Pictures| #2944AA| 1| 1| 0| 0',
         '| Warner Animation Group.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF|  | Warner Animation Group| #2C80EE| 1| 1| 0| 0'
         '| Warner Bros. Pictures.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF|  | Warner Bros. Pictures| #39538F| 1| 1| 0| 0',
         '| Warner Bros. Television.png| +0| 1600| +0| ComfortAa-Medium| 359| #FFFFFF| 0| 15| #FFFFFF|  | Warner Bros. Television| #B65CF3| 1| 1| 0| 0',
