@@ -48,17 +48,19 @@ $scriptLog = Join-Path $scriptLogPath -ChildPath "$scriptName.log"
 $databasePath = Join-Path $script_path -ChildPath "OptimalPointSizeCache.db"
 $scriptLog2 = Join-Path $scriptLogPath "create_poster.ps1.log"
 
-#################################
-# clear create_poster.ps1.log to ensure we don't get errors reported from previous runs
-#################################
-if (Test-Path -Path $scriptLog2) {
-    Remove-Item -Path $scriptLog2 -Force
-    Write-Host "File deleted: $scriptLog2"
+################################################################################
+# Function: Clear-Log
+# Description: clear create_poster.ps1.log to ensure we don't get errors reported from previous runs
+################################################################################
+Function Clear-Log {
+    if (Test-Path -Path $scriptLog2) {
+        Remove-Item -Path $scriptLog2 -Force
+        WriteToLogFile "Reset Log                    : File deleted: $scriptLog2"
+    }
+    else {
+        WriteToLogFile "Reset Log                    : File not found: $scriptLog2"
+    }
 }
-else {
-    Write-Host "File not found: $scriptLog2"
-}
-
 ################################################################################
 # Function: New-SQLCache
 # Description: creates a sqlcache file
@@ -2196,7 +2198,7 @@ Function CreateContentRating {
 
     $logo_offset = -500
     $logo_resize = 1800
-    $text_offset = +850
+    $text_offset = "+850"
     $font = "ComfortAa-Medium"
     $font_color = "#FFFFFF"
     $border = 0
@@ -4704,6 +4706,7 @@ WriteToLogFile "#### START ####"
 
 $Stopwatch = [System.Diagnostics.Stopwatch]::new()
 $Stopwatch.Start()
+Clear-Log
 New-SQLCache
 Import-YamlModule
 
@@ -4886,8 +4889,8 @@ foreach ($param in $args) {
 }
 
 if (!$args) {
-    # ShowFunctions
-    CreateContentRating
+    ShowFunctions
+    # CreateContentRating
     # CreateAwards
     # CreateResolution
     # CreateOverlays
