@@ -1,8 +1,7 @@
 #!/bin/bash
 # Original code written by the crew at (redacted) and good to share because `This is the way` https://www.youtube.com/watch?v=1iSz5cuCXdY
-# Sharing as is... you will need to tweak this as I have never run it and I am on Unraid running hotio plex container
 
-sqplex="/mnt/user/data/scripts/plex-scripts/pumpanddump/plexsql/plexmediaserver/Plex Media Server"
+sqplex="/opt/plexsql/Plex Media Server"
 
 function usage {
   echo ""
@@ -37,7 +36,7 @@ echo "stopping ${plexdocker}"
 
 docker stop "${plexdocker}"
 echo "copying plex app"
-docker cp "${plexdocker}":/app/usr/lib/plexmediaserver/ /mnt/user/data/scripts/plex-scripts/pumpanddump/plexsql
+docker cp "${plexdocker}":/usr/lib/plexmediaserver/ /opt/plexsql
 cd "$plexdbpath" || exit
 echo "backing up database"
 cp com.plexapp.plugins.library.db com.plexapp.plugins.library.db.original
