@@ -8,7 +8,7 @@
 # This script contains ten functions that are used to create various types of posters. The functions are:
 # CreateAudioLanguage, CreateAwards, CreateChart, CreateCountry, CreateDecade, CreateGenre, CreatePlaylist, CreateSubtitleLanguage, CreateUniverse, CreateYear, and CreateOverlays.
 # The script can be called by providing the name of the functionor aliases you want to run as a command-line argument.
-# AudioLanguage, Awards, Based, Charts, ContentRating, Country, Decades, Franchise, Genres, Network, Playlist, Resolution, Streaming,
+# Aspect, AudioLanguage, Awards, Based, Charts, ContentRating, Country, Decades, Franchise, Genres, Network, Playlist, Resolution, Streaming,
 # Studio, Seasonal, Separators, SubtitleLanguages, Universe, Years, All
 #
 # REQUIREMENTS:
@@ -176,7 +176,7 @@ Function InstallFontsIfNeeded {
 # Description: Removes folders to start fresh run
 ################################################################################
 Function Remove-Folders {
-    $folders = "audio_language", "award", "based", "chart", "content_rating", "country",
+    $folders = "aspect", "audio_language", "award", "based", "chart", "content_rating", "country",
     "decade", "defaults-$LanguageCode", "franchise", "genre", "network", "playlist", "resolution",
     "seasonal", "separators", "streaming", "studio", "subtitle_language",
     "translations", "universe", "year"
@@ -627,6 +627,7 @@ Function MoveFiles {
     # $defaultsPath = Join-Path $script_path -ChildPath "defaults"
 
     $foldersToMove = @(
+        "aspect"
         "audio_language"
         "award"
         "based"
@@ -660,6 +661,71 @@ Function MoveFiles {
         Move-Item -Path (Join-Path $script_path -ChildPath $file) -Destination $DefaultsPath -Force -ErrorAction SilentlyContinue
     }
 }
+
+################################################################################
+# Function: CreateAspect
+# Description:  Creates aspect ratio posters
+################################################################################
+Function CreateAspect {
+    Write-Host "Creating Aspect"
+    Set-Location $script_path
+    # Find-Path "$script_path\aspect"
+    $theMaxWidth = 1800
+    $theMaxHeight = 1000
+    $minPointSize = 100
+    $maxPointSize = 250
+
+    Move-Item -Path output -Destination output-orig
+
+    $myArray = @(
+        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        'aspect_ratio_other| transparent.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | other| #FF2000| 1| 1| 0| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        if ($($item.key_name).ToString() -eq "") {
+            $value = $null
+        }
+        else {
+            $value = (Get-YamlPropertyValue -PropertyPath "collections.$($item.key_name).name" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+        }
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
+    }
+    LaunchScripts -ScriptPaths $arr
+
+    $myArray = @(
+        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        '| 1.33.png| +0| 1800| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | 1.33| #93B69F| 1| 1| 0| 1',
+        '| 1.65.png| +0| 1800| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | 1.65| #FB0AA1| 1| 1| 0| 1',
+        '| 1.66.png| +0| 1800| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | 1.66| #FFA500| 1| 1| 0| 1',
+        '| 1.78.png| +0| 1800| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | 1.78| #B96EE9| 1| 1| 0| 1',
+        '| 1.85.png| +0| 1800| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | 1.85| #43F6EF| 1| 1| 0| 1',
+        '| 2.2.png| +0| 1800| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | 2.2| #133CD8| 1| 1| 0| 1',
+        '| 2.35.png| +0| 1800| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | 2.35| #0B8D4E| 1| 1| 0| 1',
+        '| 2.77.png| +0| 1800| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | 2.77| #8890C8| 1| 1| 0| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        if ($($item.key_name).ToString() -eq "") {
+            $value = $null
+        }
+        else {
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+        }
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_aspect\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
+    }
+    LaunchScripts -ScriptPaths $arr
+
+    Move-Item -Path output -Destination aspect
+    Copy-Item -Path logos_aspect -Destination aspect\logos -Recurse
+    Move-Item -Path output-orig -Destination output
+    
+}
+
 
 ################################################################################
 # Function: CreateAudioLanguage
@@ -3400,6 +3466,7 @@ Function CreateSeparators {
         'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
         'COLLECTIONLESS| | +0| 2000| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | collectionless| | 0| 1| 0| 0',
         'ACTOR| | +0| 2000| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | actor| | 0| 1| 0| 0',
+        'ASPECT_RATIO| | +0| 2000| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | aspect| | 0| 1| 0| 0',
         'AUDIO_LANGUAGE| | +0| 2000| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | audio_language| | 0| 1| 0| 0',
         'AWARD| | +0| 2000| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | award| | 0| 1| 0| 0',
         'CHART| | +0| 2000| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | chart| | 0| 1| 0| 0',
@@ -3969,7 +4036,7 @@ Function CreateStudio {
         '| Yumeta Company.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF|   | Yumeta Company| #945E75| 1| 1| 0| 0',
         '| Zero-G.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF|   | Zero-G| #460961| 1| 1| 0| 0',
         '| Zexcs.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF|   | Zexcs| #E60CB2| 1| 1| 0| 0'
-                    ) | ConvertFrom-Csv -Delimiter '|'
+    ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
     foreach ($item in $myArray) {
@@ -4520,7 +4587,7 @@ Function CreateOverlays {
     Set-Location $script_path
     
     $directories = @("award", "chart", "country", "franchise", "network", "playlist", "resolution", "streaming", "universe")
-    $directories_no_trim = @("content_rating", "genre", "seasonal", "studio")
+    $directories_no_trim = @("aspect", "content_rating", "genre", "seasonal", "studio")
     $size1 = "285x85>"
     $size2 = "440x100>"
     
@@ -4916,6 +4983,7 @@ Set-Location $script_path
 
 foreach ($param in $args) {
     Switch ($param) {
+        "Aspect" { CreateAspect }
         "AudioLanguage" { CreateAudioLanguage }
         "AudioLanguages" { CreateAudioLanguage }
         "Award" { CreateAwards }
@@ -4955,6 +5023,7 @@ foreach ($param in $args) {
         "Year" { CreateYear }
         "Years" { CreateYear }
         "All" {
+            CreateAspect
             CreateAudioLanguage
             CreateAwards
             CreateBased
@@ -4984,6 +5053,7 @@ foreach ($param in $args) {
 
 if (!$args) {
     ShowFunctions
+    # CreateAspect
     # CreateContentRating
     # CreateAwards
     # CreateResolution
