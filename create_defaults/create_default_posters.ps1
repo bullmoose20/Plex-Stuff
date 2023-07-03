@@ -3139,6 +3139,7 @@ Function CreateNetwork {
         ' | National Geographic.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | National Geographic| #C6B31B| 1| 1| 0| 1',
         ' | NBC.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | NBC| #703AAC| 1| 1| 0| 1',
         ' | Netflix.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Netflix| #B42A33| 1| 1| 0| 1',
+        ' | Network 10.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Network 10| #28846E| 1| 1| 0| 1',
         ' | Nick Jr.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Nick Jr| #4290A4| 1| 1| 0| 1',
         ' | Nick.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Nick| #B68021| 1| 1| 0| 1',
         ' | Nickelodeon.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Nickelodeon| #C56A16| 1| 1| 0| 1',
