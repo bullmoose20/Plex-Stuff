@@ -4594,7 +4594,8 @@ Function CreateOverlays {
     
     Foreach ($dir in $directories_no_trim) {
         $path = Join-Path $script_path $dir
-        $outputPath = Join-Path $path "logos_overlays"
+        $outputPath = Join-Path $path "overlays"
+        $outputPath = Join-Path $outputPath "standard"
         $inputPath = Join-Path $script_path "logos_$dir"
         Find-Path $path
         Find-Path $outputPath
@@ -4605,7 +4606,8 @@ Function CreateOverlays {
 
     Foreach ($dir in $directories) {
         $path = Join-Path $script_path $dir
-        $outputPath = Join-Path $path "logos_overlays"
+        $outputPath = Join-Path $path "overlays"
+        $outputPath = Join-Path $outputPath "standard"
         $inputPath = Join-Path $script_path "logos_$dir"
         Find-Path $path
         Find-Path $outputPath
@@ -4616,7 +4618,8 @@ Function CreateOverlays {
 
     Foreach ($dir in $directories_no_trim) {
         $path = Join-Path $script_path $dir
-        $outputPath = Join-Path $path "logos_overlays_440x100"
+        $outputPath = Join-Path $path "overlays"
+        $outputPath = Join-Path $outputPath "bigger"
         $inputPath = Join-Path $script_path "logos_$dir"
         Find-Path $path
         Find-Path $outputPath
@@ -4627,7 +4630,8 @@ Function CreateOverlays {
 
     Foreach ($dir in $directories) {
         $path = Join-Path $script_path $dir
-        $outputPath = Join-Path $path "logos_overlays_440x100"
+        $outputPath = Join-Path $path "overlays"
+        $outputPath = Join-Path $outputPath "bigger"
         $inputPath = Join-Path $script_path "logos_$dir"
         Find-Path $path
         Find-Path $outputPath
