@@ -3363,7 +3363,7 @@ Function CreateGenre {
         'ANTI-HERO| Anti-Hero.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Anti-Hero| #2B319B| 1| 1| 0| 1',
         'APOCALYPSE| Apocalypse.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Apocalypse| #270811| 1| 1| 0| 1',
         'ARTIFICIAL_INTELLIGENCE| Artificial Intelligence.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Artificial Intelligence| #299206| 1| 1| 0| 1',
-        'ASSASSIN| Assassin.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Assasin| #C52124| 1| 1| 0| 1',
+        'ASSASSIN| Assassin.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Assassin| #C52124| 1| 1| 0| 1',
         'ASTRONAUT| Astronaut.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Astronaut| #773A54| 1| 1| 0| 1',
         'BETRAYAL| Betrayal.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Betrayal| #06CE03| 1| 1| 0| 1',
         'BIOGRAPHY| Biography.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Biography| #C1A13E| 1| 1| 0| 1',
