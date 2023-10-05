@@ -4304,6 +4304,7 @@ Function CreateStudio {
         '| Amazon Studios.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Amazon Studios| #D28109| 1| 1| 0| 0',
         '| Amblin Entertainment.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Amblin Entertainment| #394E76| 1| 1| 0| 0',
         '| AMC Studios.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | AMC Studios| #AE8434| 1| 1| 0| 0',
+        '| Anima Sola Productions.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Anima Sola Productions| #2F6DBA| 1| 1| 0| 0',
         '| Animation Do.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Animation Do| #408FE3| 1| 1| 0| 0',
         '| Ankama.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Ankama| #CD717E| 1| 1| 0| 0',
         '| Annapurna Pictures.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Annapurna Pictures| #204682| 1| 1| 0| 0',
