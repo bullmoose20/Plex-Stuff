@@ -4513,7 +4513,6 @@ Function CreateStudio {
         '| MAPPA.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | MAPPA| #376430| 1| 1| 0| 0',
         '| Mars Media Beteiligungs.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Mars Media Beteiligungs| #15C81E| 1| 1| 0| 0',
         '| Marv Films.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Marv Films| #958F42| 1| 1| 0| 0',
-        '| marv.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | marv| #958F42| 1| 1| 0| 0',
         '| Marvel Animation.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Marvel Animation| #ED171F| 1| 1| 0| 0',
         '| Marvel Studios.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Marvel Studios| #1ED8E3| 1| 1| 0| 0',
         '| Matt Tolmach Productions.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Matt Tolmach Productions| #EAB150| 1| 1| 0| 0',
