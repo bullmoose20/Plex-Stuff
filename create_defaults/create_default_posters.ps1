@@ -2135,6 +2135,13 @@ Function CreateBased {
 
     $myArray = @(
         'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        # 'best_of_britain| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Best of Britain| #7335B5| 1| 1| 0| 1',
+        # 'based_on_books_and_games| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Based on Books and Games| #7335B5| 1| 1| 0| 1',
+        # 'heroes_and_wizards| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Heroes and Wizards| #7335B5| 1| 1| 0| 1',
+        # 'throwback_thursday| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Throwback Thursday| #7335B5| 1| 1| 0| 1',
+        # 'the_justice_system| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | The Nustice System| #7335B5| 1| 1| 0| 1',
+        # 'family_favourites| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Family Favourites| #7335B5| 1| 1| 0| 1',
+        # 'mystery_and_drama| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Mystery a d Drama| #7335B5| 1| 1| 0| 1',
         'BASED_ON_A_BOOK| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Book| #131CA1| 1| 1| 0| 1',
         'BASED_ON_A_COMIC| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Comic| #7856EF| 1| 1| 0| 1',
         'BASED_ON_A_TRUE_STORY| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | True Story| #BC0638| 1| 1| 0| 1',
@@ -3552,6 +3559,7 @@ Function CreateGenre {
         'TRUE_CRIME| True Crime.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | True Crime| #C706DE| 1| 1| 0| 1',
         'TV_MOVIE| TV Movie.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | TV Movie| #85A5B4| 1| 1| 0| 1',
         'UFO| Ufo.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Ufo| #529D82| 1| 1| 0| 1',
+        'ULTIMATE_BASS| Ultimate Bass.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Ultimate Bass| #7335B5| 1| 1| 0| 1',
         'UNEXPECTEDLY_AMAZING| Unexpectedly Amazing.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Unexpectedly Amazing| #40E6BB| 1| 1| 0| 1',
         'URBAN_FANTASY| Urban Fantasy.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Urban Fantasy| #0E7018| 1| 1| 0| 1',
         'UTOPIA| Utopia.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Utopia| #81E8E5| 1| 1| 0| 1',
