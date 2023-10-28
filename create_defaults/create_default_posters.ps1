@@ -4736,6 +4736,7 @@ Function CreateStudio {
         '| Whitaker Entertainment.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Whitaker Entertainment| #EF1BA5| 1| 1| 0| 0',
         '| White Fox.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | White Fox| #A86633| 1| 1| 0| 0',
         '| Wiedemann & Berg Television.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Wiedemann & Berg Television| #9A2F9F| 1| 1| 0| 0',
+        '| Williams Street.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Williams Street| #B5A6C5| 1| 1| 0| 0',
         '| Winkler Films.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Winkler Films| #A55752| 1| 1| 0| 0',
         '| Wit Studio.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Wit Studio| #1F3BB6| 1| 1| 0| 0',
         '| Wolf Entertainment.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Wolf Entertainment| #281D15| 1| 1| 0| 0',
