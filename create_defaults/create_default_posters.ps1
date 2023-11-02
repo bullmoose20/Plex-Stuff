@@ -2141,7 +2141,7 @@ Function CreateBased {
         # 'throwback_thursday| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Throwback Thursday| #7335B5| 1| 1| 0| 1',
         # 'the_justice_system| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | The Nustice System| #7335B5| 1| 1| 0| 1',
         # 'family_favourites| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Family Favourites| #7335B5| 1| 1| 0| 1',
-        # 'mystery_and_drama| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Mystery a d Drama| #7335B5| 1| 1| 0| 1',
+        # 'mystery_and_drama| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Mystery and Drama| #7335B5| 1| 1| 0| 1',
         'BASED_ON_A_BOOK| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Book| #131CA1| 1| 1| 0| 1',
         'BASED_ON_A_COMIC| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Comic| #7856EF| 1| 1| 0| 1',
         'BASED_ON_A_TRUE_STORY| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | True Story| #BC0638| 1| 1| 0| 1',
