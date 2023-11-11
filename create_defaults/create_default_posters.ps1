@@ -4542,6 +4542,7 @@ Function CreateStudio {
         '| Let''s Not Turn This Into a Whole Big Production.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Let''s Not Turn This Into a Whole Big Production| #7597E6| 1| 1| 0| 0',
         '| Levity Entertainment Group.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Levity Entertainment Group| #612A6D| 1| 1| 0| 0',
         '| LIDENFILMS.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | LIDENFILMS| #EF8907| 1| 1| 0| 0',
+        '| Lifetime.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Lifetime| #2831EE| 1| 1| 0| 0',
         '| Lightstorm Entertainment.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Lightstorm Entertainment| #75FF24| 1| 1| 0| 0',
         '| Likely Story.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Likely Story| #2F33CA| 1| 1| 0| 0',
         '| Lionsgate.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Lionsgate| #7D22A3| 1| 1| 0| 0',
