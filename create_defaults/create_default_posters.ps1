@@ -6,10 +6,10 @@
 #
 # DESCRIPTION: 
 # This script contains ten functions that are used to create various types of posters. The functions are:
-# CreateAudioLanguage, CreateAwards, CreateChart, CreateCountry, CreateDecade, CreateGenre, CreatePlaylist, CreateSubtitleLanguage, CreateUniverse, CreateYear, and CreateOverlays.
+# CreateAudioLanguage, CreateAwards, CreateChart, CreateCountry, CreateDecade, CreateGenre, CreatePlaylist, CreateSubtitleLanguage, CreateUniverse, CreateVideoFormat, CreateYear, and CreateOverlays.
 # The script can be called by providing the name of the function or aliases you want to run as a command-line argument.
 # Aspect, AudioLanguage, Awards, Based, Charts, ContentRating, Country, Decades, Franchise, Genres, Network, Playlist, Resolution, Streaming,
-# Studio, Seasonal, Separators, SubtitleLanguages, Universe, Years, All
+# Studio, Seasonal, Separators, SubtitleLanguages, Universe, VideoFormat, Years, All
 #
 # REQUIREMENTS:
 # Imagemagick must be installed - https://imagemagick.org/script/download.php
@@ -180,7 +180,7 @@ Function Remove-Folders {
     $folders = "aspect", "audio_language", "award", "based", "chart", "content_rating", "country",
     "decade", "defaults-$LanguageCode", "franchise", "genre", "network", "playlist", "resolution",
     "seasonal", "separators", "streaming", "studio", "subtitle_language",
-    "translations", "universe", "year"
+    "translations", "universe", "video_format", "year"
     
     foreach ($folder in $folders) {
         $path = Join-Path $script_path $folder
@@ -647,6 +647,7 @@ Function MoveFiles {
         "studio"
         "subtitle_language"
         "universe"
+        "video_format"
         "year"
     )
 
@@ -5059,6 +5060,41 @@ Function CreateSubtitleLanguage {
 }
 
 ################################################################################
+# Function: CreateVideoFormat
+# Description:  Creates Video Format
+################################################################################
+Function CreateVideoFormat {
+    Write-Host "Creating Video Format"
+    Set-Location $script_path
+    # Find-Path "$script_path\video_format" 77A5B2
+    Move-Item -Path output -Destination output-orig    
+
+    $myArray = @(
+        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        '| BluRay.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | BluRay| #a66321| 1| 1| 0| 0',
+        '| DVD.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | DVD| #E4CB63| 1| 1| 0| 0',
+        '| MoviesAnywhere.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | MoviesAnywhere| #77A5B2| 1| 1| 0| 0'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        if ($($item.key_name).ToString() -eq "") {
+            $value = $null
+        }
+        else {
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+        }
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_video_format\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
+    }
+    LaunchScripts -ScriptPaths $arr
+    
+    Move-Item -Path output -Destination video_format
+    Copy-Item -Path logos_video_format -Destination video_format\logos -Recurse
+    Move-Item -Path output-orig -Destination output
+}
+
+################################################################################
 # Function: CreateUniverse
 # Description:  Creates Universe
 ################################################################################
@@ -5348,7 +5384,7 @@ Function CreateOverlays {
     Write-Host "Creating Overlays"
     Set-Location $script_path
     
-    $directories = @("award", "chart", "country", "franchise", "network", "playlist", "resolution", "streaming", "universe")
+    $directories = @("award", "chart", "country", "franchise", "network", "playlist", "resolution", "streaming", "universe", "video_format")
     $directories_no_trim = @("aspect", "content_rating", "genre", "seasonal", "studio")
     $size1 = "285x85>"
     $size2 = "440x100>"
@@ -5615,7 +5651,7 @@ Function ShowFunctions {
     Write-Host "create_default_posters.ps1 All"
     Write-Host ""
     Write-Host "Possible parameters are:"
-    Write-Host "AudioLanguage, Awards, Based, Charts, ContentRating, Country, Decades, Franchise, Genres, Network, Playlist, Resolution, Streaming, Studio, Seasonal, Separators, SubtitleLanguages, Universe, Years, All"
+    Write-Host "AudioLanguage, Awards, Based, Charts, ContentRating, Country, Decades, Franchise, Genres, Network, Playlist, Resolution, Streaming, Studio, Seasonal, Separators, SubtitleLanguages, Universe, VideoFormat, Years, All"
     exit
 }
 
@@ -5788,6 +5824,8 @@ foreach ($param in $args) {
         "SubtitleLanguages" { CreateSubtitleLanguage }
         "Universe" { CreateUniverse }
         "Universes" { CreateUniverse }
+        "VideoFormat" { CreateVideoFormat }
+        "VideoFormats" { CreateVideoFormat }
         "Year" { CreateYear }
         "Years" { CreateYear }
         "All" {
@@ -5810,6 +5848,7 @@ foreach ($param in $args) {
             CreateStudio
             CreateSubtitleLanguage
             CreateUniverse
+            CreateVideoFormat
             CreateYear
             CreateOverlays
         }
