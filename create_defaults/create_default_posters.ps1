@@ -5071,9 +5071,10 @@ Function CreateVideoFormat {
 
     $myArray = @(
         'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
-        '| BluRay.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | BluRay| #a66321| 1| 1| 0| 0',
+        '| BluRay.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | BluRay| #A66321| 1| 1| 0| 0',
         '| DVD.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | DVD| #E4CB63| 1| 1| 0| 0',
-        '| MoviesAnywhere.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | MoviesAnywhere| #77A5B2| 1| 1| 0| 0'
+        '| MoviesAnywhere.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | MoviesAnywhere| #77A5B2| 1| 1| 0| 0',
+        '| WEBDL.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | WEBDL| #56CECE| 1| 1| 0| 0'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
