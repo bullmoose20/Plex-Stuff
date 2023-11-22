@@ -1,6 +1,6 @@
-$myDir = "C:\users\bullmoose\Downloads\metalogs"
+$myDir = "D:\metalogs"
 Set-Location $myDir
-Get-ChildItem $myDir -I met*.txt, met*.log met*.log.* -R | Select-String "Convert Error: No TVDb ID Found for IMDb ID:", 
+Get-ChildItem $myDir -I met*.txt, met*.log, met*.log.*, meta.log*.* -R | Select-String "Convert Error: No TVDb ID Found for IMDb ID:", 
 "Convert Error: No IMDb ID Found for TVDb ID:", 
 "Convert Error: No TMDb ID Found for TVDb ID:", 
 "Convert Error: No IMDb ID Found for TMDb ID:",

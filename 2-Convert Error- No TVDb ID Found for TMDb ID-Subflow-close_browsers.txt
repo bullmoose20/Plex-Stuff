@@ -1,0 +1,12 @@
+IF IsNotEmpty(TMDb_Browser) THEN
+    WebAutomation.CloseWebBrowser BrowserInstance: TMDb_Browser
+        ON ERROR
+
+        END
+END
+IF IsNotEmpty(TVDb_Browser) THEN
+    WebAutomation.CloseWebBrowser BrowserInstance: TVDb_Browser
+        ON ERROR
+
+        END
+END

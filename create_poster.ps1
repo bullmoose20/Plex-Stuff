@@ -1,6 +1,6 @@
 ﻿####################################################
 # create_poster.ps1
-# v1.8
+# v1.9
 # author: bullmoose20
 #
 # DESCRIPTION: 
@@ -82,8 +82,14 @@ $random_name = ("{0:X6}" -f (Get-Random -Maximum 0xFFFFFF))
 # $logo checks
 #################################
 $trans_path = Join-Path -Path $script_path -ChildPath "transparent.png"
+if (-not(Test-Path -Path $trans_path -PathType Leaf)) {
+  Write-Host "Logo >$trans_path< not found. Creating now..." -ForegroundColor Red -BackgroundColor White
+  if ($logo -eq "" -or $null -eq $logo) {
+    magick -size 1x1 xc:none $trans_path
+    $logo = $trans_path
+  }
+}
 if ($logo -eq "" -or $null -eq $logo) {
-  magick -size 1x1 xc:none $trans_path
   $logo = $trans_path
 }
 
@@ -263,7 +269,7 @@ else {
 
 if ($avg_color) {
   if ($orig_base -ne "") {
-  $avg_color = $False
+    $avg_color = $False
   }
 }
 

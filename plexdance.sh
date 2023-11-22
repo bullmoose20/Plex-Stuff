@@ -13,7 +13,7 @@ done
 echo "Containers stopped"
 echo "Stopping containers that will be restarted after plexdance completes..."
 
-containers=("prowlarr" "radarr" "sonarr" "lidarr" "sabnzbd" "qbittorrent", "tautulli", "wrapperr" "PlexTraktSync")
+containers=("prowlarr" "radarr" "sonarr" "lidarr" "sabnzbd" "qbittorrent" "tautulli" "wrapperr" "PlexTraktSync")
 for container in "${containers[@]}"
 do
   docker stop "$container"
