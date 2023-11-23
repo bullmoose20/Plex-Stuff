@@ -3415,6 +3415,7 @@ Function CreateGenre {
         'CHILDRENS_CARTOONS| Children''s Cartoons.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Children''s Cartoons| #C5413A| 1| 1| 0| 1',
         'CHILDRENS_CARTOON| Children''s Cartoon.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Children''s Cartoon| #A65AB7| 1| 1| 0| 1',
         'CHILDREN| Children.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Children| #9C42C2| 1| 1| 0| 1',
+        'CHRISTMAS| Christmas.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Christmas| #D52411| 1| 1| 0| 1',
         'COLORADO| Colorado.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Colorado| #75735E| 1| 1| 0| 1',
         'COMEDY_HORROR| Comedy Horror.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Comedy Horror| #289951| 1| 1| 0| 1',
         'COMEDY| Comedy.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Comedy| #B7363E| 1| 1| 0| 1',
