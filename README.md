@@ -12,7 +12,7 @@
 ## Setup
 
 1. clone repo
-2. setup python virtualenv - [I'd suggest doing this in a virtual environment. Great instructions found here - https://metamanager.wiki/en/nightly/home/guides/local.html?highlight=virtualenv#setting-up-a-virtual-environment]
+2. setup python virtualenv - [I'd suggest doing this in a virtual environment. Great instructions found here - https://www.metamanager.wiki/en/nightly/pmm/install/guides/local/#setting-up-a-virtual-environment]
 3. Activate that virtualenv
 4. Install requirements with `pip install -r requirements.txt` into that virtualenv
 5. cd to the directory that you want to run the script in
