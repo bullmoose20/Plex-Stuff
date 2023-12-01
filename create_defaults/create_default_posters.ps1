@@ -5076,6 +5076,7 @@ Function CreateStudio {
         '| Sony Pictures.png| +0| 1200| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Sony Pictures| #943EBD| 1| 1| 0| 0',
         '| Sphère Média Plus.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Sphère Média Plus| #AEBC44| 1| 1| 0| 0',
         '| Spyglass Entertainment.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Spyglass Entertainment| #472659| 1| 1| 0| 0',
+        '| Square Enix.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Square Enix| #1C0EC5| 1| 1| 0| 0',
         '| Staple Entertainment.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Staple Entertainment| #E1EB06| 1| 1| 0| 0',
         '| Star Thrower Entertainment.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Star Thrower Entertainment| #D52526| 1| 1| 0| 0',
         '| Stark Raving Black Productions.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Stark Raving Black Productions| #46D38B| 1| 1| 0| 0',
@@ -5462,10 +5463,12 @@ Function CreateVideoFormat {
 
     $myArray = @(
         'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
-        '| BluRay.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | BluRay| #A66321| 1| 1| 0| 0',
-        '| DVD.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | DVD| #E4CB63| 1| 1| 0| 0',
+        '| bluray.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | bluray| #A66321| 1| 1| 0| 0',
+        '| dvd.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | dvd| #E4CB63| 1| 1| 0| 0',
+        '| hdtv.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | hdtv| #27B618| 1| 1| 0| 0',
         '| MoviesAnywhere.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | MoviesAnywhere| #77A5B2| 1| 1| 0| 0',
-        '| WEBDL.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | WEBDL| #56CECE| 1| 1| 0| 0'
+        '| remux.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | remux| #32C493| 1| 1| 0| 0',
+        '| web.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | web| #56CECE| 1| 1| 0| 0'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
@@ -5776,8 +5779,8 @@ Function CreateOverlays {
     Write-Host "Creating Overlays"
     Set-Location $script_path
     
-    $directories = @("award", "chart", "country", "franchise", "network", "playlist", "resolution", "streaming", "universe", "video_format")
-    $directories_no_trim = @("aspect", "content_rating", "genre", "seasonal", "studio")
+    $directories = @("award", "chart", "country", "franchise", "network", "playlist", "resolution", "streaming", "universe")
+    $directories_no_trim = @("aspect", "content_rating", "genre", "seasonal", "studio", "video_format")
     $size1 = "285x85>"
     $size2 = "440x100>"
     
