@@ -5036,7 +5036,7 @@ Function CreateStudio {
         '| RadicalMedia.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | RadicalMedia| #E34304| 1| 1| 0| 0',
         '| Radix.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Radix| #1F2D33| 1| 1| 0| 0',
         '| Railsplitter Pictures.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Railsplitter Pictures| #9BE2A4| 1| 1| 0| 0',
-        '| Rankin-Bass Productions.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Rankin-Bass Productions| #A9B1D8| 1| 1| 0| 0',
+        '| Rankin Bass Productions.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Rankin Bass Productions| #A9B1D8| 1| 1| 0| 0',
         '| RatPac Entertainment.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | RatPac Entertainment| #91E130| 1| 1| 0| 0',
         '| Red Dog Culture House.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Red Dog Culture House| #46FDF5| 1| 1| 0| 0',
         '| Regency Pictures.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Regency Pictures| #1DD664| 1| 1| 0| 0',
