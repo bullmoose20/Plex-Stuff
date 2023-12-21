@@ -1,12 +1,15 @@
-IF IsNotEmpty(TMDb_Browser) THEN
-    WebAutomation.CloseWebBrowser BrowserInstance: TMDb_Browser
+
+FUNCTION close_browsers GLOBAL
+    IF IsNotEmpty(TMDb_Browser) THEN
+        WebAutomation.CloseWebBrowser BrowserInstance: TMDb_Browser
         ON ERROR
 
         END
-END
-IF IsNotEmpty(TVDb_Browser) THEN
-    WebAutomation.CloseWebBrowser BrowserInstance: TVDb_Browser
+    END
+    IF IsNotEmpty(TVDb_Browser) THEN
+        WebAutomation.CloseWebBrowser BrowserInstance: TVDb_Browser
         ON ERROR
 
         END
-END
+    END
+END FUNCTION
