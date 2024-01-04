@@ -3165,7 +3165,7 @@ Function CreateContentRating {
         '| de12c.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | 12| #37B653| 1| 1| 0| 1',
         '| de16c.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | 16| #3CA9E7| 1| 1| 0| 1',
         '| de18c.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | 18| #F51924| 1| 1| 0| 1',
-        '| debpjmc.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | BPJM| #DC1924| 1| 1| 0| 1',
+        '| debpjmc.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | BPjM| #DC1924| 1| 1| 0| 1',
         '| denr.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | NR| #0E84A3| 1| 1| 0| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
     
@@ -4461,7 +4461,7 @@ Function CreateGenre {
 Function CreateNetwork {
     Write-Host "Creating Network"
     Set-Location $script_path
-    # Find-Path "$script_path\network"
+    Find-Path "$script_path\network"
     $theMaxWidth = 1800
     $theMaxHeight = 1000
     $minPointSize = 100
@@ -4492,8 +4492,7 @@ Function CreateNetwork {
         'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
         ' | #0.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | #0| #7BE7A1| 1| 1| 0| 0',
         ' | A&E.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | A&E| #676767| 1| 1| 0| 0',
-        ' | ABC (AU).png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ABC (AU)| #CEC281| 1| 1| 0| 0',
-        ' | ABC (AU).png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ABC TV| #CEC281| 1| 1| 0| 0',
+        ' | ABC TV.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ABC TV| #CEC281| 1| 1| 0| 0',
         ' | ABC Family.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ABC Family| #73D444| 1| 1| 0| 0',
         ' | ABC Kids.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ABC Kids| #6172B9| 1| 1| 0| 0',
         ' | ABC.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ABC| #403993| 1| 1| 0| 0',
@@ -4590,7 +4589,6 @@ Function CreateNetwork {
         ' | Globoplay.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Globoplay| #775E92| 1| 1| 0| 0',
         ' | GMA Network.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | GMA Network| #A755A4| 1| 1| 0| 0',
         ' | Hallmark.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Hallmark| #601CB4| 1| 1| 0| 0',
-        ' | HBO Max.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | HBO Max| #2DE80E| 1| 1| 0| 0',
         ' | HBO.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | HBO| #458EAD| 1| 1| 0| 0',
         ' | HGTV.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | HGTV| #3CA38F| 1| 1| 0| 0',
         ' | History.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | History| #A57E2E| 1| 1| 0| 0',
@@ -4653,7 +4651,7 @@ Function CreateNetwork {
         ' | Planète+ A&E.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Planète+ A&E| #038502| 1| 1| 0| 0',
         ' | Prime Video.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Prime Video| #CB2770| 1| 1| 0| 0',
         ' | Rai 1.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Rai 1| #BC1E71| 1| 1| 0| 0',
-        ' | ReelzChannel.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ReelzChannel| #0C1668| 1| 1| 0| 0',
+        ' | Reelz.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Reelz| #0C1668| 1| 1| 0| 0',
         ' | RTL Télé.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | RTL Télé| #6790B5| 1| 1| 0| 0',
         ' | RTL.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | RTL| #21354A| 1| 1| 0| 0',
         ' | RTP1.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | RTP1| #7C7906| 1| 1| 0| 0',
@@ -4717,7 +4715,6 @@ Function CreateNetwork {
         ' | Univision.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Univision| #28BE59| 1| 1| 0| 0',
         ' | UPN.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | UPN| #C6864E| 1| 1| 0| 0',
         ' | USA Network.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | USA Network| #F7EB20| 1| 1| 0| 0',
-        ' | USA.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | USA| #C0565B| 1| 1| 0| 0',
         ' | VH1.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | VH1| #8E3BB1| 1| 1| 0| 0',
         ' | Viaplay.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Viaplay| #30F7FB| 1| 1| 0| 0',
         ' | Vice.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Vice| #D3D3D3| 1| 1| 0| 0',
@@ -4728,7 +4725,6 @@ Function CreateNetwork {
         ' | VRT 1.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | VRT 1| #680F46| 1| 1| 0| 0',
         ' | VTM.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | VTM| #9164A7| 1| 1| 0| 0',
         ' | W.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | W| #E60A55| 1| 1| 0| 0',
-        ' | Warner Bros..png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Warner Bros.| #39538F| 1| 1| 0| 0',
         ' | WE tv.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | WE tv| #15DD51| 1| 1| 0| 0',
         ' | YLE.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | YLE| #3A8722| 1| 1| 0| 0',
         ' | Youku.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Youku| #42809E| 1| 1| 0| 0',
@@ -4750,7 +4746,42 @@ Function CreateNetwork {
     }
 
     LaunchScripts -ScriptPaths $arr
-    Move-Item -Path output -Destination network
+    Move-Item -Path output -Destination network\standard
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        if ($($item.key_name).ToString() -eq "") {
+            $value = $null
+        }
+        else {
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+        }
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\white\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
+    }
+
+    LaunchScripts -ScriptPaths $arr
+
+    $myArray = @(
+        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        'network_kids_other| transparent.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Other Kids Networks| #FF2000| 1| 1| 0| 1',
+        'network_other| transparent.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Other Networks| #FF2000| 1| 1| 0| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        if ($($item.key_name).ToString() -eq "") {
+            $value = $null
+        }
+        else {
+            $value = (Get-YamlPropertyValue -PropertyPath "collections.$($item.key_name).name" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+        }
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
+    }
+
+    LaunchScripts -ScriptPaths $arr
+    Move-Item -Path output -Destination network\white
     Copy-Item -Path logos_network -Destination network\logos -Recurse
     Move-Item -Path output-orig -Destination output
     
@@ -6203,7 +6234,7 @@ Function CreateOverlays {
     Write-Host "Creating Overlays"
     Set-Location $script_path
     
-    $directories = @("award", "chart", "country", "franchise", "network", "playlist", "resolution", "streaming", "universe")
+    $directories = @("award", "chart", "country", "franchise", "network", "network\white", "playlist", "resolution", "streaming", "universe")
     $directories_no_trim = @("aspect", "content_rating", "genre", "seasonal", "studio", "video_format")
     $size1 = "285x85>"
     $size2 = "440x100>"
