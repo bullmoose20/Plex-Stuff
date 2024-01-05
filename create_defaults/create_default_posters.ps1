@@ -2027,6 +2027,8 @@ Function CreateAwards {
         'NOMINATIONS| Oscars.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | nomination| #A9842E| 1| 1| 0| 1',
         'BEST_DIRECTOR_WINNERS| Oscars.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | best_director_winner| #A9842E| 1| 1| 0| 1',
         'BEST_PICTURE_WINNERS| Oscars.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | best_picture_winner| #A9842E| 1| 1| 0| 1',
+        'BEST_DIRECTOR_NOMINATION| Oscars.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | best_director_nomination| #A9842E| 1| 1| 0| 1',
+        'BEST_PICTURE_NOMINATION| Oscars.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | best_picture_nomination| #A9842E| 1| 1| 0| 1',
         '| Oscars.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Oscars| #A9842E| 1| 1| 0| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
@@ -2041,6 +2043,11 @@ Function CreateAwards {
         $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
         $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
     }
+    $i = "1930-2"
+    $value = $i
+    $item.out_name = $i
+    $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
     LaunchScripts -ScriptPaths $arr
 
     $myArray = @(
@@ -2056,12 +2063,16 @@ Function CreateAwards {
             $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
         }
     }
+    $i = "1930-2"
+    $value = $i
+    $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
     LaunchScripts -ScriptPaths $arr
     Move-Item -Path output -Destination award\oscars
 
     $myArray = @(
         'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
-        'WINNERS| Oscars.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | winner| #A9842E| 1| 1| 0| 1'
+        'BEST_DIRECTOR_NOMINATION| Oscars.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | best_director_nomination| #A9842E| 1| 1| 0| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
@@ -2074,8 +2085,37 @@ Function CreateAwards {
             # $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
+    $i = "1930-2"
+    $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+    $value = "$value $i"
+    $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
     LaunchScripts -ScriptPaths $arr
-    Move-Item -Path output -Destination award\oscars\winner
+    Move-Item -Path output -Destination award\oscars\director_nomination
+
+
+    $myArray = @(
+        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        'BEST_PICTURE_NOMINATION| Oscars.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | best_picture_nomination| #A9842E| 1| 1| 0| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        for ($i = 1927; $i -lt 2030; $i++) {
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+            $value = "$value $i"
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
+            # $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+        }
+    }
+    $i = "1930-2"
+    $value = "$value $i"
+    $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+    $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
+    LaunchScripts -ScriptPaths $arr
+    Move-Item -Path output -Destination award\oscars\picture_nomination
 
     $myArray = @(
         'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
@@ -2091,12 +2131,17 @@ Function CreateAwards {
             $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
         }
     }
+    $i = "1930-2"
+    $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+    $value = "$value $i"
+    $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
     LaunchScripts -ScriptPaths $arr
     Move-Item -Path output -Destination award\oscars\nomination
- 
+
     $myArray = @(
         'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
-        'BEST_PICTURE_WINNER| Oscars.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | winner| #A9842E| 1| 1| 0| 1'
+        'BEST_PICTURE_WINNER| Oscars.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | best_picture_winner| #A9842E| 1| 1| 0| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
@@ -2108,8 +2153,35 @@ Function CreateAwards {
             $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
         }
     }
+    $i = "1930-2"
+    $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+    $value = "$value $i"
+    $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
     LaunchScripts -ScriptPaths $arr
     Move-Item -Path output -Destination award\oscars\best
+
+    $myArray = @(
+        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        'BEST_DIRECTOR_WINNER| Oscars.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | best_director_winner| #A9842E| 1| 1| 0| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        for ($i = 1927; $i -lt 2030; $i++) {
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+            $value = "$value $i"
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
+        }
+    }
+    $i = "1930-2"
+    $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+    $value = "$value $i"
+    $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
+    LaunchScripts -ScriptPaths $arr
+    Move-Item -Path output -Destination award\oscars\best_director
 
     ########################
     # Razzie #FF0C0C
@@ -4746,7 +4818,7 @@ Function CreateNetwork {
     }
 
     LaunchScripts -ScriptPaths $arr
-    Move-Item -Path output -Destination network\standard
+    Move-Item -Path output -Destination network\color
 
     $arr = @()
     foreach ($item in $myArray) {
@@ -5262,7 +5334,7 @@ Function CreateStudio {
         '| Carnival Films.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Carnival Films| #ABD477| 1| 1| 0| 0',
         '| Carolco.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Carolco| #684F0D| 1| 1| 0| 0',
         '| Carsey-Werner Company.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Carsey-Werner Company| #DCB758| 1| 1| 0| 0',
-        '| Cartoon Saloon.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Cartoon Saloon| #A6CB32 | 1| 1| 0| 0',
+        '| Cartoon Saloon.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Cartoon Saloon| #A6CB32| 1| 1| 0| 0',
         '| Castle Rock Entertainment.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Castle Rock Entertainment| #7C2843| 1| 1| 0| 0',
         '| CBS Productions.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | CBS Productions| #8E6C3C| 1| 1| 0| 0',
         '| CBS Studios.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | CBS Studios| #E6DE92| 1| 1| 0| 0',
