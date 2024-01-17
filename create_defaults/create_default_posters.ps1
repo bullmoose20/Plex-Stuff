@@ -4329,6 +4329,9 @@ Function CreateGenre {
     $myArray = @(
         'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
         '1001_MOVIES_YOU_MUST_SEE_BEFORE_YOU_DIE| 1001 Movies You Must See Before You Die.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | 1001 Movies You Must See Before You Die| #606723| 1| 1| 0| 1',
+        'VISUALLY_INSANE| Visually Insane.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Visually Insane| #8328A0| 1| 1| 0| 1',
+        'GUILTY_PLEASURE| Guilty Pleasure.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Guilty Pleasure| #B721A3| 1| 1| 0| 1',
+        'LOST_TREASURE| Lost Treasure.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Lost Treasure| #A8AF16| 1| 1| 0| 1',
         'ABSURDISM| Absurdism.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Absurdism| #032E2E| 1| 1| 0| 1',
         'ABSURD_COMEDY| Absurd Comedy.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Absurd Comedy| #D16496| 1| 1| 0| 0',
         'ACTION_ADVENTURE| Action & adventure.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Action & adventure| #65AEA5| 1| 1| 0| 1',
