@@ -4391,6 +4391,7 @@ Function CreateGenre {
         'CRIME_COMEDY| Crime Comedy.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Crime Comedy| #22EADE| 1| 1| 0| 0',
         'CRIME| Crime.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Crime| #888888| 1| 1| 0| 1',
         'CRITERION_COLLECTION| Criterion Collection.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Criterion Collection| #7E1D03| 1| 1| 0| 1',
+        'CULT_CLASSICS| Cult Classics.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Cult Classics| #156D88| 1| 1| 0| 1',
         'CYBERPUNK| Cyberpunk.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Cyberpunk| #0A0D7E| 1| 1| 0| 1',
         'CYBER_THRILLER| Cyber-Thriller.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Cyber-Thriller| #8F0520| 1| 1| 0| 1',
         'DARK_COMEDY| Dark Comedy.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Dark Comedy| #09F1A3| 1| 1| 0| 1',
