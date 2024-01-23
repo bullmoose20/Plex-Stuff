@@ -42,33 +42,33 @@ PLEX_TOKEN=PLEX-TOKEN                           # https://support.plex.tv/articl
 9. [image_check.ps1](#image_check) - Scans your transparent images for anomalies like head-chops, backgrounds not removed, and black and white photos instead of a color photo to give you a report so you can go and fix those by uploading new and better options to https://www.themoviedb.org/
 10. [create_people_poster.ps1](#create_people_poster) - Scans your PMM meta* logs to find missing people posters and will download and create the bw, rainier, orig, transparent. style poster for PMM/PLEX/EMBY/JELLYFIN/OTHER. This script was put together by using the image_check, get_missing_people, and Power Automate Desktop Flow (remove background) all into 1
 11. [PAD Flows](#pad_flows) - Various PAD flows for RPA stuff for PLEX, PMM, Other
-    1.  [1-Convert Error- No TMDb ID Found for IMDb ID](#Convert_Error_No_TMDb_ID_Found_for_IMDb_ID) - PAD flow to deal with Convert Errors in your meta.log file from PMM
-          2. [1-Convert Error- No TMDb ID Found for IMDb ID-Subflow-close_browsers]
-          3. [1-Convert Error- No TMDb ID Found for IMDb ID-Subflow-Refresh_browser]
-    1.  [2-Convert Error- No TVDb ID Found for TMDb ID](#Convert_Error_No_TVDb_ID_Found_for_TMDb_ID) - PAD flow to deal with Convert Errors in your meta.log file from PMM
-          2. [2-Convert Error- No TVDb ID Found for TMDb ID-Subflow-close_browsers]
-          3. [2-Convert Error- No TVDb ID Found for TMDb ID-Subflow-Refresh_browser]
-    1.  [3-Convert Error- No TVDb ID or IMDb ID found for AniDB ID](#Convert_Error_No_TVDb_ID_or_IMDb_ID_found_for_AniDB_ID) - PAD flow to deal with Convert Errors in your meta.log file from PMM
-          2. [3-Convert Error- No TVDb ID or IMDb ID found for AniDB ID-Subflow-close_browsers]
-          3. [3-Convert Error- No TVDb ID or IMDb ID found for AniDB ID-Subflow-Refresh_browser]
-    1.  [4-Convert Error No TMDb ID Found for TVDb ID](#4-Convert_Error_No_TMDb_ID_Found_for_TVDb_ID) - PAD flow to deal with Convert Errors in your meta.log file from PMM
-          2. [4-Convert Error No TMDb ID Found for TVDb ID-Subflow-close_browsers]
-          3. [4-Convert Error No TMDb ID Found for TVDb ID-Subflow-Refresh_browser]
+    1.  [1-Convert Warning- No TMDb ID Found for IMDb ID](#Convert_Warning_No_TMDb_ID_Found_for_IMDb_ID) - PAD flow to deal with Convert Warnings in your meta.log file from PMM
+          2. [1-Convert Warning- No TMDb ID Found for IMDb ID-Subflow-close_browsers]
+          3. [1-Convert Warning- No TMDb ID Found for IMDb ID-Subflow-Refresh_browser]
+    1.  [2-Convert Warning- No TVDb ID Found for TMDb ID](#Convert_Warning_No_TVDb_ID_Found_for_TMDb_ID) - PAD flow to deal with Convert Warnings in your meta.log file from PMM
+          2. [2-Convert Warning- No TVDb ID Found for TMDb ID-Subflow-close_browsers]
+          3. [2-Convert Warning- No TVDb ID Found for TMDb ID-Subflow-Refresh_browser]
+    1.  [3-Convert Warning- No TVDb ID or IMDb ID found for AniDB ID](#Convert_Warning_No_TVDb_ID_or_IMDb_ID_found_for_AniDB_ID) - PAD flow to deal with Convert Warnings in your meta.log file from PMM
+          2. [3-Convert Warning- No TVDb ID or IMDb ID found for AniDB ID-Subflow-close_browsers]
+          3. [3-Convert Warning- No TVDb ID or IMDb ID found for AniDB ID-Subflow-Refresh_browser]
+    1.  [4-Convert Warning- No TMDb ID Found for TVDb ID](#4-Convert_Warning_No_TMDb_ID_Found_for_TVDb_ID) - PAD flow to deal with Convert Warnings in your meta.log file from PMM
+          2. [4-Convert Warning- No TMDb ID Found for TVDb ID-Subflow-close_browsers]
+          3. [4-Convert Warning- No TMDb ID Found for TVDb ID-Subflow-Refresh_browser]
 
 For the above, there are subflows that should also be used as part of the flow. "Refresh_browser and close_browsers"
 
  
 Here are the possible PMM errors/warnings found in the meta.log in relation to these auto/semi-auto PAD flows
 ```
-Convert Error: No TMDb ID Found for IMDb ID:
-Convert Error: No TVDb ID Found for TMDb ID:
-Convert Error: No TVDb ID or IMDb ID found for AniDB ID:
-Convert Error: AniDB ID not found for AniList ID:
-Convert Error: AniDB ID not found for MyAnimeList ID:
-Convert Error: No IMDb ID Found for TMDb ID:
-Convert Error: No TMDb ID Found for TVDb ID:
-Convert Error: No IMDb ID Found for TVDb ID:
-Convert Error: No TVDb ID Found for IMDb ID:
+Convert Warning: No TMDb ID Found for IMDb ID:
+Convert Warning: No TVDb ID Found for TMDb ID:
+Convert Warning: No TVDb ID or IMDb ID found for AniDB ID:
+Convert Warning: AniDB ID not found for AniList ID:
+Convert Warning: AniDB ID not found for MyAnimeList ID:
+Convert Warning: No IMDb ID Found for TMDb ID:
+Convert Warning: No TMDb ID Found for TVDb ID:
+Convert Warning: No IMDb ID Found for TVDb ID:
+Convert Warning: No TVDb ID Found for IMDb ID:
 ```
 ## ~~plex-bloat-fix~~
 
@@ -331,11 +331,11 @@ Run script against a folder where you copied some meta*.log files from D:\logs o
 
 ## pad_flows
 PAD Flows
-## 1 - Convert_Error_No_TMDb_ID_Found_for_IMDb_ID
-- `1 - Convert Error- No TMDb ID Found for IMDb ID` => Windows OS is in English and Edge in English
+## 1 - Convert_Warning_No_TMDb_ID_Found_for_IMDb_ID
+- `1 - Convert Warning- No TMDb ID Found for IMDb ID` => Windows OS is in English and Edge in English
 - See [PAD Flows Install](#pad_flows_install)
 - Before starting. ensure that you have a tmdb account and that you logged in so that the cached credentials will work before trying this....
-![](images/Convert_Error-_No_TMDb_ID_Found_for_IMDb_ID.png)
+![](images/Convert_Warning-_No_TMDb_ID_Found_for_IMDb_ID.png)
 `ctrl-a` is used to ensure that the flow waits until you find/click on the actual episode in TMDB (See image)
 1. 2 browsers will open to assist you to link the missing ids
    1. 1st browser stays on the found IMDB page
@@ -352,13 +352,13 @@ Error checking is enabled and does the following:
  - if you hit `ctrl-a` and you get an error upon save, then that is logged and continues. if its a success, that is logged and continues
  - if you hit `ctrl-a` and you are somehow in tmdb in another language or the episode and its show is not in tmdb in ENGLISH, then the script will try to add the english translation and continue to try again to add the id in the subsequent iteration (This has not been tested because I have not encountered this yet but I know it happens because of the other flow I have used in the past)
 
-## 2 - Convert_Error_No_TVDb_ID_Found_for_TMDb_ID
-- `2 - Convert Error- No TVDb ID Found for TMDb ID` => Windows OS is in English and Edge in English
+## 2 - Convert_Warning_No_TVDb_ID_Found_for_TMDb_ID
+- `2 - Convert Warning- No TVDb ID Found for TMDb ID` => Windows OS is in English and Edge in English
 - See [PAD Flows Install](#pad_flows_install)
 - Before starting. ensure that you have a tmdb account and that you logged in so that the cached credentials will work before trying this....
 
-## 3 - Convert_Error_No_TVDb_ID_or_IMDb_ID_found_for_AniDB_ID
-- `3 - Convert Error- No TVDb ID or IMDb ID found for AniDB ID` => Windows OS is in English and Edge in English
+## 3 - Convert_Warning_No_TVDb_ID_or_IMDb_ID_found_for_AniDB_ID
+- `3 - Convert Warning- No TVDb ID or IMDb ID found for AniDB ID` => Windows OS is in English and Edge in English
 - See [PAD Flows Install](#pad_flows_install)
 - Before starting. ensure that you have a tmdb and anidb account and that you logged in so that the cached credentials will work before trying this....
 - AniDb does TMDb and IMDb  as well as MAL links 
@@ -367,8 +367,8 @@ Error checking is enabled and does the following:
 - The PAD flow I built launches 6 browsers to six different sites and attempts to give you a summary of what it finds… it launches AniDb, MAL, AniList, TVDb, IMDb, and TMDb. Then it tries to match up as much as possible and gives you a summary of what it finds.
 - You then decide where to make your fixes based on the summary and the pages the script finds for you. You hit save on the sites that you have updated and then you hit `ctrl-s` to have it continue to attempt finding the next ID that was not matched from PMM 
 
-## 4-Convert_Error_No_TMDb_ID_Found_for_TVDb_ID
-- `4-Convert Error No TMDb ID Found for TVDb ID` => Windows OS is in English and Edge in English
+## 4-Convert_Warning_No_TMDb_ID_Found_for_TVDb_ID
+- `4-Convert Warning No TMDb ID Found for TVDb ID` => Windows OS is in English and Edge in English
 - See [PAD Flows Install](#pad_flows_install)
 - Before starting. ensure that you have a tmdb account and that you logged in so that the cached credentials will work before trying this....
 
