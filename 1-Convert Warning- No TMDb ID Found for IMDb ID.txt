@@ -1,6 +1,6 @@
 # 1-Convert Warning: No TMDb ID Found for IMDb ID:
-SET logfile TO $'''tmdbupdater'''
-SET mySearch TO $'''Convert Warning: No TVDb ID Found for TMDb ID:'''
+SET logfile TO $'''1-no_tmdb_found_for_imdb'''
+SET mySearch TO $'''Convert Warning: No TMDb ID Found for IMDb ID:'''
 Display.SelectFileDialog.SelectFile Title: $'''Pick Input File (meta.log)''' FileFilter: $'''*.log;*.txt;*.*''' IsTopMost: False CheckIfFileExists: False SelectedFile=> SelectedFile ButtonPressed=> ButtonPressed
 DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> OverallStartTime
 DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
@@ -32,7 +32,7 @@ $myPath = \"%SelectedFile.Directory%\"
 $myLog = \"%logfile%\"
 $mySearch = \"%mySearch%\"
 
-(Get-Content \"%SelectedFile%\" | Select-String \"%mySearch%\" | Sort-Object -Unique) -replace \".*(%mySearch% \\d+).*\", \"`$1\" -replace \"\\s*\\|$\", \"\" | Out-File -FilePath \"%SelectedFile.Directory%\\%logfile%-convert.log\" -Width 3000
+(Get-Content \"%SelectedFile%\" | Select-String \"%mySearch%\" | Sort-Object -Unique) -replace \".*(%mySearch% (?: tt)?\\S+).*\", \"`$1\" -replace \"\\s*\\|$\", \"\" | Out-File -FilePath \"%SelectedFile.Directory%\\%logfile%-convert.log\" -Width 3000
 
 (Get-Content \"%SelectedFile.Directory%\\%logfile%-convert.log\") | Where-Object { $_.trim() -ne \"\" } | Out-File -FilePath \"%SelectedFile.Directory%\\%logfile%-convert.log\"
 
@@ -56,8 +56,7 @@ $myPath = \"%SelectedFile.Directory%\"
 $myLog = \"%logfile%\"
 $mySearch = \"%mySearch%\"
 
-(Get-Content \"$myVar\" | Select-String \"$mySearch\" | Sort-Object -Unique) -replace \".*($mySearch \\d+).*\", \"`$1\" -replace \"\\s*\\|$\", \"\" | Out-File -FilePath \"$myPath\\$myLog-convert.log\" -Width 3000
-
+(Get-Content \"$myVar\" | Select-String \"$mySearch\" | Sort-Object -Unique) -replace \".*($mySearch (?: tt)?\\S+).*\", \"`$1\" -replace \"\\s*\\|$\", \"\" | Out-File -FilePath \"$myPath\\$myLog-convert.log\" -Width 3000
 
 (Get-Content \"$myPath\\$myLog-convert.log\") | Where-Object { $_.trim() -ne \"\" } | Out-File -FilePath \"$myPath\\$myLog-convert.log\"
 
@@ -97,17 +96,35 @@ LOOP FOREACH CurrentItem IN ListDifference
         DISABLE GOTO end_for
     DISABLE END
     LABEL language_button_clicked
+    File.WriteText File: $'''%SelectedFile.Directory%\\%logfile%.log''' TextToWrite: $'''%CurrentDateTime% - INF - Navigating to  : https://www.imdb.com/title/%TrimmedText%/''' AppendNewLine: True IfFileExists: File.IfFileExists.Append Encoding: File.FileEncoding.Unicode
     WebAutomation.GoToWebPage.GoToWebPage BrowserInstance: IMDb_Browser Url: $'''https://www.imdb.com/title/%TrimmedText%/''' WaitForPageToLoadTimeout: 60
     ON ERROR REPEAT 1 TIMES WAIT 2
     END
-    WebAutomation.ExtractData.ExtractHandPickedValues BrowserInstance: IMDb_Browser ExtractionParameters: {[$'''html > body > div:eq(1) > main > div > section:eq(0) > section > div:eq(2) > section > section > div:eq(0) a''', $'''Own Text''', $'''''', $'''Value #1'''], [$'''html > body > div:eq(1) > main > div > section:eq(0) > section > div:eq(2) > section > section > div:eq(2) div:eq(0) > h1''', $'''Own Text''', $'''''', $'''Value #2'''] } TimeoutInSeconds: 60 ExtractedData=> OutputData
+    DISABLE WebAutomation.ExtractData.ExtractHandPickedValues BrowserInstance: IMDb_Browser ExtractionParameters: {[$'''html > body > div:eq(1) > main > div > section:eq(0) > section > div:eq(2) > section > section > div:eq(0) a''', $'''Own Text''', $'''''', $'''Value #1'''], [$'''html > body > div:eq(1) > main > div > section:eq(0) > section > div:eq(2) > section > section > div:eq(2) div:eq(0) > h1''', $'''Own Text''', $'''''', $'''Value #2'''] } TimeoutInSeconds: 60 ExtractedData=> OutputData
     ON ERROR REPEAT 1 TIMES WAIT 2
     END
+    WebAutomation.ExtractData.ExtractHandPickedValues BrowserInstance: IMDb_Browser ExtractionParameters: {[$'''html > body > div:eq(1) > main > div > section:eq(0) > section > div:eq(2) > section > section > div:eq(1) > div:eq(0) > h1 > span''', $'''Own Text''', $'''''', $'''Value #1'''], [$'''html > body > div:eq(1) > main > div > section:eq(0) > section > div:eq(2) > section > section > div:eq(0) > div > div:eq(0) > a > span:eq(1)''', $'''Own Text''', $'''''', $'''Value #2'''] } TimeoutInSeconds: 60 ExtractedData=> OutputData
+    ON ERROR REPEAT 1 TIMES WAIT 2
+    END
+    @@copilotGeneratedAction: 'False'
+Scripting.RunPowershellScript.RunPowershellScript Script: $'''# Input string to be encoded
+$inputString = \"%OutputData%\"
+
+# Replace commas with \" episode \"
+$inputString = $inputString -replace \",\", \" episode \"
+
+# Perform URL encoding
+$encodedString = [System.Uri]::EscapeDataString($inputString)
+
+# Output the encoded string
+Write-Output $encodedString
+''' ScriptOutput=> OutputData_encoded
     DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
     File.WriteText File: $'''%SelectedFile.Directory%\\%logfile%.log''' TextToWrite: $'''%CurrentDateTime% - INF - Found: %OutputData%''' AppendNewLine: True IfFileExists: File.IfFileExists.Append Encoding: File.FileEncoding.Unicode
     DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
-    File.WriteText File: $'''%SelectedFile.Directory%\\%logfile%.log''' TextToWrite: $'''%CurrentDateTime% - INF - Navigating to  : https://www.google.com/search?q=site:themoviedb.org/tv %OutputData%''' AppendNewLine: True IfFileExists: File.IfFileExists.Append Encoding: File.FileEncoding.Unicode
-    WebAutomation.GoToWebPage.GoToWebPage BrowserInstance: TMDb_Browser Url: $'''https://www.google.com/search?q=site:themoviedb.org/tv %OutputData%''' WaitForPageToLoadTimeout: 60
+    File.WriteText File: $'''%SelectedFile.Directory%\\%logfile%.log''' TextToWrite: $'''%CurrentDateTime% - INF - Navigating to  : https://www.google.com/search?q=site:themoviedb.org/tv %OutputData%
+%CurrentDateTime% - INF - Navigating to  : https://www.google.com/search?q=site:themoviedb.org/tv %OutputData_encoded%''' AppendNewLine: True IfFileExists: File.IfFileExists.Append Encoding: File.FileEncoding.Unicode
+    WebAutomation.GoToWebPage.GoToWebPage BrowserInstance: TMDb_Browser Url: $'''https://www.google.com/search?q=site:themoviedb.org/tv %OutputData_encoded%''' WaitForPageToLoadTimeout: 60
     ON ERROR REPEAT 1 TIMES WAIT 2
     END
     MouseAndKeyboard.WaitForShortcutKey.WaitForShortcutKey InputKeys: ['Ctrl+A'] IndexOfShortcutKeyPressed=> IndexOfShortcutKeyPressed

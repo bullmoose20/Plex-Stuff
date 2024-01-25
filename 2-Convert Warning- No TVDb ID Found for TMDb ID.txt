@@ -1,5 +1,5 @@
 # 2-Convert Warning: No TVDb ID Found for TMDb ID:
-SET logfile TO $'''2-tvdbupdater'''
+SET logfile TO $'''2-no_tvdb_found_for_tmdb'''
 SET mySearch TO $'''Convert Warning: No TVDb ID Found for TMDb ID:'''
 Display.SelectFileDialog.SelectFile Title: $'''Pick Input File (meta.log)''' FileFilter: $'''*.log;*.txt;*.*''' IsTopMost: False CheckIfFileExists: False SelectedFile=> SelectedFile ButtonPressed=> ButtonPressed
 DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> OverallStartTime
@@ -38,7 +38,7 @@ $myPath = \"%SelectedFile.Directory%\"
 $myLog = \"%logfile%\"
 $mySearch = \"%mySearch%\"
 
-(Get-Content \"%SelectedFile%\" | Select-String \"%mySearch%\" | Sort-Object -Unique) -replace \".*(%mySearch% \\d+).*\", \"`$1\" -replace \"\\s*\\|$\", \"\" | Out-File -FilePath \"%SelectedFile.Directory%\\%logfile%-convert.log\" -Width 3000
+(Get-Content \"%SelectedFile%\" | Select-String \"%mySearch%\" | Sort-Object -Unique) -replace \".*(%mySearch% (?: tt)?\\S+).*\", \"`$1\" -replace \"\\s*\\|$\", \"\" | Out-File -FilePath \"%SelectedFile.Directory%\\%logfile%-convert.log\" -Width 3000
 
 (Get-Content \"%SelectedFile.Directory%\\%logfile%-convert.log\") | Where-Object { $_.trim() -ne \"\" } | Out-File -FilePath \"%SelectedFile.Directory%\\%logfile%-convert.log\"
 
@@ -62,8 +62,7 @@ $myPath = \"%SelectedFile.Directory%\"
 $myLog = \"%logfile%\"
 $mySearch = \"%mySearch%\"
 
-(Get-Content \"$myVar\" | Select-String \"$mySearch\" | Sort-Object -Unique) -replace \".*($mySearch \\d+).*\", \"`$1\" -replace \"\\s*\\|$\", \"\" | Out-File -FilePath \"$myPath\\$myLog-convert.log\" -Width 3000
-
+(Get-Content \"$myVar\" | Select-String \"$mySearch\" | Sort-Object -Unique) -replace \".*($mySearch (?: tt)?\\S+).*\", \"`$1\" -replace \"\\s*\\|$\", \"\" | Out-File -FilePath \"$myPath\\$myLog-convert.log\" -Width 3000
 
 (Get-Content \"$myPath\\$myLog-convert.log\") | Where-Object { $_.trim() -ne \"\" } | Out-File -FilePath \"$myPath\\$myLog-convert.log\"
 
@@ -131,7 +130,7 @@ LOOP FOREACH CurrentItem IN ListDifference
         GOTO close_browsers
     END
     DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
-    File.WriteText File: $'''%SelectedFile.Directory%\\%logfile%.log''' TextToWrite: $'''%CurrentDateTime% - INF - TMDb title  : %TMDb_title%
+    File.WriteText File: $'''%SelectedFile.Directory%\\%logfile%.log''' TextToWrite: $'''%CurrentDateTime% - INF - TMDb ID: %TrimmedText%
 %CurrentDateTime% - INF - Navigating to  : https://www.themoviedb.org/tv/%TrimmedText%/edit?active_nav_item=external_ids&language=en-US''' AppendNewLine: True IfFileExists: File.IfFileExists.Append Encoding: File.FileEncoding.Unicode
     WebAutomation.GetDetailsOfWebPage BrowserInstance: TMDb_Browser DetailsType: WebAutomation.DetailsType.URLAddress Details=> WebPageProperty2
     LABEL retry_login_lang
@@ -242,11 +241,21 @@ LOOP FOREACH CurrentItem IN ListDifference
     WebAutomation.GetDetailsOfElement BrowserInstance: TMDb_Browser Control: appmask['Recording']['a'] AttributeName: $'''innertext''' AttributeValue=> TMDb_title
     ON ERROR REPEAT 1 TIMES WAIT 2
     END
-    WebAutomation.GoToWebPage.GoToWebPage BrowserInstance: TVDb_Browser Url: $'''https://thetvdb.com/search?query=%TMDb_title%&menu[type]=series''' WaitForPageToLoadTimeout: 60
+    @@copilotGeneratedAction: 'False'
+Scripting.RunPowershellScript.RunPowershellScript Script: $'''# Input string to be encoded
+$inputString = \"%TMDb_title%\"
+
+# Perform URL encoding
+$encodedString = [System.Uri]::EscapeDataString($inputString)
+
+# Output the encoded string
+Write-Output $encodedString
+''' ScriptOutput=> TMDb_title_encoded
+    WebAutomation.GoToWebPage.GoToWebPage BrowserInstance: TVDb_Browser Url: $'''https://thetvdb.com/search?query=%TMDb_title_encoded%&menu[type]=series''' WaitForPageToLoadTimeout: 60
     ON ERROR REPEAT 1 TIMES WAIT 2
     END
     DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
-    File.WriteText File: $'''%SelectedFile.Directory%\\%logfile%.log''' TextToWrite: $'''%CurrentDateTime% - INF - Navigating to  : https://thetvdb.com/search?query=%TMDb_title%&menu[type]=series''' AppendNewLine: True IfFileExists: File.IfFileExists.Append Encoding: File.FileEncoding.Unicode
+    File.WriteText File: $'''%SelectedFile.Directory%\\%logfile%.log''' TextToWrite: $'''%CurrentDateTime% - INF - Navigating to  : https://thetvdb.com/search?query=%TMDb_title_encoded%&menu[type]=series''' AppendNewLine: True IfFileExists: File.IfFileExists.Append Encoding: File.FileEncoding.Unicode
     WebAutomation.GetDetailsOfWebPage BrowserInstance: TVDb_Browser DetailsType: WebAutomation.DetailsType.URLAddress Details=> WebPageProperty3
     DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
     File.WriteText File: $'''%SelectedFile.Directory%\\%logfile%.log''' TextToWrite: $'''%CurrentDateTime% - INF - Actual Web Page: %WebPageProperty3%''' AppendNewLine: True IfFileExists: File.IfFileExists.Append Encoding: File.FileEncoding.Unicode

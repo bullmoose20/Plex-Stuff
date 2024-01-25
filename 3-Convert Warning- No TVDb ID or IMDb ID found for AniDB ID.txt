@@ -1,5 +1,5 @@
 # 3-Convert Warning: No TVDb ID or IMDb ID found for AniDB ID:
-SET logfile TO $'''anidbupdater'''
+SET logfile TO $'''3-no_tvdb_or_imdb_found_for_anidb'''
 SET mySearch TO $'''Convert Warning: No TVDb ID or IMDb ID found for AniDB ID:'''
 Display.SelectFileDialog.SelectFile Title: $'''Pick Input File (meta.log)''' FileFilter: $'''*.log;*.txt;*.*''' IsTopMost: False CheckIfFileExists: False SelectedFile=> SelectedFile ButtonPressed=> ButtonPressed
 DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> OverallStartTime
@@ -40,7 +40,7 @@ $myPath = \"%SelectedFile.Directory%\"
 $myLog = \"%logfile%\"
 $mySearch = \"%mySearch%\"
 
-(Get-Content \"%SelectedFile%\" | Select-String \"%mySearch%\" | Sort-Object -Unique) -replace \".*(%mySearch% \\d+).*\", \"`$1\" -replace \"\\s*\\|$\", \"\" | Out-File -FilePath \"%SelectedFile.Directory%\\%logfile%-convert.log\" -Width 3000
+(Get-Content \"%SelectedFile%\" | Select-String \"%mySearch%\" | Sort-Object -Unique) -replace \".*(%mySearch% (?: tt)?\\S+).*\", \"`$1\" -replace \"\\s*\\|$\", \"\" | Out-File -FilePath \"%SelectedFile.Directory%\\%logfile%-convert.log\" -Width 3000
 
 (Get-Content \"%SelectedFile.Directory%\\%logfile%-convert.log\") | Where-Object { $_.trim() -ne \"\" } | Out-File -FilePath \"%SelectedFile.Directory%\\%logfile%-convert.log\"
 
@@ -64,8 +64,7 @@ $myPath = \"%SelectedFile.Directory%\"
 $myLog = \"%logfile%\"
 $mySearch = \"%mySearch%\"
 
-(Get-Content \"$myVar\" | Select-String \"$mySearch\" | Sort-Object -Unique) -replace \".*($mySearch \\d+).*\", \"`$1\" -replace \"\\s*\\|$\", \"\" | Out-File -FilePath \"$myPath\\$myLog-convert.log\" -Width 3000
-
+(Get-Content \"$myVar\" | Select-String \"$mySearch\" | Sort-Object -Unique) -replace \".*($mySearch (?: tt)?\\S+).*\", \"`$1\" -replace \"\\s*\\|$\", \"\" | Out-File -FilePath \"$myPath\\$myLog-convert.log\" -Width 3000
 
 (Get-Content \"$myPath\\$myLog-convert.log\") | Where-Object { $_.trim() -ne \"\" } | Out-File -FilePath \"$myPath\\$myLog-convert.log\"
 
