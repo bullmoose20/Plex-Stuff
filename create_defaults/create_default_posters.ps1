@@ -3342,8 +3342,8 @@ Function CreateContentRating {
         '| au_ma.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | MA15+| #ED1C24| 1| 1| 0| 1',
         '| au_m.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | M| #00AEEF| 1| 1| 0| 1',
         '| au_pg.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | PG| #FFF200| 1| 1| 0| 1',
-        '| au_r.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | R| #231F20| 1| 1| 0| 1',
-        '| au_x.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | X| #221f20| 1| 1| 0| 1',
+        '| au_r.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | R18+| #231F20| 1| 1| 0| 1',
+        '| au_x.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | X18+| #221f20| 1| 1| 0| 1',
         '| au_nr.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | NR| #0D3843| 1| 1| 0| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
     
