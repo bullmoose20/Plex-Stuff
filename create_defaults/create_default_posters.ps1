@@ -3338,6 +3338,32 @@ Function CreateContentRating {
 
     $myArray = @(
         'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        '| au_g.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | G| #0DB14B| 1| 1| 0| 1',
+        '| au_ma.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | MA15+| #ED1C24| 1| 1| 0| 1',
+        '| au_m.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | M| #00AEEF| 1| 1| 0| 1',
+        '| au_pg.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | PG| #FFF200| 1| 1| 0| 1',
+        '| au_r.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | R| #231F20| 1| 1| 0| 1',
+        '| au_x.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | X| #221f20| 1| 1| 0| 1',
+        '| au_nr.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | NR| #0D3843| 1| 1| 0| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+    
+    $arr = @()
+    foreach ($item in $myArray) {
+        if ($($item.key_name).ToString() -eq "") {
+            $value = $null
+        }
+        else {
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+        }
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_content_rating\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
+    }
+    LaunchScripts -ScriptPaths $arr
+
+    Move-Item -Path output -Destination content_rating\au
+
+    $myArray = @(
+        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
         '| usg.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | G| #79EF06| 1| 1| 0| 1',
         '| usnc-17.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | NC-17| #EE45A4| 1| 1| 0| 1',
         '| usnr.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | NR| #0E84A3| 1| 1| 0| 1',
@@ -4649,6 +4675,14 @@ Function CreateNetwork {
     $myArray = @(
         'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
         ' | #0.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | #0| #7BE7A1| 1| 1| 0| 0',
+        ' | 7mate.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | 7mate| #2F3C13| 1| 1| 0| 0',
+        ' | Angel Studios.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Angel Studios| #98FC35| 1| 1| 0| 0',
+        ' | Kanal 5.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Kanal 5| #19805A| 1| 1| 0| 0',
+        ' | Seven Network.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Seven Network| #DA54DA| 1| 1| 0| 0',
+        ' | SVT Play.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | SVT Play| #5B4F8F| 1| 1| 0| 0',
+        ' | SVT.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | SVT| #C3ACE5| 1| 1| 0| 0',
+        ' | The Daily Wire.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | The Daily Wire| #5C3BC9| 1| 1| 0| 0',
+        ' | TV4 Play.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | TV4 Play| #AE56EC| 1| 1| 0| 0',
         ' | BBC Scotland.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | BBC Scotland| #16204F| 1| 1| 0| 0',
         ' | Binge.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Binge| #0D29C9| 1| 1| 0| 0',
         ' | Crave.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Crave| #F2C019| 1| 1| 0| 0',
