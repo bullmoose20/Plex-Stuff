@@ -1,0 +1,4 @@
+setuptools
+requests
+PlexAPI
+python-dotenv
