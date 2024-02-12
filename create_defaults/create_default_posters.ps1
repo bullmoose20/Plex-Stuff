@@ -3364,6 +3364,37 @@ Function CreateContentRating {
 
     $myArray = @(
         'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        '| nz_g.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | G| #0DB14B| 1| 1| 0| 1',
+        '| nz_m.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | M| #FFF200| 1| 1| 0| 1',
+        '| nz_pg.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | PG| #FFF200| 1| 1| 0| 1',
+        '| nz_r13.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | R13| #ED1C24| 1| 1| 0| 1',
+        '| nz_r15.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | R15| #ED1C24| 1| 1| 0| 1',
+        '| nz_r16.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | R16| #ED1C24| 1| 1| 0| 1',
+        '| nz_r18.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | R18| #ED1C24| 1| 1| 0| 1',
+        '| nz_r.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | R| #ED1C24| 1| 1| 0| 1',
+        '| nz_rp13.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | RP13| #ED1C24| 1| 1| 0| 1',
+        '| nz_rp16.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | RP16| #ED1C24| 1| 1| 0| 1',
+        '| nz_RP18.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | RP18| #ED1C24| 1| 1| 0| 1',
+        '| nz_nr.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | NR| #0D3843| 1| 1| 0| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+    
+    $arr = @()
+    foreach ($item in $myArray) {
+        if ($($item.key_name).ToString() -eq "") {
+            $value = $null
+        }
+        else {
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+        }
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_content_rating\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
+    }
+    LaunchScripts -ScriptPaths $arr
+
+    Move-Item -Path output -Destination content_rating\nz
+
+    $myArray = @(
+        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
         '| usg.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | G| #79EF06| 1| 1| 0| 1',
         '| usnc-17.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | NC-17| #EE45A4| 1| 1| 0| 1',
         '| usnr.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | NR| #0E84A3| 1| 1| 0| 1',
@@ -6236,6 +6267,7 @@ Function CreateUniverse {
         '| marvel.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | marvel| #ED171F| 1| 1| 0| 1',
         '| mcu.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | mcu| #C62D21| 1| 1| 0| 1',
         '| middle.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | middle| #D79C2B| 1| 1| 0| 1',
+        '| monsterverse.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | monsterverse| #016A15| 1| 1| 0| 0',
         '| mummy.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | mummy| #DBA02F| 1| 1| 0| 1',
         '| rocky.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | rocky| #CC1F10| 1| 1| 0| 1',
         '| star.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | star| #FFD64F| 1| 1| 0| 1',
