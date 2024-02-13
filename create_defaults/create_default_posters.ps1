@@ -3364,17 +3364,17 @@ Function CreateContentRating {
 
     $myArray = @(
         'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
-        '| nz_g.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | G| #0DB14B| 1| 1| 0| 1',
-        '| nz_m.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | M| #FFF200| 1| 1| 0| 1',
-        '| nz_pg.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | PG| #FFF200| 1| 1| 0| 1',
-        '| nz_r13.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | R13| #ED1C24| 1| 1| 0| 1',
-        '| nz_r15.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | R15| #ED1C24| 1| 1| 0| 1',
-        '| nz_r16.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | R16| #ED1C24| 1| 1| 0| 1',
-        '| nz_r18.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | R18| #ED1C24| 1| 1| 0| 1',
-        '| nz_r.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | R| #ED1C24| 1| 1| 0| 1',
-        '| nz_rp13.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | RP13| #ED1C24| 1| 1| 0| 1',
-        '| nz_rp16.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | RP16| #ED1C24| 1| 1| 0| 1',
-        '| nz_RP18.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | RP18| #ED1C24| 1| 1| 0| 1',
+        '| nz_g.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | G| #04934F| 1| 1| 0| 1',
+        '| nz_m.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | M| #FFEC00| 1| 1| 0| 1',
+        '| nz_pg.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | PG| #FFEC00| 1| 1| 0| 1',
+        '| nz_r13.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | R13| #FF0000| 1| 1| 0| 1',
+        '| nz_r15.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | R15| #FF0000| 1| 1| 0| 1',
+        '| nz_r16.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | R16| #FF0000| 1| 1| 0| 1',
+        '| nz_r18.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | R18| #FF0000| 1| 1| 0| 1',
+        '| nz_r.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | R| #FF0000| 1| 1| 0| 1',
+        '| nz_rp13.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | RP13| #FF0000| 1| 1| 0| 1',
+        '| nz_rp16.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | RP16| #FF0000| 1| 1| 0| 1',
+        '| nz_RP18.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | RP18| #FF0000| 1| 1| 0| 1',
         '| nz_nr.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | NR| #0D3843| 1| 1| 0| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
     
