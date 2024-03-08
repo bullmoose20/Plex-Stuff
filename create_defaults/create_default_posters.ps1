@@ -2731,6 +2731,7 @@ Function CreateChart {
         'RECENTLY_AIRED| Plex.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Recently Aired| #DC9924| 1| 1| 0| 1',
         'RECOMMENDED| Trakt.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Trakt Recommended| #CD1A20| 1| 1| 0| 1',
         'RETURNING_SOON| Plex.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Returning Soon| #DC9924| 1| 1| 0| 1',
+        'NEXT_AIRING| Plex.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Next Airing| #DC9924| 1| 1| 0| 1',
         'SEASON| AniList.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | AniList Season| #414A81| 1| 1| 0| 1',
         'SEASON| MyAnimeList.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | MyAnimeList Season| #304DA6| 1| 1| 0| 1',
         'STEVENLU''S_POPULAR_MOVIES| StevenLu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | StevenLu''s Popular Movies| #1D2D51| 1| 1| 0| 1',
