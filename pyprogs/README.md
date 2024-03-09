@@ -20,8 +20,9 @@ Some these PYTHON scripts may use a `.env` and requirements.txt per folder.
 ```bat
 PLEX_URL='http://192.168.2.242:32400'  # Plex URL
 PLEX_TOKEN='INSERT_PLEX_TOKEN_HERE'    # PLEX TOKEN
-PLEX_TIMEOUT=30                        # Default is 30
+PLEX_TIMEOUT=30                        # Default is 60
 MAX_LOG_FILES=5                        # Default is 10
+LOG_LEVEL=INFO                         # Default is INFO - CRITICAL, ERROR, WARNING, INFO, DEBUG
 ```
 
 ```bat 
