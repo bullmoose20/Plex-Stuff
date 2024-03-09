@@ -1,5 +1,8 @@
 # Python-Stuff
-## Random python related stuff
+
+[Back to HOME](../README.md)
+
+## Random python related stuff for Plex
 
 ## Requirements
 
@@ -10,7 +13,7 @@
 
 1. clone repo
 
-All these PYTHON scripts may use a `.env` and requirements.txt per folder.
+Some these PYTHON scripts may use a `.env` and requirements.txt per folder.
 
 ### `.env` contents example
 
@@ -248,7 +251,7 @@ python fake_media_generator.py --tmdbid 12345
 
 Replace "12345" with the desired TMDb ID for a movie or TV show. The script prompts users to choose between available options if both movie and TV show details are found. Once a choice is made, the script creates a folder structure and sample media files in the specified directories based on the selected media type. Adjust the TMDb ID and paths as needed for your use case.
 
-folder is created within the script subfolder called `movies` or `shows` depending on the tmdbid
+Folders are created within the script subfolder called `movies` or `shows` depending on the tmdbid
 
 [Back to top](#scripts)
 
