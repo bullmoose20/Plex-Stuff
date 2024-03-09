@@ -69,6 +69,7 @@ python -m venv venv
 .\venv\Scripts\activate.ps1
 python.exe -m pip install --upgrade pip
 pip install -r .\requirements.txt
+
 ```
 
 Now you are ready to run it (with the venv activated)
@@ -145,6 +146,7 @@ python -m venv venv
 .\venv\Scripts\activate.ps1
 python.exe -m pip install --upgrade pip
 pip install -r .\requirements.txt
+
 ```
 
 Now you are ready to run it (with the venv activated)
@@ -175,6 +177,7 @@ python -m venv venv
 .\venv\Scripts\activate.ps1
 python.exe -m pip install --upgrade pip
 pip install -r .\requirements.txt
+
 ```
 
 Now you are ready to run it (with the venv activated)
@@ -207,6 +210,7 @@ python -m venv venv
 .\venv\Scripts\activate.ps1
 python.exe -m pip install --upgrade pip
 pip install -r .\requirements.txt
+
 ```
 
 Now you are ready to run it (with the venv activated)
@@ -239,6 +243,7 @@ python -m venv venv
 .\venv\Scripts\activate.ps1
 python.exe -m pip install --upgrade pip
 pip install -r .\requirements.txt
+
 ```
 
 Now you are ready to run it (with the venv activated)
@@ -275,6 +280,7 @@ python -m venv venv
 .\venv\Scripts\activate.ps1
 python.exe -m pip install --upgrade pip
 pip install -r .\requirements.txt
+
 ```
 
 Now you are ready to run it (with the venv activated)
@@ -307,6 +313,7 @@ python -m venv venv
 .\venv\Scripts\activate.ps1
 python.exe -m pip install --upgrade pip
 pip install -r .\requirements.txt
+
 ```
 
 Now you are ready to run it (with the venv activated)
@@ -339,6 +346,7 @@ python -m venv venv
 .\venv\Scripts\activate.ps1
 python.exe -m pip install --upgrade pip
 pip install -r .\requirements.txt
+
 ```
 
 Now you are ready to run it (with the venv activated)
