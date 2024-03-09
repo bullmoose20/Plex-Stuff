@@ -19,8 +19,24 @@ PLEX_URL=https://plex.domain.tld                # URL for Plex; can be a domain 
 PLEX_TOKEN=PLEX-TOKEN                           # https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/
 ```
 
+```commandline 
+D:\PLEX-STUFF\PYPROGS
+├───collage
+│   └───output
+├───exif_overlay_checker
+├───extract_tracks
+├───fix_added_at
+├───fmg
+├───resizer
+│   ├───input
+│   └───output
+├───tcc
+└───update_plex_artist_art
+```
+
+
 ## Scripts:
-1. pyprogs\<<folder_name>>
+1. pyprogs\\<<folder_name>>
    1. collage [collage.py](#collage)
    2. exif_overlay_checker [exif_overlay_checker.py](#exif_overlay_checker)
    3. extract_tracks [extract_tracks.py](#extract_tracks)
@@ -86,6 +102,8 @@ Explanation:
       - `/XO`: Excludes older files, only copying newer or non-existing files.
 
 This script streamlines the generation of collage posters for images in the specified directory and its subfolders, providing a convenient and automated solution.
+
+[Back to top](#scripts)
 
 ## exif_overlay_checker
 
