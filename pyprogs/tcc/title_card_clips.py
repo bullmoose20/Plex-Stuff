@@ -1,48 +1,63 @@
 import argparse
+import datetime
+import gc
+import glob
 import logging
+import numpy as np
 import os
 import os.path
-from logging.handlers import RotatingFileHandler
-from PIL import Image
-from moviepy.video.io.VideoFileClip import VideoFileClip
-import numpy as np
 import re
 import sys
-import gc
-import datetime
-import glob
 import time
+from datetime import datetime as dt
+from dotenv import load_dotenv
+from PIL import Image
+from logging.handlers import RotatingFileHandler
+from moviepy.video.io.VideoFileClip import VideoFileClip
+
+# Load environment variables from .env file
+load_dotenv()
+
+# Retrieve Plex server details from environment variables
+# plex_url = os.getenv('PLEX_URL')
+# plex_token = os.getenv('PLEX_TOKEN')
+# timeout_seconds = int(os.getenv('PLEX_TIMEOUT', 60))  # Default timeout: 60 seconds
+max_log_files = int(os.getenv('MAX_LOG_FILES', 10))  # Default number of logs: 10
+log_level = os.getenv('LOG_LEVEL', 'INFO').upper()  # Default logging level: INFO
+
+# Extract the script name without the '.py' extension
+script_name = os.path.splitext(os.path.basename(sys.argv[0]))[0]
+
+# Define the logs directory
+logs_directory = "logs"
+
+# Ensure the "logs" directory exists
+if not os.path.exists(logs_directory):
+    os.makedirs(logs_directory)
+
+# Generate a unique log filename with timestamp and script name
+timestamp = dt.now().strftime("%Y%m%d_%H%M%S_%f")[:-3]
+log_filename = os.path.join(logs_directory, f"{script_name}_{timestamp}.log")
+
+# Set up logging with timestamps and the specified logging level
+log_format = '%(asctime)s - %(levelname)s - %(message)s'
+logging.basicConfig(filename=log_filename, level=getattr(logging, log_level), format=log_format)
 
 
-def setup_logging():
-    # Set up logging to both console and a rotating log file
-    log_format = '%(asctime)s %(levelname)s: %(message)s'
-    logging.basicConfig(level=logging.INFO, format=log_format)
+def clean_up_old_logs():
+    global max_log_files
 
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    log_file = os.path.join(script_dir, 'video_frame_extractor.log')
+    # Set max_log_files to 1 if it's 0 or negative
+    if max_log_files <= 0:
+        max_log_files = 1
 
-    # Check if log file exists
-    if os.path.exists(log_file):
-        # Get the creation time of the existing log file
-        creation_time = os.path.getctime(log_file)
-        timestamp = datetime.datetime.fromtimestamp(creation_time).strftime('%Y%m%d_%H%M%S')
-        # Rename the existing log file with a timestamp
-        backup_log_file = f"video_frame_extractor_{timestamp}.log"
-        os.rename(log_file, os.path.join(script_dir, backup_log_file))
-
-        # Remove old log files if there are more than 10
-        log_files = glob.glob(os.path.join(script_dir, 'video_frame_extractor_*.log'))
-        log_files.sort(key=os.path.getctime)
-        while len(log_files) >= 10:
-            os.remove(log_files.pop(0))
-
-    # Create a rotating file handler and set the formatter
-    file_handler = RotatingFileHandler(log_file, maxBytes=1024*1024, backupCount=9)
-    file_handler.setFormatter(logging.Formatter(log_format))
-
-    # Add the file handler to the root logger
-    logging.getLogger().addHandler(file_handler)
+    # Remove old log files from the 'logs' subdirectory if there are more than the allowed number
+    existing_logs = glob.glob(os.path.join(logs_directory, f"{script_name}_*.log"))
+    if len(existing_logs) > max_log_files:
+        logging.info(f"existing_logs: {len(existing_logs)} > max_log_files: {max_log_files}")
+        oldest_logs = sorted(existing_logs)[:-max_log_files]
+        for old_log in oldest_logs:
+            os.remove(old_log)
 
 
 def format_file_name(file_name, is_tv_show):
@@ -57,6 +72,7 @@ def format_file_name(file_name, is_tv_show):
 def take_screenshots(video_file, output_file, frame_extraction_time):
     # Check if the output file already exists, if yes, skip
     if os.path.exists(output_file):
+        print(f"Snapshot already exists. Skipping: {output_file}")
         logging.info(f"Snapshot already exists. Skipping: {output_file}")
         return
 
@@ -67,12 +83,14 @@ def take_screenshots(video_file, output_file, frame_extraction_time):
 
         pil_img.save(output_file)
     except Exception as e:
+        print(f"Error during frame extraction: {e}")
         logging.error(f"Error during frame extraction: {e}")
     finally:
         try:
             clip.close()
             del clip
         except Exception as e:
+            print(f"Error during cleanup: {e}")
             logging.warning(f"Error during cleanup: {e}")
 
 
@@ -102,17 +120,21 @@ def scan_directory(source_path, frame_extraction_time):
                 if is_tv_show:
                     if not os.path.exists(output_file):
                         create_titlecard_for_season(video_file, output_file, frame_extraction_time)
+                        print(f"Title card created for TV show: {output_file}")
                         logging.info(f"Title card created for TV show: {output_file}")
                         total_added += 1
                     else:
+                        print(f"Title card already exists. Skipping TV show: {output_file}")
                         logging.info(f"Title card already exists. Skipping TV show: {output_file}")
                         total_skipped += 1
                 else:
                     if not os.path.exists(output_file):
                         create_titlecard_for_movie(video_file, output_file, frame_extraction_time)
+                        print(f"Title card created for Movie: {output_file}")
                         logging.info(f"Title card created for Movie: {output_file}")
                         total_added += 1
                     else:
+                        print(f"Title card already exists. Skipping Movie: {output_file}")
                         logging.info(f"Title card already exists. Skipping Movie: {output_file}")
                         total_skipped += 1
 
@@ -120,6 +142,9 @@ def scan_directory(source_path, frame_extraction_time):
     elapsed_time = end_time - start_time
 
     # Log summary
+    print(f"Total time taken: {elapsed_time:.2f} seconds")
+    print(f"Total added: {total_added}")
+    print(f"Total skipped: {total_skipped}")
     logging.info(f"Total time taken: {elapsed_time:.2f} seconds")
     logging.info(f"Total added: {total_added}")
     logging.info(f"Total skipped: {total_skipped}")
@@ -174,15 +199,21 @@ def main():
 
     args = parser.parse_args()
 
-    setup_logging()
-
-    # Log input values
-    logging.info(f"Input --path: {args.path}")
-    logging.info(f"Input --time: {args.time} seconds")
+    # Log the command along with its arguments
+    logging.info(f"Command: {' '.join(['python'] + os.sys.argv)}")
+    logging.info(f"Arguments: {args}")
 
     try:
+        # Check if the specified source_path exists
+        if not os.path.exists(args.path):
+            print(f"Error: Source path '{args.path}' does not exist.")
+            logging.error(f"Error: Source path '{args.path}' does not exist.")
+            return  # Exit the script
+
         scan_directory(args.path, args.time)
     finally:
+        # Call the clean_up_old_logs function
+        clean_up_old_logs()
         # Explicitly run garbage collection
         gc.collect()
         # Close open files
