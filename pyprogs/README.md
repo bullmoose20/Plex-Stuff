@@ -310,7 +310,7 @@ open a powershell prompt and navigate to `pyprogs` folder
 
 pick your folder for the script you want to run
 
-```
+```bat
 cd update_plex_artist_art
 python -m venv venv
 .\venv\Scripts\activate.ps1`
@@ -322,7 +322,7 @@ now you are ready to run it (with the venv activated)
 
 Example of how to call and run the script:
 
-```
+```bat
 python update_plex_artist_art.py --apply
 ```
 
