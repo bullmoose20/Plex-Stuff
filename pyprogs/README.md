@@ -14,12 +14,14 @@ All these PYTHON scripts may use a `.env` and requirements.txt per folder.
 
 ### `.env` contents example
 
-```
-PLEX_URL=https://plex.domain.tld                # URL for Plex; can be a domain or IP:PORT
-PLEX_TOKEN=PLEX-TOKEN                           # https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/
+```bat
+PLEX_URL='http://192.168.2.242:32400'  # Plex URL
+PLEX_TOKEN='INSERT_PLEX_TOKEN_HERE'    # PLEX TOKEN
+PLEX_TIMEOUT=30                        # Default is 30
+MAX_LOG_FILES=5                        # Default is 10
 ```
 
-```commandline 
+```bat 
 D:\PLEX-STUFF\PYPROGS
 ├───collage
 │   └───output
@@ -52,9 +54,23 @@ D:\PLEX-STUFF\PYPROGS
 
 The "collage.py" script generates a grid of thumbnails from a folder of images. This script utilizes the PIL (Python Imaging Library) for image processing. Users can specify parameters such as the number of columns, thumbnail size, and whether to display text under the images. The resulting image grid is saved in a folder called "output."
 
-Example of how to call and run the script:
+Open a powershell prompt and navigate to `pyprogs` folder
 
+`cd pyprogs`
+
+Pick your folder for the script you want to run
+
+```bat
+cd collage
+python -m venv venv
+.\venv\Scripts\activate.ps1`
+python.exe -m pip install --upgrade pip
+pip install -r .\requirements.txt
 ```
+
+Now you are ready to run it (with the venv activated)
+
+```bat
 python collage.py /path/to/image/folder --num_columns 4 --thumb_width 150 --thumb_height 150 --show_text --show_image
 ```
 
@@ -64,7 +80,7 @@ Note: Ensure you have the necessary dependencies installed, particularly PIL.
 
 `@collage_maker.cmd` is an additional cmd file to assist in running collage.py
 
-```batch
+```bat
 REM This script automates the process of creating collage posters based on an input folder and all its subfolders.
 REM It utilizes PowerShell and Python scripts for collage generation, followed by the use of robocopy for image transfer.
 
@@ -80,7 +96,6 @@ REM Step 1: Extract all directories and generate collages
 
 REM Step 2: Copy images using robocopy
 robocopy D:\defaults\ D:\bullmoose20\Plex-Meta-Manager-Images\ /E /COPY:DAT /DCOPY:T /XO
-
 ```
 
 Explanation:
@@ -113,13 +128,13 @@ This script streamlines the generation of collage posters for images in the spec
 
 The "exif_overlay_checker" script is a Python tool that scans images within a specified folder, examining their EXIF metadata. Specifically designed to identify the presence of keywords like 'overlay' or 'titlecard' in the EXIF data, the script logs its findings and provides a summary of images with or without such metadata. The tool offers a command-line interface with optional verbose logging for a detailed analysis of the image files.
 
-open a powershell prompt and navigate to `pyprogs` folder
+Open a powershell prompt and navigate to `pyprogs` folder
 
 `cd pyprogs`
 
-pick your folder for the script you want to run
+Pick your folder for the script you want to run
 
-```
+```bat
 cd exif_overlay_checker
 python -m venv venv
 .\venv\Scripts\activate.ps1`
@@ -127,9 +142,11 @@ python.exe -m pip install --upgrade pip
 pip install -r .\requirements.txt
 ```
 
-now you are ready to run it (with the venv activated)
+Now you are ready to run it (with the venv activated)
 
-`python exif_overlay_checker.py --input-folder /path/to/your/images --verbose`
+```bat
+python exif_overlay_checker.py --input-folder /path/to/your/images --verbose`
+```
 
 This command initiates the script, specifying the path to the folder containing your images using the --input-folder argument. The --verbose flag enables detailed logging for a more comprehensive analysis.   
 
@@ -141,13 +158,13 @@ This command initiates the script, specifying the path to the folder containing 
 
 The "extract_tracks.py" script is a Python tool designed to interact with a Plex server, providing functionality to analyze and modify track titles within music libraries. Offering options to apply changes directly to Plex or generate a detailed report, users can choose between sentence case and title case for track titles. The script logs information about processed tracks, including warnings for titles requiring adjustments.
 
-open a powershell prompt and navigate to `pyprogs` folder
+Open a powershell prompt and navigate to `pyprogs` folder
 
 `cd pyprogs`
 
-pick your folder for the script you want to run
+Pick your folder for the script you want to run
 
-```
+```bat
 cd extract_tracks
 python -m venv venv
 .\venv\Scripts\activate.ps1`
@@ -155,11 +172,11 @@ python.exe -m pip install --upgrade pip
 pip install -r .\requirements.txt
 ```
 
-now you are ready to run it (with the venv activated)
+Now you are ready to run it (with the venv activated)
 
 Example of how to call and run the script:
 
-```
+```bat
 python extract_tracks.py --apply --title-case
 ```
 
@@ -173,13 +190,13 @@ This command applies changes to the Plex server, updating track titles to title 
 
 The "fix_added_at.py" script is a Python utility designed for interacting with a Plex server to update the track titles in music libraries. With customizable options, it allows users to switch between sentence case and title case for track titles. Additionally, the script provides the option to apply changes directly to the Plex server or generate a detailed report without making modifications.
 
-open a powershell prompt and navigate to `pyprogs` folder
+Open a powershell prompt and navigate to `pyprogs` folder
 
 `cd pyprogs`
 
-pick your folder for the script you want to run
+Pick your folder for the script you want to run
 
-```
+```bat
 cd fix_added_at
 python -m venv venv
 .\venv\Scripts\activate.ps1`
@@ -187,11 +204,11 @@ python.exe -m pip install --upgrade pip
 pip install -r .\requirements.txt
 ```
 
-now you are ready to run it (with the venv activated)
+Now you are ready to run it (with the venv activated)
 
 Example of how to call and run the script:
 
-```
+```bat
 python fix_added_at.py --apply --title-case
 ```
 
@@ -205,13 +222,13 @@ This command applies changes to the Plex server, updating track titles to title 
 
 The "fake_media_generator.py" script is a Python utility designed to simulate the creation of folder structures and sample media files for movies and TV shows using the TMDb API. By fetching details for a given TMDb ID, the script organizes these simulated media entries into appropriately named directories, incorporating IMDb IDs and season information for TV shows. The generated files include sample.avi, serving as placeholders for media content.
 
-open a powershell prompt and navigate to `pyprogs` folder
+Open a powershell prompt and navigate to `pyprogs` folder
 
 `cd pyprogs`
 
-pick your folder for the script you want to run
+Pick your folder for the script you want to run
 
-```
+```bat
 cd fmg
 python -m venv venv
 .\venv\Scripts\activate.ps1`
@@ -219,11 +236,11 @@ python.exe -m pip install --upgrade pip
 pip install -r .\requirements.txt
 ```
 
-now you are ready to run it (with the venv activated)
+Now you are ready to run it (with the venv activated)
 
 Example of how to call and run the script:
 
-```
+```bat
 python fake_media_generator.py --tmdbid 12345
 ```
 
@@ -241,13 +258,13 @@ Description for "resizer.py":
 
 The "resizer.py" script is a Python tool for resizing images within a specified input folder, and it saves the resized images into a designated output folder. Leveraging the PIL (Python Imaging Library), the script ensures that the aspect ratio of the images is maintained during resizing. The resizing process aims for a target aspect ratio of 1:1.5, avoiding skewing or adding black borders. The resulting images are saved in JPEG format.
 
-open a powershell prompt and navigate to `pyprogs` folder
+Open a powershell prompt and navigate to `pyprogs` folder
 
 `cd pyprogs`
 
-pick your folder for the script you want to run
+Pick your folder for the script you want to run
 
-```
+```bat
 cd resizer
 python -m venv venv
 .\venv\Scripts\activate.ps1`
@@ -255,10 +272,11 @@ python.exe -m pip install --upgrade pip
 pip install -r .\requirements.txt
 ```
 
-now you are ready to run it (with the venv activated)
+Now you are ready to run it (with the venv activated)
 
 Example of how to call and run the script:
-```
+
+```bat
 python resizer.py /path/to/input/folder
 ```
 
@@ -272,13 +290,13 @@ Replace "/path/to/input/folder" with the path to the folder containing the image
 
 The "title_card_clips.py" script serves the purpose of extracting title card frames from videos, offering flexibility for both TV shows and movies. Utilizing Python libraries such as PIL (Python Imaging Library) and MoviePy, the script extracts frames from specified video files and creates title card images. It provides logging functionality for tracking frame extraction operations.
 
-open a powershell prompt and navigate to `pyprogs` folder
+Open a powershell prompt and navigate to `pyprogs` folder
 
 `cd pyprogs`
 
-pick your folder for the script you want to run
+Pick your folder for the script you want to run
 
-```
+```bat
 cd title_card_clips
 python -m venv venv
 .\venv\Scripts\activate.ps1`
@@ -286,11 +304,11 @@ python.exe -m pip install --upgrade pip
 pip install -r .\requirements.txt
 ```
 
-now you are ready to run it (with the venv activated)
+Now you are ready to run it (with the venv activated)
 
 Example of how to call and run the script:
 
-```
+```bat
 python title_card_clips.py --path /path/to/videos --time 45
 ```
 
@@ -304,11 +322,11 @@ Replace "/path/to/videos" with the root directory containing the video files you
 
 The "update_plex_artist_art.py" script automates the process of updating artist thumbnails in a Plex media server. It connects to the Plex server specified in the environment variables, identifies artists with missing thumbnails, and attempts to update them based on the latest album's art. The script supports both reporting changes and applying them to Plex.
 
-open a powershell prompt and navigate to `pyprogs` folder
+Open a powershell prompt and navigate to `pyprogs` folder
 
 `cd pyprogs`
 
-pick your folder for the script you want to run
+Pick your folder for the script you want to run
 
 ```bat
 cd update_plex_artist_art
@@ -318,7 +336,7 @@ python.exe -m pip install --upgrade pip
 pip install -r .\requirements.txt
 ```
 
-now you are ready to run it (with the venv activated)
+Now you are ready to run it (with the venv activated)
 
 Example of how to call and run the script:
 
