@@ -122,7 +122,7 @@ open a powershell prompt and navigate to `pyprogs` folder
 
 pick your folder for the script you want to run
 
-```bash
+```
 cd fmg
 python -m venv venv
 .\venv\Scripts\activate.ps1`
@@ -144,26 +144,85 @@ folder is created within the script subfolder called `movies` or `shows` dependi
 
 ## resizer
 
-## title_card_clips
+Description for "resizer.py":
 
-open a powershell prompt and navigate to a `pyprogs` folder
+The "resizer.py" script is a Python tool for resizing images within a specified input folder, and it saves the resized images into a designated output folder. Leveraging the PIL (Python Imaging Library), the script ensures that the aspect ratio of the images is maintained during resizing. The resizing process aims for a target aspect ratio of 1:1.5, avoiding skewing or adding black borders. The resulting images are saved in JPEG format.
+
+open a powershell prompt and navigate to `pyprogs` folder
+
 `cd pyprogs`
 
 pick your folder for the script you want to run
-`cd tcc`
-`python -m venv venv`
-`.\venv\Scripts\activate.ps1`
-`python.exe -m pip install --upgrade pip`
-`pip install -r .\requirements.txt`
+
+```
+cd resizer
+python -m venv venv
+.\venv\Scripts\activate.ps1`
+python.exe -m pip install --upgrade pip
+pip install -r .\requirements.txt
+```
 
 now you are ready to run it (with the venv activated)
-`usage: title_card_clips.py [-h] --path PATH [--time TIME]`
 
-`python .\title_card_clips.py --path "M:\media\tv\Alex Rider [imdb-tt6964748]"` will default to clipping at 45 seconds
-`python .\title_card_clips.py --path "M:\media\tv\Alex Rider [imdb-tt6964748]" --time 170` will clip at 170 seconds
+Example of how to call and run the script:
+```
+python resizer.py /path/to/input/folder
+```
 
-folder is created within the script subfolder called `output`
+Replace "/path/to/input/folder" with the path to the folder containing the images you want to resize. If the script is executed without a command-line argument, it prompts the user to enter the input folder location interactively. The resized images are then stored in the "output" folder within the script's directory. Adjust the input and output folder paths as needed for your use case.
 
-max of 11 logs are rotated in the folder.
+## title_card_clips
+
+The "title_card_clips.py" script serves the purpose of extracting title card frames from videos, offering flexibility for both TV shows and movies. Utilizing Python libraries such as PIL (Python Imaging Library) and MoviePy, the script extracts frames from specified video files and creates title card images. It provides logging functionality for tracking frame extraction operations.
+
+open a powershell prompt and navigate to `pyprogs` folder
+
+`cd pyprogs`
+
+pick your folder for the script you want to run
+
+```
+cd title_card_clips
+python -m venv venv
+.\venv\Scripts\activate.ps1`
+python.exe -m pip install --upgrade pip
+pip install -r .\requirements.txt
+```
+
+now you are ready to run it (with the venv activated)
+
+Example of how to call and run the script:
+
+```
+python title_card_clips.py --path /path/to/videos --time 45
+```
+
+Replace "/path/to/videos" with the root directory containing the video files you want to process. The optional "--time" argument allows you to set the frame extraction time in seconds (default: 45). The script logs essential information, including the input path and frame extraction time. After execution, the title card frames are generated and saved in the "output" directory within the script's location. Adjust the input path and optional parameters as needed for your use case.
 
 ## update_plex_artist_art
+
+The "update_plex_artist_art.py" script automates the process of updating artist thumbnails in a Plex media server. It connects to the Plex server specified in the environment variables, identifies artists with missing thumbnails, and attempts to update them based on the latest album's art. The script supports both reporting changes and applying them to Plex.
+
+open a powershell prompt and navigate to `pyprogs` folder
+
+`cd pyprogs`
+
+pick your folder for the script you want to run
+
+```
+cd update_plex_artist_art
+python -m venv venv
+.\venv\Scripts\activate.ps1`
+python.exe -m pip install --upgrade pip
+pip install -r .\requirements.txt
+```
+
+now you are ready to run it (with the venv activated)
+
+Example of how to call and run the script:
+
+```
+python update_plex_artist_art.py --apply
+```
+
+Replace "--apply" with "--report" to generate a report without making changes. The script logs essential information, creates a timestamped log file, and allows configuration through environment variables such as PLEX_URL, PLEX_TOKEN, PLEX_TIMEOUT, and MAX_LOG_FILES. After execution, the script provides a summary of processed artists, artists with missing art, and the duration of the script. Ensure your environment variables are correctly set before running the script.

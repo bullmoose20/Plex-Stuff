@@ -3,9 +3,6 @@ Resize Image Script
 
 This script resizes images in a specified input folder and saves the resized images in an output folder.
 It uses the PIL (Python Imaging Library) library to perform the image processing operations.
-
-Author: [Your Name]
-Date: [Current Date]
 """
 
 import os
