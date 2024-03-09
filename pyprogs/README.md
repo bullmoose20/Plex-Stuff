@@ -24,11 +24,13 @@ PLEX_TOKEN=PLEX-TOKEN                           # https://support.plex.tv/articl
    1. collage [collage.py](#collage)
    2. exif_overlay_checker [exif_overlay_checker.py](#exif_overlay_checker)
    3. extract_tracks [extract_tracks.py](#extract_tracks)
-   4. fix_added_at [exif_overlay_checker.py](#exif_overlay_checker)
+   4. fix_added_at [fix_added_at.py](#fix_added_at)
    5. fmg [fake_media_generator.py](#fake_media_generator)
    6. resizer [resizer.py](#resizer)
    7. tcc [title_card_clips.py](#title_card_clips)
    8. update_plex_artist_art [update_plex_artist_art.py](#update_plex_artist_art)
+
+## collage
 
 ## exif_overlay_checker
 
@@ -54,6 +56,34 @@ now you are ready to run it (with the venv activated)
 
 This command initiates the script, specifying the path to the folder containing your images using the --input-folder argument. The --verbose flag enables detailed logging for a more comprehensive analysis.   
 
+## extract_tracks
+
+## fix_added_at
+
+## fake_media_generator
+
+open a powershell prompt and navigate to a `pyprogs` folder
+`cd pyprogs`
+
+pick your folder for the script you want to run
+
+`cd fmg`
+`python -m venv venv`
+`.\venv\Scripts\activate.ps1`
+`python.exe -m pip install --upgrade pip`
+`pip install -r .\requirements.txt`
+
+now you are ready to run it (with the venv activated)
+`usage: fake_media_generator [-h] --tmdbid ####
+
+`python .\fake_media_generator.py --tmdbid 54155
+`python .\fake_media_generator.py --tmdbid 123123
+
+folder is created within the script subfolder called `movies` or `shows` depending on the tmdbid
+
+## resizer
+
+## title_card_clips
 
 open a powershell prompt and navigate to a `pyprogs` folder
 `cd pyprogs`
@@ -75,22 +105,4 @@ folder is created within the script subfolder called `output`
 
 max of 11 logs are rotated in the folder.
 
-
-open a powershell prompt and navigate to a `pyprogs` folder
-`cd pyprogs`
-
-pick your folder for the script you want to run
-
-`cd fmg`
-`python -m venv venv`
-`.\venv\Scripts\activate.ps1`
-`python.exe -m pip install --upgrade pip`
-`pip install -r .\requirements.txt`
-
-now you are ready to run it (with the venv activated)
-`usage: fake_media_generator [-h] --tmdbid ####
-
-`python .\fake_media_generator.py --tmdbid 54155
-`python .\fake_media_generator.py --tmdbid 123123
-
-folder is created within the script subfolder called `movies` or `shows` depending on the tmdbid
+## update_plex_artist_art
