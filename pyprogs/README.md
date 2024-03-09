@@ -32,6 +32,61 @@ PLEX_TOKEN=PLEX-TOKEN                           # https://support.plex.tv/articl
 
 ## collage
 
+The "collage.py" script generates a grid of thumbnails from a folder of images. This script utilizes the PIL (Python Imaging Library) for image processing. Users can specify parameters such as the number of columns, thumbnail size, and whether to display text under the images. The resulting image grid is saved in a folder called "output."
+
+Example of how to call and run the script:
+
+```
+python collage.py /path/to/image/folder --num_columns 4 --thumb_width 150 --thumb_height 150 --show_text --show_image
+```
+
+Replace "/path/to/image/folder" with the actual path to the folder containing images. Adjust other parameters as needed. The script creates a timestamped log file and outputs the generated image grid both in the specified "output" folder and the original folder.
+
+Note: Ensure you have the necessary dependencies installed, particularly PIL.
+
+Certainly! Here's an updated explanation with the additional information:
+
+```batch
+REM This script automates the process of creating collage posters based on an input folder and all its subfolders.
+REM It utilizes PowerShell and Python scripts for collage generation, followed by the use of robocopy for image transfer.
+
+REM Set the active code page to UTF-8 for enhanced character support
+chcp 65001
+
+REM Navigate to the directory containing the collage.py script
+D:
+cd D:\bullmoose20\pyprogs\collage
+
+REM Step 1: Extract all directories and generate collages
+"C:\Program Files\PowerShell\7\pwsh.exe" -Command "$filteredDirectories = Get-ChildItem -Path 'D:\defaults\' -Directory -Recurse | Where-Object { -not ($_ -match '\\\.' -or $_ -match '\\\[\\]*\\\.') }; $filteredDirectories | ForEach-Object { .\venv\Scripts\python.exe .\collage.py $_ }"
+
+REM Step 2: Copy images using robocopy
+robocopy D:\defaults\ D:\bullmoose20\Plex-Meta-Manager-Images\ /E /COPY:DAT /DCOPY:T /XO
+
+```
+
+Explanation:
+
+1. **`REM This script automates...`**: Describes the purpose of the script.
+
+2. **`REM Set the active code page...`**: Changes the code page to UTF-8 for better handling of Unicode characters in the command prompt.
+
+3. **`D:` and `cd D:\bullmoose20\pyprogs\collage`**: Navigates to the directory where the `collage.py` script is located.
+
+4. **Step 1 (PowerShell command)**:
+   - **`"C:\Program Files\PowerShell\7\pwsh.exe" -Command ...`**: Invokes PowerShell 7 to execute the specified command.
+   - **`$filteredDirectories = ...`**: Retrieves all directories under 'D:\defaults\' recursively, excluding hidden and system directories.
+   - **`ForEach-Object { .\venv\Scripts\python.exe .\collage.py $_ }`**: For each filtered directory, runs the `collage.py` script using the Python interpreter within the virtual environment.
+
+5. **Step 2 (robocopy command)**:
+   - **`robocopy D:\defaults\ D:\bullmoose20\Plex-Meta-Manager-Images\ /E /COPY:DAT /DCOPY:T /XO`**: Uses robocopy to copy images from 'D:\defaults\' to 'D:\bullmoose20\Plex-Meta-Manager-Images\'.
+      - `/E`: Copies subdirectories, including empty ones.
+      - `/COPY:DAT`: Copies file data, attributes, and timestamps.
+      - `/DCOPY:T`: Copies directory timestamps.
+      - `/XO`: Excludes older files, only copying newer or non-existing files.
+
+This script streamlines the generation of collage posters for images in the specified directory and its subfolders, providing a convenient and automated solution.
+
 ## exif_overlay_checker
 
 The "exif_overlay_checker" script is a Python tool that scans images within a specified folder, examining their EXIF metadata. Specifically designed to identify the presence of keywords like 'overlay' or 'titlecard' in the EXIF data, the script logs its findings and provides a summary of images with or without such metadata. The tool offers a command-line interface with optional verbose logging for a detailed analysis of the image files.
