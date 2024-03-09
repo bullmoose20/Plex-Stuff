@@ -69,9 +69,10 @@ pip install -r .\requirements.txt
 ```
 
 Now you are ready to run it (with the venv activated)
-
 ```bat
 python collage.py /path/to/image/folder
+```
+```bat
 python collage.py /path/to/image/folder --num_columns 4 --thumb_width 150 --thumb_height 150 --show_text --show_image
 ```
 
