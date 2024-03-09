@@ -1,15 +1,16 @@
-import plexapi
-import logging
 import argparse
-import urllib.parse
-from plexapi.server import PlexServer
-from dotenv import load_dotenv
-import os
-import re
-import time
-import glob
-import sys
 import datetime
+import glob
+import logging
+import os
+import plexapi
+import re
+import sys
+import time
+import urllib.parse
+from datetime import datetime as dt
+from dotenv import load_dotenv
+from plexapi.server import PlexServer
 from requests.exceptions import RequestException
 
 # Load environment variables from .env file
@@ -20,24 +21,30 @@ plex_url = os.getenv('PLEX_URL')
 plex_token = os.getenv('PLEX_TOKEN')
 timeout_seconds = int(os.getenv('PLEX_TIMEOUT', 60))  # Default timeout: 60 seconds
 max_log_files = int(os.getenv('MAX_LOG_FILES', 10))  # Default number of logs: 10
-# Set the name of the subfolder
-subfolder = "artist_thumbnails"
-
-# Ensure the subfolder exists, create it if necessary
-if not os.path.exists(subfolder):
-    os.makedirs(subfolder)
+log_level = os.getenv('LOG_LEVEL', 'INFO').upper()  # Default logging level: INFO
 
 # Check if Plex URL and token are defined
 if plex_url is None or plex_token is None:
     print("Error: Plex URL or token not found in .env file.")
     sys.exit(1)
 
-# Set up command-line argument parser
-parser = argparse.ArgumentParser(description='Update Plex artist art.')
-group = parser.add_mutually_exclusive_group(required=True)
-group.add_argument('--apply', action='store_true', help='Apply changes.')
-group.add_argument('--report', action='store_true', help='Report changes without applying them.')
-args = parser.parse_args()
+# Extract the script name without the '.py' extension
+script_name = os.path.splitext(os.path.basename(sys.argv[0]))[0]
+
+# Define the logs directory
+logs_directory = "logs"
+
+# Ensure the "logs" directory exists
+if not os.path.exists(logs_directory):
+    os.makedirs(logs_directory)
+
+# Generate a unique log filename with timestamp and script name
+timestamp = dt.now().strftime("%Y%m%d_%H%M%S_%f")[:-3]
+log_filename = os.path.join(logs_directory, f"{script_name}_{timestamp}.log")
+
+# Set up logging with timestamps and the specified logging level
+log_format = '%(asctime)s - %(levelname)s - %(message)s'
+logging.basicConfig(filename=log_filename, level=getattr(logging, log_level), format=log_format)
 
 # Set up Plex server connection
 plex = None
@@ -59,6 +66,24 @@ except plexapi.exceptions.BadRequest as e:
     logging.error(f"Details: {str(e)}")
 
     sys.exit(1)
+
+# Set the name of the subfolder
+subfolder = "artist_thumbnails"
+
+# Ensure the subfolder exists, create it if necessary
+if not os.path.exists(subfolder):
+    os.makedirs(subfolder)
+
+# Set up command-line argument parser
+parser = argparse.ArgumentParser(description='Update Plex artist art.')
+group = parser.add_mutually_exclusive_group(required=True)
+group.add_argument('--apply', action='store_true', help='Apply changes.')
+group.add_argument('--report', action='store_true', help='Report changes without applying them.')
+args = parser.parse_args()
+
+# Log the command along with its arguments
+logging.info(f"Command: {' '.join(['python'] + sys.argv)}")
+logging.info(f"Arguments: {args}")
 
 # Get all libraries/sections
 libraries = plex.library.sections()
@@ -163,16 +188,25 @@ except Exception as e:
     # Log any unhandled exceptions
     logging.error(f"An unexpected error occurred: {e}", exc_info=True)
 
-# Set max_log_files to 1 if it's 0 or negative
-if max_log_files <= 0:
-    max_log_files = 1
-
-# Remove old log files if there are more than the allowed number
-existing_logs = glob.glob("update_plex_artist_art_*.log")
-if len(existing_logs) > max_log_files:
-    logging.info(f"existing_logs: {len(existing_logs)} > max_log_files: {max_log_files}")
-    oldest_logs = sorted(existing_logs)[:-max_log_files]
-    for old_log in oldest_logs:
-        os.remove(old_log)
 
 print(f"DONE! Check log for more information: {log_filename}")
+
+
+def clean_up_old_logs():
+    global max_log_files
+
+    # Set max_log_files to 1 if it's 0 or negative
+    if max_log_files <= 0:
+        max_log_files = 1
+
+    # Remove old log files from the 'logs' subdirectory if there are more than the allowed number
+    existing_logs = glob.glob(os.path.join(logs_directory, f"{script_name}_*.log"))
+    if len(existing_logs) > max_log_files:
+        logging.info(f"existing_logs: {len(existing_logs)} > max_log_files: {max_log_files}")
+        oldest_logs = sorted(existing_logs)[:-max_log_files]
+        for old_log in oldest_logs:
+            os.remove(old_log)
+
+
+# Call the clean_up_old_logs function
+clean_up_old_logs()

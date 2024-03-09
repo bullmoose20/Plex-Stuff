@@ -1,14 +1,65 @@
+import argparse
+import glob
+import logging
 import os
-from dotenv import load_dotenv
-import shutil
 import requests
-import argparse  # Import the argparse module
+import shutil
+import sys
+from datetime import datetime as dt
+from dotenv import load_dotenv
 
 # Load environment variables from .env file
 load_dotenv()
 
-# Get the TMDb API key from the environment variable
+# Retrieve Plex server details from environment variables
+# plex_url = os.getenv('PLEX_URL')
+# plex_token = os.getenv('PLEX_TOKEN')
+# timeout_seconds = int(os.getenv('PLEX_TIMEOUT', 60))  # Default timeout: 60 seconds
+max_log_files = int(os.getenv('MAX_LOG_FILES', 10))  # Default number of logs: 10
+log_level = os.getenv('LOG_LEVEL', 'INFO').upper()  # Default logging level: INFO
+
+# Extract the script name without the '.py' extension
+script_name = os.path.splitext(os.path.basename(sys.argv[0]))[0]
+
+# Define the logs directory
+logs_directory = "logs"
+
+# Ensure the "logs" directory exists
+if not os.path.exists(logs_directory):
+    os.makedirs(logs_directory)
+
+# Generate a unique log filename with timestamp and script name
+timestamp = dt.now().strftime("%Y%m%d_%H%M%S_%f")[:-3]
+log_filename = os.path.join(logs_directory, f"{script_name}_{timestamp}.log")
+
+# Set up logging with timestamps and the specified logging level
+log_format = '%(asctime)s - %(levelname)s - %(message)s'
+logging.basicConfig(filename=log_filename, level=getattr(logging, log_level), format=log_format)
+
+# Retrieve TMDB API key from environment variable
 TMDB_API_KEY = os.getenv("TMDB_API_KEY")
+
+# Check if TMDB API key is present and not empty
+if not TMDB_API_KEY:
+    print("TMDB_API_KEY is missing or empty in the .env file. Please provide a valid API key.")
+    logging.error("TMDB_API_KEY is missing or empty in the .env file. Please provide a valid API key.")
+    exit()
+
+
+def clean_up_old_logs():
+    global max_log_files
+
+    # Set max_log_files to 1 if it's 0 or negative
+    if max_log_files <= 0:
+        max_log_files = 1
+
+    # Remove old log files from the 'logs' subdirectory if there are more than the allowed number
+    existing_logs = glob.glob(os.path.join(logs_directory, f"{script_name}_*.log"))
+    if len(existing_logs) > max_log_files:
+        logging.info(f"existing_logs: {len(existing_logs)} > max_log_files: {max_log_files}")
+        oldest_logs = sorted(existing_logs)[:-max_log_files]
+        for old_log in oldest_logs:
+            os.remove(old_log)
 
 
 def fetch_movie_details(tmdb_id):
@@ -18,6 +69,7 @@ def fetch_movie_details(tmdb_id):
     # Check for a 404 status code
     if response.status_code == 404:
         print(f"Failed to retrieve <movie> details for TMDb ID {tmdb_id}. Resource not found.")
+        logging.warning(f"Failed to retrieve <movie> details for TMDb ID {tmdb_id}. Resource not found.")
         return {}
 
     data = response.json()
@@ -37,6 +89,7 @@ def fetch_tv_details(tmdb_id):
     # Check for a 404 status code
     if response.status_code == 404:
         print(f"Failed to retrieve <tv> details for TMDb ID {tmdb_id}. Resource not found.")
+        logging.warning(f"Failed to retrieve <tv> details for TMDb ID {tmdb_id}. Resource not found.")
         return {}
 
     data = response.json()
@@ -61,6 +114,7 @@ def fetch_imdb_id(tmdb_id, media_type):
     # Check for a 404 status code
     if response.status_code == 404:
         print(f"Failed to retrieve {media_type} information for TMDb ID {tmdb_id}. Resource not found.")
+        logging.warning(f"Failed to retrieve {media_type} information for TMDb ID {tmdb_id}. Resource not found.")
         return {}
 
     data = response.json()
@@ -107,6 +161,7 @@ def display_options(options):
         media_type = 'Movie' if 'title' in entry else 'TV Show'
         title = entry.get('title') if 'title' in entry else entry.get('name', 'Unknown Title')
         print(f"{index}. {title} ({media_type} - ID: {entry['id']})")
+        logging.info(f"{index}. {title} ({media_type} - ID: {entry['id']})")
 
 
 def main():
@@ -121,11 +176,16 @@ def main():
     # Use the provided TMDb ID or prompt the user if not provided
     tmdb_id = args.tmdbid or input("Enter TMDb ID: ")
 
+    # Log the command along with its arguments
+    logging.info(f"Command: {' '.join(['python'] + os.sys.argv)}")
+    logging.info(f"Arguments: {args}")
+
     movie_details = fetch_movie_details(tmdb_id)
     tv_details = fetch_tv_details(tmdb_id)
 
     if not movie_details and not tv_details:
         print("Invalid TMDb ID. Make sure the TMDb ID is correct.")
+        logging.error("Invalid TMDb ID. Make sure the TMDb ID is correct.")
         return
 
     if movie_details and tv_details:
@@ -149,12 +209,19 @@ def main():
     season_data = tv_details.get("seasons", []) if media_type == 'tv' else None
 
     print(f"IMDb ID for {media_type}: {imdb_id}")
+    logging.info(f"IMDb ID for {media_type}: {imdb_id}")
 
     # Continue with the rest of your script
     create_folders_and_files(chosen_option, media_type, imdb_id, season_data)
     print(
         f"Folders and files created successfully for <{media_type}> {chosen_option['title'] if media_type == 'movie' else chosen_option['name']}.")
+    logging.info(
+        f"Folders and files created successfully for <{media_type}> {chosen_option['title'] if media_type == 'movie' else chosen_option['name']}.")
 
 
 if __name__ == "__main__":
     main()
+
+    # Call the clean_up_old_logs function
+    clean_up_old_logs()
+

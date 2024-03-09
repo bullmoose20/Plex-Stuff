@@ -308,7 +308,7 @@ Open a powershell prompt and navigate to `pyprogs` folder
 Pick your folder for the script you want to run
 
 ```bat
-cd title_card_clips
+cd tcc
 python -m venv venv
 .\venv\Scripts\activate.ps1
 python.exe -m pip install --upgrade pip
