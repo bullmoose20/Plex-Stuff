@@ -116,12 +116,13 @@ This command applies changes to the Plex server, updating track titles to title 
 
 The "fake_media_generator.py" script is a Python utility designed to simulate the creation of folder structures and sample media files for movies and TV shows using the TMDb API. By fetching details for a given TMDb ID, the script organizes these simulated media entries into appropriately named directories, incorporating IMDb IDs and season information for TV shows. The generated files include sample.avi, serving as placeholders for media content.
 
-open a powershell prompt and navigate to a `pyprogs` folder
+open a powershell prompt and navigate to `pyprogs` folder
+
 `cd pyprogs`
 
 pick your folder for the script you want to run
 
-```
+```bash
 cd fmg
 python -m venv venv
 .\venv\Scripts\activate.ps1`
@@ -131,10 +132,9 @@ pip install -r .\requirements.txt
 
 now you are ready to run it (with the venv activated)
 
-
 Example of how to call and run the script:
 
-```bash
+```
 python fake_media_generator.py --tmdbid 12345
 ```
 
