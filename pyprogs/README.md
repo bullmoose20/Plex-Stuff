@@ -9,17 +9,6 @@
 ## Setup
 
 1. clone repo
-2. setup python virtualenv - [I'd suggest doing this in a virtual environment. Great instructions found here - https://www.metamanager.wiki/en/nightly/pmm/install/guides/local/#setting-up-a-virtual-environment]
-3. Activate that virtualenv
-4. Install requirements with `pip install -r requirements.txt` into that virtualenv
-5. cd to the directory that you want to run the script in
-6. Copy `.env.example` to `.env` 
-7. Edit `.env` to suit
-8. drop file into a folder
-9. create a venv
-10. activate the venv
-11. install requirements
-12. run title_card_clips
 
 All these PYTHON scripts may use a `.env` and requirements.txt per folder.
 
@@ -30,12 +19,10 @@ PLEX_URL=https://plex.domain.tld                # URL for Plex; can be a domain 
 PLEX_TOKEN=PLEX-TOKEN                           # https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/
 ```
 
-## Plex scripts:
-
 ## Scripts:
 1. pyprogs\<<folder_name>>
    2. collage
-   3. exif_overlay_checker
+   3. [exif_overlay_checker.py](#exif_overlay_checker)
    4. extract_tracks
    5. fix-added_at
    6. fmg
@@ -43,7 +30,29 @@ PLEX_TOKEN=PLEX-TOKEN                           # https://support.plex.tv/articl
    8. tcc
    9. update_plex_artist_art
 
+## exif_overlay_checker
 
+The "exif_overlay_checker" script is a Python tool that scans images within a specified folder, examining their EXIF metadata. Specifically designed to identify the presence of keywords like 'overlay' or 'titlecard' in the EXIF data, the script logs its findings and provides a summary of images with or without such metadata. The tool offers a command-line interface with optional verbose logging for a detailed analysis of the image files.
+
+open a powershell prompt and navigate to `pyprogs` folder
+
+`cd pyprogs`
+
+pick your folder for the script you want to run
+
+```
+cd exif_overlay_checker
+python -m venv venv
+.\venv\Scripts\activate.ps1`
+python.exe -m pip install --upgrade pip
+pip install -r .\requirements.txt
+```
+
+now you are ready to run it (with the venv activated)
+
+`python exif_overlay_checker.py --input-folder /path/to/your/images --verbose`
+
+This command initiates the script, specifying the path to the folder containing your images using the --input-folder argument. The --verbose flag enables detailed logging for a more comprehensive analysis.   
 
 
 open a powershell prompt and navigate to a `pyprogs` folder
