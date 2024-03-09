@@ -21,14 +21,14 @@ PLEX_TOKEN=PLEX-TOKEN                           # https://support.plex.tv/articl
 
 ## Scripts:
 1. pyprogs\<<folder_name>>
-   2. collage
-   3. [exif_overlay_checker.py](#exif_overlay_checker)
-   4. extract_tracks
-   5. fix-added_at
-   6. fmg
-   7. resizer
-   8. tcc
-   9. update_plex_artist_art
+   2. collage [collage.py](#collage)
+   3. exif_overlay_checker [exif_overlay_checker.py](#exif_overlay_checker)
+   4. extract_tracks [extract_tracks.py](#extract_tracks)
+   5. fix_added_at [exif_overlay_checker.py](#exif_overlay_checker)
+   6. fmg [fake_media_generator.py](#fake_media_generator)
+   7. resizer [resizer.py](#resizer)
+   8. tcc [title_card_clips.py](#title_card_clips)
+   9. update_plex_artist_art [update_plex_artist_art.py](#update_plex_artist_art)
 
 ## exif_overlay_checker
 
