@@ -63,7 +63,7 @@ Pick your folder for the script you want to run
 ```bat
 cd collage
 python -m venv venv
-.\venv\Scripts\activate.ps1`
+.\venv\Scripts\activate.ps1
 python.exe -m pip install --upgrade pip
 pip install -r .\requirements.txt
 ```
@@ -71,6 +71,7 @@ pip install -r .\requirements.txt
 Now you are ready to run it (with the venv activated)
 
 ```bat
+python collage.py /path/to/image/folder
 python collage.py /path/to/image/folder --num_columns 4 --thumb_width 150 --thumb_height 150 --show_text --show_image
 ```
 
@@ -137,7 +138,7 @@ Pick your folder for the script you want to run
 ```bat
 cd exif_overlay_checker
 python -m venv venv
-.\venv\Scripts\activate.ps1`
+.\venv\Scripts\activate.ps1
 python.exe -m pip install --upgrade pip
 pip install -r .\requirements.txt
 ```
@@ -167,7 +168,7 @@ Pick your folder for the script you want to run
 ```bat
 cd extract_tracks
 python -m venv venv
-.\venv\Scripts\activate.ps1`
+.\venv\Scripts\activate.ps1
 python.exe -m pip install --upgrade pip
 pip install -r .\requirements.txt
 ```
@@ -199,7 +200,7 @@ Pick your folder for the script you want to run
 ```bat
 cd fix_added_at
 python -m venv venv
-.\venv\Scripts\activate.ps1`
+.\venv\Scripts\activate.ps1
 python.exe -m pip install --upgrade pip
 pip install -r .\requirements.txt
 ```
@@ -231,7 +232,7 @@ Pick your folder for the script you want to run
 ```bat
 cd fmg
 python -m venv venv
-.\venv\Scripts\activate.ps1`
+.\venv\Scripts\activate.ps1
 python.exe -m pip install --upgrade pip
 pip install -r .\requirements.txt
 ```
@@ -267,7 +268,7 @@ Pick your folder for the script you want to run
 ```bat
 cd resizer
 python -m venv venv
-.\venv\Scripts\activate.ps1`
+.\venv\Scripts\activate.ps1
 python.exe -m pip install --upgrade pip
 pip install -r .\requirements.txt
 ```
@@ -299,7 +300,7 @@ Pick your folder for the script you want to run
 ```bat
 cd title_card_clips
 python -m venv venv
-.\venv\Scripts\activate.ps1`
+.\venv\Scripts\activate.ps1
 python.exe -m pip install --upgrade pip
 pip install -r .\requirements.txt
 ```
@@ -331,7 +332,7 @@ Pick your folder for the script you want to run
 ```bat
 cd update_plex_artist_art
 python -m venv venv
-.\venv\Scripts\activate.ps1`
+.\venv\Scripts\activate.ps1
 python.exe -m pip install --upgrade pip
 pip install -r .\requirements.txt
 ```
