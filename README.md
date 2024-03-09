@@ -3,32 +3,17 @@
 
 ## Requirements
 
-1. A system that can run Python3
-2. Python3 installed on that system
-3. Preferable to also have a system that can run powershell
-4. Preferable to have a system that can also run Power Automate Desktop Flows
-5. System that has ImageMagick installed
+1. A system that can run powershell
+2. A system that can also run Power Automate Desktop Flows
+3. System that has ImageMagick installed
 
 ## Setup
 
 1. clone repo
-2. setup python virtualenv - [I'd suggest doing this in a virtual environment. Great instructions found here - https://www.metamanager.wiki/en/nightly/pmm/install/guides/local/#setting-up-a-virtual-environment]
-3. Activate that virtualenv
-4. Install requirements with `pip install -r requirements.txt` into that virtualenv
-5. cd to the directory that you want to run the script in
-6. Copy `.env.example` to `.env` 
-7. Edit `.env` to suit
 
-All these PYTHON scripts use the same `.env` and requirements. The Unraid bash scripts, Windows powershell or Windows cmd scripts, will vary in nature. Read the related section down below for more details. 
+The Unraid bash scripts, Windows powershell or Windows cmd scripts, will vary in nature. Read the related section down below for more details. 
 
-### `.env` contents
-
-```
-PLEX_URL=https://plex.domain.tld                # URL for Plex; can be a domain or IP:PORT
-PLEX_TOKEN=PLEX-TOKEN                           # https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/
-```
-
-## Plex scripts:
+[Goto to Python Section](./pyprogs/README.md)
 
 ## Scripts:
 1. ~~[plex-bloat-fix.py](#plex-bloat-fix) - removes unneeded image files (Posters/Title Cards) from plex.~~ ***RETIRED!!! Please go here now: https://github.com/meisnate12/Plex-Image-Cleanup***
@@ -37,11 +22,10 @@ PLEX_TOKEN=PLEX-TOKEN                           # https://support.plex.tv/articl
 4. [pumpanddump.sh](#pumpanddump) - Unraid script to automate the plex db repair when using hotio plex container
 5. [chk-video-codec.sh](#chk-video-codec) - Unraid script to find and sort files that have been converted to HEVC/H265 and those that have not been
 6. [create_poster.ps1](#create_poster) - Powershell script to create posters/images for PMM/PLEX/EMBY/JELLYFIN/OTHER
-7. [advanced-plex-edits.py](#advanced-plex-edits) - Sets your plex collections to default and then to hide in case your PMM separator blank collections continue to show
-8. [get_missing_people.ps1](#get_missing_people) - Scans your PMM meta* logs to find missing people posters to download and create the bw, rainier, orig, etc. style poster for PMM/PLEX/EMBY/JELLYFIN/OTHER
-9. [image_check.ps1](#image_check) - Scans your transparent images for anomalies like head-chops, backgrounds not removed, and black and white photos instead of a color photo to give you a report so you can go and fix those by uploading new and better options to https://www.themoviedb.org/
-10. [create_people_poster.ps1](#create_people_poster) - Scans your PMM meta* logs to find missing people posters and will download and create the bw, rainier, orig, transparent. style poster for PMM/PLEX/EMBY/JELLYFIN/OTHER. This script was put together by using the image_check, get_missing_people, and Power Automate Desktop Flow (remove background) all into 1
-11. [PAD Flows](#pad_flows) - Various PAD flows for RPA stuff for PLEX, PMM, Other
+7. [get_missing_people.ps1](#get_missing_people) - Scans your PMM meta* logs to find missing people posters to download and create the bw, rainier, orig, etc. style poster for PMM/PLEX/EMBY/JELLYFIN/OTHER
+8. [image_check.ps1](#image_check) - Scans your transparent images for anomalies like head-chops, backgrounds not removed, and black and white photos instead of a color photo to give you a report so you can go and fix those by uploading new and better options to https://www.themoviedb.org/
+9. [create_people_poster.ps1](#create_people_poster) - Scans your PMM meta* logs to find missing people posters and will download and create the bw, rainier, orig, transparent. style poster for PMM/PLEX/EMBY/JELLYFIN/OTHER. This script was put together by using the image_check, get_missing_people, and Power Automate Desktop Flow (remove background) all into 1
+10. [PAD Flows](#pad_flows) - Various PAD flows for RPA stuff for PLEX, PMM, Other
     1.  [1-Convert Warning- No TMDb ID Found for IMDb ID](#Convert_Warning_No_TMDb_ID_Found_for_IMDb_ID) - PAD flow to deal with Convert Warnings in your meta.log file from PMM
           2. [1-Convert Warning- No TMDb ID Found for IMDb ID-Subflow-close_browsers]
           3. [1-Convert Warning- No TMDb ID Found for IMDb ID-Subflow-Refresh_browser]
@@ -139,7 +123,7 @@ In a powershell window and with ImageMagick installed, this will
 ### REQUIREMENTS
 Imagemagick must be installed - https://imagemagick.org/script/download.php
 
-font must be installed on system and visible by Imagemagick. Make sure that you install the ttf font for ALL users as an admin so ImageMagick has access to the font when running (r-click on font Install for ALL Users in Windows)
+Font must be installed on system and visible by Imagemagick. Make sure that you install the ttf font for ALL users as an admin so ImageMagick has access to the font when running (r-click on font Install for ALL Users in Windows)
 
 Powershell version 7.x or greater: https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows?view=powershell-7.3
 
@@ -202,18 +186,6 @@ Create a poster with the Spotify.png and specified background color of "#FB19B9"
 ![](images/create_poster-example2.png)
 ![](images/create_poster-example3.png)
 
-## advanced-plex-edits
-
-When you use blank collections in PLEX through PMM, if the separators continue to show up in the library tab as shown below, even if you have hide_collections enabled, run this after PMM completes the run to unhide and hide the collections
-
-### Usage
-1. setup as above
-2. Run with `python advanced-plex-edits.py` - sometimes (usually when you have not setup the virtualenv for python as recommended above), you need to specify the version of python in the command like `python3.9 advanced-plex-edits.py`
-3. Make sure that you are NOT actively updating posters or title cards with PMM or TCM while running this script. Schedule this after the last run happens. So TCM, Plex Scheduled Tasks, PMM, THEN schedule or run advanced-plex-edits.py. Example: TCM @ 00:00, PLEX @ 02:00-05:00, and PMM @ 05:00
-
-### EXAMPLES
-![](images/advanced-plex-edits-example1.png)
-
 ## get_missing_people
 
 This Powershell script will find and download people posters/images for PMM/PLEX/EMBY/JELLYFIN/OTHER based on the PMM meta* logs
@@ -274,10 +246,12 @@ This Powershell script will find and download people posters/images for PMM/PLEX
 2. It will create 1 .cmd file per meta.log file and run it to download the images locally
 3. It will then scan, remove the background, and produce 4 files all at 2000x3000 in size
 - bw-style
+- diiivoy-style
+- diiivoycolor-style
 - rainier-style
 - original-style
 - signature-style
-- transparent
+- transparent-style
  
 ### REQUIREMENTS
 $metalog_location=   is the directory path to scan the PMM directory logs (meta*.log)

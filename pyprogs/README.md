@@ -94,9 +94,9 @@ chcp 65001
 
 REM Navigate to the directory containing the collage.py script
 D:
-cd D:\bullmoose20\pyprogs\collage
+cd D:\Plex-Stuff\pyprogs\collage
 
-REM Step 1: Extract all directories and generate collages
+REM Step 1: Extract all directories and generate collages. Replace D:\defaults with your desired folder of images
 "C:\Program Files\PowerShell\7\pwsh.exe" -Command "$filteredDirectories = Get-ChildItem -Path 'D:\defaults\' -Directory -Recurse | Where-Object { -not ($_ -match '\\\.' -or $_ -match '\\\[\\]*\\\.') }; $filteredDirectories | ForEach-Object { .\venv\Scripts\python.exe .\collage.py $_ }"
 
 REM Step 2: Copy images using robocopy
@@ -109,7 +109,7 @@ Explanation:
 
 2. **`REM Set the active code page...`**: Changes the code page to UTF-8 for better handling of Unicode characters in the command prompt.
 
-3. **`D:` and `cd D:\bullmoose20\pyprogs\collage`**: Navigates to the directory where the `collage.py` script is located.
+3. **`D:` and `cd D:\Plex-Stuff\pyprogs\collage`**: Navigates to the directory where the `collage.py` script is located.
 
 4. **Step 1 (PowerShell command)**:
    - **`"C:\Program Files\PowerShell\7\pwsh.exe" -Command ...`**: Invokes PowerShell 7 to execute the specified command.
