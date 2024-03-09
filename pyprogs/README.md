@@ -44,6 +44,8 @@ Replace "/path/to/image/folder" with the actual path to the folder containing im
 
 Note: Ensure you have the necessary dependencies installed, particularly PIL.
 
+`@collage_maker.cmd` is an additional cmd file to assist in running collage.py
+
 ```batch
 REM This script automates the process of creating collage posters based on an input folder and all its subfolders.
 REM It utilizes PowerShell and Python scripts for collage generation, followed by the use of robocopy for image transfer.
