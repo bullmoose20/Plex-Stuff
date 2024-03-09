@@ -1,18 +1,75 @@
-import os
+import argparse
+import glob
 import logging
+import os
+import sys
+from datetime import datetime as dt
+from dotenv import load_dotenv, find_dotenv
 from PIL import Image
 from PIL.ExifTags import TAGS
-import argparse
+
+try:
+    # Find the .env file
+    dotenv_path = find_dotenv(raise_error_if_not_found=True)
+
+    # Load environment variables from .env file
+    load_dotenv(dotenv_path)
+except OSError:
+    print("Error: The .env file was not found. Please make sure it exists in the script's directory.")
+    exit(1)
+
+# Retrieve Plex server details from environment variables
+# plex_url = os.getenv('PLEX_URL')
+# plex_token = os.getenv('PLEX_TOKEN')
+# timeout_seconds = int(os.getenv('PLEX_TIMEOUT', 60))  # Default timeout: 60 seconds
+max_log_files = int(os.getenv('MAX_LOG_FILES', 10))  # Default number of logs: 10
+log_level = os.getenv('LOG_LEVEL', 'INFO').upper()  # Default logging level: INFO
+
+# Extract the script name without the '.py' extension
+script_name = os.path.splitext(os.path.basename(sys.argv[0]))[0]
+
+# Define the logs directory
+logs_directory = "logs"
+
+# Ensure the "logs" directory exists
+if not os.path.exists(logs_directory):
+    os.makedirs(logs_directory)
+
+# Generate a unique log filename with timestamp and script name
+timestamp = dt.now().strftime("%Y%m%d_%H%M%S_%f")[:-3]
+log_filename = os.path.join(logs_directory, f"{script_name}_{timestamp}.log")
+
+# Set up logging with timestamps and the specified logging level
+log_format = '%(asctime)s - %(levelname)s - %(message)s'
+logging.basicConfig(filename=log_filename, level=getattr(logging, log_level), format=log_format)
+
+
+def clean_up_old_logs():
+    global max_log_files
+
+    # Set max_log_files to 1 if it's 0 or negative
+    if max_log_files <= 0:
+        max_log_files = 1
+
+    # Remove old log files from the 'logs' subdirectory if there are more than the allowed number
+    existing_logs = glob.glob(os.path.join(logs_directory, f"{script_name}_*.log"))
+    if len(existing_logs) > max_log_files:
+        logging.info(f"existing_logs: {len(existing_logs)} > max_log_files: {max_log_files}")
+        oldest_logs = sorted(existing_logs)[:-max_log_files]
+        for old_log in oldest_logs:
+            os.remove(old_log)
 
 
 def main(input_folder, verbose):
     overlay_count = 0
     without_overlay_count = 0
 
-    logging.basicConfig(filename='exif_overlay_log.txt', filemode='w', level=logging.DEBUG if verbose else logging.INFO,
-                        format='%(asctime)s - %(levelname)s - %(message)s', encoding='utf-8')
+    # Log the command along with its arguments
+    logging.info(f"Command: {' '.join(['python'] + os.sys.argv)}")
+    logging.info(f"Arguments: {args}")
 
-    logging.info(f"Scanning images in folder: {input_folder}")
+    # logging.info(f"Command line arguments: {' '.join(sys.argv)}")
+    logging.info(f"Input folder: {input_folder}")
 
     total_files = count_files(input_folder)
     current_file_count = 0
@@ -24,10 +81,10 @@ def main(input_folder, verbose):
                 has_overlay, user_comment = check_overlay_in_exif(file_path)
                 if has_overlay:
                     overlay_count += 1
-                    logging.info(f"FOUND 'overlay' in EXIF data for file: {file_path}")
+                    logging.info(f"FOUND 'overlay' or 'titlecard' in EXIF data for file: {file_path}")
                 else:
                     without_overlay_count += 1
-                    logging.info(f"No 'overlay' in EXIF data for file: {file_path}")
+                    logging.info(f"No 'overlay' or 'titlecard' in EXIF data for file: {file_path}")
 
                 if user_comment:
                     logging.debug(f"UserComment for file {file_path}: {user_comment}")
@@ -78,9 +135,12 @@ def print_progress(current, total):
 
 
 def print_summary(overlay_count, without_overlay_count):
-    print("\nSummary:")
+    print("Summary:")
     print(f"Total images with exif data of 'overlay' or 'titlecard': {overlay_count}")
     print(f"Total images without exif data of 'overlay' or 'titlecard': {without_overlay_count}")
+    logging.info("Summary:")
+    logging.info(f"Total images with exif data of 'overlay' or 'titlecard': {overlay_count}")
+    logging.info(f"Total images without exif data of 'overlay' or 'titlecard': {without_overlay_count}")
 
 
 if __name__ == "__main__":
@@ -95,3 +155,5 @@ if __name__ == "__main__":
         input_folder = args.input_folder
 
     main(input_folder, args.verbose)
+    # Call the clean_up_old_logs function
+    clean_up_old_logs()
