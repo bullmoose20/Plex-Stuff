@@ -58,7 +58,59 @@ This command initiates the script, specifying the path to the folder containing 
 
 ## extract_tracks
 
+The "extract_tracks.py" script is a Python tool designed to interact with a Plex server, providing functionality to analyze and modify track titles within music libraries. Offering options to apply changes directly to Plex or generate a detailed report, users can choose between sentence case and title case for track titles. The script logs information about processed tracks, including warnings for titles requiring adjustments.
+
+open a powershell prompt and navigate to `pyprogs` folder
+
+`cd pyprogs`
+
+pick your folder for the script you want to run
+
+```
+cd extract_tracks
+python -m venv venv
+.\venv\Scripts\activate.ps1`
+python.exe -m pip install --upgrade pip
+pip install -r .\requirements.txt
+```
+
+now you are ready to run it (with the venv activated)
+
+Example of how to call and run the script:
+
+```
+python extract_tracks.py --apply --title-case
+```
+
+This command applies changes to the Plex server, updating track titles to title case. Customize the arguments based on your preferences, and adjust the paths accordingly to run the script with your environment and Plex server details.
+
 ## fix_added_at
+
+The "fix_added_at.py" script is a Python utility designed for interacting with a Plex server to update the track titles in music libraries. With customizable options, it allows users to switch between sentence case and title case for track titles. Additionally, the script provides the option to apply changes directly to the Plex server or generate a detailed report without making modifications.
+
+open a powershell prompt and navigate to `pyprogs` folder
+
+`cd pyprogs`
+
+pick your folder for the script you want to run
+
+```
+cd fix_added_at
+python -m venv venv
+.\venv\Scripts\activate.ps1`
+python.exe -m pip install --upgrade pip
+pip install -r .\requirements.txt
+```
+
+now you are ready to run it (with the venv activated)
+
+Example of how to call and run the script:
+
+```
+python fix_added_at.py --apply --title-case
+```
+
+This command applies changes to the Plex server, updating track titles to title case. Modify the arguments as needed based on your preferences.
 
 ## fake_media_generator
 
