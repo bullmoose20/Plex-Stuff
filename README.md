@@ -316,7 +316,7 @@ Run script against a folder where you copied some meta*.log files from D:\logs o
 
 `.\create_people_poster.ps1 -metalog_location D:\logs -flowname "remove backgrounds edge-en windows-en"`
 
-![](images/create_people_poster-example1.png)
+![](images/create_people_poster-example1.jpg)
 
 ## pad_flows
 PAD Flows
