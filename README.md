@@ -11,7 +11,7 @@
 
 1. clone repo
 
-The Unraid bash scripts, Windows powershell or Windows cmd scripts, will vary in nature. Read the related section down below for more details. 
+The Unraid bash scripts, Windows powershell or Windows cmd scripts, will vary in nature. Read the related section down below for more details. There is a separate section here for Python scripts. 
 
 [Goto to Python Scripts Section](./pyprogs/README.md)
 
