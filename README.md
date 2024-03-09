@@ -13,7 +13,22 @@
 
 The Unraid bash scripts, Windows powershell or Windows cmd scripts, will vary in nature. Read the related section down below for more details. 
 
-[Goto to Python Section](./pyprogs/README.md)
+[Goto to Python Scripts Section](./pyprogs/README.md)
+
+```bat 
+D:\PLEX-STUFF\PYPROGS
+├───collage
+│   └───output
+├───exif_overlay_checker
+├───extract_tracks
+├───fix_added_at
+├───fmg
+├───resizer
+│   ├───input
+│   └───output
+├───tcc
+└───update_plex_artist_art
+```
 
 ## Scripts:
 1. ~~[plex-bloat-fix.py](#plex-bloat-fix) - removes unneeded image files (Posters/Title Cards) from plex.~~ ***RETIRED!!! Please go here now: https://github.com/meisnate12/Plex-Image-Cleanup***
