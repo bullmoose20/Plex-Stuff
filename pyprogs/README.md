@@ -147,7 +147,7 @@ pip install -r .\requirements.txt
 Now you are ready to run it (with the venv activated)
 
 ```bat
-python exif_overlay_checker.py --input-folder /path/to/your/images --verbose`
+python exif_overlay_checker.py --input-folder /path/to/your/images --verbose
 ```
 
 This command initiates the script, specifying the path to the folder containing your images using the --input-folder argument. The --verbose flag enables detailed logging for a more comprehensive analysis.   
@@ -190,7 +190,7 @@ This command applies changes to the Plex server, updating track titles to title 
 
 [Back to top](#scripts)
 
-The "fix_added_at.py" script is a Python utility designed for interacting with a Plex server to update the track titles in music libraries. With customizable options, it allows users to switch between sentence case and title case for track titles. Additionally, the script provides the option to apply changes directly to the Plex server or generate a detailed report without making modifications.
+The fix_added_at.py script is designed to correct the added_at metadata for media items in a Plex library. It identifies media items whose underlying files have been modified after their original added_at timestamp. The script then prompts the user to confirm the changes before applying them. This ensures that the Plex library accurately reflects the modification time of the media files.
 
 Open a powershell prompt and navigate to `pyprogs` folder
 
@@ -211,10 +211,10 @@ Now you are ready to run it (with the venv activated)
 Example of how to call and run the script:
 
 ```bat
-python fix_added_at.py --apply --title-case
+python fix_added_at.py
 ```
 
-This command applies changes to the Plex server, updating track titles to title case. Modify the arguments as needed based on your preferences.
+The command updates Plex media items' "added at" timestamps to match the modification times of their associated files on disk, ensuring accurate metadata synchronization. Simply run python fix_added_at.py, follow prompts to select a library and specify the parent directory, and confirm changes to update Plex metadata accordingly.
 
 [Back to top](#scripts)
 
