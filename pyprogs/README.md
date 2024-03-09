@@ -289,10 +289,13 @@ Now you are ready to run it (with the venv activated)
 Example of how to call and run the script:
 
 ```bat
-python resizer.py /path/to/input/folder
+python resizer.py --input-folder /path/to/input/folder --output-folder /path/to/output/folder
+```
+```bat
+python resizer.py --input-folder input --output-folder output
 ```
 
-Replace "/path/to/input/folder" with the path to the folder containing the images you want to resize. If the script is executed without a command-line argument, it prompts the user to enter the input folder location interactively. The resized images are then stored in the "output" folder within the script's directory. Adjust the input and output folder paths as needed for your use case.
+Replace "/path/to/input/folder" with the path to the folder containing the images you want to resize. The resized images are then stored in the "output" folder within the script's directory. Adjust the input and output folder paths as needed for your use case.
 
 [Back to top](#scripts)
 

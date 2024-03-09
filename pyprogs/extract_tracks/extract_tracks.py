@@ -7,12 +7,19 @@ import sys
 import time
 import titlecase
 from datetime import datetime as dt
-from dotenv import load_dotenv
+from dotenv import load_dotenv, find_dotenv
 from plexapi.server import PlexServer
 from requests.exceptions import RequestException
 
-# Load environment variables from .env file
-load_dotenv()
+try:
+    # Find the .env file
+    dotenv_path = find_dotenv(raise_error_if_not_found=True)
+
+    # Load environment variables from .env file
+    load_dotenv(dotenv_path)
+except OSError:
+    print("Error: The .env file was not found. Please make sure it exists in the script's directory.")
+    exit(1)
 
 # Retrieve Plex server details from environment variables
 plex_url = os.getenv('PLEX_URL')

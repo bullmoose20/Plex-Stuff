@@ -10,13 +10,20 @@ import re
 import sys
 import time
 from datetime import datetime as dt
-from dotenv import load_dotenv
+from dotenv import load_dotenv, find_dotenv
 from PIL import Image
 from logging.handlers import RotatingFileHandler
 from moviepy.video.io.VideoFileClip import VideoFileClip
 
-# Load environment variables from .env file
-load_dotenv()
+try:
+    # Find the .env file
+    dotenv_path = find_dotenv(raise_error_if_not_found=True)
+
+    # Load environment variables from .env file
+    load_dotenv(dotenv_path)
+except OSError:
+    print("Error: The .env file was not found. Please make sure it exists in the script's directory.")
+    exit(1)
 
 # Retrieve Plex server details from environment variables
 # plex_url = os.getenv('PLEX_URL')
