@@ -71,11 +71,17 @@ Convert Warning: No TVDb ID Found for IMDb ID:
 ```
 ## ~~plex-bloat-fix~~
 
+[Back to top](#scripts)
+
 RETIRED!!! Please go here now: https://github.com/meisnate12/Plex-Image-Cleanup
  
 ~~Your PLEX folders are growing out of control. You use overlays from PMM or upload lots of custom art that you no longer want to use or need to eliminate. You don't want to perform the plex dance if you can avoid it. This script will free up gigs of space....It can also perform some PLEX operations like "empty trash", "clean bundles", and "optimize db". PBF also supports the use of PASSTHROUGH alerts to discord with notifiarr.com.~~
 
+[Back to top](#scripts)
+
 ## plexdance
+
+[Back to top](#scripts)
 
 So your plex is hosed... and your DB and metadata is in a real mess... time for the plexdance. https://forums.plex.tv/t/the-plex-dance/197064 Quote: "The purpose of this is to remove all cached metadata and xml data for an item that Plex usually keeps. This helps when you want to “start from scratch” for particular item" My version will do a FULL plexdance on ALL of your libraries
 
@@ -89,7 +95,11 @@ So your plex is hosed... and your DB and metadata is in a real mess... time for 
 7. Run with `./plexdance.sh`
 8. follow prompts closely
 
+[Back to top](#scripts)
+
 ## process-tcards
+
+[Back to top](#scripts)
 
 This script will use Imagemagick to produce title cards based on a folder that contains the episode titlecards stored as jpg. The end results will be in the `results` subfolder along with the `grayscale` subfolder
 
@@ -99,7 +109,11 @@ This script will use Imagemagick to produce title cards based on a folder that c
 3. Run `process-tcards.cmd`
 4. Original files will not be touched and results are stored in `results` subfolder and the `grayscale` subfolder
 
+[Back to top](#scripts)
+
 ## pumpanddump
+
+[Back to top](#scripts)
 
 This script will dump your plex db to a file and reimport it which usually repairs your db when you are seeing corruption and unable to download the db via the ui or the plexapi. This script is currently setup to work with the hotio plex container...... It ROCKS! https://hotio.dev/containers/plex/
 
@@ -109,7 +123,11 @@ This script will dump your plex db to a file and reimport it which usually repai
 3. Open a terminal session and navigate to that folder with the script and run: `chmod 755 pumpanddump.sh` to make it executable
 4. Run `./pumpanddump.sh plex` where `plex` is the name of your container
 
+[Back to top](#scripts)
+
 ## chk-video-codec
+
+[Back to top](#scripts)
 
 This script will go through the current directory and 10 levels down (if needed) to determine which files have been converted to HEVC/H265 and those that have not been.
 
@@ -120,7 +138,11 @@ This script will go through the current directory and 10 levels down (if needed)
 4. Goto the media folder that you want to scan and run `/mnt/user/data/scripts/plex-scripts/chk-video-codec/chk-video-codec.sh`
 5. 3 log files will be created. Review them to see the results
 
+[Back to top](#scripts)
+
 ## create_poster
+
+[Back to top](#scripts)
 
 This Powershell script will create posters/images for PMM/PLEX/EMBY/JELLYFIN/OTHER
 
@@ -201,7 +223,11 @@ Create a poster with the Spotify.png and specified background color of "#FB19B9"
 ![](images/create_poster-example2.png)
 ![](images/create_poster-example3.png)
 
+[Back to top](#scripts)
+
 ## get_missing_people
+
+[Back to top](#scripts)
 
 This Powershell script will find and download people posters/images for PMM/PLEX/EMBY/JELLYFIN/OTHER based on the PMM meta* logs
 
@@ -225,7 +251,11 @@ Run script against the \\NZWHS01\appdata\Plex-Meta-Manager\logs folder
 
 ![](images/get_people_posters-example1.png)
 
+[Back to top](#scripts)
+
 ## image_check
+
+[Back to top](#scripts)
 
 This Powershell script will scan your transparent images for anomalies like head-chops, backgrounds not removed, and black and white photos instead of a color photo to give you a report so you can go and fix those by uploading new and better options to https://www.themoviedb.org/
 
@@ -251,7 +281,11 @@ Run script against the c:\temp\people\transparent folder
 
 ![](images/image_check-example1.png)
 
+[Back to top](#scripts)
+
 ## create_people_poster
+
+[Back to top](#scripts)
 
 This Powershell script will find and download people posters/images for PMM/PLEX/EMBY/JELLYFIN/OTHER based on the PMM meta* logs
 
@@ -363,3 +397,5 @@ Error checking is enabled and does the following:
 
 
 - So far, this is as far as I got so it’s far from perfect, and still pretty manual, but effective.
+
+[Back to top](#scripts)
