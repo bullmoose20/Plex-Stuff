@@ -11,7 +11,11 @@
 
 ## Setup
 
-1. clone repo
+1. clone repo This only needs to be done once or when you want to get updates
+
+```bat
+git clone https://github.com/bullmoose20/Plex-Stuff.git
+```
 
 Some these PYTHON scripts may use a `.env` and requirements.txt per folder.
 
