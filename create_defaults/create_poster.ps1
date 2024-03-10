@@ -1,6 +1,6 @@
 ﻿####################################################
 # create_poster.ps1
-# v1.9
+# v2.0
 # author: bullmoose20
 #
 # DESCRIPTION: 

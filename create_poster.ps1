@@ -1,6 +1,6 @@
 ﻿####################################################
 # create_poster.ps1
-# v1.9
+# v2.0
 # author: bullmoose20
 #
 # DESCRIPTION: 
@@ -49,6 +49,25 @@ param ($logo, $logo_offset, $logo_resize, $base_color, $gradient, $text, $text_o
 #################################
 $global:magick = $null
 
+#################################
+# collect paths
+#################################
+$script_path = $PSScriptRoot
+Set-Location $script_path
+$commandLine = $MyInvocation.Line
+$scriptName = $MyInvocation.MyCommand.Name
+$scriptLogPath = Join-Path $script_path -ChildPath "logs"
+$scriptLog = Join-Path $scriptLogPath -ChildPath "$scriptName.log"
+
+################################################################################
+# Function: WriteToLogFile
+# Description: Writes to a log file with timestamp
+################################################################################
+Function WriteToLogFile ($message) {
+  Add-content $scriptLog -value ((Get-Date).ToString() + " ~ " + $message)
+  Write-Host ((Get-Date).ToString() + " ~ " + $message)
+}
+
 ###########################################
 # VALIDATE params and set default params
 ###########################################
@@ -67,6 +86,7 @@ Test-ImageMagick
 $test = $global:magick
 if ($null -eq $test) {
   Write-Host "Imagemagick   : Imagemagick is NOT installed. Aborting.... Imagemagick must be installed - https://imagemagick.org/script/download.php"
+  WriteToLogFile "Imagemagick [ERROR]          : Imagemagick is NOT installed. Aborting.... Imagemagick must be installed - https://imagemagick.org/script/download.php $commandLine"
   exit
 }
 else {
@@ -104,6 +124,7 @@ Write-Host "Logo path     : $logo"
 
 if (-not(Test-Path -Path $logo -PathType Leaf)) {
   Write-Host "Logo >$logo< not found. Exiting now..." -ForegroundColor Red -BackgroundColor White
+  WriteToLogFile "Logo        [ERROR]          : Logo >$logo< not found. Exiting now... $commandLine"
   exit
 }
 
@@ -257,6 +278,7 @@ if ($avg_color_image -eq "" -or $null -eq $avg_color_image) {
 if ($avg_color) {
   if (-not(Test-Path -Path $avg_color_image -PathType Leaf)) {
     Write-Host "Image for avg_color_image >$avg_color_image< not found. Exiting now..." -ForegroundColor Red -BackgroundColor White
+    WriteToLogFile "avg_color_image [ERROR]      : Image for avg_color_image >$avg_color_image< not found. Exiting now... $commandLine"
     exit
   }
   else { 
@@ -294,6 +316,7 @@ else {
   $X = "#" + $base_color.Substring(0, 6)
   $X = $X.Trim()
   Write-Host "Base color parameter >$base_color< is missing '#'. Should be something like $X. Exiting now..." -ForegroundColor Red -BackgroundColor White
+  WriteToLogFile "Base color [ERROR]           : Base color parameter >$base_color< is missing '#'. Should be something like $X. Exiting now... $commandLine"
   exit
 }
 
@@ -308,6 +331,7 @@ else {
   }
   $X = $X.Trim()
   Write-Host "Base color parameter >$base_color< is ("$base_color.Substring(1).length") not 6 characters long. Should be something like $X. Exiting now..." -ForegroundColor Red -BackgroundColor White
+  WriteToLogFile "Base color [ERROR]           : Base color parameter >$base_color< is ("$base_color.Substring(1).length") not 6 characters long. Should be something like $X. Exiting now... $commandLine"
   exit
 }
 
@@ -317,6 +341,7 @@ if ($base_color.Substring(1) -match "[0123456789abcdefABCDEF]{$Y}") {
 else {
   $tmp = ("#{0:X6}" -f (Get-Random -Maximum 0xFFFFFF))
   Write-Host "Base color parameter >$base_color< is not HEX. Should be something like $tmp. Exiting now..." -ForegroundColor Red -BackgroundColor White
+  WriteToLogFile "Base color [ERROR]          : Base color parameter >$base_color< is not HEX. Should be something like $tmp. Exiting now... $commandLine"
   exit
 }
 
@@ -349,6 +374,7 @@ if ($chkfont -eq "" -or $null -eq $chkfont) {
 
 if ($font -eq "" -or $null -eq $font) {
   Write-Host "No fonts found. Aborting..."
+  WriteToLogFile "Fonts [ERROR]                : No fonts found. Aborting... $commandLine"
   exit
 }
 
@@ -366,6 +392,7 @@ else {
   $X = "#" + $font_color.Substring(0, 6)
   $X = $X.Trim()
   Write-Host "Font Color parameter >$font_color< is missing '#'. Should be something like $X. Exiting now..." -ForegroundColor Red -BackgroundColor White
+  WriteToLogFile "Font Color [ERROR]           : Font Color parameter >$font_color< is missing '#'. Should be something like $X. Exiting now... $commandLine"
   exit
 }
 
@@ -380,6 +407,7 @@ else {
   }
   $X = $X.Trim()
   Write-Host "Font color parameter >$font_color< is ("$font_color.Substring(1).length") not 6 characters long. Should be something like $X. Exiting now..." -ForegroundColor Red -BackgroundColor White
+  WriteToLogFile "Font color [ERROR]                : Font color parameter >$font_color< is ("$font_color.Substring(1).length") not 6 characters long. Should be something like $X. Exiting now... $commandLine"
   exit
 }
 
@@ -389,6 +417,7 @@ if ($font_color.Substring(1) -match "[0123456789abcdefABCDEF]{$Y}") {
 else {
   $tmp = ("#{0:X6}" -f (Get-Random -Maximum 0xFFFFFF))
   Write-Host "Font color parameter >$font_color< is not HEX. Should be something like $tmp. Exiting now..." -ForegroundColor Red -BackgroundColor White
+  WriteToLogFile "Font color [ERROR]           : Font color parameter >$font_color< is not HEX. Should be something like $tmp. Exiting now... $commandLine"
   exit
 }
 
@@ -429,6 +458,7 @@ else {
   $X = "#" + $border_color.Substring(0, 6)
   $X = $X.Trim()
   Write-Host "Border color parameter >$border_color< is missing '#'. Should be something like $X. Exiting now..." -ForegroundColor Red -BackgroundColor White
+  WriteToLogFile "Border color [ERROR]         : Border color parameter >$border_color< is missing '#'. Should be something like $X. Exiting now... $commandLine"
   exit
 }
 
@@ -438,6 +468,7 @@ else {
   $X = $border_color.Substring(0, 7)
   $X = $X.Trim()
   Write-Host "Border color parameter >$border_color< is ("$border_color.Substring(1).length") not 6 characters long. Should be something like $X. Exiting now..." -ForegroundColor Red -BackgroundColor White
+  WriteToLogFile "Border color [ERROR]                : Border color parameter >$border_color< is ("$border_color.Substring(1).length") not 6 characters long. Should be something like $X. Exiting now... $commandLine"
   exit
 }
 
@@ -447,6 +478,7 @@ if ($border_color.Substring(1) -match "[0123456789abcdefABCDEF]{$Y}") {
 else {
   $tmp = ("#{0:X6}" -f (Get-Random -Maximum 0xFFFFFF))
   Write-Host "Border color parameter >$border_color< is not HEX. Should be something like $tmp. Exiting now..." -ForegroundColor Red -BackgroundColor White
+  WriteToLogFile "Border color [ERROR]         : Border color parameter >$border_color< is not HEX. Should be something like $tmp. Exiting now... $commandLine"
   exit
 }
 
@@ -463,6 +495,7 @@ if ($logo_offset.StartsWith('-', 'CurrentCultureIgnoreCase') -or $logo_offset.St
 }
 else {
   Write-Host "Logo Offset parameter is missing '+' or '-'. Exiting now..." -ForegroundColor Red -BackgroundColor White
+  WriteToLogFile "Logo Offset [ERROR]          : Logo Offset parameter is missing '+' or '-'. Exiting now... $commandLine"
   exit
 }
 
@@ -470,6 +503,7 @@ if ($logo_offset.Substring(1) -match "^-?\d+$") {
 }
 else {
   Write-Host "Logo Offset parameter is not numeric. Exiting now..." -ForegroundColor Red -BackgroundColor White
+  WriteToLogFile "Logo Offset [ERROR]          : Logo Offset parameter is not numeric. Exiting now... $commandLine"
   exit
 }
 
@@ -477,6 +511,7 @@ if ($logo_offset.Substring(1) -In -1500..1500) {
 }
 else {
   Write-Host "Logo Offset parameter is"$logo_offset.Substring(1)"which is NOT between -1500 and 1500. Exiting now..." -ForegroundColor Red -BackgroundColor White
+  WriteToLogFile "Logo Offset [ERROR]          : Logo Offset parameter is"$logo_offset.Substring(1)"which is NOT between -1500 and 1500. Exiting now... $commandLine"
   exit
 }
 
@@ -492,6 +527,7 @@ if ($logo_resize -In 1..2000) {
 }
 else {
   Write-Host "Logo resize parameter is>$logo_resize<which is NOT between 1 and 2000. Exiting now..." -ForegroundColor Red -BackgroundColor White
+  WriteToLogFile "Logo resize [ERROR]          : Logo resize parameter is>$logo_resize<which is NOT between 1 and 2000. Exiting now... $commandLine"
   exit
 }
 
@@ -508,13 +544,16 @@ if ($text_offset.StartsWith('-', 'CurrentCultureIgnoreCase') -or $text_offset.St
 }
 else {
   Write-Host "Text Offset parameter is missing '+' or '-'. Exiting now..." -ForegroundColor Red -BackgroundColor White
+  WriteToLogFile "Text Offset [ERROR]          : Text Offset parameter is missing '+' or '-'. Exiting now... $commandLine"
   exit
+
 }
 
 if ($text_offset.Substring(1) -match "^-?\d+$") {
 }
 else {
   Write-Host "Text Offset parameter is not numeric. Exiting now..." -ForegroundColor Red -BackgroundColor White
+  WriteToLogFile "Text Offset [ERROR]          : Text Offset parameter is not numeric. Exiting now... $commandLine"
   exit
 }
 
@@ -522,6 +561,7 @@ if ($text_offset.Substring(1) -In -1500..1500) {
 }
 else {
   Write-Host "Text Offset parameter is>"$text_offset.Substring(1)"<which is NOT between -1500 and 1500. Exiting now..." -ForegroundColor Red -BackgroundColor White
+  WriteToLogFile "Text Offset [ERROR]          : Text Offset parameter is>"$text_offset.Substring(1)"<which is NOT between -1500 and 1500. Exiting now... $commandLine"
   exit
 }
 
