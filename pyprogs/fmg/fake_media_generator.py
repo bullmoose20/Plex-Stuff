@@ -133,12 +133,13 @@ def fetch_imdb_id(tmdb_id, media_type):
 
 
 def create_folders_and_files(details, media_type, imdb_id, season_data=None):
+    output_directory = 'output'
     base_directory = 'movies' if media_type == 'movie' else 'shows'
 
-    # Create folder path
+    # Create folder path within the output directory
     title = details["title"] if media_type == 'movie' else details["name"]
     folder_path = f"{title} [imdb-{imdb_id}]"
-    base_folder_path = os.path.join(base_directory, folder_path)
+    base_folder_path = os.path.join(output_directory, base_directory, folder_path)
     os.makedirs(base_folder_path, exist_ok=True)
 
     if media_type == 'tv':

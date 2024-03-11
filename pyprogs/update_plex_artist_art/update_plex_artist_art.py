@@ -75,7 +75,7 @@ except plexapi.exceptions.BadRequest as e:
     sys.exit(1)
 
 # Set the name of the subfolder
-subfolder = "artist_thumbnails"
+subfolder = "output"
 
 # Ensure the subfolder exists, create it if necessary
 if not os.path.exists(subfolder):
