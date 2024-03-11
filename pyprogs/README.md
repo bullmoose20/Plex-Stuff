@@ -85,6 +85,15 @@ python collage.py /path/to/image/folder
 python collage.py /path/to/image/folder --num_columns 4 --thumb_width 150 --thumb_height 150 --show_text --show_image
 ```
 
+Or how to call it to run from the venv
+
+```bat
+.\venv\scripts\python collage.py /path/to/image/folder
+```
+```bat
+.\venv\scripts\python collage.py /path/to/image/folder --num_columns 4 --thumb_width 150 --thumb_height 150 --show_text --show_image
+```
+
 Replace "/path/to/image/folder" with the actual path to the folder containing images. Adjust other parameters as needed. The script creates a timestamped log file and outputs the generated image grid both in the specified "output" folder and the original folder.
 
 Note: Ensure you have the necessary dependencies installed, particularly PIL.
@@ -160,6 +169,12 @@ Now you are ready to run it (with the venv activated)
 python exif_overlay_checker.py --input-folder /path/to/your/images --verbose
 ```
 
+Or how to call it to run from the venv
+
+```bat
+.\venv\scripts\python exif_overlay_checker.py --input-folder /path/to/your/images --verbose
+```
+
 This command initiates the script, specifying the path to the folder containing your images using the --input-folder argument. The --verbose flag enables detailed logging for a more comprehensive analysis.   
 
 [Back to top](#Scripts)
@@ -191,6 +206,12 @@ Example of how to call and run the script:
 
 ```bat
 python extract_tracks.py --apply --title-case
+```
+
+Or how to call it to run from the venv
+
+```bat
+.\venv\scripts\python extract_tracks.py --apply --title-case
 ```
 
 This command applies changes to the Plex server, updating track titles to title case. Customize the arguments based on your preferences, and adjust the paths accordingly to run the script with your environment and Plex server details.
@@ -226,6 +247,12 @@ Example of how to call and run the script:
 python fix_added_at.py
 ```
 
+Or how to call it to run from the venv
+
+```bat
+.\venv\scripts\python fix_added_at.py
+```
+
 The command updates Plex media items' "added at" timestamps to match the modification times of their associated files on disk, ensuring accurate metadata synchronization. Simply run python fix_added_at.py, follow prompts to select a library and specify the parent directory, and confirm changes to update Plex metadata accordingly.
 
 [Back to top](#Scripts)
@@ -257,6 +284,12 @@ Example of how to call and run the script:
 
 ```bat
 python fake_media_generator.py --tmdbid 12345
+```
+
+Or how to call it to run from the venv
+
+```bat
+.\venv\scripts\python fake_media_generator.py --tmdbid 12345
 ```
 
 Replace "12345" with the desired TMDb ID for a movie or TV show. The script prompts users to choose between available options if both movie and TV show details are found. Once a choice is made, the script creates a folder structure and sample media files in the specified directories based on the selected media type. Adjust the TMDb ID and paths as needed for your use case.
@@ -347,6 +380,12 @@ Example of how to call and run the script:
 python title_card_clips.py --path /path/to/videos --time 45
 ```
 
+Or how to call it to run from the venv
+
+```bat
+.\venv\scripts\python title_card_clips.py --path /path/to/videos --time 45
+```
+
 Replace "/path/to/videos" with the root directory containing the video files you want to process. The optional "--time" argument allows you to set the frame extraction time in seconds (default: 45). The script logs essential information, including the input path and frame extraction time. After execution, the title card frames are generated and saved in the "output" directory within the script's location. Adjust the input path and optional parameters as needed for your use case.
 
 [Back to top](#Scripts)
@@ -378,6 +417,12 @@ Example of how to call and run the script:
 
 ```bat
 python update_plex_artist_art.py --apply
+```
+
+Or how to call it to run from the venv
+
+```bat
+.\venv\scripts\update_plex_artist_art.py --apply
 ```
 
 Replace "--apply" with "--report" to generate a report without making changes. The script logs essential information, creates a timestamped log file, and allows configuration through environment variables such as PLEX_URL, PLEX_TOKEN, PLEX_TIMEOUT, and MAX_LOG_FILES. After execution, the script provides a summary of processed artists, artists with missing art, and the duration of the script. Ensure your environment variables are correctly set before running the script.
