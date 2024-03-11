@@ -5,6 +5,7 @@ import os
 import requests
 import shutil
 import sys
+import time
 from datetime import datetime as dt
 from dotenv import load_dotenv, find_dotenv
 
@@ -67,6 +68,27 @@ def clean_up_old_logs():
         oldest_logs = sorted(existing_logs)[:-max_log_files]
         for old_log in oldest_logs:
             os.remove(old_log)
+
+
+def get_formatted_duration(seconds):
+    if seconds < 1:
+        # Convert to milliseconds
+        milliseconds = seconds * 1000
+        return "{:.3f} milliseconds".format(milliseconds)
+    elif seconds < 60:
+        return "{:.3f} seconds".format(seconds)
+    elif seconds < 3600:
+        minutes, seconds = divmod(seconds, 60)
+        return "{:.0f} minutes {:.3f} seconds".format(minutes, seconds)
+    elif seconds < 86400:
+        hours, remainder = divmod(seconds, 3600)
+        minutes, seconds = divmod(remainder, 60)
+        return "{:.0f} hours {:.0f} minutes {:.3f} seconds".format(hours, minutes, seconds)
+    else:
+        days, remainder = divmod(seconds, 86400)
+        hours, remainder = divmod(remainder, 3600)
+        minutes, seconds = divmod(remainder, 60)
+        return "{:.0f} days {:.0f} hours {:.0f} minutes {:.3f} seconds".format(days, hours, minutes, seconds)
 
 
 def fetch_movie_details(tmdb_id):
@@ -138,6 +160,11 @@ def create_folders_and_files(details, media_type, imdb_id, season_data=None):
 
     # Create folder path within the output directory
     title = details["title"] if media_type == 'movie' else details["name"]
+
+    # Replace invalid characters in the title with underscores
+    title = title.replace(':', '_').replace('/', '_').replace('\\', '_').replace('?', '_').replace('"', '_').replace(
+        '<', '_').replace('>', '_').replace('|', '_')
+
     folder_path = f"{title} [imdb-{imdb_id}]"
     base_folder_path = os.path.join(output_directory, base_directory, folder_path)
     os.makedirs(base_folder_path, exist_ok=True)
@@ -157,10 +184,23 @@ def create_folders_and_files(details, media_type, imdb_id, season_data=None):
                 # Create file path and copy sample.avi
                 filepath = os.path.join(season_folder_path, episode_name.replace('.mkv', '.avi'))
                 shutil.copy('sample.avi', filepath)
+
+                # Log and print details
+                logging.info(f"Created file: {filepath}")
+                print(f"Created file: {filepath}")
+
     else:
         # For movies, create file path and copy sample.avi
         filepath = os.path.join(base_folder_path, f"{title} [WEBDL-1080p][HDR][10bit][h265][EAC3 Atmos 5.1]-FLUX.avi")
         shutil.copy('sample.avi', filepath)
+
+        # Log and print details
+        logging.info(f"Created file: {filepath}")
+        print(f"Created file: {filepath}")
+
+    # Log and print the base folder path
+    logging.info(f"Base Folder Path: {base_folder_path}")
+    print(f"Base Folder Path: {base_folder_path}")
 
 
 def display_options(options):
@@ -173,58 +213,71 @@ def display_options(options):
 
 
 def main():
+    # Record the start time
+    start_time = time.time()
+
     parser = argparse.ArgumentParser(
         description="Fetch and organize details about movies or TV shows using the TMDb API.")
 
     # Add the --tmdbid argument
-    parser.add_argument("--tmdbid", type=int, help="TMDb ID for the movie or TV show")
+    parser.add_argument("--tmdbid", nargs='+', type=int, help="TMDb ID(s) for the movie or TV show")
 
     args = parser.parse_args()
 
-    # Use the provided TMDb ID or prompt the user if not provided
-    tmdb_id = args.tmdbid or input("Enter TMDb ID: ")
+    # Use the provided TMDb ID(s) or prompt the user if not provided
+    tmdb_ids = args.tmdbid or input("Enter TMDb ID(s) separated by space: ").split()
 
     # Log the command along with its arguments
     logging.info(f"Command: {' '.join(['python'] + os.sys.argv)}")
     logging.info(f"Arguments: {args}")
 
-    movie_details = fetch_movie_details(tmdb_id)
-    tv_details = fetch_tv_details(tmdb_id)
+    # Initialize counts
+    movie_count = 0
+    tv_count = 0
 
-    if not movie_details and not tv_details:
-        print("Invalid TMDb ID. Make sure the TMDb ID is correct.")
-        logging.error("Invalid TMDb ID. Make sure the TMDb ID is correct.")
-        return
+    for tmdb_id in tmdb_ids:
+        movie_details = fetch_movie_details(tmdb_id)
+        tv_details = fetch_tv_details(tmdb_id)
 
-    if movie_details and tv_details:
-        # Display titles and prompt the user to choose
-        options = [movie_details, tv_details]
-        display_options(options)
-        choice = input("Enter the number corresponding to your choice: ")
+        if not movie_details and not tv_details:
+            print(f"Invalid TMDb ID {tmdb_id}. Make sure the TMDb ID is correct.")
+            logging.error(f"Invalid TMDb ID {tmdb_id}. Make sure the TMDb ID is correct.")
+            continue
 
-        try:
-            chosen_option = options[int(choice) - 1]
-        except (ValueError, IndexError):
-            print("Invalid choice. Exiting.")
-            return
-    elif movie_details:
-        chosen_option = movie_details
-    else:
-        chosen_option = tv_details
+        # Create folders and files for movies
+        if movie_details:
+            media_type = 'movie'
+            imdb_id = movie_details.get("imdb_id", "")
+            create_folders_and_files(movie_details, media_type, imdb_id)
+            movie_count += 1
 
-    media_type = 'movie' if 'title' in chosen_option else 'tv'
-    imdb_id = chosen_option.get("imdb_id", "")
-    season_data = tv_details.get("seasons", []) if media_type == 'tv' else None
+        # Create folders and files for TV shows
+        if tv_details:
+            media_type = 'tv'
+            imdb_id = tv_details.get("imdb_id", "")
+            season_data = tv_details.get("seasons", [])
+            create_folders_and_files(tv_details, media_type, imdb_id, season_data)
+            tv_count += 1
 
-    print(f"IMDb ID for {media_type}: {imdb_id}")
-    logging.info(f"IMDb ID for {media_type}: {imdb_id}")
+    # Record the end time
+    end_time = time.time()
 
-    # Continue with the rest of your script
-    create_folders_and_files(chosen_option, media_type, imdb_id, season_data)
-    print(
-        f"Folders and files created successfully for <{media_type}> {chosen_option['title'] if media_type == 'movie' else chosen_option['name']}.")
-    logging.info(
-        f"Folders and files created successfully for <{media_type}> {chosen_option['title'] if media_type == 'movie' else chosen_option['name']}.")
+    # Calculate and format the elapsed time
+    elapsed_time = end_time - start_time
+    formatted_duration = get_formatted_duration(elapsed_time)
+
+    # Log and print the formatted duration
+    logging.info(f"Script execution time: {formatted_duration}")
+    print(f"Script execution time: {formatted_duration}")
+
+    # Log and print counts
+    logging.info(f"Movies processed: {movie_count}")
+    logging.info(f"TV shows processed: {tv_count}")
+    print(f"Movies processed: {movie_count}")
+    print(f"TV shows processed: {tv_count}")
+
+    print("Folders and files created successfully.")
+    logging.info("Folders and files created successfully.")
 
 
 if __name__ == "__main__":
@@ -232,4 +285,3 @@ if __name__ == "__main__":
 
     # Call the clean_up_old_logs function
     clean_up_old_logs()
-
