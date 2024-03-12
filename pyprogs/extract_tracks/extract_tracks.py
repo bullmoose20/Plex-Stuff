@@ -124,9 +124,6 @@ class PlexTrackProcessor:
         return titlecase.titlecase(
             track_title) if self.use_title_case else track_title.capitalize() if self.use_sentence_case else track_title
 
-    def process_title_case2(self, track_title):
-        return track_title.title() if self.use_title_case else track_title.capitalize() if self.use_sentence_case else track_title
-
     def process_sentence_case(self, track_title):
         return track_title.capitalize() if not self.is_sentence_case(track_title) else track_title
 
@@ -176,11 +173,11 @@ class PlexTrackProcessor:
         logging.info(f"Script completed in {mode} mode with chosen case: {case_info}.")
         logging.info(f"Total tracks processed: {self.total_tracks}")
         logging.info(f"Tracks with bad case: {self.tracks_bad_case}")
-        logging.info(f"Script duration: {script_duration: .2f} seconds")
+        logging.info(f"Script duration: {get_formatted_duration(script_duration)}")  # Use get_formatted_duration here
         print(f"Script completed in {mode} mode with chosen case: {case_info}.")
         print(f"Total tracks processed: {self.total_tracks}")
         print(f"Tracks with bad case: {self.tracks_bad_case}")
-        print(f"Script duration: {script_duration: .2f} seconds")
+        print(f"Script duration: {get_formatted_duration(script_duration)}")
 
 
 def clean_up_old_logs():
@@ -197,6 +194,23 @@ def clean_up_old_logs():
         oldest_logs = sorted(existing_logs)[:-max_log_files]
         for old_log in oldest_logs:
             os.remove(old_log)
+
+
+def get_formatted_duration(seconds):
+    units = [('day', 86400), ('hour', 3600), ('minute', 60), ('second', 1)]
+    result = []
+
+    for unit_name, unit_seconds in units:
+        value, seconds = divmod(seconds, unit_seconds)
+        if value > 0:
+            unit_name = unit_name if value == 1 else unit_name + 's'
+            result.append(f"{int(value):.0f} {unit_name}")
+
+    if not result:
+        milliseconds = seconds * 1000
+        return "{:.3f} millisecond".format(milliseconds) if milliseconds == 1 else "{:.3f} milliseconds".format(milliseconds)
+
+    return ' '.join(result)
 
 
 if __name__ == "__main__":

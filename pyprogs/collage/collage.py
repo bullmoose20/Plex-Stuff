@@ -4,6 +4,7 @@ import logging
 import math
 import os
 import sys
+import time
 from datetime import datetime as dt
 from dotenv import load_dotenv, find_dotenv
 from PIL import Image, ImageDraw, ImageFont
@@ -58,6 +59,23 @@ def clean_up_old_logs():
         oldest_logs = sorted(existing_logs)[:-max_log_files]
         for old_log in oldest_logs:
             os.remove(old_log)
+
+
+def get_formatted_duration(seconds):
+    units = [('day', 86400), ('hour', 3600), ('minute', 60), ('second', 1)]
+    result = []
+
+    for unit_name, unit_seconds in units:
+        value, seconds = divmod(seconds, unit_seconds)
+        if value > 0:
+            unit_name = unit_name if value == 1 else unit_name + 's'
+            result.append(f"{int(value):.0f} {unit_name}")
+
+    if not result:
+        milliseconds = seconds * 1000
+        return "{:.3f} millisecond".format(milliseconds) if milliseconds == 1 else "{:.3f} milliseconds".format(milliseconds)
+
+    return ' '.join(result)
 
 
 def str_to_bool(value):
@@ -188,6 +206,7 @@ def create_image_grid(folder_path, num_columns, thumb_size, show_text, save_outp
 
 
 if __name__ == "__main__":
+    start_time = time.time()
     parser = argparse.ArgumentParser(description="Create a grid of thumbnails from a folder of images.")
     parser.add_argument("folder_path", type=str, help="Path to the folder containing images")
     parser.add_argument("--num_columns", type=int, default=None,
@@ -232,3 +251,9 @@ if __name__ == "__main__":
         # Show the grid image if specified
         if args.show_image:
             grid_image.show()
+
+        end_time = time.time()  # Record the end time after script execution
+        script_duration = end_time - start_time
+
+        print(f"Script duration: {get_formatted_duration(script_duration)}")
+        logging.info(f"Script duration: {get_formatted_duration(script_duration)}")

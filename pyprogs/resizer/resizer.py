@@ -74,24 +74,20 @@ def clean_up_old_logs():
 
 
 def get_formatted_duration(seconds):
-    if seconds < 1:
-        # Convert to milliseconds
+    units = [('day', 86400), ('hour', 3600), ('minute', 60), ('second', 1)]
+    result = []
+
+    for unit_name, unit_seconds in units:
+        value, seconds = divmod(seconds, unit_seconds)
+        if value > 0:
+            unit_name = unit_name if value == 1 else unit_name + 's'
+            result.append(f"{int(value):.0f} {unit_name}")
+
+    if not result:
         milliseconds = seconds * 1000
-        return "{:.3f} milliseconds".format(milliseconds)
-    elif seconds < 60:
-        return "{:.3f} seconds".format(seconds)
-    elif seconds < 3600:
-        minutes, seconds = divmod(seconds, 60)
-        return "{:.0f} minutes {:.3f} seconds".format(minutes, seconds)
-    elif seconds < 86400:
-        hours, remainder = divmod(seconds, 3600)
-        minutes, seconds = divmod(remainder, 60)
-        return "{:.0f} hours {:.0f} minutes {:.3f} seconds".format(hours, minutes, seconds)
-    else:
-        days, remainder = divmod(seconds, 86400)
-        hours, remainder = divmod(remainder, 3600)
-        minutes, seconds = divmod(remainder, 60)
-        return "{:.0f} days {:.0f} hours {:.0f} minutes {:.3f} seconds".format(days, hours, minutes, seconds)
+        return "{:.3f} millisecond".format(milliseconds) if milliseconds == 1 else "{:.3f} milliseconds".format(milliseconds)
+
+    return ' '.join(result)
 
 
 def resize_image(image_path, output_folder, min_width, max_width):

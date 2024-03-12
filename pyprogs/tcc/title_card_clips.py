@@ -67,6 +67,23 @@ def clean_up_old_logs():
             os.remove(old_log)
 
 
+def get_formatted_duration(seconds):
+    units = [('day', 86400), ('hour', 3600), ('minute', 60), ('second', 1)]
+    result = []
+
+    for unit_name, unit_seconds in units:
+        value, seconds = divmod(seconds, unit_seconds)
+        if value > 0:
+            unit_name = unit_name if value == 1 else unit_name + 's'
+            result.append(f"{int(value):.0f} {unit_name}")
+
+    if not result:
+        milliseconds = seconds * 1000
+        return "{:.3f} millisecond".format(milliseconds) if milliseconds == 1 else "{:.3f} milliseconds".format(milliseconds)
+
+    return ' '.join(result)
+
+
 def format_file_name(file_name, is_tv_show):
     if is_tv_show:
         match = re.search(r'S\d+E\d+', file_name)
@@ -149,10 +166,8 @@ def scan_directory(source_path, frame_extraction_time):
     elapsed_time = end_time - start_time
 
     # Log summary
-    print(f"Total time taken: {elapsed_time:.2f} seconds")
     print(f"Total added: {total_added}")
     print(f"Total skipped: {total_skipped}")
-    logging.info(f"Total time taken: {elapsed_time:.2f} seconds")
     logging.info(f"Total added: {total_added}")
     logging.info(f"Total skipped: {total_skipped}")
 
@@ -210,6 +225,9 @@ def main():
     logging.info(f"Command: {' '.join(['python'] + os.sys.argv)}")
     logging.info(f"Arguments: {args}")
 
+    # Record script start time
+    start_time = time.time()
+
     try:
         # Check if the specified source_path exists
         if not os.path.exists(args.path):
@@ -219,6 +237,18 @@ def main():
 
         scan_directory(args.path, args.time)
     finally:
+        # Record script end time
+        end_time = time.time()
+
+        # Calculate script duration
+        script_duration = end_time - start_time
+
+        # Log summary
+        print(f"Script completed.")
+        print(f"Script duration: {get_formatted_duration(script_duration)}")
+        logging.info(f"Script completed.")
+        logging.info(f"Script duration: {get_formatted_duration(script_duration)}")
+
         # Call the clean_up_old_logs function
         clean_up_old_logs()
         # Explicitly run garbage collection

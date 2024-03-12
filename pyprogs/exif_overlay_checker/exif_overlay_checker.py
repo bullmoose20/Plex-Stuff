@@ -3,6 +3,7 @@ import glob
 import logging
 import os
 import sys
+import time
 from datetime import datetime as dt
 from dotenv import load_dotenv, find_dotenv
 from PIL import Image
@@ -60,6 +61,23 @@ def clean_up_old_logs():
             os.remove(old_log)
 
 
+def get_formatted_duration(seconds):
+    units = [('day', 86400), ('hour', 3600), ('minute', 60), ('second', 1)]
+    result = []
+
+    for unit_name, unit_seconds in units:
+        value, seconds = divmod(seconds, unit_seconds)
+        if value > 0:
+            unit_name = unit_name if value == 1 else unit_name + 's'
+            result.append(f"{int(value):.0f} {unit_name}")
+
+    if not result:
+        milliseconds = seconds * 1000
+        return "{:.3f} millisecond".format(milliseconds) if milliseconds == 1 else "{:.3f} milliseconds".format(milliseconds)
+
+    return ' '.join(result)
+
+
 def main(input_folder, verbose):
     overlay_count = 0
     without_overlay_count = 0
@@ -73,6 +91,8 @@ def main(input_folder, verbose):
 
     total_files = count_files(input_folder)
     current_file_count = 0
+
+    start_time = time.time()
 
     for root, _, files in os.walk(input_folder):
         for file in files:
@@ -92,7 +112,12 @@ def main(input_folder, verbose):
                 current_file_count += 1
                 print_progress(current_file_count, total_files)
 
+    end_time = time.time()
+    script_duration = end_time - start_time
+
     print_summary(overlay_count, without_overlay_count)
+    print(f"Script duration: {get_formatted_duration(script_duration)}")
+    logging.info(f"Script duration: {get_formatted_duration(script_duration)}")
 
 
 def check_overlay_in_exif(file_path):

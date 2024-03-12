@@ -113,6 +113,39 @@ log_filename = f"update_plex_artist_art_{timestamp}.log"
 log_format = '%(asctime)s - %(levelname)s - %(message)s'
 logging.basicConfig(filename=log_filename, level=logging.DEBUG, format=log_format)
 
+def clean_up_old_logs():
+    global max_log_files
+
+    # Set max_log_files to 1 if it's 0 or negative
+    if max_log_files <= 0:
+        max_log_files = 1
+
+    # Remove old log files from the 'logs' subdirectory if there are more than the allowed number
+    existing_logs = glob.glob(os.path.join(logs_directory, f"{script_name}_*.log"))
+    if len(existing_logs) > max_log_files:
+        logging.info(f"existing_logs: {len(existing_logs)} > max_log_files: {max_log_files}")
+        oldest_logs = sorted(existing_logs)[:-max_log_files]
+        for old_log in oldest_logs:
+            os.remove(old_log)
+
+
+def get_formatted_duration(seconds):
+    units = [('day', 86400), ('hour', 3600), ('minute', 60), ('second', 1)]
+    result = []
+
+    for unit_name, unit_seconds in units:
+        value, seconds = divmod(seconds, unit_seconds)
+        if value > 0:
+            unit_name = unit_name if value == 1 else unit_name + 's'
+            result.append(f"{int(value):.0f} {unit_name}")
+
+    if not result:
+        milliseconds = seconds * 1000
+        return "{:.3f} millisecond".format(milliseconds) if milliseconds == 1 else "{:.3f} milliseconds".format(milliseconds)
+
+    return ' '.join(result)
+
+
 try:
     # Loop through all libraries
     for library in libraries:
@@ -186,10 +219,14 @@ try:
     script_duration = end_time - start_time
 
     # Log summary
+    print(f"Script completed in {mode} mode.")
+    print(f"Total artists processed: {total_artists}")
+    print(f"Artists with missing art: {artists_with_missing_art}")
+    print(f"Script duration: {get_formatted_duration(script_duration)}")
     logging.info(f"Script completed in {mode} mode.")
     logging.info(f"Total artists processed: {total_artists}")
     logging.info(f"Artists with missing art: {artists_with_missing_art}")
-    logging.info(f"Script duration: {script_duration: .2f} seconds")
+    logging.info(f"Script duration: {get_formatted_duration(script_duration)}")
 
 except Exception as e:
     # Log any unhandled exceptions
@@ -197,23 +234,6 @@ except Exception as e:
 
 
 print(f"DONE! Check log for more information: {log_filename}")
-
-
-def clean_up_old_logs():
-    global max_log_files
-
-    # Set max_log_files to 1 if it's 0 or negative
-    if max_log_files <= 0:
-        max_log_files = 1
-
-    # Remove old log files from the 'logs' subdirectory if there are more than the allowed number
-    existing_logs = glob.glob(os.path.join(logs_directory, f"{script_name}_*.log"))
-    if len(existing_logs) > max_log_files:
-        logging.info(f"existing_logs: {len(existing_logs)} > max_log_files: {max_log_files}")
-        oldest_logs = sorted(existing_logs)[:-max_log_files]
-        for old_log in oldest_logs:
-            os.remove(old_log)
-
 
 # Call the clean_up_old_logs function
 clean_up_old_logs()

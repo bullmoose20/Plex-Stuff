@@ -73,6 +73,43 @@ except plexapi.exceptions.BadRequest as e:
 
     sys.exit(1)
 
+
+def clean_up_old_logs():
+    global max_log_files
+
+    # Set max_log_files to 1 if it's 0 or negative
+    if max_log_files <= 0:
+        max_log_files = 1
+
+    # Remove old log files from the 'logs' subdirectory if there are more than the allowed number
+    existing_logs = glob.glob(os.path.join(logs_directory, f"{script_name}_*.log"))
+    if len(existing_logs) > max_log_files:
+        logging.info(f"existing_logs: {len(existing_logs)} > max_log_files: {max_log_files}")
+        oldest_logs = sorted(existing_logs)[:-max_log_files]
+        for old_log in oldest_logs:
+            os.remove(old_log)
+
+
+def get_formatted_duration(seconds):
+    units = [('day', 86400), ('hour', 3600), ('minute', 60), ('second', 1)]
+    result = []
+
+    for unit_name, unit_seconds in units:
+        value, seconds = divmod(seconds, unit_seconds)
+        if value > 0:
+            unit_name = unit_name if value == 1 else unit_name + 's'
+            result.append(f"{int(value):.0f} {unit_name}")
+
+    if not result:
+        milliseconds = seconds * 1000
+        return "{:.3f} millisecond".format(milliseconds) if milliseconds == 1 else "{:.3f} milliseconds".format(milliseconds)
+
+    return ' '.join(result)
+
+
+# Record script start time
+start_time = time.time()
+
 # Get a list of libraries and prompt the user to select one
 libraries = plex.library.sections()
 print("Select a library to update:")
@@ -176,21 +213,17 @@ else:
     logging.info("No changes were applied.")
 
 
-def clean_up_old_logs():
-    global max_log_files
+# Record script end time
+end_time = time.time()
 
-    # Set max_log_files to 1 if it's 0 or negative
-    if max_log_files <= 0:
-        max_log_files = 1
+# Calculate script duration
+script_duration = end_time - start_time
 
-    # Remove old log files from the 'logs' subdirectory if there are more than the allowed number
-    existing_logs = glob.glob(os.path.join(logs_directory, f"{script_name}_*.log"))
-    if len(existing_logs) > max_log_files:
-        logging.info(f"existing_logs: {len(existing_logs)} > max_log_files: {max_log_files}")
-        oldest_logs = sorted(existing_logs)[:-max_log_files]
-        for old_log in oldest_logs:
-            os.remove(old_log)
-
+# Log summary
+print(f"Script completed.")
+print(f"Script duration: {get_formatted_duration(script_duration)}")
+logging.info(f"Script completed.")
+logging.info(f"Script duration: {get_formatted_duration(script_duration)}")
 
 # Call the clean_up_old_logs function
 clean_up_old_logs()
