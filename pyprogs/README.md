@@ -44,6 +44,27 @@ D:\PLEX-STUFF\PYPROGS
 └───update_plex_artist_art
 ```
 
+If this doesn't return a version number, you'll need to get git installed.
+
+=== ":fontawesome-brands-linux: Linux"
+
+    The git install is discussed here: [Download for Linux and Unix](https://git-scm.com/download/linux)
+
+=== ":fontawesome-brands-apple: macOS"
+
+    The git install is discussed here: [Git - Downloading Package](https://git-scm.com/download/mac)
+
+=== ":fontawesome-brands-windows: Windows"
+
+    Download the installer from [here](https://git-scm.com/download/windows)
+
+    Run the install; you can probably just accept the defaults and click through except for the step that asks you to choose an editor; you probably want to choose something other than the default there:
+    
+    ![Git Install](images/wt-git-install.png)
+    
+    This install comes with its own command line interface.  **Do not use this interface in this walkthrough**.  Continue to do everything here in Powershell.
+
+
 
 ## Scripts:
 1. pyprogs\\<<folder_name>>
