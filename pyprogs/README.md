@@ -72,7 +72,7 @@ Pick your folder for the script you want to run
 cd collage
 python -m venv venv
 .\venv\scripts\activate.ps1
-python.exe -m pip install --upgrade pip
+python -m pip install --upgrade pip
 pip install -r .\requirements.txt
 
 ```
@@ -112,7 +112,7 @@ D:
 cd D:\Plex-Stuff\pyprogs\collage
 
 REM Step 1: Extract all directories and generate collages. Replace D:\defaults with your desired folder of images
-"C:\Program Files\PowerShell\7\pwsh.exe" -Command "$filteredDirectories = Get-ChildItem -Path 'D:\defaults\' -Directory -Recurse | Where-Object { -not ($_ -match '\\\.' -or $_ -match '\\\[\\]*\\\.') }; $filteredDirectories | ForEach-Object { .\venv\scripts\python.exe .\collage.py $_ }"
+"C:\Program Files\PowerShell\7\pwsh.exe" -Command "$filteredDirectories = Get-ChildItem -Path 'D:\defaults\' -Directory -Recurse | Where-Object { -not ($_ -match '\\\.' -or $_ -match '\\\[\\]*\\\.') }; $filteredDirectories | ForEach-Object { .\venv\scripts\python .\collage.py $_ }"
 
 REM Step 2: Copy images using robocopy
 robocopy D:\defaults\ D:\bullmoose20\Plex-Meta-Manager-Images\ /E /COPY:DAT /DCOPY:T /XO
@@ -129,7 +129,7 @@ Explanation:
 4. **Step 1 (PowerShell command)**:
    - **`"C:\Program Files\PowerShell\7\pwsh.exe" -Command ...`**: Invokes PowerShell 7 to execute the specified command.
    - **`$filteredDirectories = ...`**: Retrieves all directories under 'D:\defaults\' recursively, excluding hidden and system directories.
-   - **`ForEach-Object { .\venv\scripts\python.exe .\collage.py $_ }`**: For each filtered directory, runs the `collage.py` script using the Python interpreter within the virtual environment.
+   - **`ForEach-Object { .\venv\scripts\python .\collage.py $_ }`**: For each filtered directory, runs the `collage.py` script using the Python interpreter within the virtual environment.
 
 5. **Step 2 (robocopy command)**:
    - **`robocopy D:\defaults\ D:\bullmoose20\Plex-Meta-Manager-Images\ /E /COPY:DAT /DCOPY:T /XO`**: Uses robocopy to copy images from 'D:\defaults\' to 'D:\bullmoose20\Plex-Meta-Manager-Images\'.
@@ -158,7 +158,7 @@ Pick your folder for the script you want to run
 cd exif_overlay_checker
 python -m venv venv
 .\venv\scripts\activate.ps1
-python.exe -m pip install --upgrade pip
+python -m pip install --upgrade pip
 pip install -r .\requirements.txt
 
 ```
@@ -195,7 +195,7 @@ Pick your folder for the script you want to run
 cd extract_tracks
 python -m venv venv
 .\venv\scripts\activate.ps1
-python.exe -m pip install --upgrade pip
+python -m pip install --upgrade pip
 pip install -r .\requirements.txt
 
 ```
@@ -234,7 +234,7 @@ Pick your folder for the script you want to run
 cd fix_added_at
 python -m venv venv
 .\venv\scripts\activate.ps1
-python.exe -m pip install --upgrade pip
+python -m pip install --upgrade pip
 pip install -r .\requirements.txt
 
 ```
@@ -273,7 +273,7 @@ Pick your folder for the script you want to run
 cd fmg
 python -m venv venv
 .\venv\scripts\activate.ps1
-python.exe -m pip install --upgrade pip
+python -m pip install --upgrade pip
 pip install -r .\requirements.txt
 
 ```
@@ -316,7 +316,7 @@ Pick your folder for the script you want to run
 cd resizer
 python -m venv venv
 .\venv\scripts\activate.ps1
-python.exe -m pip install --upgrade pip
+python -m pip install --upgrade pip
 pip install -r .\requirements.txt
 
 ```
@@ -367,7 +367,7 @@ Pick your folder for the script you want to run
 cd tcc
 python -m venv venv
 .\venv\scripts\activate.ps1
-python.exe -m pip install --upgrade pip
+python -m pip install --upgrade pip
 pip install -r .\requirements.txt
 
 ```
@@ -406,7 +406,7 @@ Pick your folder for the script you want to run
 cd update_plex_artist_art
 python -m venv venv
 .\venv\scripts\activate.ps1
-python.exe -m pip install --upgrade pip
+python -m pip install --upgrade pip
 pip install -r .\requirements.txt
 
 ```
