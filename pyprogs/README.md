@@ -283,13 +283,13 @@ Now you are ready to run it (with the venv activated)
 Example of how to call and run the script:
 
 ```bat
-python your_script_name.py --tmdbid --tmdbid 389 19404 429 12477 11216 637 346 550 568332 246 94954 87108 95557 1408 71712 4194 1409 153312 1668
+python fake_media_generator.py --tmdbid 389 19404 429 12477 11216 637 346 550 568332 246 94954 87108 95557 1408 71712 4194 1409 153312 1668
 ```
 
 Or how to call it to run from the venv
 
 ```bat
-.\venv\scripts\python your_script_name.py --tmdbid --tmdbid 389 19404 429 12477 11216 637 346 550 568332 246 94954 87108 95557 1408 71712 4194 1409 153312 1668
+.\venv\scripts\python fake_media_generator.py --tmdbid  389 19404 429 12477 11216 637 346 550 568332 246 94954 87108 95557 1408 71712 4194 1409 153312 1668
 ```
 
 Replace "12345" with the desired TMDb ID for a movie or TV show. The script prompts users to choose between available options if both movie and TV show details are found. Once a choice is made, the script creates a folder structure and sample media files in the specified directories based on the selected media type. Adjust the TMDb ID and paths as needed for your use case.
