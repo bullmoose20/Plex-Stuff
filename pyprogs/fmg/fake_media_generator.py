@@ -159,7 +159,7 @@ def create_folders_and_files(details, media_type, imdb_id, season_data=None):
 
     # Replace invalid characters in the title with underscores
     title = title.replace(':', '_').replace('/', '_').replace('\\', '_').replace('?', '_').replace('"', '_').replace(
-        '<', '_').replace('>', '_').replace('|', '_')
+        '<', '_').replace('>', '_').replace('|', '_').replace('*', '_')
 
     folder_path = f"{title} [imdb-{imdb_id}]"
     base_folder_path = os.path.join(output_directory, base_directory, folder_path)
@@ -215,8 +215,8 @@ def main():
     parser = argparse.ArgumentParser(
         description="Fetch and organize details about movies or TV shows using the TMDb API.")
 
-    # Add the --tmdbid argument
     parser.add_argument("--tmdbid", nargs='+', type=int, help="TMDb ID(s) for the movie or TV show")
+    parser.add_argument("--media-type", choices=['movie', 'tv'], help="Type of media to fetch (movie or tv)")
 
     args = parser.parse_args()
 
@@ -232,28 +232,24 @@ def main():
     tv_count = 0
 
     for tmdb_id in tmdb_ids:
-        movie_details = fetch_movie_details(tmdb_id)
-        tv_details = fetch_tv_details(tmdb_id)
+        print(f"Working on TMDb ID {tmdb_id}.")
 
-        if not movie_details and not tv_details:
-            print(f"Invalid TMDb ID {tmdb_id}. Make sure the TMDb ID is correct.")
-            logging.error(f"Invalid TMDb ID {tmdb_id}. Make sure the TMDb ID is correct.")
-            continue
+        if args.media_type == 'movie' or not args.media_type:
+            movie_details = fetch_movie_details(tmdb_id)
+            if movie_details:
+                media_type = 'movie'
+                imdb_id = movie_details.get("imdb_id", "")
+                create_folders_and_files(movie_details, media_type, imdb_id)
+                movie_count += 1
 
-        # Create folders and files for movies
-        if movie_details:
-            media_type = 'movie'
-            imdb_id = movie_details.get("imdb_id", "")
-            create_folders_and_files(movie_details, media_type, imdb_id)
-            movie_count += 1
-
-        # Create folders and files for TV shows
-        if tv_details:
-            media_type = 'tv'
-            imdb_id = tv_details.get("imdb_id", "")
-            season_data = tv_details.get("seasons", [])
-            create_folders_and_files(tv_details, media_type, imdb_id, season_data)
-            tv_count += 1
+        if args.media_type == 'tv' or not args.media_type:
+            tv_details = fetch_tv_details(tmdb_id)
+            if tv_details:
+                media_type = 'tv'
+                imdb_id = tv_details.get("imdb_id", "")
+                season_data = tv_details.get("seasons", [])
+                create_folders_and_files(tv_details, media_type, imdb_id, season_data)
+                tv_count += 1
 
     # Record the end time
     end_time = time.time()

@@ -261,7 +261,9 @@ The command updates Plex media items' "added at" timestamps to match the modific
 
 [Back to top](#Scripts)
 
-The "fake_media_generator.py" script is a Python utility designed to simulate the creation of folder structures and sample media files for movies and TV shows using the TMDb API. By fetching details for a given TMDb ID, the script organizes these simulated media entries into appropriately named directories, incorporating IMDb IDs and season information for TV shows. The generated files include sample.avi, serving as placeholders for media content.
+Description for "fake_media_generator.py":
+
+The "fake_media_generator.py" script is a Python utility designed to simulate the creation of folder structures and sample media files for movies and TV shows using the TMDb API. By fetching details for a given TMDb ID, the script organizes these simulated media entries into appropriately named directories, incorporating IMDb IDs for TV shows and movies. The generated files include sample.avi, serving as placeholders for media content.
 
 Open a powershell prompt and navigate to `pyprogs` folder
 
@@ -280,21 +282,20 @@ pip install -r .\requirements.txt
 
 Now you are ready to run it (with the venv activated)
 
-Example of how to call and run the script:
+Example of how to call and run the script: `python fake_media_generator.py --tmdbid <tmdb_id(s)> --media-type <media_type>`
 
 ```bat
-python fake_media_generator.py --tmdbid 389 19404 429 12477 11216 637 346 550 568332 246 94954 87108 95557 1408 71712 4194 1409 153312 1668
+python fake_media_generator.py --tmdbid 389 19404 429 12477 11216 637 346 550 568332 246 94954 87108 95557 1408 71712 4194 1409 153312 1668 --media-type movie
 ```
 
 Or how to call it to run from the venv
 
 ```bat
-.\venv\scripts\python fake_media_generator.py --tmdbid  389 19404 429 12477 11216 637 346 550 568332 246 94954 87108 95557 1408 71712 4194 1409 153312 1668
+.\venv\scripts\python fake_media_generator.py --tmdbid  389 19404 429 12477 11216 637 346 550 568332 246 94954 87108 95557 1408 71712 4194 1409 153312 1668 --media-type tv
 ```
 
-Replace "12345" with the desired TMDb ID for a movie or TV show. The script prompts users to choose between available options if both movie and TV show details are found. Once a choice is made, the script creates a folder structure and sample media files in the specified directories based on the selected media type. Adjust the TMDb ID and paths as needed for your use case.
-
-Folders are created within the script subfolder called `movies` or `shows` depending on the tmdbid
+Replace <tmdb_id(s)> with the TMDb ID(s) for the movie or TV show (separated by space).Use the --media-type option to specify the type of media to process. Valid values are `movie`, or `tv`. Omitting this option will default to processing both movies and TV shows.Example:python fake_media_generator.py --tmdbid 389 19404 429 --media-type tv
+Output:Folders are created within the output subfolder:For movies: output/moviesFor TV shows: output/shows
 
 [Back to top](#Scripts)
 
