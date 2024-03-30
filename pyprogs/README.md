@@ -299,10 +299,10 @@ Replace `<tmdb_id(s)>` with the TMDb ID(s) for the movie or TV show (separated b
 Example:
 
 ```bat
-.\venv\scripts\python fake_media_generator.py --tmdbid 389 19404 429 --media-type tv
+.\venv\scripts\python fake_media_generator.py --tmdbid 389 19404 429
 ```
 
-Output:Folders are created within the `output` subfolder.
+Folders are created within the `output` subfolder.
 
 For movies: `output/movies`
 
