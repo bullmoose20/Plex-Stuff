@@ -294,8 +294,19 @@ Or how to call it to run from the venv
 .\venv\scripts\python fake_media_generator.py --tmdbid  389 19404 429 12477 11216 637 346 550 568332 246 94954 87108 95557 1408 71712 4194 1409 153312 1668 --media-type tv
 ```
 
-Replace <tmdb_id(s)> with the TMDb ID(s) for the movie or TV show (separated by space).Use the --media-type option to specify the type of media to process. Valid values are `movie`, or `tv`. Omitting this option will default to processing both movies and TV shows.Example:python fake_media_generator.py --tmdbid 389 19404 429 --media-type tv
-Output:Folders are created within the output subfolder:For movies: output/moviesFor TV shows: output/shows
+Replace `<tmdb_id(s)>` with the TMDb ID(s) for the movie or TV show (separated by space).Use the `--media-type` option to specify the type of media to process. Valid values are `movie`, or `tv`. Omitting this option will default to processing both movies and TV shows.
+
+Example:
+
+```bat
+.\venv\scripts\python fake_media_generator.py --tmdbid 389 19404 429 --media-type tv
+```
+
+Output:Folders are created within the `output` subfolder.
+
+For movies: `output/movies`
+
+For TV shows: `output/shows`
 
 [Back to top](#Scripts)
 
