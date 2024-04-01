@@ -5814,6 +5814,7 @@ Function CreateStudio {
         '| Scott Free Productions.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Scott Free Productions| #A425E7| 1| 1| 0| 0',
         '| Sculptor Media.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Sculptor Media| #599D96| 1| 1| 0| 0',
         '| Sean Daniel Company.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Sean Daniel Company| #16EC29| 1| 1| 0| 0',
+        '| Searchlight Pictures.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Searchlight Pictures| #354672| 1| 1| 0| 0',
         '| Secret Hideout.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Secret Hideout| #3B18AD| 1| 1| 0| 0',
         '| See-Saw Films.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | See-Saw Films| #2D7D0F| 1| 1| 0| 0',
         '| Sentai Filmworks.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Sentai Filmworks| #E00604| 1| 1| 0| 0',
