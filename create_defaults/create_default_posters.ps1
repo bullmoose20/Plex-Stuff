@@ -4709,6 +4709,7 @@ Function CreateNetwork {
     $myArray = @(
         'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
         ' | #0.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | #0| #7BE7A1| 1| 1| 0| 0',
+        ' | ANIMAX.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ANIMAX| #6301F6| 1| 1| 0| 0',
         ' | 7mate.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | 7mate| #2F3C13| 1| 1| 0| 0',
         ' | A&E.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | A&E| #676767| 1| 1| 0| 0',
         ' | ABC Family.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ABC Family| #73D444| 1| 1| 0| 0',
@@ -5486,6 +5487,10 @@ Function CreateStudio {
     $myArray = @(
         'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
         '| 101 Studios.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | 101 Studios| #B69367| 1| 1| 0| 0',
+        '| Codeblack Entertainment.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Codeblack Entertainment| #0CE02A| 1| 1| 0| 0',
+        '| Dimension Films.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Dimension Films| #D13B12| 1| 1| 0| 0',
+        '| Broken Lizard Industries.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Broken Lizard Industries| #DA4FD2| 1| 1| 0| 0',
+        '| Magic Light Pictures.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Magic Light Pictures| #BD5DEF| 1| 1| 0| 0',
         '| 1492 Pictures.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | 1492 Pictures| #2BACFC| 1| 1| 0| 0',
         '| 20th Century Animation.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | 20th Century Animation| #9F3137| 1| 1| 0| 0',
         '| 20th Century Fox Television.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | 20th Century Fox Television| #EF3F42| 1| 1| 0| 0',
