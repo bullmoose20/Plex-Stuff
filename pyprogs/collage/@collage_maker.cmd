@@ -12,4 +12,4 @@ REM Step 1: Extract all directories and generate collages. Replace D:\defaults w
 "C:\Program Files\PowerShell\7\pwsh.exe" -Command "$filteredDirectories = Get-ChildItem -Path 'D:\defaults\' -Directory -Recurse | Where-Object { -not ($_ -match '\\\.' -or $_ -match '\\\[\\]*\\\.') }; $filteredDirectories | ForEach-Object { .\venv\Scripts\python.exe .\collage.py --save_original_folder=true $_ }"
 
 REM Step 2: Copy images using robocopy
-robocopy D:\defaults\ D:\bullmoose20\Plex-Meta-Manager-Images\ /E /COPY:DAT /DCOPY:T /XO
+robocopy D:\defaults\ D:\bullmoose20\Default-Images\ /E /COPY:DAT /DCOPY:T /XO

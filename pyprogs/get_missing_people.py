@@ -142,11 +142,10 @@ def download_images(download_urls):
 if __name__ == "__main__":
     import argparse
 
-    online_file_url = 'https://raw.githubusercontent.com/meisnate12/Plex-Meta-Manager-People-rainier/master/README.md'
-
-    parser = argparse.ArgumentParser(description='PMM Missing People Downloader')
+    online_file_url = 'https://raw.githubusercontent.com/Kometa-Team/People-Images-rainier/master/README.md'                       
+    parser = argparse.ArgumentParser(description='Kometa Missing People Downloader')
     parser.add_argument('-metalog_location', metavar='metalog_location', type=str,
-                        help='Specify the logs folder location for PMM')
+                        help='Specify the logs folder location for Kometa')
 
     args = parser.parse_args()
 

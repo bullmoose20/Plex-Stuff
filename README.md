@@ -31,7 +31,7 @@ D:\PLEX-STUFF\PYPROGS
 ```
 
 ## Scripts:
-1. ~~[plex-bloat-fix.py](#plex-bloat-fix) - removes unneeded image files (Posters/Title Cards) from plex.~~ ***RETIRED!!! Please go here now: https://github.com/meisnate12/Plex-Image-Cleanup***
+1. ~~[plex-bloat-fix.py](#plex-bloat-fix) - removes unneeded image files (Posters/Title Cards) from plex.~~ ***RETIRED!!! Please go here now: https://github.com/Kometa-Team/ImageMaid***
 2. [plexdance.sh](#plexdance) - Unraid script to automate the full plexdance
 3. [process-tcards.cmd](#process-tcards) - Windows script to create properly sized PLEX titlecards to use with TCM or for other purposes
 4. [pumpanddump.sh](#pumpanddump) - Unraid script to automate the plex db repair when using hotio plex container
@@ -73,7 +73,7 @@ Convert Warning: No TVDb ID Found for IMDb ID:
 
 [Back to top](#scripts)
 
-RETIRED!!! Please go here now: https://github.com/meisnate12/Plex-Image-Cleanup
+RETIRED!!! Please go here now: https://github.com/kometa-team/ImageMaid
  
 ~~Your PLEX folders are growing out of control. You use overlays from PMM or upload lots of custom art that you no longer want to use or need to eliminate. You don't want to perform the plex dance if you can avoid it. This script will free up gigs of space....It can also perform some PLEX operations like "empty trash", "clean bundles", and "optimize db". PBF also supports the use of PASSTHROUGH alerts to discord with notifiarr.com.~~
 

@@ -4,18 +4,18 @@
 # author: bullmoose20
 #
 # DESCRIPTION: 
-# In a powershell window this will go through all your meta*.log files created by PMM to find all missing people posters.
+# In a powershell window this will go through all your meta*.log files created by Kometa to find all missing people posters.
 # It will create 1 .cmd file per meta.log file and run it to download the images locally
 #
 # REQUIREMENTS:
-# $metalog_location=is the path to the logs directory for PMM
+# $metalog_location=is the path to the logs directory for Kometa
 # Powershell security settings: https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_execution_policies?view=powershell-7.2
 #
 # PARAMETERS:
-# -metalog_location          (specify the logs folder location for PMM)
+# -metalog_location          (specify the logs folder location for Kometa)
 # 
 # EXAMPLE:
-# .\get_missing_people.ps1 -metalog_location \\NZWHS01\appdata\Plex-Meta-Manager\logs
+# .\get_missing_people.ps1 -metalog_location \\NZWHS01\appdata\Kometa\logs
 ####################################################
 
 param ($metalog_location)

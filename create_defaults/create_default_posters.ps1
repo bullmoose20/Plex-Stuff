@@ -273,9 +273,9 @@ Function Get-TranslationFile {
         return
     }
 
-    # $GitHubRepository = "https://raw.githubusercontent.com/meisnate12/Plex-Meta-Manager/$BranchOption/defaults/translations"
-    $GitHubRepository = "https://raw.githubusercontent.com/meisnate12/PMM-Translations/master/defaults"
-    $TranslationFile = "$LanguageCode.yml"
+    # $GitHubRepository = "https://raw.githubusercontent.com/Kometa-Team/Kometa/$BranchOption/defaults/translations"
+    $GitHubRepository = "https://raw.githubusercontent.com/Kometa-Team/Translations/master/defaults"
+	$TranslationFile = "$LanguageCode.yml"
     $TranslationFileUrl = "$GitHubRepository/$TranslationFile"
     $TranslationsPath = Join-Path $script_path "@translations"
     $TranslationFilePath = Join-Path $TranslationsPath $TranslationFile

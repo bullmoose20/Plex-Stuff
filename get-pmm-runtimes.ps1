@@ -1,4 +1,4 @@
-$logFile = "\\nzwhs01\appdata\Plex-Meta-Manager\logs\meta.log"
+$logFile = "\\nzwhs01\appdata\kometa\logs\meta.log"
 # Read the log file and split it into lines
 $lines = Get-Content $logFile
 
