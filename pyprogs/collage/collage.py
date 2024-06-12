@@ -94,7 +94,7 @@ def get_image_files(folder_path):
             os.path.isfile(os.path.join(folder_path, f)) and (f.endswith(b'.jpg') or f.endswith(b'.png')) and not f.decode('utf-8').startswith('!_')]
 
 
-def create_image_grid(folder_path, num_columns, thumb_size, show_text, save_output_folder, save_original_folder):
+def create_image_grid(folder_path, num_columns, thumb_size, show_text, save_output_folder, save_original_folder, output_format, jpg_quality):
     thumb_width, thumb_height = thumb_size
     # Determine text color based on show_text value
     text_color = (255, 255, 255) if show_text else (0, 0, 0)
@@ -189,16 +189,26 @@ def create_image_grid(folder_path, num_columns, thumb_size, show_text, save_outp
     if save_output_folder:
         timestamp = dt.now().strftime('%Y%m%d%H%M%S')
         final_image_name = f"!_{os.path.basename(folder_path.decode('utf-8'))}_grid_{timestamp}"
-        final_image_path_output = os.path.join(output_folder, final_image_name + ".jpg")
-        grid_image.save(final_image_path_output)
+        final_image_path_output = os.path.join(output_folder, final_image_name + f".{output_format.lower()}")
+        if output_format.upper() == 'JPG':
+            grid_image.save(final_image_path_output, format=output_format, quality=jpg_quality)
+        elif output_format.upper() == 'WEBP':
+            grid_image.save(final_image_path_output, format=output_format, lossless=True)
+        else:
+            grid_image.save(final_image_path_output, format=output_format)
         print(f"Final grid image saved in the output folder as {final_image_path_output}")
         logging.info(f"Final grid image saved in the output folder as {final_image_path_output}")
 
     # Save in the original folder if specified
     if save_original_folder:
         final_image_name = f"!_{os.path.basename(folder_path.decode('utf-8'))}_grid"
-        final_image_path_original = os.path.join(folder_path.decode('utf-8'), final_image_name + ".jpg")
-        grid_image.save(final_image_path_original)
+        final_image_path_original = os.path.join(folder_path.decode('utf-8'), final_image_name + f".{output_format.lower()}")
+        if output_format.upper() == 'JPG':
+            grid_image.save(final_image_path_original, format=output_format, quality=jpg_quality)
+        elif output_format.upper() == 'WEBP':
+            grid_image.save(final_image_path_original, format=output_format, lossless=True)
+        else:
+            grid_image.save(final_image_path_original, format=output_format)
         print(f"Final grid image saved in the original folder as {final_image_path_original}")
         logging.info(f"Final grid image saved in the original folder as {final_image_path_original}")
 
@@ -217,6 +227,8 @@ if __name__ == "__main__":
     parser.add_argument("--show_image", action="store_true", help="Show the grid image")
     parser.add_argument("--save_output_folder", default=True, type=str_to_bool, help="Save the grid image in the output folder")
     parser.add_argument("--save_original_folder", default=False, type=str_to_bool, help="Save the grid image in the original folder")
+    parser.add_argument("--output_format", type=str, choices=["PNG", "JPG", "WEBP"], default="JPG", help="Output format (default JPG)")
+    parser.add_argument("--jpg_quality", type=int, default=95, help="Quality for JPG format (default 95)")
 
     args = parser.parse_args()
 
@@ -242,7 +254,8 @@ if __name__ == "__main__":
         # Create the image grid
         grid_image = create_image_grid(
             folder_path, num_columns, thumb_size, show_text,
-            args.save_output_folder, args.save_original_folder
+            args.save_output_folder, args.save_original_folder,
+            args.output_format, args.jpg_quality
         )
 
         # Call the clean_up_old_logs function
