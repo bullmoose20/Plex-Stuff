@@ -4637,6 +4637,7 @@ Function CreateGenre {
         'TIME_LOOP| Time Travel.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Time Loop| #88D761| 1| 1| 0| 1',
         'TOP_GROSSING_FILMS_ANNUALLY| Top Grossing Films Annually.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Top Grossing Films Annually| #CA1E1B| 1| 1| 0| 1',
         'TOP_GROSSING_FILMS_OF_ALL-TIME| Top Grossing Films of All-Time.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Top Grossing Films of All-Time| #8ED310| 1| 1| 0| 1',
+        'TRAINS| Trains.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Trains| #430CB1| 1| 1| 0| 1',
         'TRAVEL| Travel.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Travel| #B6BA6D| 1| 1| 0| 1',
         'TREASURE_HUNT| Treasure Hunt.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Treasure Hunt| #AFBE09| 1| 1| 0| 1',
         'TRUE_CRIME| True Crime.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | True Crime| #C706DE| 1| 1| 0| 1',
