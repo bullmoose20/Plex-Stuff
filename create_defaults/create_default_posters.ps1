@@ -4239,6 +4239,8 @@ Function CreateFranchise {
     $myArray = @(
         'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
         '| 28 Days Weeks Later.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | 28 Days Weeks Later| #B93033| 1| 1| 0| 0',
+        '| Power.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Power| #63E2C5| 1| 1| 0| 0',
+        '| Game of Thrones.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Game of Thrones| #25972E| 1| 1| 0| 0',
         '| 9-1-1.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | 9-1-1| #C62B2B| 1| 1| 0| 1',
         '| A Nightmare on Elm Street.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | A Nightmare on Elm Street| #BE3C3E| 1| 1| 0| 1',
         '| Alien Predator.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Alien Predator| #1EAC1B| 1| 1| 0| 1',
