@@ -4403,6 +4403,8 @@ Function CreateGenre {
     $myArray = @(
         'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
         '1001_MOVIES_YOU_MUST_SEE_BEFORE_YOU_DIE| 1001 Movies You Must See Before You Die.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | 1001 Movies You Must See Before You Die| #606723| 1| 1| 0| 1',
+        'MAY_THE_FOURTH| May the Fourth.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | May the Fourth | #14F001| 1| 1| 0| 1',
+        'NEW_YEARS_EVE| New Years Eve.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | New Years Eve | #E315C9| 1| 1| 0| 1',
         'DISNEY| Disney.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Disney | #8AD6D2| 1| 1| 0| 1',
         'PIXAR| Pixar.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Pixar| #0195C1| 1| 1| 0| 1',
         'DREAMWORKS| Dreamworks.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Dreamworks| #4CECB4| 1| 1| 0| 0',
