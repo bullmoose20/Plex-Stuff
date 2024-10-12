@@ -6587,8 +6587,8 @@ Function CreateOverlays {
     
     $directories = @("award", "chart", "country", "franchise", "network", "network\white", "playlist", "resolution", "streaming", "universe")
     $directories_no_trim = @("aspect", "content_rating", "genre", "seasonal", "studio", "video_format")
-    $size1 = "285x85>"
-    $size2 = "440x100>"
+    $size1 = "285x85"
+    $size2 = "440x100"
     
     Foreach ($dir in $directories_no_trim) {
         $path = Join-Path $script_path $dir
