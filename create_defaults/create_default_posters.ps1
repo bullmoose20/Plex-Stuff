@@ -5354,102 +5354,102 @@ Function CreateSeparators {
 Function CreateStreaming {
     Write-Host "Creating Streaming"
     Set-Location $script_path
-    # Find-Path "$script_path\streaming"
+    Find-Path "$script_path\streaming"
     Move-Item -Path output -Destination output-orig
 
     $myArray = @(
         'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
-        '| All 4.png| +0| 1000| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | All 4| #14AE9A| 1| 1| 0| 1',
-        '| Apple TV+.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Apple TV+| #494949| 1| 1| 0| 1',
-        '| BET+.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | BET+| #B3359C| 1| 1| 0| 1',
-        '| BritBox.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | BritBox| #198CA8| 1| 1| 0| 1',
-        '| Crave.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Crave| #29C2F1| 1| 1| 0| 1',
-        '| Crunchyroll.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Crunchyroll| #C9761D| 1| 1| 0| 1',
-        '| discovery+.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | discovery+| #2175D9| 1| 1| 0| 1',
-        '| Disney+.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Disney+| #0F2FA4| 1| 1| 0| 1',
-        '| Funimation.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Funimation| #513790| 1| 1| 0| 1',
-        '| hayu.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hayu| #C9516D| 1| 1| 0| 1',
-        '| HBO Max.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | HBO Max| #7870B9| 1| 1| 0| 1',
-        '| Hulu.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Hulu| #1BC073| 1| 1| 0| 1',
-        '| Max.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Max| #002BE7| 1| 1| 0| 1',
-        '| My 5.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | My 5| #426282| 1| 1| 0| 1',
-        '| Netflix.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Netflix| #B42A33| 1| 1| 0| 1',
-        '| NOW.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | NOW| #215659| 1| 1| 0| 1',
-        '| Paramount+.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Paramount+| #2A67CC| 1| 1| 0| 1',
-        '| Peacock.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Peacock| #DA4428| 1| 1| 0| 1',
-        '| Prime Video.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Prime Video| #11607E| 1| 1| 0| 1',
-        '| Quibi.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Quibi| #FFF9C4| 1| 1| 0| 1',
-        '| Showtime.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Showtime| #BC1818| 1| 1| 0| 1',
-        '| Stan.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Stan| #227CC0| 1| 1| 0| 1',
-        '| YouTube.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | YouTube| #CD201F| 1| 1| 0| 1',
-        'MOVIES| All 4.png| -500| 1000| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | All 4_movies| #14AE9A| 1| 1| 0| 1',
-        'MOVIES| Apple TV+.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Apple TV+_movies| #494949| 1| 1| 0| 1',
-        'MOVIES| BET+.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | BET+_movies| #B3359C| 1| 1| 0| 1',
-        'MOVIES| BritBox.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | BritBox_movies| #198CA8| 1| 1| 0| 1',
-        'MOVIES| Crave.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Crave_movies| #29C2F1| 1| 1| 0| 1',
-        'MOVIES| Crunchyroll.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Crunchyroll_movies| #C9761D| 1| 1| 0| 1',
-        'MOVIES| discovery+.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | discovery+_movies| #2175D9| 1| 1| 0| 1',
-        'MOVIES| Disney+.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Disney+_movies| #0F2FA4| 1| 1| 0| 1',
-        'MOVIES| Funimation.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Funimation_movies| #513790| 1| 1| 0| 1',
-        'MOVIES| hayu.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hayu_movies| #C9516D| 1| 1| 0| 1',
-        'MOVIES| HBO Max.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | HBO Max_movies| #7870B9| 1| 1| 0| 1',
-        'MOVIES| Hulu.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Hulu_movies| #1BC073| 1| 1| 0| 1',
-        'MOVIES| Max.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Max_movies| #002BE7| 1| 1| 0| 1',
-        'MOVIES| My 5.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | My 5_movies| #426282| 1| 1| 0| 1',
-        'MOVIES| Netflix.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Netflix_movies| #B42A33| 1| 1| 0| 1',
-        'MOVIES| NOW.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | NOW_movies| #215659| 1| 1| 0| 1',
-        'MOVIES| Paramount+.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Paramount+_movies| #2A67CC| 1| 1| 0| 1',
-        'MOVIES| Peacock.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Peacock_movies| #DA4428| 1| 1| 0| 1',
-        'MOVIES| Prime Video.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Prime Video_movies| #11607E| 1| 1| 0| 1',
-        'MOVIES| Quibi.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Quibi_movies| #FFF9C4| 1| 1| 0| 1',
-        'MOVIES| Showtime.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Showtime_movies| #BC1818| 1| 1| 0| 1',
-        'MOVIES| Stan.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Stan_movies| #227CC0| 1| 1| 0| 1',
-        'MOVIES| YouTube.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | YouTube_movies| #CD201F| 1| 1| 0| 1',
-        'SHOWS| All 4.png| -500| 1000| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | All 4_shows| #14AE9A| 1| 1| 0| 1',
-        'SHOWS| Apple TV+.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Apple TV+_shows| #494949| 1| 1| 0| 1',
-        'SHOWS| BET+.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | BET+_shows| #B3359C| 1| 1| 0| 1',
-        'SHOWS| BritBox.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | BritBox_shows| #198CA8| 1| 1| 0| 1',
-        'SHOWS| Crave.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Crave_shows| #29C2F1| 1| 1| 0| 1',
-        'SHOWS| Crunchyroll.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Crunchyroll_shows| #C9761D| 1| 1| 0| 1',
-        'SHOWS| discovery+.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | discovery+_shows| #2175D9| 1| 1| 0| 1',
-        'SHOWS| Disney+.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Disney+_shows| #0F2FA4| 1| 1| 0| 1',
-        'SHOWS| Funimation.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Funimation_shows| #513790| 1| 1| 0| 1',
-        'SHOWS| hayu.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hayu_shows| #C9516D| 1| 1| 0| 1',
-        'SHOWS| HBO Max.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | HBO Max_shows| #7870B9| 1| 1| 0| 1',
-        'SHOWS| Hulu.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Hulu_shows| #1BC073| 1| 1| 0| 1',
-        'SHOWS| Max.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Max_shows| #002BE7| 1| 1| 0| 1',
-        'SHOWS| My 5.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | My 5_shows| #426282| 1| 1| 0| 1',
-        'SHOWS| Netflix.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Netflix_shows| #B42A33| 1| 1| 0| 1',
-        'SHOWS| NOW.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | NOW_shows| #215659| 1| 1| 0| 1',
-        'SHOWS| Paramount+.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Paramount+_shows| #2A67CC| 1| 1| 0| 1',
-        'SHOWS| Peacock.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Peacock_shows| #DA4428| 1| 1| 0| 1',
-        'SHOWS| Prime Video.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Prime Video_shows| #11607E| 1| 1| 0| 1',
-        'SHOWS| Quibi.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Quibi_shows| #FFF9C4| 1| 1| 0| 1',
-        'SHOWS| Showtime.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Showtime_shows| #BC1818| 1| 1| 0| 1',
-        'SHOWS| Stan.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Stan_shows| #227CC0| 1| 1| 0| 1',
-        'SHOWS| YouTube.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | YouTube_shows| #CD201F| 1| 1| 0| 1',
-        'ORIGINALS| All 4.png| -500| 1000| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | All 4_originals| #14AE9A| 1| 1| 0| 1',
-        'ORIGINALS| Apple TV+.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Apple TV+_originals| #494949| 1| 1| 0| 1',
-        'ORIGINALS| BET+.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | BET+_originals| #B3359C| 1| 1| 0| 1',
-        'ORIGINALS| BritBox.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | BritBox_originals| #198CA8| 1| 1| 0| 1',
-        'ORIGINALS| Crave.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Crave_originals| #29C2F1| 1| 1| 0| 1',
-        'ORIGINALS| Crunchyroll.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Crunchyroll_originals| #C9761D| 1| 1| 0| 1',
-        'ORIGINALS| discovery+.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | discovery+_originals| #2175D9| 1| 1| 0| 1',
-        'ORIGINALS| Disney+.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Disney+_originals| #0F2FA4| 1| 1| 0| 1',
-        'ORIGINALS| Funimation.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Funimation_originals| #513790| 1| 1| 0| 1',
-        'ORIGINALS| hayu.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hayu_originals| #C9516D| 1| 1| 0| 1',
-        'ORIGINALS| HBO Max.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | HBO Max_originals| #7870B9| 1| 1| 0| 1',
-        'ORIGINALS| Hulu.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Hulu_originals| #1BC073| 1| 1| 0| 1',
-        'ORIGINALS| Max.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Max_originals| #002BE7| 1| 1| 0| 1',
-        'ORIGINALS| My 5.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | My 5_originals| #426282| 1| 1| 0| 1',
-        'ORIGINALS| Netflix.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Netflix_originals| #B42A33| 1| 1| 0| 1',
-        'ORIGINALS| NOW.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | NOW_originals| #215659| 1| 1| 0| 1',
-        'ORIGINALS| Paramount+.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Paramount+_originals| #2A67CC| 1| 1| 0| 1',
-        'ORIGINALS| Peacock.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Peacock_originals| #DA4428| 1| 1| 0| 1',
-        'ORIGINALS| Prime Video.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Prime Video_originals| #11607E| 1| 1| 0| 1',
-        'ORIGINALS| Quibi.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Quibi_originals| #FFF9C4| 1| 1| 0| 1',
-        'ORIGINALS| Showtime.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Showtime_originals| #BC1818| 1| 1| 0| 1',
-        'ORIGINALS| Stan.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Stan_originals| #227CC0| 1| 1| 0| 1',
+        '| All 4.png| +0| 1000| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | All 4| #14AE9A| 1| 1| 0| 0',
+        '| Apple TV+.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Apple TV+| #494949| 1| 1| 0| 0',
+        '| BET+.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | BET+| #B3359C| 1| 1| 0| 0',
+        '| BritBox.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | BritBox| #198CA8| 1| 1| 0| 0',
+        '| Crave.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Crave| #29C2F1| 1| 1| 0| 0',
+        '| Crunchyroll.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Crunchyroll| #C9761D| 1| 1| 0| 0',
+        '| discovery+.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | discovery+| #2175D9| 1| 1| 0| 0',
+        '| Disney+.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Disney+| #0F2FA4| 1| 1| 0| 0',
+        '| Funimation.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Funimation| #513790| 1| 1| 0| 0',
+        '| hayu.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hayu| #C9516D| 1| 1| 0| 0',
+        '| HBO Max.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | HBO Max| #7870B9| 1| 1| 0| 0',
+        '| Hulu.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Hulu| #1BC073| 1| 1| 0| 0',
+        '| Max.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Max| #002BE7| 1| 1| 0| 0',
+        '| My 5.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | My 5| #426282| 1| 1| 0| 0',
+        '| Netflix.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Netflix| #B42A33| 1| 1| 0| 0',
+        '| NOW.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | NOW| #215659| 1| 1| 0| 0',
+        '| Paramount+.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Paramount+| #2A67CC| 1| 1| 0| 0',
+        '| Peacock.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Peacock| #DA4428| 1| 1| 0| 0',
+        '| Prime Video.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Prime Video| #11607E| 1| 1| 0| 0',
+        '| Quibi.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Quibi| #FFF9C4| 1| 1| 0| 0',
+        '| Showtime.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Showtime| #BC1818| 1| 1| 0| 0',
+        '| Stan.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Stan| #227CC0| 1| 1| 0| 0',
+        '| YouTube.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | YouTube| #CD201F| 1| 1| 0| 0',
+        'MOVIES| All 4.png| -500| 1000| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | All 4_movies| #14AE9A| 1| 1| 0| 0',
+        'MOVIES| Apple TV+.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Apple TV+_movies| #494949| 1| 1| 0| 0',
+        'MOVIES| BET+.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | BET+_movies| #B3359C| 1| 1| 0| 0',
+        'MOVIES| BritBox.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | BritBox_movies| #198CA8| 1| 1| 0| 0',
+        'MOVIES| Crave.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Crave_movies| #29C2F1| 1| 1| 0| 0',
+        'MOVIES| Crunchyroll.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Crunchyroll_movies| #C9761D| 1| 1| 0| 0',
+        'MOVIES| discovery+.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | discovery+_movies| #2175D9| 1| 1| 0| 0',
+        'MOVIES| Disney+.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Disney+_movies| #0F2FA4| 1| 1| 0| 0',
+        'MOVIES| Funimation.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Funimation_movies| #513790| 1| 1| 0| 0',
+        'MOVIES| hayu.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hayu_movies| #C9516D| 1| 1| 0| 0',
+        'MOVIES| HBO Max.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | HBO Max_movies| #7870B9| 1| 1| 0| 0',
+        'MOVIES| Hulu.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Hulu_movies| #1BC073| 1| 1| 0| 0',
+        'MOVIES| Max.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Max_movies| #002BE7| 1| 1| 0| 0',
+        'MOVIES| My 5.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | My 5_movies| #426282| 1| 1| 0| 0',
+        'MOVIES| Netflix.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Netflix_movies| #B42A33| 1| 1| 0| 0',
+        'MOVIES| NOW.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | NOW_movies| #215659| 1| 1| 0| 0',
+        'MOVIES| Paramount+.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Paramount+_movies| #2A67CC| 1| 1| 0| 0',
+        'MOVIES| Peacock.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Peacock_movies| #DA4428| 1| 1| 0| 0',
+        'MOVIES| Prime Video.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Prime Video_movies| #11607E| 1| 1| 0| 0',
+        'MOVIES| Quibi.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Quibi_movies| #FFF9C4| 1| 1| 0| 0',
+        'MOVIES| Showtime.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Showtime_movies| #BC1818| 1| 1| 0| 0',
+        'MOVIES| Stan.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Stan_movies| #227CC0| 1| 1| 0| 0',
+        'MOVIES| YouTube.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | YouTube_movies| #CD201F| 1| 1| 0| 0',
+        'SHOWS| All 4.png| -500| 1000| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | All 4_shows| #14AE9A| 1| 1| 0| 0',
+        'SHOWS| Apple TV+.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Apple TV+_shows| #494949| 1| 1| 0| 0',
+        'SHOWS| BET+.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | BET+_shows| #B3359C| 1| 1| 0| 0',
+        'SHOWS| BritBox.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | BritBox_shows| #198CA8| 1| 1| 0| 0',
+        'SHOWS| Crave.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Crave_shows| #29C2F1| 1| 1| 0| 0',
+        'SHOWS| Crunchyroll.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Crunchyroll_shows| #C9761D| 1| 1| 0| 0',
+        'SHOWS| discovery+.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | discovery+_shows| #2175D9| 1| 1| 0| 0',
+        'SHOWS| Disney+.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Disney+_shows| #0F2FA4| 1| 1| 0| 0',
+        'SHOWS| Funimation.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Funimation_shows| #513790| 1| 1| 0| 0',
+        'SHOWS| hayu.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hayu_shows| #C9516D| 1| 1| 0| 0',
+        'SHOWS| HBO Max.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | HBO Max_shows| #7870B9| 1| 1| 0| 0',
+        'SHOWS| Hulu.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Hulu_shows| #1BC073| 1| 1| 0| 0',
+        'SHOWS| Max.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Max_shows| #002BE7| 1| 1| 0| 0',
+        'SHOWS| My 5.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | My 5_shows| #426282| 1| 1| 0| 0',
+        'SHOWS| Netflix.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Netflix_shows| #B42A33| 1| 1| 0| 0',
+        'SHOWS| NOW.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | NOW_shows| #215659| 1| 1| 0| 0',
+        'SHOWS| Paramount+.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Paramount+_shows| #2A67CC| 1| 1| 0| 0',
+        'SHOWS| Peacock.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Peacock_shows| #DA4428| 1| 1| 0| 0',
+        'SHOWS| Prime Video.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Prime Video_shows| #11607E| 1| 1| 0| 0',
+        'SHOWS| Quibi.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Quibi_shows| #FFF9C4| 1| 1| 0| 0',
+        'SHOWS| Showtime.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Showtime_shows| #BC1818| 1| 1| 0| 0',
+        'SHOWS| Stan.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Stan_shows| #227CC0| 1| 1| 0| 0',
+        'SHOWS| YouTube.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | YouTube_shows| #CD201F| 1| 1| 0| 0',
+        'ORIGINALS| All 4.png| -500| 1000| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | All 4_originals| #14AE9A| 1| 1| 0| 0',
+        'ORIGINALS| Apple TV+.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Apple TV+_originals| #494949| 1| 1| 0| 0',
+        'ORIGINALS| BET+.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | BET+_originals| #B3359C| 1| 1| 0| 0',
+        'ORIGINALS| BritBox.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | BritBox_originals| #198CA8| 1| 1| 0| 0',
+        'ORIGINALS| Crave.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Crave_originals| #29C2F1| 1| 1| 0| 0',
+        'ORIGINALS| Crunchyroll.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Crunchyroll_originals| #C9761D| 1| 1| 0| 0',
+        'ORIGINALS| discovery+.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | discovery+_originals| #2175D9| 1| 1| 0| 0',
+        'ORIGINALS| Disney+.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Disney+_originals| #0F2FA4| 1| 1| 0| 0',
+        'ORIGINALS| Funimation.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Funimation_originals| #513790| 1| 1| 0| 0',
+        'ORIGINALS| hayu.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hayu_originals| #C9516D| 1| 1| 0| 0',
+        'ORIGINALS| HBO Max.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | HBO Max_originals| #7870B9| 1| 1| 0| 0',
+        'ORIGINALS| Hulu.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Hulu_originals| #1BC073| 1| 1| 0| 0',
+        'ORIGINALS| Max.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Max_originals| #002BE7| 1| 1| 0| 0',
+        'ORIGINALS| My 5.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | My 5_originals| #426282| 1| 1| 0| 0',
+        'ORIGINALS| Netflix.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Netflix_originals| #B42A33| 1| 1| 0| 0',
+        'ORIGINALS| NOW.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | NOW_originals| #215659| 1| 1| 0| 0',
+        'ORIGINALS| Paramount+.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Paramount+_originals| #2A67CC| 1| 1| 0| 0',
+        'ORIGINALS| Peacock.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Peacock_originals| #DA4428| 1| 1| 0| 0',
+        'ORIGINALS| Prime Video.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Prime Video_originals| #11607E| 1| 1| 0| 0',
+        'ORIGINALS| Quibi.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Quibi_originals| #FFF9C4| 1| 1| 0| 0',
+        'ORIGINALS| Showtime.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Showtime_originals| #BC1818| 1| 1| 0| 0',
+        'ORIGINALS| Stan.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Stan_originals| #227CC0| 1| 1| 0| 0',
         'ORIGINALS| YouTube.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | YouTube_originals| #CD201F| 1| 1| 0| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
@@ -5466,7 +5466,23 @@ Function CreateStreaming {
     }
 
     LaunchScripts -ScriptPaths $arr
-    Move-Item -Path output -Destination streaming
+    Move-Item -Path output -Destination streaming\color
+
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        if ($($item.key_name).ToString() -eq "") {
+            $value = $null
+        }
+        else {
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+        }
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_streaming\white\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
+    }
+
+    LaunchScripts -ScriptPaths $arr
+    Move-Item -Path output -Destination streaming\white
     Copy-Item -Path logos_streaming -Destination streaming\logos -Recurse
     Move-Item -Path output-orig -Destination output
 }
@@ -6585,7 +6601,7 @@ Function CreateOverlays {
     Write-Host "Creating Overlays"
     Set-Location $script_path
     
-    $directories = @("award", "chart", "country", "franchise", "network", "network\white", "playlist", "resolution", "streaming", "universe")
+    $directories = @("award", "chart", "country", "franchise", "network", "network\white", "playlist", "resolution", "streaming", "streaming\white", "universe")
     $directories_no_trim = @("aspect", "content_rating", "genre", "seasonal", "studio", "video_format")
     $size1 = "285x85"
     $size2 = "440x100"
