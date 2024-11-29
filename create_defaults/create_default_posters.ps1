@@ -6947,6 +6947,7 @@ Read-Yaml
 #################################
 # Imagemagick version check
 #################################
+. .\create_poster.ps1
 Test-ImageMagick
 $test = $global:magick
 
