@@ -1,10 +1,10 @@
 ﻿####################################################
 # create_poster.ps1
-# v2.0
 # author: bullmoose20
+# special thanks to fscorrupt on the functions/logic for the header, fonts, autoupdates of ps1, and imagemagick autoupdates: https://github.com/fscorrupt/Posterizarr
 #
-# DESCRIPTION: 
-# In a powershell window and with ImageMagick installed, this will 
+# DESCRIPTION:
+# In a powershell window, this will
 # 1 - create a 2000x3000 colored poster based on $base_color parameter otherwise a random color for base is used and creates base_$base_color.jpg
 # 2 - it will add the gradient in the second line to create a file called gradient_$base_color.jpg
 # 3 - takes the $logo specified and sizes it 2000px (or whatever desired logo_size specified) wide leaving 100 on each side as a buffer of space
@@ -12,10 +12,11 @@
 # 5 - if text is desired it will be added to the final result with desired size, color and font
 # 6 - if white-wash is enabled, the colored logo with be made to 100% white
 # 7 - final results are a logo centered and merged to create a 2000x3000 poster with the $base_color color and gradient fade applied and saved as a jpg file (with an optional border of specified width and color and logo offset, as well as text, font, font_color, and font_size )
-# 
+#
 # REQUIREMENTS:
-# Imagemagick must be installed - https://imagemagick.org/script/download.php
-# font must be installed on system and visible by Imagemagick. Make sure that you install the ttf font for ALL users as an admin so ImageMagick has access to the font when running (r-click on font Install for ALL Users in Windows)
+# Imagemagick must be installed (default is that it will autoinstall the portable version and update it as needed) - https://imagemagick.org/script/download.php
+# font could be installed on system and visible by Imagemagick. In Windows: Make sure that you install the ttf font for ALL users as an admin so ImageMagick has access to the font when running (r-click on font Install for ALL Users in Windows)
+# font could also be specified via a path even if the system does not have it installed. so drop your font into a directory that this script has access to and specify the full or relative path to it
 # Powershell security settings: https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_execution_policies?view=powershell-7.2
 #
 # PARAMETERS:
@@ -48,6 +49,11 @@ param ($logo, $logo_offset, $logo_resize, $base_color, $gradient, $text, $text_o
 # GLOBAL VARS
 #################################
 $global:magick = $null
+$global:CurrentImagemagickversion = $null
+$global:LatestImagemagickversion = $null
+$global:AutoUpdateIM = $true
+$global:HeaderWritten = $false
+$CurrentScriptVersion = "2.1"
 
 #################################
 # collect paths
@@ -57,15 +63,327 @@ Set-Location $script_path
 $commandLine = $MyInvocation.Line
 $scriptName = $MyInvocation.MyCommand.Name
 $scriptLogPath = Join-Path $script_path -ChildPath "logs"
+$scriptTempPath = Join-Path $script_path -ChildPath "temp"
 $scriptLog = Join-Path $scriptLogPath -ChildPath "$scriptName.log"
+# Ensure the ScriptLog path exists
+if (-not (Test-Path -Path $scriptLogPath)) {
+  New-Item -Path $scriptLogPath -ItemType Directory -Force | Out-Null
+}
+if (-not (Test-Path -Path $scriptTempPath)) {
+  New-Item -Path $scriptTempPath -ItemType Directory -Force | Out-Null
+}
 
 ################################################################################
 # Function: WriteToLogFile
 # Description: Writes to a log file with timestamp
 ################################################################################
-Function WriteToLogFile ($message) {
+function WriteToLogFile ($message) {
   Add-content $scriptLog -value ((Get-Date).ToString() + " ~ " + $message)
   Write-Host ((Get-Date).ToString() + " ~ " + $message)
+}
+
+#################################
+# AddTrailingSlash function
+#################################
+function AddTrailingSlash($path) {
+  if (-not ($path -match '[\\/]$')) {
+    $path += if ($path -match '\\') { '\' } else { '/' }
+  }
+  return $path
+}
+
+#################################
+# RemoveTrailingSlash function
+#################################
+function RemoveTrailingSlash($path) {
+  if ($path -match '[\\/]$') {
+    $path = $path.TrimEnd('\', '/')
+  }
+  return $path
+}
+
+#################################
+# Set-OSTypeAndScriptRoot function
+#################################
+function Set-OSTypeAndScriptRoot {
+  if ($env:POWERSHELL_DISTRIBUTION_CHANNEL -like 'PSDocker*') {
+    $global:OSType = "Docker"
+    $currentuser = whoami
+    if ($currentuser -eq 'create_poster' -or $currentuser -eq 'abc' -or $env:VIRTUAL_ENV -eq '/lsiopy') {
+      $global:ScriptRoot = "/config"
+    }
+    Else {
+      $global:ScriptRoot = "./config"
+    }
+  }
+  Else {
+    $global:ScriptRoot = $PSScriptRoot
+    $global:OSType = [System.Environment]::OSVersion.Platform
+  }
+}
+
+#################################
+# Get-CPUModel function
+#################################
+function Get-CPUModel {
+  if ($Platform -eq 'Docker') {
+    $cpuInfo = cat /proc/cpuinfo | Out-String
+    $cpuModelLine = $cpuInfo -split "`n" | Where-Object { $_ -like "model name*" }
+    $cpuModel = $cpuModelLine -replace "model name\s*:\s*", ""
+    $cpuModel = $cpuModel[0]
+  }
+  Elseif ($Platform -eq 'Windows') {
+    $cpuModel = (Get-CimInstance win32_processor).name
+  }
+  Elseif ($Platform -eq 'Linux') {
+    $cpuInfo = lscpu | Out-String
+    $cpuInfoLines = $cpuInfo -split "`n"
+    $cpuModel = ($cpuInfoLines | Where-Object { $_ -like "Model name*" }) -replace "Model name\s*:\s*", ""
+  }
+  Elseif ($Platform -eq 'macOS') {
+    $cpuModel = system_profiler SPHardwareDataType | grep "Processor Name" | awk -F': ' '{print $2}' | xargs
+  }
+  Else {
+    $cpuModel = 'Unknown'
+  }
+  return $cpuModel
+}
+
+#################################
+# Get-Platform function
+#################################
+function Get-Platform {
+  if ($global:OSType -eq 'Docker') {
+    return 'Docker'
+  }
+  elseif ($global:OSType -eq 'Unix' -and $env:POWERSHELL_DISTRIBUTION_CHANNEL -notlike 'PSDocker*') {
+    # Check if it is a Mac
+    $unameOutput = & uname
+    if ($unameOutput -like "*Darwin*") {
+      return 'macOS'
+    }
+    Else {
+      return 'Linux'
+    }
+  }
+  elseif ($global:OSType -eq 'Win32NT') {
+    return 'Windows'
+  }
+  else {
+    return 'Unknown'
+  }
+}
+
+#################################
+# Get-LatestScriptVersion function
+#################################
+function Get-LatestScriptVersion {
+  try {
+    return Invoke-RestMethod -Uri "https://raw.githubusercontent.com/bullmoose20/Plex-Stuff/refs/heads/main/create_poster_release.txt" -Method Get -ErrorAction Stop
+  }
+  catch {
+    Write-Host "Could not query latest script version, Error: $($_.Exception.Message)"
+    return $null
+  }
+}
+
+#################################
+# CheckImageMagick function
+#################################
+function CheckImageMagick {
+  param (
+    [string]$magick,
+    [string]$magickinstalllocation
+  )
+
+  if (!(Test-Path $magick)) {
+    if ($global:OSType -ne "Win32NT") {
+      if ($global:OSType -ne "Docker") {
+        Write-Host "ImageMagick missing, downloading the portable version for you..."
+        $magickUrl = "https://imagemagick.org/archive/binaries/magick"
+        Invoke-WebRequest -Uri $magickUrl -OutFile "$global:ScriptRoot/magick"
+        chmod +x "$global:ScriptRoot/magick"
+        Write-Host "Made the portable Magick executable..."
+      }
+    }
+    else {
+      Write-Host "ImageMagick missing, downloading it for you..."
+      $errorCount++
+      $result = Invoke-WebRequest "https://imagemagick.org/archive/binaries/?C=M;O=D"
+      $LatestRelease = ($result.links.href | Where-Object { $_ -like '*portable-Q16-HDRI-x64.zip' } | Sort-Object -Descending)[0]
+      $DownloadPath = Join-Path -Path $global:ScriptRoot -ChildPath (Join-Path -Path 'temp' -ChildPath $LatestRelease)
+
+      # Ensure the $temp directory exists
+      if (-not (Test-Path -LiteralPath $global:ScriptRoot\temp)) {
+        New-Item -ItemType Directory -Path $global:ScriptRoot\temp | Out-Null
+      }
+
+      Invoke-WebRequest "https://imagemagick.org/archive/binaries/$LatestRelease" -OutFile $DownloadPath
+
+      # Ensure the $magickinstalllocation directory exists
+      if (-not (Test-Path -LiteralPath $magickinstalllocation)) {
+        New-Item -ItemType Directory -Path $magickinstalllocation | Out-Null
+      }
+
+      Expand-Archive -Path $DownloadPath -DestinationPath $magickinstalllocation -Force
+      if ((Get-ChildItem -Directory -LiteralPath $magickinstalllocation).name -eq $($LatestRelease.replace('.zip', ''))) {
+        Copy-item -Force -Recurse "$magickinstalllocation\$((Get-ChildItem -Directory -LiteralPath $magickinstalllocation).name)\*" $magickinstalllocation
+        Remove-Item -Recurse -LiteralPath "$magickinstalllocation\$((Get-ChildItem -Directory -LiteralPath $magickinstalllocation).name)" -Force
+      }
+      if (Test-Path -LiteralPath $magickinstalllocation\magick.exe) {
+        Write-Host "Placed Portable ImageMagick here: $magickinstalllocation"
+      }
+      Else {
+        Write-Host "Error During extraction, please manually install/copy portable Imagemagick from here: https://imagemagick.org/archive/binaries/$LatestRelease"
+      }
+    }
+  }
+}
+
+#################################
+# SetMagickLocation function
+#################################
+function SetMagickLocation {
+  if ($global:OSType -ne "Win32NT") {
+    $global:OSarch = [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture
+    if ($global:OSType -eq "Docker" -or $global:OSarch -eq "Arm64") {
+      $magick = 'magick'
+      $global:magick = $magick
+    }
+    Else {
+      $magickinstalllocation = $global:ScriptRoot
+      $magick = Join-Path $global:ScriptRoot 'magick'
+      $global:magick = $magick
+    }
+  }
+  Else {
+    $magickinstalllocation = RemoveTrailingSlash "./magick"
+    $magick = Join-Path $magickinstalllocation 'magick.exe'
+    $global:magick = $magick
+  }
+
+  if ($global:OSarch -eq "Arm64") {
+    try {
+      $CurrentImagemagickversion = & $magick -version
+    }
+    catch {
+      Write-Host "Could not query installed Imagemagick"
+      # Clear Running File
+      if (Test-Path $CurrentlyRunning) {
+        Remove-Item -LiteralPath $CurrentlyRunning | out-null
+      }
+      Exit
+    }
+    $CurrentImagemagickversion = [regex]::Match($CurrentImagemagickversion, 'Version: ImageMagick (\d+(\.\d+){1,2}-\d+)')
+    $CurrentImagemagickversion = $CurrentImagemagickversion.Groups[1].Value.replace('-', '.')
+    $global:CurrentImagemagickversion = $CurrentImagemagickversion
+    # Write-Host "Current Imagemagick Version: $CurrentImagemagickversion"
+  }
+  Else {
+    # Check ImageMagick now:
+    CheckImageMagick -magick $magick -magickinstalllocation $magickinstalllocation
+
+    $CurrentImagemagickversion = & $magick -version
+    $CurrentImagemagickversion = [regex]::Match($CurrentImagemagickversion, 'Version: ImageMagick (\d+(\.\d+){1,2}-\d+)')
+    $CurrentImagemagickversion = $CurrentImagemagickversion.Groups[1].Value.replace('-', '.')
+    $global:CurrentImagemagickversion = $CurrentImagemagickversion
+    # Write-Host "Current Imagemagick Version: $CurrentImagemagickversion"
+  }
+  if ($global:OSType -eq "Docker") {
+    $Url = "https://pkgs.alpinelinux.org/package/edge/community/x86_64/imagemagick"
+    $response = Invoke-WebRequest -Uri $url
+    $htmlContent = $response.Content
+    #$regexPattern = '<th class="header">Version<\/th>\s*<td>\s*<strong>\s*<a[^>]*>([^<]+)<\/a>\s*<\/strong>\s*<\/td>' # Old Pattern 20240929
+    $regexPattern = '<th class="header">Version<\/th>\s*<td>\s*<strong>([\d\.]+-r\d+)<\/strong>\s*<\/td>'
+    $Versionmatching = [regex]::Matches($htmlContent, $regexPattern)
+
+    if ($Versionmatching.Count -gt 0) {
+      $LatestImagemagickversion = $Versionmatching[0].Groups[1].Value.split('-')[0]
+    }
+  }
+  Elseif ($global:OSType -eq "Win32NT") {
+    $Url = "https://imagemagick.org/archive/binaries/?C=M;O=D"
+    $result = Invoke-WebRequest -Uri $Url
+    $LatestImagemagickversion = ($result.links.href | Where-Object { $_ -like '*portable-Q16-HDRI-x64.zip' } | Sort-Object -Descending)[0].Replace('-portable-Q16-HDRI-x64.zip', '').Replace('ImageMagick-', '')
+  }
+  Else {
+    $LatestImagemagickversion = (Invoke-RestMethod -Uri "https://api.github.com/repos/ImageMagick/ImageMagick/releases/latest" -Method Get).tag_name
+  }
+  if ($LatestImagemagickversion) {
+    $LatestImagemagickversion = $LatestImagemagickversion.replace('-', '.')
+    $global:LatestImagemagickversion = $LatestImagemagickversion
+    # Write-Host "Latest Imagemagick Version: $LatestImagemagickversion"
+  }
+
+  # Auto Update Magick
+  if ($global:AutoUpdateIM -eq 'true' -and $global:OSType -ne "Docker" -and $LatestImagemagickversion -gt $CurrentImagemagickversion -and $global:OSarch -ne "Arm64") {
+    if ($global:OSType -eq "Win32NT") {
+      Remove-Item -LiteralPath $magickinstalllocation -Recurse -Force
+    }
+    Else {
+      Remove-Item -LiteralPath "$global:ScriptRoot/magick" -Force
+    }
+    if ($global:OSType -ne "Win32NT") {
+      if ($global:OSType -ne "Docker") {
+        Write-Host "Downloading the latest Imagemagick portable version for you..."
+        $magickUrl = "https://imagemagick.org/archive/binaries/magick"
+        Invoke-WebRequest -Uri $magickUrl -OutFile "$global:ScriptRoot/magick"
+        chmod +x "$global:ScriptRoot/magick"
+        Write-Host "Made the portable Magick executable..."
+      }
+    }
+    else {
+      Write-Host "Downloading the latest Imagemagick portable version for you..."
+      $result = Invoke-WebRequest "https://imagemagick.org/archive/binaries/?C=M;O=D"
+      $LatestRelease = ($result.links.href | Where-Object { $_ -like '*portable-Q16-HDRI-x64.zip' } | Sort-Object -Descending)[0]
+      $DownloadPath = Join-Path -Path $global:ScriptRoot -ChildPath (Join-Path -Path 'temp' -ChildPath $LatestRelease)
+      Invoke-WebRequest "https://imagemagick.org/archive/binaries/$LatestRelease" -OutFile $DownloadPath
+      Expand-Archive -Path $DownloadPath -DestinationPath $magickinstalllocation -Force
+      if ((Get-ChildItem -Directory -LiteralPath $magickinstalllocation).name -eq $($LatestRelease.replace('.zip', ''))) {
+        Copy-item -Force -Recurse "$magickinstalllocation\$((Get-ChildItem -Directory -LiteralPath $magickinstalllocation).name)\*" $magickinstalllocation
+        Remove-Item -Recurse -LiteralPath "$magickinstalllocation\$((Get-ChildItem -Directory -LiteralPath $magickinstalllocation).name)" -Force
+      }
+      if (Test-Path -LiteralPath $magickinstalllocation\magick.exe) {
+        Write-Host "Placed Portable ImageMagick here: $magickinstalllocation"
+      }
+      Else {
+        Write-Host "Error During extraction, please manually install/copy portable Imagemagick from here: https://imagemagick.org/archive/binaries/$LatestRelease"
+      }
+    }
+  }
+}
+
+##### PRE-START #####
+# Set some global vars
+Set-OSTypeAndScriptRoot
+# Get platform
+$Platform = Get-Platform
+# Get Latest Script Version
+$LatestScriptVersion = Get-LatestScriptVersion
+# Check if Script is Latest
+if ($CurrentScriptVersion -eq $LatestScriptVersion) {
+  Write-Host "You are Running Version - v$CurrentScriptVersion"
+}
+Else {
+  Write-Host  "You are Running Version: v$CurrentScriptVersion - Latest Version is: v$LatestScriptVersion"
+}
+
+# Replace Script with Latest
+if ($Platform -ne 'Docker' -and $CurrentScriptVersion -ne $LatestScriptVersion) {
+  Write-Host "create_poster version upgrade started..."
+  $CurrentScriptPath = $MyInvocation.MyCommand.Path
+
+  # Backup the current script
+  Write-Host  "Backup current Script to: $CurrentScriptPath.bak"
+  Copy-Item -Path $CurrentScriptPath -Destination "$CurrentScriptPath.bak" -Force
+  try {
+    Invoke-WebRequest -Uri "https://github.com/fscorrupt/create_poster/raw/main/create_poster1.ps1" -OutFile $CurrentScriptPath -ErrorAction Stop
+    Write-Host "create_poster script updated to v$LatestScriptVersion, please restart script..."
+  }
+  catch {
+    Write-Host "Failed to download the latest script, Error: $($_.Exception.Message)"
+  }
+  Exit
 }
 
 ###########################################
@@ -75,26 +393,163 @@ $script_path = $PSScriptRoot
 Write-Host "****************************"
 Write-Host "Script path   : $script_path"
 
-#################################
-# check ImageMagick function
-#################################
-function Test-ImageMagick {
-  $global:magick = $global:magick
-  $global:magick = magick -version | select-string "Version:"
+SetMagickLocation
+
+$pwshver = $null
+$pwshver = $PSVersionTable.PSVersion.ToString()
+# ASCII art header
+if (-not $global:HeaderWritten) {
+  # Retrieve CPU model
+  $cpuModel = Get-CPUModel
+  # Retrieve RAM Info
+  if ($Platform -eq 'Docker' -or $Platform -eq 'Linux') {
+    # Check Memory Usage (Total and Free)
+    $memoryUsage = free -m | Out-String
+    $memoryUsageLines = $memoryUsage -split "`n"
+    $memValues = $memoryUsageLines[1] -split "\s+"
+
+    $totalMemory = [int]$memValues[1]
+    $usedMemory = [int]$memValues[2]
+    $freeMemory = [int]$memValues[3]
+    $sharedMemory = [int]$memValues[4]
+    $buffersCache = [int]$memValues[5]
+    $availableMemory = [int]$memValues[6]
+    if (Test-Path /etc/os-release) {
+      $OSVersion = (Get-Content /etc/os-release | Select-String -Pattern "^PRETTY_NAME=").ToString().Split('=')[1].Trim('"')
+    }
+    $Header = @"
+=========================================================================================
+
+ ####  #####  ######   ##   ##### ######         #####   ####   ####  ##### ###### #####
+#    # #    # #       #  #    #   #              #    # #    # #        #   #      #    #
+#      #    # #####  #    #   #   #####          #    # #    #  ####    #   #####  #    #
+#      #####  #      ######   #   #              #####  #    #      #   #   #      #####
+#    # #   #  #      #    #   #   #              #      #    # #    #   #   #      #   #
+ ####  #    # ###### #    #   #   ######         #       ####   ####    #   ###### #    #
+                                         #######
+
+Current Version: $CurrentScriptVersion
+Latest Version: $LatestScriptVersion
+Platform: $Platform
+OS Version: $OSVersion
+Powershell Version: $pwshver
+Current Imagemagick Version: $CurrentImagemagickversion
+Latest Imagemagick Version: $LatestImagemagickversion
+
+CPU Model: $cpuModel
+
+Total Memory: $totalMemory MB
+Used Memory: $usedMemory MB
+Free Memory: $freeMemory MB
+Shared Memory: $sharedMemory MB
+Buffers/Cache: $buffersCache MB
+Available: $availableMemory MB
+=========================================================================================
+"@
+  }
+  Elseif ($Platform -eq 'Windows') {
+    # Retrieve memory information in GB or MB
+    $memoryInfo = Get-CimInstance Win32_OperatingSystem | Select-Object @{Name = "FreePhysicalMemory"; Expression = {
+        if ($_.FreePhysicalMemory -ge 1GB) {
+          "$([math]::Round($_.FreePhysicalMemory / 1GB, 2)) MB"
+        }
+        elseif ($_.FreePhysicalMemory -ge 1MB) {
+          "$([math]::Round($_.FreePhysicalMemory / 1MB, 2)) GB"
+        }
+        else {
+          "$($_.FreePhysicalMemory)"
+        } }
+    },
+    @{Name = "TotalVisibleMemorySize"; Expression = {
+        if ($_.TotalVisibleMemorySize -ge 1GB) {
+          "$([math]::Round($_.TotalVisibleMemorySize / 1GB, 2)) MB"
+        }
+        elseif ($_.TotalVisibleMemorySize -ge 1MB) {
+          "$([math]::Round($_.TotalVisibleMemorySize / 1MB, 2)) GB"
+        }
+        else {
+          "$($_.TotalVisibleMemorySize)"
+        }
+      }
+    },
+    @{Name = "UsedMemory"; Expression = {
+        $totalMemory = $_.TotalVisibleMemorySize
+        $freeMemory = $_.FreePhysicalMemory
+        $usedMemory = $totalMemory - $freeMemory
+
+        if ($usedMemory -ge 1GB) {
+          "$([math]::Round($usedMemory / 1GB, 2)) MB"
+        }
+        elseif ($usedMemory -ge 1MB) {
+          "$([math]::Round($usedMemory / 1MB, 2)) GB"
+        }
+        else {
+          $usedMemory
+        }
+      }
+    }
+    $totalMemory = $memoryInfo.TotalVisibleMemorySize
+    $usedMemory = $memoryInfo.UsedMemory
+    $freeMemory = $memoryInfo.FreePhysicalMemory
+    $OSVersion = (Get-WmiObject -class Win32_OperatingSystem).Caption
+    $Header = @"
+=========================================================================================
+
+ ####  #####  ######   ##   ##### ######         #####   ####   ####  ##### ###### #####
+#    # #    # #       #  #    #   #              #    # #    # #        #   #      #    #
+#      #    # #####  #    #   #   #####          #    # #    #  ####    #   #####  #    #
+#      #####  #      ######   #   #              #####  #    #      #   #   #      #####
+#    # #   #  #      #    #   #   #              #      #    # #    #   #   #      #   #
+ ####  #    # ###### #    #   #   ######         #       ####   ####    #   ###### #    #
+                                         #######
+
+Current Version: $CurrentScriptVersion
+Latest Version: $LatestScriptVersion
+Platform: $Platform
+OS Version: $OSVersion
+Powershell Version: $pwshver
+Current Imagemagick Version: $CurrentImagemagickversion
+Latest Imagemagick Version: $LatestImagemagickversion
+
+CPU Model: $cpuModel
+
+Total Memory: $totalMemory
+Used Memory: $usedMemory
+Free Memory: $freeMemory
+=========================================================================================
+"@
+  }
+  Else {
+    $Header = @"
+=========================================================================================
+
+ ####  #####  ######   ##   ##### ######         #####   ####   ####  ##### ###### #####
+#    # #    # #       #  #    #   #              #    # #    # #        #   #      #    #
+#      #    # #####  #    #   #   #####          #    # #    #  ####    #   #####  #    #
+#      #####  #      ######   #   #              #####  #    #      #   #   #      #####
+#    # #   #  #      #    #   #   #              #      #    # #    #   #   #      #   #
+ ####  #    # ###### #    #   #   ######         #       ####   ####    #   ###### #    #
+                                         #######
+
+Current Version: $CurrentScriptVersion
+Latest Version: $LatestScriptVersion
+Platform: $Platform
+Powershell Version: $pwshver
+Current Imagemagick Version: $CurrentImagemagickversion
+Latest Imagemagick Version: $LatestImagemagickversion
+CPU Model: $cpuModel
+=========================================================================================
+"@
+  }
+  Write-Host $Header
+  # $Header | Out-File $Path -Append
+  $global:HeaderWritten = $true
 }
-Test-ImageMagick
-$test = $global:magick
-if ($null -eq $test) {
-  Write-Host "Imagemagick   : Imagemagick is NOT installed. Aborting.... Imagemagick must be installed - https://imagemagick.org/script/download.php"
-  WriteToLogFile "Imagemagick [ERROR]          : Imagemagick is NOT installed. Aborting.... Imagemagick must be installed - https://imagemagick.org/script/download.php $commandLine"
-  exit
-}
-else {
-  Write-Host "Imagemagick   : Imagemagick is installed. $global:magick"
-}
-$tmp = $null
-$tmp = $PSVersionTable.PSVersion.ToString()
-Write-Host "Powershell Ver: $tmp"
+
+
+
+
+
 
 $random_name = ("{0:X6}" -f (Get-Random -Maximum 0xFFFFFF))
 
@@ -105,7 +560,7 @@ $trans_path = Join-Path -Path $script_path -ChildPath "transparent.png"
 if (-not(Test-Path -Path $trans_path -PathType Leaf)) {
   Write-Host "Logo >$trans_path< not found. Creating now..." -ForegroundColor Red -BackgroundColor White
   if ($logo -eq "" -or $null -eq $logo) {
-    magick -size 1x1 xc:none $trans_path
+    & $magick -size 1x1 xc:none $trans_path
     $logo = $trans_path
   }
 }
@@ -159,7 +614,7 @@ Function Convert-TextToBinary {
     [Parameter(Mandatory)]
     [string]
     $Text,
-    
+
     [Parameter(Mandatory)]
     [string]
     $OutputPath
@@ -220,28 +675,28 @@ if (-not(Test-Path -Path $fade4 -PathType Leaf)) {
 
 switch ($gradient) {
   0 {
-    $fade = Resolve-Path $fade0 
+    $fade = Resolve-Path $fade0
     $fadenum = 0
   }
   1 {
-    $fade = Resolve-Path $fade1 
+    $fade = Resolve-Path $fade1
     $fadenum = 1
   }
   2 {
     $fade = Resolve-Path $fade2
-    $fadenum = 2 
+    $fadenum = 2
   }
   3 {
-    $fade = Resolve-Path $fade3 
+    $fade = Resolve-Path $fade3
     $fadenum = 3
   }
   4 {
-    $fade = Resolve-Path $fade4 
+    $fade = Resolve-Path $fade4
     $fadenum = 4
   }
   Default {
     $fade = Resolve-Path $fade1
-    $fadenum = 1 
+    $fadenum = 1
   }
 }
 
@@ -270,7 +725,8 @@ if ($avg_color_image -eq "" -or $null -eq $avg_color_image) {
   if (Test-Path $trans_path) {
   }
   else {
-    magick -size 1x1 xc:none $trans_path
+    & $magick -size 1x1 xc:none $trans_path
+    # magick -size 1x1 xc:none $trans_path
   }
   $avg_color_image = $trans_path
 }
@@ -281,7 +737,7 @@ if ($avg_color) {
     WriteToLogFile "avg_color_image [ERROR]      : Image for avg_color_image >$avg_color_image< not found. Exiting now... $commandLine"
     exit
   }
-  else { 
+  else {
     $avg_color_image = Resolve-Path $avg_color_image
   }
 }
@@ -305,10 +761,10 @@ if ($avg_color -eq "" -or $null -eq $avg_color) {
 else {
   $avg_color = $avg_color
   # using a modulate adds Hsl "brightness" of 120%, so a 20% brighter image
-  $my_avg = magick $avg_color_image -resize 1x1 -modulate 120 txt:-
+  $my_avg = & $magick $avg_color_image -resize 1x1 -modulate 120 txt:-
   $my_avg = $my_avg -split "(#[a-zA-Z0-9]{6})"
   $base_color = $my_avg[2]
-}  
+}
 
 if ($base_color.StartsWith('#', 'CurrentCultureIgnoreCase')) {
 }
@@ -348,13 +804,32 @@ else {
 #################################
 # $font checks
 #################################
+if ($font -eq "" -or $null -eq $font) {
+}
+else {
+  $font = $font.replace('\', '\\')
+}
+
 $tmpfont = $font + "$"
-$chkfont = magick identify -list font | Select-String "Font: $tmpfont"
+$chkfont = & $magick identify -list font | Select-String "Font: $tmpfont"
+if ($chkfont -eq "" -or $null -eq $chkfont) {
+  if ($font -eq "" -or $null -eq $font) {
+  }
+  else {
+    if (Test-Path $font) {
+      $chkfont = $chkfont + $font
+    }
+    else {
+      # File not found
+      $font = ""
+    }
+  }
+}
 
 if ($chkfont -eq "" -or $null -eq $chkfont) {
-  $font_list = magick identify -list font | Select-String "Font: "
+  $font_list = & $magick identify -list font | Select-String "Font: "
   $font_list -replace "  Font: ", ""> magick_fonts.txt
-  Write-Host "Font parameter >$font< is not installed/found. List of installed fonts that Imagemagick can use was listed and exported to here: magick_fonts.txt. Random Font mode enabling now..." -ForegroundColor Red -BackgroundColor White
+  Write-Host "Font parameter >$font< is not installed/found. Check path to font or check list of installed fonts that Imagemagick can use here: magick_fonts.txt. Random Font mode enabling now..." -ForegroundColor Red -BackgroundColor White
   Write-Host $font_list.count " fonts are visible to Imagemagick. Picking random font and continuing..."
   if ($font_list.count -gt 0) {
     if (Test-Path magick_fonts.txt) {
@@ -665,35 +1140,35 @@ Add-Content -Path playback.txt -Value ".\create_poster.ps1 -logo ""$orig_logo"" 
 # creation of image begins
 #################################
 
-#Write-Host "magick -size 2000x3000 xc:$base_color $bcf"
-magick -size 2000x3000 xc:$base_color $bcf
-#Write-Host "magick -gravity center $bcf $fade -background None -layers Flatten $gbcf"
-magick -gravity center $bcf $ff -background None -layers Flatten $gbcf
-#Write-Host "magick $logo -colorspace gray -fill white -colorize 100 $wf"
-magick $logo -colorspace gray -fill white -colorize 100 $wf
+#Write-Host "& $magick -size 2000x3000 xc:$base_color $bcf"
+& $magick -size 2000x3000 xc:$base_color $bcf
+#Write-Host "& $magick -gravity center $bcf $fade -background None -layers Flatten $gbcf"
+& $magick -gravity center $bcf $ff -background None -layers Flatten $gbcf
+#Write-Host "& $magick $logo -colorspace gray -fill white -colorize 100 $wf"
+& $magick $logo -colorspace gray -fill white -colorize 100 $wf
 
 $tmplogo = Resolve-Path $logo
 if ($white_wash) {
   $logo = Join-Path -Path 'tmp' -ChildPath $random_name"_white_$noextension$extension"
 }
 
-#Write-Host "magick $logo -resize $logo_resize PNG32:$rf"
-magick $logo -resize $logo_resize PNG32:$rf 
-#Write-Host "magick $gbcf -set colorspace sRGB $rf -gravity center -geometry +0$logo_offset -quality 100% -composite $nef"
-magick $gbcf -set colorspace sRGB $rf -gravity center -geometry +0$logo_offset -quality 100% -composite $nef
+#Write-Host "& $magick $logo -resize $logo_resize PNG32:$rf"
+& $magick $logo -resize $logo_resize PNG32:$rf
+#Write-Host "& $magick $gbcf -set colorspace sRGB $rf -gravity center -geometry +0$logo_offset -quality 100% -composite $nef"
+& $magick $gbcf -set colorspace sRGB $rf -gravity center -geometry +0$logo_offset -quality 100% -composite $nef
 
 if ($text -eq "" -or $null -eq $text) {
 }
 else {
-  #Write-Host "magick $nef -gravity center -background None -layers Flatten `( -font $font -pointsize $font_size -fill $font_color -size 1900x1000 -background none caption:$text -trim -gravity center -extent 1900x1000 `) -gravity center -geometry +0$text_offset -quality 100% -composite $nef"
-  magick $nef -gravity center -background None -layers Flatten `( -font $font -pointsize $font_size -fill $font_color -size 1900x1000 -background none caption:"$text" -trim -gravity center -extent 1900x1000 `) -gravity center -geometry +0$text_offset -quality 100% -composite $nef
+  #Write-Host "& $magick $nef -gravity center -background None -layers Flatten `( -font $font -pointsize $font_size -fill $font_color -size 1900x1000 -background none caption:$text -trim -gravity center -extent 1900x1000 `) -gravity center -geometry +0$text_offset -quality 100% -composite $nef"
+  & $magick $nef -gravity center -background None -layers Flatten `( -font $font -pointsize $font_size -fill $font_color -size 1900x1000 -background none caption:"$text" -trim -gravity center -extent 1900x1000 `) -gravity center -geometry +0$text_offset -quality 100% -composite $nef
 }
 
 if ($border) {
-  #Write-Host "magick $nef -resize $tmp_resize $nef"
-  magick $nef -resize $tmp_resize $nef
-  #Write-Host "magick $nef -bordercolor $border_color -border $tmp_border $nef"
-  magick $nef -bordercolor "$border_color" -border $tmp_border $nef
+  #Write-Host "& $magick $nef -resize $tmp_resize $nef"
+  & $magick $nef -resize $tmp_resize $nef
+  #Write-Host "& $magick $nef -bordercolor $border_color -border $tmp_border $nef"
+  & $magick $nef -bordercolor "$border_color" -border $tmp_border $nef
 }
 
 #################################
