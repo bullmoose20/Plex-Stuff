@@ -48,6 +48,8 @@ param ($logo, $logo_offset, $logo_resize, $base_color, $gradient, $text, $text_o
 #################################
 # GLOBAL VARS
 #################################
+$global:OSType = $null
+$global:ScriptRoot = $null
 $global:magick = $null
 $global:CurrentImagemagickversion = $null
 $global:LatestImagemagickversion = $null
@@ -432,6 +434,7 @@ Current Version: $CurrentScriptVersion
 Latest Version: $LatestScriptVersion
 Platform: $Platform
 OS Version: $OSVersion
+OS Type: $global:OSType
 Powershell Version: $pwshver
 Current Imagemagick Version: $CurrentImagemagickversion
 Latest Imagemagick Version: $LatestImagemagickversion
@@ -507,6 +510,7 @@ Current Version: $CurrentScriptVersion
 Latest Version: $LatestScriptVersion
 Platform: $Platform
 OS Version: $OSVersion
+OS Type: $global:OSType
 Powershell Version: $pwshver
 Current Imagemagick Version: $CurrentImagemagickversion
 Latest Imagemagick Version: $LatestImagemagickversion
@@ -545,11 +549,6 @@ CPU Model: $cpuModel
   # $Header | Out-File $Path -Append
   $global:HeaderWritten = $true
 }
-
-
-
-
-
 
 $random_name = ("{0:X6}" -f (Get-Random -Maximum 0xFFFFFF))
 
