@@ -4,7 +4,7 @@
 # Version: 3.1
 # Author: bullmoose20
 #
-# DESCRIPTION: 
+# DESCRIPTION:
 # This script contains ten functions that are used to create various types of posters. The functions are:
 # CreateAudioLanguage, CreateAwards, CreateChart, CreateCountry, CreateDecade, CreateGenre, CreatePlaylist, CreateSubtitleLanguage, CreateUniverse, CreateVideoFormat, CreateYear, and CreateOverlays.
 # The script can be called by providing the name of the function or aliases you want to run as a command-line argument.
@@ -20,7 +20,7 @@
 #
 # EXAMPLES:
 # You can run the script by providing the name of the function you want to run as a command-line argument:
-# create_default_posters.ps1 AudioLanguage 
+# create_default_posters.ps1 AudioLanguage
 # This will run only the CreateAudioLanguage function.
 # You can also provide multiple function names as command-line arguments:
 # create_default_posters.ps1 AudioLanguage Playlist Chart
@@ -141,26 +141,26 @@ Function Update-LogFile {
 ################################################################################
 Function InstallFontsIfNeeded {
     $fontNames = @(
-        "Comfortaa-Medium", 
+        "Comfortaa-Medium",
         "Bebas-Regular",
-        "Rye-Regular", 
-        "Limelight-Regular", 
-        "BoecklinsUniverse", 
-        "UnifrakturCook", 
-        "Trochut", 
-        "Righteous", 
-        "Yesteryear", 
-        "Cherry-Cream-Soda-Regular", 
-        "Boogaloo-Regular", 
-        "Monoton", 
-        "Press-Start-2P", 
-        "Jura-Bold", 
-        "Special-Elite-Regular", 
-        "Barlow-Regular", 
+        "Rye-Regular",
+        "Limelight-Regular",
+        "BoecklinsUniverse",
+        "UnifrakturCook",
+        "Trochut",
+        "Righteous",
+        "Yesteryear",
+        "Cherry-Cream-Soda-Regular",
+        "Boogaloo-Regular",
+        "Monoton",
+        "Press-Start-2P",
+        "Jura-Bold",
+        "Special-Elite-Regular",
+        "Barlow-Regular",
         "Helvetica-Bold"
     )
     $missingFonts = $fontNames | Where-Object { !(magick identify -list font | Select-String "Font: $_$") }
-    
+
     if ($missingFonts) {
         $fontList = magick identify -list font | Select-String "Font: " | ForEach-Object { $_.ToString().Trim().Substring(6) }
         $fontList | Out-File -Encoding utf8 -FilePath "magick_fonts.txt"
@@ -181,7 +181,7 @@ Function Remove-Folders {
     "decade", "defaults-$LanguageCode", "franchise", "genre", "network", "playlist", "resolution",
     "seasonal", "separators", "streaming", "studio", "subtitle_language",
     "translations", "universe", "video_format", "year"
-    
+
     foreach ($folder in $folders) {
         $path = Join-Path $script_path $folder
         Remove-Item $path -Force -Recurse -ErrorAction SilentlyContinue
@@ -275,7 +275,7 @@ Function Get-TranslationFile {
 
     # $GitHubRepository = "https://raw.githubusercontent.com/Kometa-Team/Kometa/$BranchOption/defaults/translations"
     $GitHubRepository = "https://raw.githubusercontent.com/Kometa-Team/Translations/master/defaults"
-	$TranslationFile = "$LanguageCode.yml"
+    $TranslationFile = "$LanguageCode.yml"
     $TranslationFileUrl = "$GitHubRepository/$TranslationFile"
     $TranslationsPath = Join-Path $script_path "@translations"
     $TranslationFilePath = Join-Path $TranslationsPath $TranslationFile
@@ -298,7 +298,7 @@ Function Get-TranslationFile {
         Write-Error $_
         return
     }
-  
+
     Write-Output "Translation file downloaded to $TranslationFilePath"
 }
 
@@ -320,15 +320,15 @@ Function Get-YamlPropertyValue {
     param (
         [Parameter(Mandatory = $true)]
         [string]$PropertyPath,
-        
+
         [Parameter(Mandatory = $true)]
         [object]$ConfigObject,
-        
+
         [Parameter()]
         [ValidateSet("Exact", "Upper", "Lower")]
         [string]$CaseSensitivity = "Exact"
     )
-    
+
     $value = $ConfigObject
     foreach ($path in $PropertyPath.Split(".")) {
         if ($value.ContainsKey($path)) {
@@ -340,7 +340,7 @@ Function Get-YamlPropertyValue {
             return
         }
     }
-    
+
     switch ($CaseSensitivity) {
         "Exact" { break }
         "Upper" { $value = $value.ToUpper() }
@@ -609,7 +609,7 @@ Function LaunchScripts {
         $batch = $ScriptPaths[$i..($i + $batchSize - 1)]
         $processes = @()
         foreach ($scriptPath in $batch) {
-            $encodedCommand = EncodeIt $scriptPath 
+            $encodedCommand = EncodeIt $scriptPath
             WriteToLogFile "Unencoded                    : $scriptPath"
             WriteToLogFile "Encoded                      : $encodedCommand"
             # $process = Start-Process -NoNewWindow -FilePath "pwsh.exe" -ArgumentList "-noexit -encodedCommand $encodedCommand" -PassThru
@@ -726,7 +726,7 @@ Function CreateAspect {
     Move-Item -Path output -Destination aspect
     Copy-Item -Path logos_aspect -Destination aspect\logos -Recurse
     Move-Item -Path output-orig -Destination output
-    
+
 }
 
 
@@ -971,7 +971,7 @@ Function CreateAudioLanguage {
 
     Move-Item -Path output -Destination audio_language
     Move-Item -Path output-orig -Destination output
-    
+
 }
 
 ################################################################################
@@ -1961,7 +1961,7 @@ Function CreateAwards {
         '| Golden.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Golden| #D0A047| 1| 1| 0| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
-    
+
     $arr = @()
     foreach ($item in $myArray) {
         if ($($item.key_name).ToString() -eq "") {
@@ -1974,7 +1974,7 @@ Function CreateAwards {
         $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
     }
     LaunchScripts -ScriptPaths $arr
-    
+
     $myArray = @(
         'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
         'WINNERS| Golden.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | winner| #D0A047| 1| 1| 0| 1'
@@ -2246,7 +2246,7 @@ Function CreateAwards {
         'BEST_PICTURE_WINNERS| Razzie.png| -500| 1000| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | best_picture_winner| #FF0C0C| 1| 1| 0| 1',
         '| Razzie.png| -500| 1000| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Razzie| #FF0C0C| 1| 1| 0| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
-    
+
     $arr = @()
     foreach ($item in $myArray) {
         if ($($item.key_name).ToString() -eq "") {
@@ -2259,7 +2259,7 @@ Function CreateAwards {
         $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
     }
     LaunchScripts -ScriptPaths $arr
-    
+
     $myArray = @(
         'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
         'WINNERS| Razzie.png| -500| 1000| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | winner| #FF0C0C| 1| 1| 0| 1'
@@ -2352,7 +2352,7 @@ Function CreateAwards {
         $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
     }
     LaunchScripts -ScriptPaths $arr
-    
+
     $myArray = @(
         'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
         'WINNERS| Spirit.png| -500| 1000| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | winner| #4662E7| 1| 1| 0| 1'
@@ -2644,7 +2644,7 @@ Function CreateBased {
         'BASED_ON_A_TRUE_STORY| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | True Story| #BC0638| 1| 1| 0| 1',
         'BASED_ON_A_VIDEO_GAME| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Video Game| #38CC66| 1| 1| 0| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
-    
+
     $arr = @()
     foreach ($item in $myArray) {
         if ($($item.key_name).ToString() -eq "") {
@@ -3187,7 +3187,7 @@ Function CreateChart {
         'WATCHED| Tautulli.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Tautulli Watched| #B9851F| 1| 1| 0| 0',
         'WATCHED| Trakt.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Trakt Watched| #CD1A20| 1| 1| 0| 0',
         'WATCHLIST| Trakt.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Trakt Watchlist| #CD1A20| 1| 1| 0| 0'
-        ) | ConvertFrom-Csv -Delimiter '|'
+    ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
     foreach ($item in $myArray) {
@@ -3286,11 +3286,11 @@ Function CreateContentRating {
     LaunchScripts -ScriptPaths $arr
 
     Move-Item -Path output -Destination content_rating\cs
-    
+
     $content_rating = "G", "PG", "PG-13", "R", "R+", "Rx"
     $base_color = "#2444D1"
     $arr = @()
-    foreach ( $cr in $content_rating ) { 
+    foreach ( $cr in $content_rating ) {
         $value = (Get-YamlPropertyValue -PropertyPath "key_names.RATED" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
         $value = "$value $cr"
         $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
@@ -3300,7 +3300,7 @@ Function CreateContentRating {
     $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
     $arr += ".\create_poster.ps1 -logo `"$script_path\logos_content_rating\mal.png`" -logo_offset $logo_offset -logo_resize $logo_resize -text `"$value`" -text_offset $text_offset -font `"$font`" -font_size $optimalFontSize -font_color `"$font_color`" -border $border -border_width $border_width -border_color `"$border_color`" -avg_color_image `"$avg_color_image`" -out_name `"NR`" -base_color `"$base_color`" -gradient $gradient -avg_color $avg_color -clean $clean -white_wash $white_wash"
     LaunchScripts -ScriptPaths $arr
-    
+
     Move-Item -Path output -Destination content_rating\mal
 
     $myArray = @(
@@ -3314,7 +3314,7 @@ Function CreateContentRating {
         '| ukr18.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | R18| #016ED3| 1| 1| 0| 1',
         '| uku.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | U| #0BC700| 1| 1| 0| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
-    
+
     $arr = @()
     foreach ($item in $myArray) {
         if ($($item.key_name).ToString() -eq "") {
@@ -3340,7 +3340,7 @@ Function CreateContentRating {
         '| debpjmc.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | BPjM| #DC1924| 1| 1| 0| 1',
         '| denr.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | NR| #0E84A3| 1| 1| 0| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
-    
+
     $arr = @()
     foreach ($item in $myArray) {
         if ($($item.key_name).ToString() -eq "") {
@@ -3366,7 +3366,7 @@ Function CreateContentRating {
         '| au_x.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | X18+| #221f20| 1| 1| 0| 1',
         '| au_nr.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | NR| #0D3843| 1| 1| 0| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
-    
+
     $arr = @()
     foreach ($item in $myArray) {
         if ($($item.key_name).ToString() -eq "") {
@@ -3397,7 +3397,7 @@ Function CreateContentRating {
         '| nz_RP18.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | RP18| #FF0000| 1| 1| 0| 1',
         '| nz_nr.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | NR| #0D3843| 1| 1| 0| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
-    
+
     $arr = @()
     foreach ($item in $myArray) {
         if ($($item.key_name).ToString() -eq "") {
@@ -3427,7 +3427,7 @@ Function CreateContentRating {
         '| ustv-pg.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | TV-PG| #5B0EFD| 1| 1| 0| 1',
         '| ustv-y.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | TV-Y| #3EB3C1| 1| 1| 0| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
-    
+
     $arr = @()
     foreach ($item in $myArray) {
         if ($($item.key_name).ToString() -eq "") {
@@ -3703,8 +3703,8 @@ Function CreateCountry {
         'PUERTO_RICO| pr.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Puerto Rico| #48ED66| 1| 1| 0| 0',
         'QATAR| qa.png| -500| 750| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Qatar| #4C1FCC| 1| 1| 0| 0',
         'REPUBLIC_OF_THE_CONGO| cg.png| -500| 1000| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Republic of the Congo| #9D3C85| 1| 1| 0| 0',
-        'SAINT_PIERRE_AND_MIQUELON| pm.png| -500| 1000| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Saint Pierre and Miquelon| #29C4C6| 1| 1| 0| 0',        
-        'CAYMAN_ISLANDS| ky.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Cayman Islands| #9589CC| 1| 1| 0| 0',        
+        'SAINT_PIERRE_AND_MIQUELON| pm.png| -500| 1000| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Saint Pierre and Miquelon| #29C4C6| 1| 1| 0| 0',
+        'CAYMAN_ISLANDS| ky.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Cayman Islands| #9589CC| 1| 1| 0| 0',
         'RÉUNION| re.png| -500| 750| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Réunion| #502892| 1| 1| 0| 0',
         'ROMANIA| ro.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Romania| #ABD0CF| 1| 1| 0| 0',
         'RUSSIAN| Russian.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Russian| #05C9B6| 1| 1| 0| 0',
@@ -3784,8 +3784,8 @@ Function CreateCountry {
         'ZAMBIA| zm.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Zambia| #AB1780| 1| 1| 0| 0',
         'ZIMBABWE| zw.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Zimbabwe| #A44C98| 1| 1| 0| 0',
         'ÅLAND_ISLANDS| ax.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Åland Islands| #B7E412| 1| 1| 0| 0'
-        ) | ConvertFrom-Csv -Delimiter '|'
-    
+    ) | ConvertFrom-Csv -Delimiter '|'
+
     $arr = @()
     foreach ($item in $myArray) {
         if ($($item.key_name).ToString() -eq "") {
@@ -4023,8 +4023,8 @@ Function CreateCountry {
         'PUERTO_RICO| pr.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Puerto Rico| #48ED66| 1| 1| 0| 1',
         'QATAR| qa.png| -500| 750| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Qatar| #4C1FCC| 1| 1| 0| 1',
         'REPUBLIC_OF_THE_CONGO| cg.png| -500| 1000| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Republic of the Congo| #9D3C85| 1| 1| 0| 1',
-        'SAINT_PIERRE_AND_MIQUELON| pm.png| -500| 1000| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Saint Pierre and Miquelon| #29C4C6| 1| 1| 0| 1',        
-        'CAYMAN_ISLANDS| ky.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Cayman Islands| #9589CC| 1| 1| 0| 1',        
+        'SAINT_PIERRE_AND_MIQUELON| pm.png| -500| 1000| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Saint Pierre and Miquelon| #29C4C6| 1| 1| 0| 1',
+        'CAYMAN_ISLANDS| ky.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Cayman Islands| #9589CC| 1| 1| 0| 1',
         'RÉUNION| re.png| -500| 750| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Réunion| #502892| 1| 1| 0| 1',
         'ROMANIA| ro.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Romania| #ABD0CF| 1| 1| 0| 1',
         'RUSSIAN| Russian.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Russian| #05C9B6| 1| 1| 0| 1',
@@ -4104,7 +4104,7 @@ Function CreateCountry {
         'ZAMBIA| zm.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Zambia| #AB1780| 1| 1| 0| 1',
         'ZIMBABWE| zw.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Zimbabwe| #A44C98| 1| 1| 0| 1',
         'ÅLAND_ISLANDS| ax.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Åland Islands| #B7E412| 1| 1| 0| 1'
-        ) | ConvertFrom-Csv -Delimiter '|'
+    ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
     foreach ($item in $myArray) {
@@ -4142,7 +4142,7 @@ Function CreateCountry {
     Move-Item -Path output -Destination country\white
     Copy-Item -Path logos_country -Destination country\logos -Recurse
     Move-Item -Path output-orig -Destination output
-    
+
 }
 
 ################################################################################
@@ -4203,7 +4203,7 @@ Function CreateDecade {
         '2010s| transparent.png| +0| 0| +0| Barlow-Regular| 500| #FFFFFF| 0| 15| #FFFFFF| | 2010| #44EF10| 1| 1| 0| 1',
         '2020s| transparent.png| +0| 0| +0| Helvetica-Bold| 500| #FFFFFF| 0| 15| #FFFFFF| | 2020| #44EF10| 1| 1| 0| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
-    
+
     $arr = @()
     foreach ($item in $myArray) {
         $value = $($item.key_name)
@@ -4215,7 +4215,7 @@ Function CreateDecade {
     WriteToLogFile "MonitorProcess               : Waiting for all processes to end before continuing..."
     Start-Sleep -Seconds 3
     MonitorProcess -ProcessName "magick.exe"
-    
+
     Move-Item -Path output -Destination decade
 
     $pre_value = Get-YamlPropertyValue -PropertyPath "key_names.BEST_OF" -ConfigObject $global:ConfigObj -CaseSensitivity Upper
@@ -4378,7 +4378,7 @@ Function CreateFranchise {
     Move-Item -Path output -Destination franchise
     Copy-Item -Path logos_franchise -Destination franchise\logos -Recurse
     Move-Item -Path output-orig -Destination output
-    
+
 }
 
 ################################################################################
@@ -4685,7 +4685,7 @@ Function CreateGenre {
         'ZOMBIE_COMEDY| Zombie Comedy.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Zombie Comedy| #04B69C| 1| 1| 0| 0',
         'ZOMBIE_HORROR| Zombie Horror.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Zombie Horror| #909513| 1| 1| 0| 1',
         'ZOMBIE| Zombie.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Zombie| #909513| 1| 1| 0| 0'
-        ) | ConvertFrom-Csv -Delimiter '|'
+    ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
     foreach ($item in $myArray) {
@@ -5010,7 +5010,7 @@ Function CreateNetwork {
         ' | YouTube.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | YouTube| #C51414| 1| 1| 0| 0',
         ' | ZDF.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ZDF| #C58654| 1| 1| 0| 0',
         ' | ZEE5.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ZEE5| #8704C1| 1| 1| 0| 0'
-        ) | ConvertFrom-Csv -Delimiter '|'
+    ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
     foreach ($item in $myArray) {
@@ -5063,7 +5063,7 @@ Function CreateNetwork {
     Move-Item -Path output -Destination network\white
     Copy-Item -Path logos_network -Destination network\logos -Recurse
     Move-Item -Path output-orig -Destination output
-    
+
 }
 
 ################################################################################
@@ -5125,7 +5125,7 @@ Function CreateResolution {
     $theMaxHeight = 1000
     $minPointSize = 100
     $maxPointSize = 250
-    
+
     Move-Item -Path output -Destination output-orig
 
     $myArray = @(
@@ -5175,7 +5175,7 @@ Function CreateResolution {
     LaunchScripts -ScriptPaths $arr
 
     Move-Item -Path output -Destination resolution
-    
+
     $myArray = @(
         'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
         'resolutions_other| transparent.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | other| #FF2000| 1| 1| 0| 1'
@@ -5219,7 +5219,7 @@ Function CreateResolution {
     Move-Item -Path output -Destination resolution\standards
     Copy-Item -Path logos_resolution -Destination resolution\logos -Recurse
     Move-Item -Path output-orig -Destination output
-    
+
 }
 
 ################################################################################
@@ -5538,16 +5538,16 @@ Function CreateStudio {
     $myArray = @(
         'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
         '| 101 Studios.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | 101 Studios| #B69367| 1| 1| 0| 0',
-'| Disney Television Animation.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| #D19068| Disney Television Animation| #D19068| 1| 1| 0| 0',
-'| DisneyToon Studios.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | DisneyToon Studios| #867CE1| 1| 1| 0| 0',
-'| Dynamic Planning.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Dynamic Planning| #1316DE| 1| 1| 0| 0',
-'| Film4 Productions.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Film4 Productions| #B2FCEC| 1| 1| 0| 0',
-'| Golden Harvest.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Golden Harvest| #A21FBF| 1| 1| 0| 0',
-'| Hungry Man.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Hungry Man| #7C3476| 1| 1| 0| 0',
-'| Screen Gems.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Screen Gems| #7A7A70| 1| 1| 0| 0',
-'| Shaw Brothers.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Shaw Brothers| #F45C0B| 1| 1| 0| 0',
-'| Studio Live.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Studio Live| #62C64A| 1| 1| 0| 0',
-'| The Stone Quarry.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | The Stone Quarry| #6727FA| 1| 1| 0| 0',
+        '| Disney Television Animation.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| #D19068| Disney Television Animation| #D19068| 1| 1| 0| 0',
+        '| DisneyToon Studios.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | DisneyToon Studios| #867CE1| 1| 1| 0| 0',
+        '| Dynamic Planning.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Dynamic Planning| #1316DE| 1| 1| 0| 0',
+        '| Film4 Productions.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Film4 Productions| #B2FCEC| 1| 1| 0| 0',
+        '| Golden Harvest.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Golden Harvest| #A21FBF| 1| 1| 0| 0',
+        '| Hungry Man.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Hungry Man| #7C3476| 1| 1| 0| 0',
+        '| Screen Gems.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Screen Gems| #7A7A70| 1| 1| 0| 0',
+        '| Shaw Brothers.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Shaw Brothers| #F45C0B| 1| 1| 0| 0',
+        '| Studio Live.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Studio Live| #62C64A| 1| 1| 0| 0',
+        '| The Stone Quarry.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | The Stone Quarry| #6727FA| 1| 1| 0| 0',
         '| Codeblack Entertainment.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Codeblack Entertainment| #0CE02A| 1| 1| 0| 0',
         '| Dimension Films.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Dimension Films| #D13B12| 1| 1| 0| 0',
         '| Broken Lizard Industries.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Broken Lizard Industries| #DA4FD2| 1| 1| 0| 0',
@@ -6023,7 +6023,7 @@ Function CreateStudio {
         '| Yumeta Company.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Yumeta Company| #945E75| 1| 1| 0| 0',
         '| Zero-G.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Zero-G| #460961| 1| 1| 0| 0',
         '| Zexcs.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Zexcs| #E60CB2| 1| 1| 0| 0'
-        ) | ConvertFrom-Csv -Delimiter '|'
+    ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
     foreach ($item in $myArray) {
@@ -6036,7 +6036,7 @@ Function CreateStudio {
         $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
         $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
     }
-    
+
     LaunchScripts -ScriptPaths $arr
     Move-Item -Path output -Destination studio
     Copy-Item -Path logos_studio -Destination studio\logos -Recurse
@@ -6281,7 +6281,7 @@ Function CreateSubtitleLanguage {
         $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
     }
     LaunchScripts -ScriptPaths $arr
-    
+
     Move-Item -Path output -Destination subtitle_language
     Move-Item -Path output-orig -Destination output
 }
@@ -6294,7 +6294,7 @@ Function CreateVideoFormat {
     Write-Host "Creating Video Format"
     Set-Location $script_path
     # Find-Path "$script_path\video_format" 77A5B2
-    Move-Item -Path output -Destination output-orig    
+    Move-Item -Path output -Destination output-orig
 
     $myArray = @(
         'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
@@ -6318,7 +6318,7 @@ Function CreateVideoFormat {
         $arr += ".\create_poster.ps1 -logo `"$script_path\logos_video_format\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
     }
     LaunchScripts -ScriptPaths $arr
-    
+
     Move-Item -Path output -Destination video_format
     Copy-Item -Path logos_video_format -Destination video_format\logos -Recurse
     Move-Item -Path output-orig -Destination output
@@ -6332,7 +6332,7 @@ Function CreateUniverse {
     Write-Host "Creating Universe"
     Set-Location $script_path
     # Find-Path "$script_path\universe"
-    Move-Item -Path output -Destination output-orig    
+    Move-Item -Path output -Destination output-orig
 
     $myArray = @(
         'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
@@ -6368,7 +6368,7 @@ Function CreateUniverse {
         $arr += ".\create_poster.ps1 -logo `"$script_path\logos_universe\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
     }
     LaunchScripts -ScriptPaths $arr
-    
+
     Move-Item -Path output -Destination universe
     Copy-Item -Path logos_universe -Destination universe\logos -Recurse
     Move-Item -Path output-orig -Destination output
@@ -6582,7 +6582,7 @@ Function CreateYear {
     WriteToLogFile "MonitorProcess               : Waiting for all processes to end before continuing..."
     Start-Sleep -Seconds 3
     MonitorProcess -ProcessName "magick.exe"
-    
+
     Move-Item -Path output -Destination year
 
     $pre_value = Get-YamlPropertyValue -PropertyPath "key_names.BEST_OF" -ConfigObject $global:ConfigObj -CaseSensitivity Upper
@@ -6614,12 +6614,12 @@ Function CreateYear {
 Function CreateOverlays {
     Write-Host "Creating Overlays"
     Set-Location $script_path
-    
+
     $directories = @("award", "chart", "chart\white", "country", "franchise", "network", "network\white", "playlist", "resolution", "streaming", "streaming\white", "universe")
     $directories_no_trim = @("aspect", "content_rating", "genre", "seasonal", "studio", "video_format")
     $size1 = "285x85"
     $size2 = "440x100"
-    
+
     Foreach ($dir in $directories_no_trim) {
         $path = Join-Path $script_path $dir
         $outputPath = Join-Path $path "overlays"
@@ -6743,15 +6743,15 @@ Function Get-Checksum-Files {
     $ttf15 = "Barlow-Regular.ttf"
     $ttf16 = "SpecialElite-Regular.ttf"
     $ttf17 = "Trochut-Regular.ttf"
-    
+
     $fade1 = "@bottom-top-fade.png"
     $fade2 = "@bottom-up-fade.png"
     $fade3 = "@center-out-fade.png"
     $fade4 = "@none.png"
     $fade5 = "@top-down-fade.png"
-    
+
     $trans1 = "transparent.png"
-    
+
     $expectedChecksum_sep1 = "8FFEF200F9AA2126052684FBAF5BB1B96F402FAF3055532FBBFFCABF610D9573"
     $expectedChecksum_sep2 = "940E5F5BD81B0C7388BDA0B6E639D59BAEFAABAD78F04F41982440D49BAE8871"
     $expectedChecksum_sep3 = "AB8DBC5FCE661BDFC643F9697EEC1463CD2CDE90E4594B232A6B92C272DE0561"
@@ -6826,7 +6826,7 @@ Function Get-Checksum-Files {
     Compare-FileChecksum -Path $script_path\@base\$sep20 -ExpectedChecksum $expectedChecksum_sep20 -failFlag $failFlag
     Compare-FileChecksum -Path $script_path\@base\$sep21 -ExpectedChecksum $expectedChecksum_sep21 -failFlag $failFlag
     Compare-FileChecksum -Path $script_path\@base\$sep22 -ExpectedChecksum $expectedChecksum_sep22 -failFlag $failFlag
-    
+
     Compare-FileChecksum -Path $script_path\fonts\$ttf1 -ExpectedChecksum $expectedChecksum_ttf1 -failFlag $failFlag
     Compare-FileChecksum -Path $script_path\fonts\$ttf2 -ExpectedChecksum $expectedChecksum_ttf2 -failFlag $failFlag
     Compare-FileChecksum -Path $script_path\fonts\$ttf3 -ExpectedChecksum $expectedChecksum_ttf3 -failFlag $failFlag
@@ -6844,15 +6844,15 @@ Function Get-Checksum-Files {
     Compare-FileChecksum -Path $script_path\fonts\$ttf15 -ExpectedChecksum $expectedChecksum_ttf15 -failFlag $failFlag
     Compare-FileChecksum -Path $script_path\fonts\$ttf16 -ExpectedChecksum $expectedChecksum_ttf16 -failFlag $failFlag
     Compare-FileChecksum -Path $script_path\fonts\$ttf17 -ExpectedChecksum $expectedChecksum_ttf17 -failFlag $failFlag
-    
+
     Compare-FileChecksum -Path $script_path\fades\$fade1 -ExpectedChecksum $expectedChecksum_fade1 -failFlag $failFlag
     Compare-FileChecksum -Path $script_path\fades\$fade2 -ExpectedChecksum $expectedChecksum_fade2 -failFlag $failFlag
     Compare-FileChecksum -Path $script_path\fades\$fade3 -ExpectedChecksum $expectedChecksum_fade3 -failFlag $failFlag
     Compare-FileChecksum -Path $script_path\fades\$fade4 -ExpectedChecksum $expectedChecksum_fade4 -failFlag $failFlag
     Compare-FileChecksum -Path $script_path\fades\$fade5 -ExpectedChecksum $expectedChecksum_fade5 -failFlag $failFlag
-    
+
     Compare-FileChecksum -Path $script_path\$trans1 -ExpectedChecksum $expectedChecksum_trans1 -failFlag $failFlag
-        
+
     Write-Output "End:" $failFlag.Value
 
     if ($failFlag.Value) {
@@ -7190,10 +7190,11 @@ if ($errorCount1 -ne 0 -or $errorCount2 -ne 0) {
     for ($i = 0; $i -lt $flashCount; $i++) {
         if ($i % 2 -eq 0) {
             Write-Host "Flashing message. Check the log for details." -ForegroundColor Red -NoNewline
-        } else {
+        }
+        else {
             Write-Host "Flashing message. Check the log for details." -ForegroundColor Yellow -NoNewline
         }
-    
+
         Start-Sleep -Milliseconds 500
         Write-Host -NoNewline ("`r" + (" " * [System.Console]::BufferWidth) + "`r")
         Start-Sleep -Milliseconds 500

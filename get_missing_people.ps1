@@ -3,7 +3,7 @@
 # v1.3
 # author: bullmoose20
 #
-# DESCRIPTION: 
+# DESCRIPTION:
 # In a powershell window this will go through all your meta*.log files created by Kometa to find all missing people posters.
 # It will create 1 .cmd file per meta.log file and run it to download the images locally
 #
@@ -13,7 +13,7 @@
 #
 # PARAMETERS:
 # -metalog_location          (specify the logs folder location for Kometa)
-# 
+#
 # EXAMPLE:
 # .\get_missing_people.ps1 -metalog_location \\NZWHS01\appdata\Kometa\logs
 ####################################################
@@ -99,7 +99,7 @@ ForEach ($item in $inputfile) {
     $theString = Get-Content $outputfile$theOutput.cmd | Select-String -Pattern $find -CaseSensitive -SimpleMatch
     if ($theString -eq "" -or $null -eq $theString) {
       Remove-Item $outputfile$theOutput.cmd
-      WriteToLogFile "0 items found..."  
+      WriteToLogFile "0 items found..."
     }
     else {
       $theString > tmp.txt
@@ -112,7 +112,7 @@ ForEach ($item in $inputfile) {
       Set-Content -Path $outputfile$theOutput.cmd -Value $chcp
       Add-Content -Path $outputfile$theOutput.cmd -Value $theString
       $files_to_process = $theString.Count - 1
-      WriteToLogFile "$files_to_process items found..."  
+      WriteToLogFile "$files_to_process items found..."
       Start-Process -FilePath $outputfile$theOutput.cmd -Wait
     }
   }
