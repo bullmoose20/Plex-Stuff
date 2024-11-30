@@ -1,7 +1,7 @@
 ﻿####################################################
 # create_poster.ps1
 # author: bullmoose20
-# special thanks to fscorrupt on the functions/logic for the header, fonts, autoupdates of ps1, and imagemagick autoupdates: https://github.com/fscorrupt/Posterizarr
+# special thanks to fscorrupt (author of Posterizarr) on the functions/logic for the header, fonts, autoupdates of ps1, and imagemagick autoupdates: https://github.com/fscorrupt/Posterizarr
 #
 # DESCRIPTION:
 # In a powershell window, this will
