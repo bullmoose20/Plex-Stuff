@@ -29,7 +29,7 @@ MAX_LOG_FILES=5                        # Default is 10
 LOG_LEVEL=INFO                         # Default is INFO - CRITICAL, ERROR, WARNING, INFO, DEBUG
 ```
 
-```bat 
+```bat
 D:\PLEX-STUFF\PYPROGS
 ├───collage
 │   └───output
@@ -54,7 +54,8 @@ D:\PLEX-STUFF\PYPROGS
    5. fmg [fake_media_generator.py](#fake_media_generator)
    6. resizer [resizer.py](#resizer)
    7. tcc [title_card_clips.py](#title_card_clips)
-   8. update_plex_artist_art [update_plex_artist_art.py](#update_plex_artist_art)
+   8. ltp [landscape_to_portrait.py](#landscape_to_portrait)
+   9. update_plex_artist_art [update_plex_artist_art.py](#update_plex_artist_art)
 
 ## collage
 
@@ -175,7 +176,7 @@ Or how to call it to run from the venv
 .\venv\scripts\python exif_overlay_checker.py --input-folder /path/to/your/images --verbose
 ```
 
-This command initiates the script, specifying the path to the folder containing your images using the --input-folder argument. The --verbose flag enables detailed logging for a more comprehensive analysis.   
+This command initiates the script, specifying the path to the folder containing your images using the --input-folder argument. The --verbose flag enables detailed logging for a more comprehensive analysis.
 
 [Back to top](#Scripts)
 
@@ -399,6 +400,43 @@ Or how to call it to run from the venv
 ```
 
 Replace "/path/to/videos" with the root directory containing the video files you want to process. The optional "--time" argument allows you to set the frame extraction time in seconds (default: 45). The script logs essential information, including the input path and frame extraction time. After execution, the title card frames are generated and saved in the "output" directory within the script's location. Adjust the input path and optional parameters as needed for your use case.
+
+[Back to top](#Scripts)
+
+## landscape_to_portrait
+
+[Back to top](#Scripts)
+
+The "landscape_to_portrait.py" script serves the purpose of extracting landscape images from plex and producing portrait images from that landscape image into a 1000x1500px portrait image which could be used as a media poster in Plex. Utilizing Python libraries such as PIL (Python Imaging Library), the script extracts backgrounds from movies or episode cards from shows to create these images in an organized folder structure based on what Plex already has and sees for those items. The script will prompt you to specify the library and the specific media item or you can have it process all items in the chosen library. A rerun will only process missing items. It provides logging functionality for tracking extraction operations. It can process about 5000 items in about 10 minutes.
+
+Open a powershell prompt and navigate to `pyprogs` folder
+
+`cd pyprogs`
+
+Pick your folder for the script you want to run
+
+```bat
+cd ltp
+python -m venv venv
+.\venv\scripts\activate.ps1
+python -m pip install --upgrade pip
+pip install -r .\requirements.txt
+
+```
+
+Now you are ready to run it (with the venv activated)
+
+Example of how to call and run the script:
+
+```bat
+python landscape_to_portrait.py
+```
+
+Or how to call it to run from the venv
+
+```bat
+.\venv\scripts\python landscape_to_portrait.py
+```
 
 [Back to top](#Scripts)
 
