@@ -54,12 +54,26 @@ def clean_up_old_logs():
 
 
 def get_media_folder(media):
-    """Retrieve the Plex folder location for a media item."""
+    """
+    Retrieve the Plex folder location for a media item.
+    For movies, return the parent folder.
+    For TV shows, return the show's full folder name.
+    """
     try:
-        return os.path.basename(os.path.normpath(media.locations[0]))
+        if media.TYPE == "movie":
+            # For movies, return the parent folder of the file
+            full_path = media.locations[0]
+            parent_folder = os.path.dirname(full_path)  # Parent directory
+            return os.path.basename(parent_folder)     # Extract folder name
+        elif media.TYPE == "show":
+            # For TV episodes, get the root folder from the file path
+            full_path = media.locations[0]
+            return os.path.basename(full_path)     # Extract folder name
+        else:
+            return media.title  # Fallback for unknown types
     except Exception as e:
         logger.warning(f"Could not determine folder for media '{media.title}': {e}")
-        return media.title
+        return media.title  # Fallback to media title
 
 
 def select_from_list(items, prompt, include_all=False):
@@ -150,7 +164,7 @@ def process_episode_thumb(episode, show_output_dir, stats):
 
 
 def process_tv_show(show, library_name, stats):
-    """Process a TV show and create episode cards."""
+    """Process a TV show, create a poster for the show, and generate episode cards."""
     try:
         episodes = show.episodes()
         stats["total"] += len(episodes)
@@ -158,6 +172,33 @@ def process_tv_show(show, library_name, stats):
         show_folder = os.path.join(OUTPUT_FOLDER, library_name, get_media_folder(show))
         os.makedirs(show_folder, exist_ok=True)
 
+        # Create a poster for the show
+        poster_path = os.path.join(show_folder, "poster.jpg")
+        if not os.path.exists(poster_path):
+            try:
+                if not show.art:
+                    logger.warning(f"Skipping poster creation for {show.title}: No background art available.")
+                    stats["skipped"] += 1  # Increment skipped for missing art
+                else:
+                    art_url = f"{PLEX_URL}{show.art}?X-Plex-Token={PLEX_TOKEN}"
+                    response = requests.get(art_url, timeout=PLEX_TIMEOUT)
+                    response.raise_for_status()
+
+                    image = Image.open(BytesIO(response.content))
+                    resized_image = resize_and_crop(image, 1000, 1500)
+
+                    resized_image.save(poster_path, format="JPEG", quality=95)
+                    logger.info(f"Saved: {poster_path}")
+                    print(f"Saved: {poster_path}")
+                    stats["processed"] += 1  # Increment processed for successful poster
+            except Exception as e:
+                logger.error(f"Error creating poster for show '{show.title}': {e}")
+                stats["errors"] += 1  # Increment errors for poster creation failure
+        else:
+            logger.info(f"File already exists, skipping poster creation: {poster_path}")
+            stats["skipped"] += 1  # Increment skipped for existing poster
+
+        # Process episodes
         for episode in episodes:
             process_episode_thumb(episode, show_folder, stats)
     except Exception as e:
@@ -165,66 +206,151 @@ def process_tv_show(show, library_name, stats):
         stats["errors"] += 1
 
 
+def get_libraries_from_env():
+    """Get library names from the .env file."""
+    libraries = os.getenv("LIBRARIES", "").split(",")
+    return [lib.strip() for lib in libraries if lib.strip()]  # Remove extra spaces
+
+
+def process_libraries(plex, libraries_from_env):
+    """
+    Process libraries specified in the .env file.
+    If no libraries are specified, fall back to interactive mode.
+    """
+    available_libraries = plex.library.sections()
+    available_names = {lib.title: lib for lib in available_libraries}
+
+    if not libraries_from_env:
+        print("\nNo libraries specified in .env. Switching to interactive mode.")
+        return available_libraries
+
+    print("\nProcessing libraries from .env:")
+    valid_libraries = []
+    for library_name in libraries_from_env:
+        if library_name in available_names:
+            valid_libraries.append(available_names[library_name])
+        else:
+            logger.warning(f"Library '{library_name}' not found.")
+            print(f"Warning: Library '{library_name}' not found.")
+
+    return valid_libraries
+
+
 def main():
     start_time = time.time()
+
+    # Initialize overall stats for all libraries
+    overall_stats = {"total": 0, "processed": 0, "skipped": 0, "errors": 0}
 
     try:
         logger.info("Connecting to Plex server...")
         plex = PlexServer(PLEX_URL, PLEX_TOKEN, timeout=PLEX_TIMEOUT)
 
-        # List only Movie and TV Show libraries
-        libraries = plex.library.sections()
-        tv_libraries = [lib for lib in libraries if lib.type == "show"]
-        movie_libraries = [lib for lib in libraries if lib.type == "movie"]
+        # Get libraries from .env
+        libraries_from_env = get_libraries_from_env()
 
-        if not tv_libraries and not movie_libraries:
-            print("No Movie or TV Show libraries found in Plex.")
-            return
+        # If no libraries are specified in .env, switch to interactive mode
+        if not libraries_from_env:
+            logger.info("No libraries specified in .env. Switching to interactive mode.")
+            # List only Movie and TV Show libraries
+            libraries = plex.library.sections()
+            tv_libraries = [lib for lib in libraries if lib.type == "show"]
+            movie_libraries = [lib for lib in libraries if lib.type == "movie"]
 
-        print("\nAvailable Libraries:")
-        for idx, lib in enumerate(tv_libraries + movie_libraries, start=1):
-            lib_type = "TV Shows" if lib.type == "show" else "Movies"
-            print(f"{idx}. {lib.title} ({lib_type})")
-        print()
+            if not tv_libraries and not movie_libraries:
+                print("No Movie or TV Show libraries found in Plex.")
+                return
 
-        all_libraries = tv_libraries + movie_libraries
-        selected_library_index = select_from_list(all_libraries, "Select a library to process: ")
-        selected_library = all_libraries[selected_library_index - 1]
-        logger.info(f"Selected library: {selected_library.title}")
-        library_name = selected_library.title
+            print("\nAvailable Libraries:")
+            for idx, lib in enumerate(tv_libraries + movie_libraries, start=1):
+                lib_type = "TV Shows" if lib.type == "show" else "Movies"
+                print(f"{idx}. {lib.title} ({lib_type})")
+            print()
 
-        stats = {"total": 0, "processed": 0, "skipped": 0, "errors": 0}
+            all_libraries = tv_libraries + movie_libraries
+            selected_library_index = select_from_list(all_libraries, "Select a library to process: ")
+            selected_library = all_libraries[selected_library_index - 1]
+            logger.info(f"Selected library: {selected_library.title}")
+            library_name = selected_library.title
 
-        if selected_library.type == "movie":
-            movies = selected_library.all()
-            stats["total"] = len(movies)
-            choice = select_from_list(movies, "Select a movie to process (or 0 for all): ", include_all=True)
+            stats = {"total": 0, "processed": 0, "skipped": 0, "errors": 0}
 
-            if choice == 0:
-                for movie in movies:
-                    process_movie(movie, library_name, stats)
-            else:
-                selected_movie = movies[choice - 1]
-                process_movie(selected_movie, library_name, stats)
+            if selected_library.type == "movie":
+                movies = selected_library.all()
+                stats["total"] = len(movies)
+                choice = select_from_list(movies, "Select a movie to process (or 0 for all): ", include_all=True)
 
-        elif selected_library.type == "show":
-            shows = selected_library.all()
-            choice = select_from_list(shows, "Select a TV show to process (or 0 for all): ", include_all=True)
+                if choice == 0:
+                    for movie in movies:
+                        process_movie(movie, library_name, stats)
+                else:
+                    selected_movie = movies[choice - 1]
+                    process_movie(selected_movie, library_name, stats)
 
-            if choice == 0:
-                for show in shows:
-                    process_tv_show(show, library_name, stats)
-            else:
-                selected_show = shows[choice - 1]
-                process_tv_show(selected_show, library_name, stats)
+            elif selected_library.type == "show":
+                shows = selected_library.all()
+                choice = select_from_list(shows, "Select a TV show to process (or 0 for all): ", include_all=True)
 
-        # Print summary stats
-        print("\nProcessing Summary:")
-        print(f"Total items: {stats['total']}")
-        print(f"Processed: {stats['processed']}")
-        print(f"Skipped: {stats['skipped']}")
-        print(f"Errors: {stats['errors']}")
-        logger.info(f"Summary: {stats}")
+                if choice == 0:
+                    for show in shows:
+                        process_tv_show(show, library_name, stats)
+                else:
+                    selected_show = shows[choice - 1]
+                    process_tv_show(selected_show, library_name, stats)
+
+            # Print library-specific stats
+            print("\nProcessing Summary:")
+            print(f"Total items: {stats['total']}")
+            print(f"Processed: {stats['processed']}")
+            print(f"Skipped: {stats['skipped']}")
+            print(f"Errors: {stats['errors']}")
+            logger.info(f"Summary: {stats}")
+
+            # Update overall stats
+            for key in overall_stats:
+                overall_stats[key] += stats[key]
+
+        else:
+            # Process libraries from .env
+            libraries_to_process = process_libraries(plex, libraries_from_env)
+
+            for library in libraries_to_process:
+                logger.info(f"Processing library: {library.title}")
+                library_name = library.title
+                stats = {"total": 0, "processed": 0, "skipped": 0, "errors": 0}
+
+                if library.type == "movie":
+                    movies = library.all()
+                    stats["total"] = len(movies)
+                    print(f"Processing all movies in library: {library_name}")
+                    for movie in movies:
+                        process_movie(movie, library_name, stats)
+
+                elif library.type == "show":
+                    shows = library.all()
+                    print(f"Processing all shows in library: {library_name}")
+                    for show in shows:
+                        process_tv_show(show, library_name, stats)
+
+                # Print library-specific stats
+                print(f"\nLibrary '{library_name}' Summary:")
+                print(f"Total items: {stats['total']}")
+                print(f"Processed: {stats['processed']}")
+                print(f"Skipped: {stats['skipped']}")
+                print(f"Errors: {stats['errors']}")
+                logger.info(f"Summary for library '{library_name}': {stats}")
+
+                # Update overall stats
+                for key in overall_stats:
+                    overall_stats[key] += stats[key]
+
+        # Print overall summary
+        print("\nOverall Processing Summary:")
+        print(f"Total items: {overall_stats['total']}")
+        print(f"Processed: {overall_stats['processed']}")
+        print(f"Skipped: {overall_stats['skipped']}")
+        print(f"Errors: {overall_stats['errors']}")
+        logger.info(f"Overall Summary: {overall_stats}")
 
         logger.info("Processing complete.")
         print("Processing complete.")
