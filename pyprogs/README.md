@@ -32,14 +32,15 @@ LOG_LEVEL=INFO                         # Default is INFO - CRITICAL, ERROR, WARN
 ```bat
 D:\PLEX-STUFF\PYPROGS
 ├───collage
-│   └───output
 ├───exif_overlay_checker
 ├───extract_tracks
 ├───fix_added_at
 ├───fmg
+├───label_remover
+├───ltp
+├───orchestrator
 ├───resizer
-│   ├───input
-│   └───output
+├───strip_columns
 ├───tcc
 └───update_plex_artist_art
 ```
@@ -52,10 +53,13 @@ D:\PLEX-STUFF\PYPROGS
    3. extract_tracks [extract_tracks.py](#extract_tracks)
    4. fix_added_at [fix_added_at.py](#fix_added_at)
    5. fmg [fake_media_generator.py](#fake_media_generator)
-   6. resizer [resizer.py](#resizer)
-   7. tcc [title_card_clips.py](#title_card_clips)
-   8. ltp [landscape_to_portrait.py](#landscape_to_portrait)
-   9. update_plex_artist_art [update_plex_artist_art.py](#update_plex_artist_art)
+   6. label_remover [label_remover.py](#label_remover)
+   7. ltp [landscape_to_portrait.py](#landscape_to_portrait)
+   8. orchestrator [orchestrator.py](#orchestrator)
+   9. resizer [resizer.py](#resizer)
+   10. strip_columns [strip_columns.py](#strip_columns)
+   11. tcc [title_card_clips.py](#title_card_clips)
+   12. update_plex_artist_art [update_plex_artist_art.py](#update_plex_artist_art)
 
 ## collage
 
@@ -311,6 +315,132 @@ For TV shows: `output/shows`
 
 [Back to top](#Scripts)
 
+## label_remover
+
+[Back to top](#Scripts)
+
+Description for "label_remover.py":
+
+The "label_remover.py" script is a Python utility designed to find labels and remove them from plex shows, seasons, or episodes. Labels are not exposed for shows in the Plex UI so this can be useful to remove the `Overlay` label from certain shows.
+
+Open a powershell prompt and navigate to `pyprogs` folder
+
+`cd pyprogs`
+
+Pick your folder for the script you want to run
+
+```bat
+cd label_remover
+python -m venv venv
+.\venv\scripts\activate.ps1
+python -m pip install --upgrade pip
+pip install -r .\requirements.txt
+
+```
+
+Edit the .env file accordingly. Now you are ready to run it (with the venv activated)
+
+Example of how to call and run the script: `python label_remover.py`
+
+```bat
+python label_remover.py
+```
+
+Or how to call it to run from the venv
+
+```bat
+.\venv\scripts\python label_remover.py
+```
+
+You will be prompted for the show in question. If the show name is not found, the script will list all shows for you to pick from. Then you can decide what level you want to query labels for and then decide what labels you want to delete. The logs will be sent to the `logs` subdirectory.
+
+[Back to top](#Scripts)
+
+
+
+## landscape_to_portrait
+
+[Back to top](#Scripts)
+
+Description for "landscape_to_portrait.py":
+
+The "landscape_to_portrait.py" script is a Python utility designed to extract landscape images from Plex like backgrounds and episodes to create poster.jpg files in portrait mode. These can then be used for Plex posters. Output is in the format known for Kometa assets
+
+Open a powershell prompt and navigate to `pyprogs` folder
+
+`cd pyprogs`
+
+Pick your folder for the script you want to run
+
+```bat
+cd ltp
+python -m venv venv
+.\venv\scripts\activate.ps1
+python -m pip install --upgrade pip
+pip install -r .\requirements.txt
+
+```
+
+Edit your .env accordingly. Now you are ready to run it (with the venv activated)
+
+Example of how to call and run the script: `python landscape_to_portrait.py`
+
+```bat
+python landscape_to_portrait.py
+```
+
+Or how to call it to run from the venv
+
+```bat
+.\venv\scripts\python landscape_to_portrait.py
+```
+
+This will output the files and folders to the `output` subdirectory. The logs will be sent to the `logs` subdirectory.
+
+[Back to top](#Scripts)
+
+## orchestrator
+
+[Back to top](#Scripts)
+
+Description for "orchestrator.py":
+
+The "orchestrator.py" script is a Python utility designed to run tasks.
+
+Open a powershell prompt and navigate to `pyprogs` folder
+
+`cd pyprogs`
+
+Pick your folder for the script you want to run
+
+```bat
+cd orchestrator
+python -m venv venv
+.\venv\scripts\activate.ps1
+python -m pip install --upgrade pip
+pip install -r .\requirements.txt
+
+```
+
+Edit your .env and tasks.yml accordingly. Now you are ready to run it (with the venv activated)
+
+Example of how to call and run the script: `python orchestrator.py`
+
+```bat
+python orchestrator.py
+```
+
+Or how to call it to run from the venv
+
+```bat
+.\venv\scripts\python orchestrator.py
+```
+
+The logs will be sent to the `logs` subdirectory.
+
+[Back to top](#Scripts)
+
+
 ## resizer
 
 [Back to top](#Scripts)
@@ -403,11 +533,21 @@ Replace "/path/to/videos" with the root directory containing the video files you
 
 [Back to top](#Scripts)
 
-## landscape_to_portrait
+## strip_columns
 
 [Back to top](#Scripts)
 
-The "landscape_to_portrait.py" script serves the purpose of extracting landscape images from plex and producing portrait images from that landscape image into a 1000x1500px portrait image which could be used as a media poster in Plex. Utilizing Python libraries such as PIL (Python Imaging Library), the script extracts backgrounds from movies or episode cards from shows to create these images in an organized folder structure based on what Plex already has and sees for those items. The script will prompt you to specify the library and the specific media item or you can have it process all items in the chosen library. A rerun will only process missing items. It provides logging functionality for tracking extraction operations. It can process about 5000 items in about 10 minutes. These images can the  be used by Kometa with the assets pipeline to apply overlays.
+Description for "strip_columns.py":
+
+The "strip_columns.py" script removes a specified number of characters from the beginning of each line in a text file. It is designed for quick and efficient text processing, ensuring clean and customized output. Useful when you want to compare two or more Kometa meta.log files and you need to strip the timestamps out.
+
+Removes the first `N` characters from each line in a text file.
+
+Supports UTF-8 encoding for compatibility with various file types.
+
+Generates a new output file with _stripped appended to the original file name.
+
+Handles edge cases like short lines or invalid input gracefully
 
 Open a powershell prompt and navigate to `pyprogs` folder
 
@@ -416,7 +556,7 @@ Open a powershell prompt and navigate to `pyprogs` folder
 Pick your folder for the script you want to run
 
 ```bat
-cd ltp
+cd strip_columns
 python -m venv venv
 .\venv\scripts\activate.ps1
 python -m pip install --upgrade pip
@@ -426,17 +566,27 @@ pip install -r .\requirements.txt
 
 Now you are ready to run it (with the venv activated)
 
-Example of how to call and run the script:
+Example of how to call and run the script: `python strip_columns.py input.txt 5`
 
 ```bat
-python landscape_to_portrait.py
+python strip_columns.py input.txt 5
+```
+
+```bat
+python strip_columns.py <input_file> <characters_to_remove> [--output_file <output_file>]
 ```
 
 Or how to call it to run from the venv
 
 ```bat
-.\venv\scripts\python landscape_to_portrait.py
+.\venv\scripts\python strip_columns.py input.txt 5
 ```
+
+```bat
+.\venv\scripts\python strip_columns.py <input_file> <characters_to_remove> [--output_file <output_file>]
+```
+
+This will create an output file named input_stripped.txt with the specified characters removed (5) from each line.
 
 [Back to top](#Scripts)
 

@@ -1,0 +1,90 @@
+tasks:
+  - description: "Run ImageMaid Python script to clear"
+    script_path: "C:/Users/bullmoose20/ImageMaid/imagemaid.py"
+    args:
+      - "-m"
+      - "clear"
+    use_venv: "C:/Users/bullmoose20/ImageMaid/venv"
+
+  - description: "Run Posterizarr PowerShell script"
+    script_path: "C:/Users/bullmoose20/ppm/pm6.ps1"
+    args: []
+    use_venv: null
+
+  - description: "Run Posterizarr again PowerShell script"
+    script_path: "C:/Users/bullmoose20/PosterMaker/pm6.ps1"
+    args: []
+    use_venv: null
+
+  - description: "Disable Sonarr downloaders"
+    action: "disable_sonarr_download_clients"
+
+  - description: "Disable Radarr downloaders"
+    action: "disable_radarr_download_clients"
+
+  - description: "Disable Lidarr downloaders"
+    action: "disable_lidarr_download_clients"
+
+  - description: "Pause qBittorrent"
+    action: "pause_qbittorrent_downloads"
+
+  - description: "Pause SABnzbd"
+    action: "pause_sabnzbd_downloads"
+
+  - description: "Pause NZBGet"
+    action: "pause_nzbget_downloads"
+
+  - description: "Run landscape_to_portrait.py"
+    script_path: "C:/Users/bullmoose20/pyprogs/ltp/landscape_to_portrait.py"
+    args: []
+    use_venv: "C:/Users/bullmoose20/pyprogs/ltp/venv"
+
+  - description: "Enable Sonarr downloaders"
+    action: "enable_sonarr_download_clients"
+
+  - description: "Enable Radarr downloaders"
+    action: "enable_radarr_download_clients"
+
+  - description: "Enable Lidarr downloaders"
+    action: "enable_lidarr_download_clients"
+
+  - description: "Resume qBittorrent"
+    action: "resume_qbittorrent_downloads"
+
+  - description: "Resume SABnzbd"
+    action: "resume_sabnzbd_downloads"
+
+  - description: "Resume NZBGet"
+    action: "resume_nzbget_downloads"
+
+  - description: "Run Kometa update PowerShell script"
+    script_path: "C:/Users/bullmoose20/update_kometa.ps1"
+    args: []
+    use_venv: null
+
+  - description: "Run Kometa Python script"
+    script_path: "C:/Users/bullmoose20/Kometa/kometa.py"
+    args:
+      - "-r"
+      - "-c"
+      - "./config/config-bullmoose20.yml"
+    use_venv: "C:/Users/bullmoose20/Kometa/kometa-venv"
+
+  - description: "Run ImageMaid Python script to move"
+    script_path: "C:/Users/bullmoose20/ImageMaid/imagemaid.py"
+    args:
+      - "-m"
+      - "move"
+    use_venv: "C:/Users/bullmoose20/ImageMaid/venv"
+
+  - description: "Run Posterizarr -SyncEmby PowerShell script"
+    script_path: "C:/Users/bullmoose20/ppm/pm6.ps1"
+    args:
+      - "-SyncEmby"
+    use_venv: null
+
+  - description: "Run Posterizarr -SyncJelly PowerShell script"
+    script_path: "C:/Users/bullmoose20/PosterMaker/pm6.ps1"
+    args:
+      - "-SyncJelly"
+    use_venv: null
