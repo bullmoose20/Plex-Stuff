@@ -209,7 +209,7 @@ def manage_labels(item, item_type):
                     # Attempt to remove the label
                     logger.info(f"Attempting to delete label '{label_to_delete}' from {item_type} '{item.title}'.")
                     # Remove the label (session timeout applies globally)
-                    # item.removeLabel(label_to_delete)
+                    item.removeLabel(label_to_delete)
                     item.removeLabel("Overlay")
                     item.reload()
 
