@@ -3,19 +3,19 @@
 # v1.3
 # author: bullmoose20
 #
-# DESCRIPTION: 
-# In a powershell window this will go through all your meta*.log files created by PMM to find all missing people posters.
+# DESCRIPTION:
+# In a powershell window this will go through all your meta*.log files created by Kometa to find all missing people posters.
 # It will create 1 .cmd file per meta.log file and run it to download the images locally
 #
 # REQUIREMENTS:
-# $metalog_location=is the path to the logs directory for PMM
+# $metalog_location=is the path to the logs directory for Kometa
 # Powershell security settings: https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_execution_policies?view=powershell-7.2
 #
 # PARAMETERS:
-# -metalog_location          (specify the logs folder location for PMM)
-# 
+# -metalog_location          (specify the logs folder location for Kometa)
+#
 # EXAMPLE:
-# .\get_missing_people.ps1 -metalog_location \\NZWHS01\appdata\Plex-Meta-Manager\logs
+# .\get_missing_people.ps1 -metalog_location \\NZWHS01\appdata\Kometa\logs
 ####################################################
 
 param ($metalog_location)
@@ -99,7 +99,7 @@ ForEach ($item in $inputfile) {
     $theString = Get-Content $outputfile$theOutput.cmd | Select-String -Pattern $find -CaseSensitive -SimpleMatch
     if ($theString -eq "" -or $null -eq $theString) {
       Remove-Item $outputfile$theOutput.cmd
-      WriteToLogFile "0 items found..."  
+      WriteToLogFile "0 items found..."
     }
     else {
       $theString > tmp.txt
@@ -112,7 +112,7 @@ ForEach ($item in $inputfile) {
       Set-Content -Path $outputfile$theOutput.cmd -Value $chcp
       Add-Content -Path $outputfile$theOutput.cmd -Value $theString
       $files_to_process = $theString.Count - 1
-      WriteToLogFile "$files_to_process items found..."  
+      WriteToLogFile "$files_to_process items found..."
       Start-Process -FilePath $outputfile$theOutput.cmd -Wait
     }
   }

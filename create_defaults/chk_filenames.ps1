@@ -15,17 +15,28 @@ function Compare-FolderContents {
     $uniqueInFolder2 = Compare-Object $folder1Names $folder2Names -CaseSensitive | Where-Object { $_.SideIndicator -eq "=>" } | Select-Object -ExpandProperty InputObject
 
     Write-Host "Unique items in ${folder1}:"
-    $uniqueInFolder1 | ForEach-Object { Join-Path $folder1 $_ }
+    $uniqueInFolder1 | ForEach-Object {
+        $fullPath = Join-Path $folder1 $_
+        Write-Host $fullPath -ForegroundColor Green
+    }
 
     Write-Host "Unique items in ${folder2}:"
-    $uniqueInFolder2 | ForEach-Object { Join-Path $folder2 $_ }
+    $uniqueInFolder2 | ForEach-Object {
+        $fullPath = Join-Path $folder2 $_
+        Write-Host $fullPath -ForegroundColor Cyan
+    }
 }
 
 
 # $folder1 = "D:\defaults"
-# $folder2 = "D:\bullmoose20\Plex-Meta-Manager-Images"
-Compare-FolderContents -folder1 "D:\defaults" -folder2 "D:\bullmoose20\Plex-Meta-Manager-Images"
-Compare-FolderContents -folder1 "D:\Plex-Meta-Manager" -folder2 "C:\Users\nickz\Documents\Plex-Meta-Manager"
+# $folder2 = "D:\bullmoose20\Default-Images"
+Compare-FolderContents -folder1 "D:\defaults" -folder2 "D:\bullmoose20\Default-Images"
+Compare-FolderContents -folder1 "D:\Kometa" -folder2 "D:\bullmoose20\Kometa"
+Compare-FolderContents -folder1 "D:\defaults\studio\logos_overlays" -folder2 "D:\Kometa\defaults\overlays\images\studio"
+Compare-FolderContents -folder1 "D:\defaults\streaming\logos_overlays" -folder2 "D:\Kometa\defaults\overlays\images\streaming"
+Compare-FolderContents -folder1 "D:\defaults\network\logos_overlays" -folder2 "D:\Kometa\defaults\overlays\images\network"
+Compare-FolderContents -folder1 "D:\defaults\resolution\logos_overlays" -folder2 "D:\Kometa\defaults\overlays\images\resolution"
+# Compare-FolderContents -folder1 "D:\defaults\content_rating\logos_overlays" -folder2 "D:\Kometa\defaults\overlays\images\cr"
 
 # $ignoreItems = @("D:\temp\TEST\create_defaults\logs\", "D:\temp\TEST\create_defaults\defaults-fr\", "D:\temp\TEST\create_defaults\defaults-en\", "D:\temp\TEST\create_defaults\defaults-de\", "D:\temp\TEST\create_defaults\file1.txt")
 # Compare-FolderContents -folder1 "D:\temp\TEST\create_defaults\" -folder2 "C:\Users\nickz\Documents\Plex-Stuff\create_defaults\" -ignoreItems $ignoreItems

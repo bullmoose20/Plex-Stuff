@@ -1,0 +1,2 @@
+Pillow
+python-dotenv

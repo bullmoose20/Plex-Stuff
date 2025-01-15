@@ -3,71 +3,85 @@
 
 ## Requirements
 
-1. A system that can run Python3
-2. Python3 installed on that system
-3. Preferable to also have a system that can run powershell
-4. Preferable to have a system that can also run Power Automate Desktop Flows
-5. System that has ImageMagick installed
+1. A system that can run powershell
+2. A system that can also run Power Automate Desktop Flows
+3. System that has ImageMagick installed
 
 ## Setup
 
 1. clone repo
-2. setup python virtualenv - [I'd suggest doing this in a virtual environment. Great instructions found here - https://www.metamanager.wiki/en/nightly/pmm/install/guides/local/#setting-up-a-virtual-environment]
-3. Activate that virtualenv
-4. Install requirements with `pip install -r requirements.txt` into that virtualenv
-5. cd to the directory that you want to run the script in
-6. Copy `.env.example` to `.env` 
-7. Edit `.env` to suit
 
-All these PYTHON scripts use the same `.env` and requirements. The Unraid bash scripts, Windows powershell or Windows cmd scripts, will vary in nature. Read the related section down below for more details. 
+The Unraid bash scripts, Windows powershell or Windows cmd scripts, will vary in nature. Read the related section down below for more details. There is a separate section here for Python scripts. 
 
-### `.env` contents
+[Goto to Python Scripts Section](./pyprogs/README.md)
 
+```bat 
+D:\PLEX-STUFF\PYPROGS
+├───collage
+│   └───output
+├───exif_overlay_checker
+├───extract_tracks
+├───fix_added_at
+├───fmg
+├───resizer
+│   ├───input
+│   └───output
+├───tcc
+└───update_plex_artist_art
 ```
-PLEX_URL=https://plex.domain.tld                # URL for Plex; can be a domain or IP:PORT
-PLEX_TOKEN=PLEX-TOKEN                           # https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/
-```
-
-## Plex scripts:
 
 ## Scripts:
-1. ~~[plex-bloat-fix.py](#plex-bloat-fix) - removes unneeded image files (Posters/Title Cards) from plex.~~ ***RETIRED!!! Please go here now: https://github.com/meisnate12/Plex-Image-Cleanup***
+1. ~~[plex-bloat-fix.py](#plex-bloat-fix) - removes unneeded image files (Posters/Title Cards) from plex.~~ ***RETIRED!!! Please go here now: https://github.com/Kometa-Team/ImageMaid***
 2. [plexdance.sh](#plexdance) - Unraid script to automate the full plexdance
 3. [process-tcards.cmd](#process-tcards) - Windows script to create properly sized PLEX titlecards to use with TCM or for other purposes
 4. [pumpanddump.sh](#pumpanddump) - Unraid script to automate the plex db repair when using hotio plex container
 5. [chk-video-codec.sh](#chk-video-codec) - Unraid script to find and sort files that have been converted to HEVC/H265 and those that have not been
 6. [create_poster.ps1](#create_poster) - Powershell script to create posters/images for PMM/PLEX/EMBY/JELLYFIN/OTHER
-7. [advanced-plex-edits.py](#advanced-plex-edits) - Sets your plex collections to default and then to hide in case your PMM separator blank collections continue to show
-8. [get_missing_people.ps1](#get_missing_people) - Scans your PMM meta* logs to find missing people posters to download and create the bw, rainier, orig, etc. style poster for PMM/PLEX/EMBY/JELLYFIN/OTHER
-9. [image_check.ps1](#image_check) - Scans your transparent images for anomalies like head-chops, backgrounds not removed, and black and white photos instead of a color photo to give you a report so you can go and fix those by uploading new and better options to https://www.themoviedb.org/
-10. [create_people_poster.ps1](#create_people_poster) - Scans your PMM meta* logs to find missing people posters and will download and create the bw, rainier, orig, transparent. style poster for PMM/PLEX/EMBY/JELLYFIN/OTHER. This script was put together by using the image_check, get_missing_people, and Power Automate Desktop Flow (remove background) all into 1
-11. [PAD Flows](#pad_flows) - Various PAD flows for RPA stuff for PLEX, PMM, Other
-    1.  [Convert Error: No TMDb ID Found for IMDb ID:](#Convert_Error_No_TMDb_ID_Found_for_IMDb_ID) - PAD flow to deal with Convert Errors in your meta.log file from PMM
-    1.  [Convert Error: No TVDb ID Found for TMDb ID:](#Convert_Error_No_TVDb_ID_Found_for_TMDb_ID) - PAD flow to deal with Convert Errors in your meta.log file from PMM
-    1.  [Convert Error: No TVDb ID or IMDb ID found for AniDB ID](#Convert_Error_No_TVDb_ID_or_IMDb_ID_found_for_AniDB_ID) - PAD flow to deal with Convert Errors in your meta.log file from PMM
+7. [get_missing_people.ps1](#get_missing_people) - Scans your PMM meta* logs to find missing people posters to download and create the bw, rainier, orig, etc. style poster for PMM/PLEX/EMBY/JELLYFIN/OTHER
+8. [image_check.ps1](#image_check) - Scans your transparent images for anomalies like head-chops, backgrounds not removed, and black and white photos instead of a color photo to give you a report so you can go and fix those by uploading new and better options to https://www.themoviedb.org/
+9. [create_people_poster.ps1](#create_people_poster) - Scans your PMM meta* logs to find missing people posters and will download and create the bw, rainier, orig, transparent. style poster for PMM/PLEX/EMBY/JELLYFIN/OTHER. This script was put together by using the image_check, get_missing_people, and Power Automate Desktop Flow (remove background) all into 1
+10. [PAD Flows](#pad_flows) - Various PAD flows for RPA stuff for PLEX, PMM, Other
+    1.  [1-Convert Warning- No TMDb ID Found for IMDb ID](#1-Convert_Warning_No_TMDb_ID_Found_for_IMDb_ID) - PAD flow to deal with Convert Warnings in your meta.log file from PMM
+          2. [1-Convert Warning- No TMDb ID Found for IMDb ID-Subflow-close_browsers]
+          3. [1-Convert Warning- No TMDb ID Found for IMDb ID-Subflow-Refresh_browser]
+    1.  [2-Convert Warning- No TVDb ID Found for TMDb ID](#2-Convert_Warning_No_TVDb_ID_Found_for_TMDb_ID) - PAD flow to deal with Convert Warnings in your meta.log file from PMM
+          2. [2-Convert Warning- No TVDb ID Found for TMDb ID-Subflow-close_browsers]
+          3. [2-Convert Warning- No TVDb ID Found for TMDb ID-Subflow-Refresh_browser]
+    1.  [3-Convert Warning- No TVDb ID or IMDb ID found for AniDB ID](#3-Convert_Warning_No_TVDb_ID_or_IMDb_ID_found_for_AniDB_ID) - PAD flow to deal with Convert Warnings in your meta.log file from PMM
+          2. [3-Convert Warning- No TVDb ID or IMDb ID found for AniDB ID-Subflow-close_browsers]
+          3. [3-Convert Warning- No TVDb ID or IMDb ID found for AniDB ID-Subflow-Refresh_browser]
+    1.  [4-Convert Warning- No TMDb ID Found for TVDb ID](#4-Convert_Warning_No_TMDb_ID_Found_for_TVDb_ID) - PAD flow to deal with Convert Warnings in your meta.log file from PMM
+          2. [4-Convert Warning- No TMDb ID Found for TVDb ID-Subflow-close_browsers]
+          3. [4-Convert Warning- No TMDb ID Found for TVDb ID-Subflow-Refresh_browser]
 
 For the above, there are subflows that should also be used as part of the flow. "Refresh_browser and close_browsers"
 
  
 Here are the possible PMM errors/warnings found in the meta.log in relation to these auto/semi-auto PAD flows
 ```
-Convert Error: No TMDb ID Found for IMDb ID:
-Convert Error: No TVDb ID Found for TMDb ID:
-Convert Error: No TVDb ID or IMDb ID found for AniDB ID:
-Convert Error: AniDB ID not found for AniList ID:
-Convert Error: AniDB ID not found for MyAnimeList ID:
-Convert Error: No IMDb ID Found for TMDb ID:
-Convert Error: No TMDb ID Found for TVDb ID:
-Convert Error: No IMDb ID Found for TVDb ID:
-Convert Error: No TVDb ID Found for IMDb ID:
+Convert Warning: No TMDb ID Found for IMDb ID:
+Convert Warning: No TVDb ID Found for TMDb ID:
+Convert Warning: No TVDb ID or IMDb ID found for AniDB ID:
+Convert Warning: AniDB ID not found for AniList ID:
+Convert Warning: AniDB ID not found for MyAnimeList ID:
+Convert Warning: No IMDb ID Found for TMDb ID:
+Convert Warning: No TMDb ID Found for TVDb ID:
+Convert Warning: No IMDb ID Found for TVDb ID:
+Convert Warning: No TVDb ID Found for IMDb ID:
 ```
 ## ~~plex-bloat-fix~~
 
-RETIRED!!! Please go here now: https://github.com/meisnate12/Plex-Image-Cleanup
+[Back to top](#scripts)
+
+RETIRED!!! Please go here now: https://github.com/kometa-team/ImageMaid
  
 ~~Your PLEX folders are growing out of control. You use overlays from PMM or upload lots of custom art that you no longer want to use or need to eliminate. You don't want to perform the plex dance if you can avoid it. This script will free up gigs of space....It can also perform some PLEX operations like "empty trash", "clean bundles", and "optimize db". PBF also supports the use of PASSTHROUGH alerts to discord with notifiarr.com.~~
 
+[Back to top](#scripts)
+
 ## plexdance
+
+[Back to top](#scripts)
 
 So your plex is hosed... and your DB and metadata is in a real mess... time for the plexdance. https://forums.plex.tv/t/the-plex-dance/197064 Quote: "The purpose of this is to remove all cached metadata and xml data for an item that Plex usually keeps. This helps when you want to “start from scratch” for particular item" My version will do a FULL plexdance on ALL of your libraries
 
@@ -81,7 +95,11 @@ So your plex is hosed... and your DB and metadata is in a real mess... time for 
 7. Run with `./plexdance.sh`
 8. follow prompts closely
 
+[Back to top](#scripts)
+
 ## process-tcards
+
+[Back to top](#scripts)
 
 This script will use Imagemagick to produce title cards based on a folder that contains the episode titlecards stored as jpg. The end results will be in the `results` subfolder along with the `grayscale` subfolder
 
@@ -91,7 +109,11 @@ This script will use Imagemagick to produce title cards based on a folder that c
 3. Run `process-tcards.cmd`
 4. Original files will not be touched and results are stored in `results` subfolder and the `grayscale` subfolder
 
+[Back to top](#scripts)
+
 ## pumpanddump
+
+[Back to top](#scripts)
 
 This script will dump your plex db to a file and reimport it which usually repairs your db when you are seeing corruption and unable to download the db via the ui or the plexapi. This script is currently setup to work with the hotio plex container...... It ROCKS! https://hotio.dev/containers/plex/
 
@@ -101,7 +123,11 @@ This script will dump your plex db to a file and reimport it which usually repai
 3. Open a terminal session and navigate to that folder with the script and run: `chmod 755 pumpanddump.sh` to make it executable
 4. Run `./pumpanddump.sh plex` where `plex` is the name of your container
 
+[Back to top](#scripts)
+
 ## chk-video-codec
+
+[Back to top](#scripts)
 
 This script will go through the current directory and 10 levels down (if needed) to determine which files have been converted to HEVC/H265 and those that have not been.
 
@@ -112,7 +138,11 @@ This script will go through the current directory and 10 levels down (if needed)
 4. Goto the media folder that you want to scan and run `/mnt/user/data/scripts/plex-scripts/chk-video-codec/chk-video-codec.sh`
 5. 3 log files will be created. Review them to see the results
 
+[Back to top](#scripts)
+
 ## create_poster
+
+[Back to top](#scripts)
 
 This Powershell script will create posters/images for PMM/PLEX/EMBY/JELLYFIN/OTHER
 
@@ -130,7 +160,7 @@ In a powershell window and with ImageMagick installed, this will
 ### REQUIREMENTS
 Imagemagick must be installed - https://imagemagick.org/script/download.php
 
-font must be installed on system and visible by Imagemagick. Make sure that you install the ttf font for ALL users as an admin so ImageMagick has access to the font when running (r-click on font Install for ALL Users in Windows)
+Font must be installed on system and visible by Imagemagick. Make sure that you install the ttf font for ALL users as an admin so ImageMagick has access to the font when running (r-click on font Install for ALL Users in Windows)
 
 Powershell version 7.x or greater: https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows?view=powershell-7.3
 
@@ -193,19 +223,11 @@ Create a poster with the Spotify.png and specified background color of "#FB19B9"
 ![](images/create_poster-example2.png)
 ![](images/create_poster-example3.png)
 
-## advanced-plex-edits
-
-When you use blank collections in PLEX through PMM, if the separators continue to show up in the library tab as shown below, even if you have hide_collections enabled, run this after PMM completes the run to unhide and hide the collections
-
-### Usage
-1. setup as above
-2. Run with `python advanced-plex-edits.py` - sometimes (usually when you have not setup the virtualenv for python as recommended above), you need to specify the version of python in the command like `python3.9 advanced-plex-edits.py`
-3. Make sure that you are NOT actively updating posters or title cards with PMM or TCM while running this script. Schedule this after the last run happens. So TCM, Plex Scheduled Tasks, PMM, THEN schedule or run advanced-plex-edits.py. Example: TCM @ 00:00, PLEX @ 02:00-05:00, and PMM @ 05:00
-
-### EXAMPLES
-![](images/advanced-plex-edits-example1.png)
+[Back to top](#scripts)
 
 ## get_missing_people
+
+[Back to top](#scripts)
 
 This Powershell script will find and download people posters/images for PMM/PLEX/EMBY/JELLYFIN/OTHER based on the PMM meta* logs
 
@@ -229,7 +251,11 @@ Run script against the \\NZWHS01\appdata\Plex-Meta-Manager\logs folder
 
 ![](images/get_people_posters-example1.png)
 
+[Back to top](#scripts)
+
 ## image_check
+
+[Back to top](#scripts)
 
 This Powershell script will scan your transparent images for anomalies like head-chops, backgrounds not removed, and black and white photos instead of a color photo to give you a report so you can go and fix those by uploading new and better options to https://www.themoviedb.org/
 
@@ -255,7 +281,11 @@ Run script against the c:\temp\people\transparent folder
 
 ![](images/image_check-example1.png)
 
+[Back to top](#scripts)
+
 ## create_people_poster
+
+[Back to top](#scripts)
 
 This Powershell script will find and download people posters/images for PMM/PLEX/EMBY/JELLYFIN/OTHER based on the PMM meta* logs
 
@@ -265,10 +295,12 @@ This Powershell script will find and download people posters/images for PMM/PLEX
 2. It will create 1 .cmd file per meta.log file and run it to download the images locally
 3. It will then scan, remove the background, and produce 4 files all at 2000x3000 in size
 - bw-style
+- diiivoy-style
+- diiivoycolor-style
 - rainier-style
 - original-style
 - signature-style
-- transparent
+- transparent-style
  
 ### REQUIREMENTS
 $metalog_location=   is the directory path to scan the PMM directory logs (meta*.log)
@@ -301,7 +333,8 @@ PAD Installation steps
 ![](images/step4.png)
 5. You should see all the steps pasted into the GUI
 ![](images/step5.png)
-6. Save the flow
+6. Repeat for the Subflows if they exist by only adding the subflow like Refresh_browser and closer_browsers
+7. Save the flow
 
 ### PARAMETERS
 `-metalog_location`          (specify the logs folder location for PMM)
@@ -317,15 +350,21 @@ Run script against a folder where you copied some meta*.log files from D:\logs o
 
 `.\create_people_poster.ps1 -metalog_location D:\logs -flowname "remove backgrounds edge-en windows-en"`
 
-![](images/create_people_poster-example1.png)
+![](images/create_people_poster-example1.jpg)
 
 ## pad_flows
+
+[Back to top](#scripts)
+
 PAD Flows
-## Convert_Error_No_TMDb_ID_Found_for_IMDb_ID
-- `Convert Error- No TMDb ID Found for IMDb ID` => Windows OS is in English and Edge in English
+## 1-Convert_Warning_No_TMDb_ID_Found_for_IMDb_ID
+
+[Back to top](#scripts)
+
+- `1-Convert Warning- No TMDb ID Found for IMDb ID` => Windows OS is in English and Edge in English
 - See [PAD Flows Install](#pad_flows_install)
 - Before starting. ensure that you have a tmdb account and that you logged in so that the cached credentials will work before trying this....
-![](images/Convert_Error-_No_TMDb_ID_Found_for_IMDb_ID.png)
+![](images/Convert_Warning-_No_TMDb_ID_Found_for_IMDb_ID.png)
 `ctrl-a` is used to ensure that the flow waits until you find/click on the actual episode in TMDB (See image)
 1. 2 browsers will open to assist you to link the missing ids
    1. 1st browser stays on the found IMDB page
@@ -342,20 +381,36 @@ Error checking is enabled and does the following:
  - if you hit `ctrl-a` and you get an error upon save, then that is logged and continues. if its a success, that is logged and continues
  - if you hit `ctrl-a` and you are somehow in tmdb in another language or the episode and its show is not in tmdb in ENGLISH, then the script will try to add the english translation and continue to try again to add the id in the subsequent iteration (This has not been tested because I have not encountered this yet but I know it happens because of the other flow I have used in the past)
 
-## Convert_Error_No_TVDb_ID_Found_for_TMDb_ID
-- `Convert Error- No TVDb ID Found for TMDb ID` => Windows OS is in English and Edge in English
+## 2-Convert_Warning_No_TVDb_ID_Found_for_TMDb_ID
+
+[Back to top](#scripts)
+
+- `2-Convert Warning- No TVDb ID Found for TMDb ID` => Windows OS is in English and Edge in English
 - See [PAD Flows Install](#pad_flows_install)
 - Before starting. ensure that you have a tmdb account and that you logged in so that the cached credentials will work before trying this....
 
-## Convert_Error_No_TVDb_ID_or_IMDb_ID_found_for_AniDB_ID
-- `Convert Error- No TVDb ID or IMDb ID found for AniDB ID` => Windows OS is in English and Edge in English
+## 3-Convert_Warning_No_TVDb_ID_or_IMDb_ID_found_for_AniDB_ID
+
+[Back to top](#scripts)
+
+- `3-Convert Warning- No TVDb ID or IMDb ID found for AniDB ID` => Windows OS is in English and Edge in English
 - See [PAD Flows Install](#pad_flows_install)
 - Before starting. ensure that you have a tmdb and anidb account and that you logged in so that the cached credentials will work before trying this....
 - AniDb does TMDb and IMDb  as well as MAL links 
 - TMDb tv has IMDb and TVDb external links 
 - TMDb movies has IMDb external link
 - The PAD flow I built launches 6 browsers to six different sites and attempts to give you a summary of what it finds… it launches AniDb, MAL, AniList, TVDb, IMDb, and TMDb. Then it tries to match up as much as possible and gives you a summary of what it finds.
-
 - You then decide where to make your fixes based on the summary and the pages the script finds for you. You hit save on the sites that you have updated and then you hit `ctrl-s` to have it continue to attempt finding the next ID that was not matched from PMM 
 
+## 4-Convert_Warning_No_TMDb_ID_Found_for_TVDb_ID
+
+[Back to top](#scripts)
+
+- `4-Convert Warning No TMDb ID Found for TVDb ID` => Windows OS is in English and Edge in English
+- See [PAD Flows Install](#pad_flows_install)
+- Before starting. ensure that you have a tmdb account and that you logged in so that the cached credentials will work before trying this....
+
+
 - So far, this is as far as I got so it’s far from perfect, and still pretty manual, but effective.
+
+[Back to top](#scripts)

@@ -4,7 +4,7 @@
 # Version: 3.1
 # Author: bullmoose20
 #
-# DESCRIPTION: 
+# DESCRIPTION:
 # This script contains ten functions that are used to create various types of posters. The functions are:
 # CreateAudioLanguage, CreateAwards, CreateChart, CreateCountry, CreateDecade, CreateGenre, CreatePlaylist, CreateSubtitleLanguage, CreateUniverse, CreateVideoFormat, CreateYear, and CreateOverlays.
 # The script can be called by providing the name of the function or aliases you want to run as a command-line argument.
@@ -20,7 +20,7 @@
 #
 # EXAMPLES:
 # You can run the script by providing the name of the function you want to run as a command-line argument:
-# create_default_posters.ps1 AudioLanguage 
+# create_default_posters.ps1 AudioLanguage
 # This will run only the CreateAudioLanguage function.
 # You can also provide multiple function names as command-line arguments:
 # create_default_posters.ps1 AudioLanguage Playlist Chart
@@ -141,26 +141,26 @@ Function Update-LogFile {
 ################################################################################
 Function InstallFontsIfNeeded {
     $fontNames = @(
-        "Comfortaa-Medium", 
+        "Comfortaa-Medium",
         "Bebas-Regular",
-        "Rye-Regular", 
-        "Limelight-Regular", 
-        "BoecklinsUniverse", 
-        "UnifrakturCook", 
-        "Trochut", 
-        "Righteous", 
-        "Yesteryear", 
-        "Cherry-Cream-Soda-Regular", 
-        "Boogaloo-Regular", 
-        "Monoton", 
-        "Press-Start-2P", 
-        "Jura-Bold", 
-        "Special-Elite-Regular", 
-        "Barlow-Regular", 
+        "Rye-Regular",
+        "Limelight-Regular",
+        "BoecklinsUniverse",
+        "UnifrakturCook",
+        "Trochut",
+        "Righteous",
+        "Yesteryear",
+        "Cherry-Cream-Soda-Regular",
+        "Boogaloo-Regular",
+        "Monoton",
+        "Press-Start-2P",
+        "Jura-Bold",
+        "Special-Elite-Regular",
+        "Barlow-Regular",
         "Helvetica-Bold"
     )
     $missingFonts = $fontNames | Where-Object { !(magick identify -list font | Select-String "Font: $_$") }
-    
+
     if ($missingFonts) {
         $fontList = magick identify -list font | Select-String "Font: " | ForEach-Object { $_.ToString().Trim().Substring(6) }
         $fontList | Out-File -Encoding utf8 -FilePath "magick_fonts.txt"
@@ -181,7 +181,7 @@ Function Remove-Folders {
     "decade", "defaults-$LanguageCode", "franchise", "genre", "network", "playlist", "resolution",
     "seasonal", "separators", "streaming", "studio", "subtitle_language",
     "translations", "universe", "video_format", "year"
-    
+
     foreach ($folder in $folders) {
         $path = Join-Path $script_path $folder
         Remove-Item $path -Force -Recurse -ErrorAction SilentlyContinue
@@ -273,8 +273,8 @@ Function Get-TranslationFile {
         return
     }
 
-    # $GitHubRepository = "https://raw.githubusercontent.com/meisnate12/Plex-Meta-Manager/$BranchOption/defaults/translations"
-    $GitHubRepository = "https://raw.githubusercontent.com/meisnate12/PMM-Translations/master/defaults"
+    # $GitHubRepository = "https://raw.githubusercontent.com/Kometa-Team/Kometa/$BranchOption/defaults/translations"
+    $GitHubRepository = "https://raw.githubusercontent.com/Kometa-Team/Translations/master/defaults"
     $TranslationFile = "$LanguageCode.yml"
     $TranslationFileUrl = "$GitHubRepository/$TranslationFile"
     $TranslationsPath = Join-Path $script_path "@translations"
@@ -298,7 +298,7 @@ Function Get-TranslationFile {
         Write-Error $_
         return
     }
-  
+
     Write-Output "Translation file downloaded to $TranslationFilePath"
 }
 
@@ -320,15 +320,15 @@ Function Get-YamlPropertyValue {
     param (
         [Parameter(Mandatory = $true)]
         [string]$PropertyPath,
-        
+
         [Parameter(Mandatory = $true)]
         [object]$ConfigObject,
-        
+
         [Parameter()]
         [ValidateSet("Exact", "Upper", "Lower")]
         [string]$CaseSensitivity = "Exact"
     )
-    
+
     $value = $ConfigObject
     foreach ($path in $PropertyPath.Split(".")) {
         if ($value.ContainsKey($path)) {
@@ -340,7 +340,7 @@ Function Get-YamlPropertyValue {
             return
         }
     }
-    
+
     switch ($CaseSensitivity) {
         "Exact" { break }
         "Upper" { $value = $value.ToUpper() }
@@ -529,6 +529,7 @@ Function Get-OptimalPointSize {
     }
 
     $cmd = "magick -size ${box_width}x${box_height} -font `"$escaped_font`" -gravity center -fill black caption:`'$escaped_text`' -format `"%[caption:pointsize]`" info:"
+    WriteToLogFile "cmd for optimal size         : $cmd"
 
     # Execute command and get point size
     $current_pointsize = [int](Invoke-Expression $cmd | Out-String).Trim()
@@ -540,7 +541,7 @@ Function Get-OptimalPointSize {
         $current_pointsize = $max_pointsize
     }
     elseif ($current_pointsize -lt $min_pointsize) {
-        WriteToLogFile "Optimal Point Size ERROR     : Text is too small and will be truncated"
+        WriteToLogFile "Optimal Point Size [ERROR]   : Text is too small and will be truncated"
         $current_pointsize = $min_pointsize
     }
 
@@ -608,7 +609,7 @@ Function LaunchScripts {
         $batch = $ScriptPaths[$i..($i + $batchSize - 1)]
         $processes = @()
         foreach ($scriptPath in $batch) {
-            $encodedCommand = EncodeIt $scriptPath 
+            $encodedCommand = EncodeIt $scriptPath
             WriteToLogFile "Unencoded                    : $scriptPath"
             WriteToLogFile "Encoded                      : $encodedCommand"
             # $process = Start-Process -NoNewWindow -FilePath "pwsh.exe" -ArgumentList "-noexit -encodedCommand $encodedCommand" -PassThru
@@ -725,7 +726,7 @@ Function CreateAspect {
     Move-Item -Path output -Destination aspect
     Copy-Item -Path logos_aspect -Destination aspect\logos -Recurse
     Move-Item -Path output-orig -Destination output
-    
+
 }
 
 
@@ -857,7 +858,7 @@ Function CreateAudioLanguage {
         'KOREAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ko| #F5C630| 1| 1| 0| 1',
         'KUANYAMA| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | kj| #D8CB60| 1| 1| 0| 1',
         'KURDISH| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ku| #467330| 1| 1| 0| 1',
-        'LAO| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | lo| #DD3B78| 1| 1| 0| 1',
+        'LAOS| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | lo| #DD3B78| 1| 1| 0| 1',
         'LATIN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | la| #A73376| 1| 1| 0| 1',
         'LATVIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | lv| #A65EC1| 1| 1| 0| 1',
         'LIMBURGAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | li| #13C252| 1| 1| 0| 1',
@@ -970,7 +971,7 @@ Function CreateAudioLanguage {
 
     Move-Item -Path output -Destination audio_language
     Move-Item -Path output-orig -Destination output
-    
+
 }
 
 ################################################################################
@@ -988,6 +989,379 @@ Function CreateAwards {
     $maxPointSize = 250
 
     Move-Item -Path output -Destination output-orig
+
+    ########################
+    # PCA #B26AAA
+    ########################
+    WriteToLogFile "ImageMagick Commands for     : PCA"
+    $myArray = @(
+        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        'WINNERS| PCA.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | winner| #B26AAA| 1| 1| 0| 1',
+        'NOMINATIONS| PCA.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | nomination| #B26AAA| 1| 1| 0| 1',
+        'BEST_DIRECTOR_WINNERS| PCA.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | best_director_winner| #B26AAA| 1| 1| 0| 1',
+        'BEST_PICTURE_WINNERS| PCA.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | best_picture_winner| #B26AAA| 1| 1| 0| 1',
+        '| PCA.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | PCA| #B26AAA| 1| 1| 0| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        if ($($item.key_name).ToString() -eq "") {
+            $value = $null
+        }
+        else {
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+        }
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
+    }
+    LaunchScripts -ScriptPaths $arr
+
+    $myArray = @(
+        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        'WINNERS| PCA.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | winner| #B26AAA| 1| 1| 0| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        for ($i = 1975; $i -lt 2030; $i++) {
+            $value = $i
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
+        }
+    }
+    LaunchScripts -ScriptPaths $arr
+    Move-Item -Path output -Destination award\pca
+
+    $myArray = @(
+        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        'WINNERS| PCA.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | winner| #B26AAA| 1| 1| 0| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        for ($i = 1975; $i -lt 2030; $i++) {
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+            $value = "$value $i"
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
+        }
+    }
+    LaunchScripts -ScriptPaths $arr
+    Move-Item -Path output -Destination award\pca\winner
+
+    $myArray = @(
+        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        'NOMINATIONS| PCA.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | nomination| #B26AAA| 1| 1| 0| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        for ($i = 1975; $i -lt 2030; $i++) {
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+            $value = "$value $i"
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
+        }
+    }
+    LaunchScripts -ScriptPaths $arr
+    Move-Item -Path output -Destination award\pca\nomination
+
+    $myArray = @(
+        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        'BEST_PICTURE_WINNER| PCA.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | winner| #B26AAA| 1| 1| 0| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        for ($i = 1975; $i -lt 2030; $i++) {
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+            $value = "$value $i"
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
+        }
+    }
+    LaunchScripts -ScriptPaths $arr
+    Move-Item -Path output -Destination award\pca\best
+
+    ########################
+    # NFR #D32864
+    ########################
+    WriteToLogFile "ImageMagick Commands for     : NFR"
+    $myArray = @(
+        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        # 'WINNERS| NFR.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | winner| #D32864| 1| 1| 0| 1',
+        # 'NOMINATIONS| NFR.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | nomination| #D32864| 1| 1| 0| 1',
+        # 'BEST_DIRECTOR_WINNERS| NFR.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | best_director_winner| #D32864| 1| 1| 0| 1',
+        # 'BEST_PICTURE_WINNERS| NFR.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | best_picture_winner| #D32864| 1| 1| 0| 1',
+        'ALL_TIME| NFR.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | all_time| #D32864| 1| 1| 0| 1',
+        '| NFR.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | NFR| #D32864| 1| 1| 0| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        if ($($item.key_name).ToString() -eq "") {
+            $value = $null
+        }
+        else {
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+        }
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
+    }
+    LaunchScripts -ScriptPaths $arr
+
+    $myArray = @(
+        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        'WINNERS| NFR.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | winner| #D32864| 1| 1| 0| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        for ($i = 1989; $i -lt 2030; $i++) {
+            $value = $i
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
+        }
+    }
+    LaunchScripts -ScriptPaths $arr
+    Move-Item -Path output -Destination award\nfr
+
+    # $myArray = @(
+    #     'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+    #     'WINNERS| NFR.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | winner| #D32864| 1| 1| 0| 1'
+    # ) | ConvertFrom-Csv -Delimiter '|'
+
+    # $arr = @()
+    # foreach ($item in $myArray) {
+    #     for ($i = 1989; $i -lt 2030; $i++) {
+    #         $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+    #         $value = "$value $i"
+    #         $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+    #         $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
+    #     }
+    # }
+    # LaunchScripts -ScriptPaths $arr
+    # Move-Item -Path output -Destination award\nfr\winner
+
+    # $myArray = @(
+    #     'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+    #     'NOMINATIONS| NFR.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | nomination| #D32864| 1| 1| 0| 1'
+    # ) | ConvertFrom-Csv -Delimiter '|'
+
+    # $arr = @()
+    # foreach ($item in $myArray) {
+    #     for ($i = 1989; $i -lt 2030; $i++) {
+    #         $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+    #         $value = "$value $i"
+    #         $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+    #         $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
+    #     }
+    # }
+    # LaunchScripts -ScriptPaths $arr
+    # Move-Item -Path output -Destination award\nfr\nomination
+
+    # $myArray = @(
+    #     'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+    #     'BEST_PICTURE_WINNER| NFR.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | winner| #D32864| 1| 1| 0| 1'
+    # ) | ConvertFrom-Csv -Delimiter '|'
+
+    # $arr = @()
+    # foreach ($item in $myArray) {
+    #     for ($i = 1989; $i -lt 2030; $i++) {
+    #         $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+    #         $value = "$value $i"
+    #         $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+    #         $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
+    #     }
+    # }
+    # LaunchScripts -ScriptPaths $arr
+    # Move-Item -Path output -Destination award\nfr\best
+
+    ########################
+    # SAG #6E889A
+    ########################
+    WriteToLogFile "ImageMagick Commands for     : SAG"
+    $myArray = @(
+        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        'WINNERS| SAG.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | winner| #6E889A| 1| 1| 0| 1',
+        'NOMINATIONS| SAG.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | nomination| #6E889A| 1| 1| 0| 1',
+        'BEST_DIRECTOR_WINNERS| SAG.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | best_director_winner| #6E889A| 1| 1| 0| 1',
+        'BEST_PICTURE_WINNERS| SAG.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | best_picture_winner| #6E889A| 1| 1| 0| 1',
+        '| SAG.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | SAG| #6E889A| 1| 1| 0| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        if ($($item.key_name).ToString() -eq "") {
+            $value = $null
+        }
+        else {
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+        }
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
+    }
+    LaunchScripts -ScriptPaths $arr
+
+    $myArray = @(
+        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        'WINNERS| SAG.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | winner| #6E889A| 1| 1| 0| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        for ($i = 1963; $i -lt 2030; $i++) {
+            $value = $i
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
+        }
+    }
+    LaunchScripts -ScriptPaths $arr
+    Move-Item -Path output -Destination award\sag
+
+    $myArray = @(
+        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        'WINNERS| SAG.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | winner| #6E889A| 1| 1| 0| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        for ($i = 1963; $i -lt 2030; $i++) {
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+            $value = "$value $i"
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
+        }
+    }
+    LaunchScripts -ScriptPaths $arr
+    Move-Item -Path output -Destination award\sag\winner
+
+    $myArray = @(
+        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        'NOMINATIONS| SAG.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | nomination| #6E889A| 1| 1| 0| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        for ($i = 1963; $i -lt 2030; $i++) {
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+            $value = "$value $i"
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
+        }
+    }
+    LaunchScripts -ScriptPaths $arr
+    Move-Item -Path output -Destination award\sag\nomination
+
+    $myArray = @(
+        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        'BEST_PICTURE_WINNER| SAG.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | winner| #6E889A| 1| 1| 0| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        for ($i = 1963; $i -lt 2030; $i++) {
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+            $value = "$value $i"
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
+        }
+    }
+    LaunchScripts -ScriptPaths $arr
+    Move-Item -Path output -Destination award\sag\best
+
+    ########################
+    # TIFF #F36F21
+    ########################
+    WriteToLogFile "ImageMagick Commands for     : TIFF"
+    $myArray = @(
+        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        'WINNERS| tiff.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | winner| #F36F21| 1| 1| 0| 1',
+        'NOMINATIONS| tiff.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | nomination| #F36F21| 1| 1| 0| 1',
+        'BEST_DIRECTOR_WINNERS| tiff.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | best_director_winner| #F36F21| 1| 1| 0| 1',
+        'BEST_PICTURE_WINNERS| tiff.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | best_picture_winner| #F36F21| 1| 1| 0| 1',
+        '| tiff.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | tiff| #F36F21| 1| 1| 0| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        if ($($item.key_name).ToString() -eq "") {
+            $value = $null
+        }
+        else {
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+        }
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
+    }
+    LaunchScripts -ScriptPaths $arr
+
+    $myArray = @(
+        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        'WINNERS| tiff.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | winner| #F36F21| 1| 1| 0| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        for ($i = 1978; $i -lt 2030; $i++) {
+            $value = $i
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
+        }
+    }
+    LaunchScripts -ScriptPaths $arr
+    Move-Item -Path output -Destination award\tiff
+
+    $myArray = @(
+        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        'WINNERS| tiff.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | winner| #F36F21| 1| 1| 0| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        for ($i = 1978; $i -lt 2030; $i++) {
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+            $value = "$value $i"
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
+        }
+    }
+    LaunchScripts -ScriptPaths $arr
+    Move-Item -Path output -Destination award\tiff\winner
+
+    $myArray = @(
+        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        'NOMINATIONS| tiff.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | nomination| #F36F21| 1| 1| 0| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        for ($i = 1978; $i -lt 2030; $i++) {
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+            $value = "$value $i"
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
+        }
+    }
+    LaunchScripts -ScriptPaths $arr
+    Move-Item -Path output -Destination award\tiff\nomination
+
+    $myArray = @(
+        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        'BEST_PICTURE_WINNER| tiff.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | winner| #F36F21| 1| 1| 0| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        for ($i = 1978; $i -lt 2030; $i++) {
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+            $value = "$value $i"
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
+        }
+    }
+    LaunchScripts -ScriptPaths $arr
+    Move-Item -Path output -Destination award\tiff\best
 
     ########################
     # BAFTA #9C7C26
@@ -1064,7 +1438,7 @@ Function CreateAwards {
     }
     LaunchScripts -ScriptPaths $arr
     Move-Item -Path output -Destination award\bafta\nomination
- 
+
     $myArray = @(
         'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
         'BEST_PICTURE_WINNER| BAFTA.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | winner| #9C7C26| 1| 1| 0| 1'
@@ -1157,7 +1531,7 @@ Function CreateAwards {
     }
     LaunchScripts -ScriptPaths $arr
     Move-Item -Path output -Destination award\berlinale\nomination
- 
+
     $myArray = @(
         'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
         'BEST_PICTURE_WINNER| Berlinale.png| -500| 1000| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | winner| #BB0B34| 1| 1| 0| 1'
@@ -1250,7 +1624,7 @@ Function CreateAwards {
     }
     LaunchScripts -ScriptPaths $arr
     Move-Item -Path output -Destination award\cannes\nomination
- 
+
     $myArray = @(
         'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
         'BEST_PICTURE_WINNER| Cannes.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | winner| #AF8F51| 1| 1| 0| 1'
@@ -1343,7 +1717,7 @@ Function CreateAwards {
     }
     LaunchScripts -ScriptPaths $arr
     Move-Item -Path output -Destination award\cesar\nomination
- 
+
     $myArray = @(
         'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
         'BEST_PICTURE_WINNER| Cesar.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | winner| #E2A845| 1| 1| 0| 1'
@@ -1385,6 +1759,11 @@ Function CreateAwards {
         $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
         $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
     }
+    $i = "2016-2"
+    $value = $i
+    $item.out_name = $i
+    $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
     LaunchScripts -ScriptPaths $arr
 
     $myArray = @(
@@ -1400,6 +1779,11 @@ Function CreateAwards {
             $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
         }
     }
+    $i = "2016-2"
+    $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+    $value = $i
+    $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
     LaunchScripts -ScriptPaths $arr
     Move-Item -Path output -Destination award\choice
 
@@ -1417,6 +1801,11 @@ Function CreateAwards {
             $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
         }
     }
+    $i = "2016-2"
+    $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+    $value = "$value $i"
+    $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
     LaunchScripts -ScriptPaths $arr
     Move-Item -Path output -Destination award\choice\winner
 
@@ -1434,9 +1823,14 @@ Function CreateAwards {
             $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
         }
     }
+    $i = "2016-2"
+    $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+    $value = "$value $i"
+    $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
     LaunchScripts -ScriptPaths $arr
     Move-Item -Path output -Destination award\choice\nomination
- 
+
     $myArray = @(
         'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
         'BEST_PICTURE_WINNER| Choice.png| -500| 600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | winner| #AC7427| 1| 1| 0| 1'
@@ -1451,6 +1845,11 @@ Function CreateAwards {
             $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
         }
     }
+    $i = "2016-2"
+    $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+    $value = "$value $i"
+    $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
     LaunchScripts -ScriptPaths $arr
     Move-Item -Path output -Destination award\choice\best
 
@@ -1531,7 +1930,7 @@ Function CreateAwards {
     }
     LaunchScripts -ScriptPaths $arr
     Move-Item -Path output -Destination award\emmys\nomination
- 
+
     $myArray = @(
         'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
         'BEST_PICTURE_WINNER| Emmys.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | winner| #D89C27| 1| 1| 0| 1'
@@ -1562,7 +1961,7 @@ Function CreateAwards {
         '| Golden.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Golden| #D0A047| 1| 1| 0| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
-    
+
     $arr = @()
     foreach ($item in $myArray) {
         if ($($item.key_name).ToString() -eq "") {
@@ -1575,7 +1974,7 @@ Function CreateAwards {
         $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
     }
     LaunchScripts -ScriptPaths $arr
-    
+
     $myArray = @(
         'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
         'WINNERS| Golden.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | winner| #D0A047| 1| 1| 0| 1'
@@ -1625,7 +2024,7 @@ Function CreateAwards {
     }
     LaunchScripts -ScriptPaths $arr
     Move-Item -Path output -Destination award\golden\nomination
- 
+
     $myArray = @(
         'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
         'BEST_PICTURE_WINNER| Golden.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | winner| #D0A047| 1| 1| 0| 1'
@@ -1652,8 +2051,14 @@ Function CreateAwards {
         'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
         'WINNERS| Oscars.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | winner| #A9842E| 1| 1| 0| 1',
         'NOMINATIONS| Oscars.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | nomination| #A9842E| 1| 1| 0| 1',
+        'BEST_ANIMATED_FEATURE_FILM_NOMINATION| Oscars.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | best_animated_feature_film_nomination| #A9842E| 1| 1| 0| 1',
+        'BEST_ANIMATED_FEATURE_FILM_WINNERS| Oscars.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | best_animated_feature_film_winner| #A9842E| 1| 1| 0| 1',
         'BEST_DIRECTOR_WINNERS| Oscars.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | best_director_winner| #A9842E| 1| 1| 0| 1',
+        'BEST_LIVE_ACTION_SHORT_FILM_NOMINATION| Oscars.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | best_live_action_short_film_nomination| #A9842E| 1| 1| 0| 1',
+        'BEST_LIVE_ACTION_SHORT_FILM_WINNERS| Oscars.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | best_live_action_short_film_winner| #A9842E| 1| 1| 0| 1',
         'BEST_PICTURE_WINNERS| Oscars.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | best_picture_winner| #A9842E| 1| 1| 0| 1',
+        'BEST_DIRECTOR_NOMINATION| Oscars.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | best_director_nomination| #A9842E| 1| 1| 0| 1',
+        'BEST_PICTURE_NOMINATION| Oscars.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | best_picture_nomination| #A9842E| 1| 1| 0| 1',
         '| Oscars.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Oscars| #A9842E| 1| 1| 0| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
@@ -1668,6 +2073,11 @@ Function CreateAwards {
         $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
         $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
     }
+    $i = "1930-2"
+    $value = $i
+    $item.out_name = $i
+    $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
     LaunchScripts -ScriptPaths $arr
 
     $myArray = @(
@@ -1683,12 +2093,16 @@ Function CreateAwards {
             $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
         }
     }
+    $i = "1930-2"
+    $value = $i
+    $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
     LaunchScripts -ScriptPaths $arr
     Move-Item -Path output -Destination award\oscars
 
     $myArray = @(
         'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
-        'WINNERS| Oscars.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | winner| #A9842E| 1| 1| 0| 1'
+        'BEST_DIRECTOR_NOMINATION| Oscars.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | best_director_nomination| #A9842E| 1| 1| 0| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
@@ -1701,8 +2115,36 @@ Function CreateAwards {
             # $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
         }
     }
+    $i = "1930-2"
+    $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+    $value = "$value $i"
+    $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
     LaunchScripts -ScriptPaths $arr
-    Move-Item -Path output -Destination award\oscars\winner
+    Move-Item -Path output -Destination award\oscars\director_nomination
+
+    $myArray = @(
+        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        'BEST_PICTURE_NOMINATION| Oscars.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | best_picture_nomination| #A9842E| 1| 1| 0| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        for ($i = 1927; $i -lt 2030; $i++) {
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+            $value = "$value $i"
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
+            # $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.Logo)`" -logo_offset -500 -logo_resize $($item.logo_resize) -text `"$value`" -text_offset +850 -font `"$theFont`" -font_size $optimalFontSize -font_color `"#FFFFFF`" -border 0 -border_width 15 -border_color `"#FFFFFF`" -avg_color_image `"`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient 1 -avg_color 0 -clean 1 -white_wash $($item.ww)"
+        }
+    }
+    $i = "1930-2"
+    $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+    $value = "$value $i"
+    $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
+    LaunchScripts -ScriptPaths $arr
+    Move-Item -Path output -Destination award\oscars\picture_nomination
 
     $myArray = @(
         'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
@@ -1718,12 +2160,17 @@ Function CreateAwards {
             $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
         }
     }
+    $i = "1930-2"
+    $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+    $value = "$value $i"
+    $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
     LaunchScripts -ScriptPaths $arr
     Move-Item -Path output -Destination award\oscars\nomination
- 
+
     $myArray = @(
         'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
-        'BEST_PICTURE_WINNER| Oscars.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | winner| #A9842E| 1| 1| 0| 1'
+        'BEST_PICTURE_WINNER| Oscars.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | best_picture_winner| #A9842E| 1| 1| 0| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
@@ -1735,8 +2182,57 @@ Function CreateAwards {
             $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
         }
     }
+    $i = "1930-2"
+    $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+    $value = "$value $i"
+    $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
     LaunchScripts -ScriptPaths $arr
     Move-Item -Path output -Destination award\oscars\best
+
+    $myArray = @(
+        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        'WINNERS| Oscars.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | winner| #A9842E| 1| 1| 0| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        for ($i = 1927; $i -lt 2030; $i++) {
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+            $value = "$value $i"
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
+        }
+    }
+    $i = "1930-2"
+    $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+    $value = "$value $i"
+    $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
+    LaunchScripts -ScriptPaths $arr
+    Move-Item -Path output -Destination award\oscars\winner
+
+    $myArray = @(
+        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        'BEST_DIRECTOR_WINNERS| Oscars.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | best_director_winner| #A9842E| 1| 1| 0| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        for ($i = 1927; $i -lt 2030; $i++) {
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+            $value = "$value $i"
+            $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+            $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
+        }
+    }
+    $i = "1930-2"
+    $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+    $value = "$value $i"
+    $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+    $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$i`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
+    LaunchScripts -ScriptPaths $arr
+    Move-Item -Path output -Destination award\oscars\best_director
 
     ########################
     # Razzie #FF0C0C
@@ -1750,7 +2246,7 @@ Function CreateAwards {
         'BEST_PICTURE_WINNERS| Razzie.png| -500| 1000| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | best_picture_winner| #FF0C0C| 1| 1| 0| 1',
         '| Razzie.png| -500| 1000| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Razzie| #FF0C0C| 1| 1| 0| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
-    
+
     $arr = @()
     foreach ($item in $myArray) {
         if ($($item.key_name).ToString() -eq "") {
@@ -1763,7 +2259,7 @@ Function CreateAwards {
         $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
     }
     LaunchScripts -ScriptPaths $arr
-    
+
     $myArray = @(
         'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
         'WINNERS| Razzie.png| -500| 1000| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | winner| #FF0C0C| 1| 1| 0| 1'
@@ -1778,7 +2274,7 @@ Function CreateAwards {
         }
     }
     LaunchScripts -ScriptPaths $arr
-    Move-Item -Path output -Destination award\razzies
+    Move-Item -Path output -Destination award\razzie
 
     $myArray = @(
         'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
@@ -1795,7 +2291,7 @@ Function CreateAwards {
         }
     }
     LaunchScripts -ScriptPaths $arr
-    Move-Item -Path output -Destination award\razzies\winner
+    Move-Item -Path output -Destination award\razzie\winner
 
     $myArray = @(
         'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
@@ -1812,8 +2308,8 @@ Function CreateAwards {
         }
     }
     LaunchScripts -ScriptPaths $arr
-    Move-Item -Path output -Destination award\razzies\nomination
- 
+    Move-Item -Path output -Destination award\razzie\nomination
+
     $myArray = @(
         'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
         'BEST_PICTURE_WINNER| Razzie.png| -500| 1000| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | winner| #FF0C0C| 1| 1| 0| 1'
@@ -1829,7 +2325,7 @@ Function CreateAwards {
         }
     }
     LaunchScripts -ScriptPaths $arr
-    Move-Item -Path output -Destination award\razzies\best
+    Move-Item -Path output -Destination award\razzie\best
 
     ########################
     # Spirit #4662E7
@@ -1856,7 +2352,7 @@ Function CreateAwards {
         $arr += ".\create_poster.ps1 -logo `"$script_path\logos_award\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
     }
     LaunchScripts -ScriptPaths $arr
-    
+
     $myArray = @(
         'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
         'WINNERS| Spirit.png| -500| 1000| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | winner| #4662E7| 1| 1| 0| 1'
@@ -1906,7 +2402,7 @@ Function CreateAwards {
     }
     LaunchScripts -ScriptPaths $arr
     Move-Item -Path output -Destination award\spirit\nomination
- 
+
     $myArray = @(
         'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
         'BEST_PICTURE_WINNER| Spirit.png| -500| 1000| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | winner| #4662E7| 1| 1| 0| 1'
@@ -2001,7 +2497,7 @@ Function CreateAwards {
     }
     LaunchScripts -ScriptPaths $arr
     Move-Item -Path output -Destination award\sundance\nomination
- 
+
     $myArray = @(
         'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
         'BEST_PICTURE_WINNER| Sundance.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | winner| #7EB2CF| 1| 1| 0| 1'
@@ -2095,7 +2591,7 @@ Function CreateAwards {
     }
     LaunchScripts -ScriptPaths $arr
     Move-Item -Path output -Destination award\venice\nomination
- 
+
     $myArray = @(
         'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
         'BEST_PICTURE_WINNER| Venice.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | winner| #D21635| 1| 1| 0| 1'
@@ -2148,7 +2644,7 @@ Function CreateBased {
         'BASED_ON_A_TRUE_STORY| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | True Story| #BC0638| 1| 1| 0| 1',
         'BASED_ON_A_VIDEO_GAME| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Video Game| #38CC66| 1| 1| 0| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
-    
+
     $arr = @()
     foreach ($item in $myArray) {
         if ($($item.key_name).ToString() -eq "") {
@@ -2173,7 +2669,7 @@ Function CreateBased {
 Function CreateChart {
     Write-Host "Creating Chart"
     Set-Location $script_path
-    # Find-Path "$script_path\chart"
+    Find-Path "$script_path\chart"
     $theMaxWidth = 1500
     $theMaxHeight = 1000
     $minPointSize = 100
@@ -2183,73 +2679,514 @@ Function CreateChart {
 
     $myArray = @(
         'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
-        'POPULAR| AniDB.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | AniDB Popular| #FF7E17| 1| 1| 0| 1',
-        'POPULAR| AniList.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | AniList Popular| #414A81| 1| 1| 0| 1',
-        'SEASON| AniList.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | AniList Season| #414A81| 1| 1| 0| 1',
-        'TOP_RATED| AniList.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | AniList Top Rated| #414A81| 1| 1| 0| 1',
-        'TRENDING| AniList.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | AniList Trending| #414A81| 1| 1| 0| 1',
-        'TOP_10| Apple TV+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | apple_top| #494949| 1| 1| 0| 1',
-        'TOP_10| Disney+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | disney_top| #002CA1| 1| 1| 0| 1',
-        'TOP_10| HBO Max.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hbo_top| #9015C5| 1| 1| 0| 1',
-        'TOP_10| Max.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | max_top| #002BE7| 1| 1| 0| 1',
-        'BOTTOM_RATED| IMDb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | IMDb Bottom Rated| #D7B00B| 1| 1| 0| 1',
-        'BOX_OFFICE| IMDb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | IMDb Box Office| #D7B00B| 1| 1| 0| 1',
-        'LOWEST_RATED| IMDb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | IMDb Lowest Rated| #D7B00B| 1| 1| 0| 1',
-        'POPULAR| IMDb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | IMDb Popular| #D7B00B| 1| 1| 0| 1',
-        'TOP_10| IMDb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | imdb_top| #D7B00B| 1| 1| 0| 1',
-        'TOP_250| IMDb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | IMDb Top 250| #D7B00B| 1| 1| 0| 1',
-        'FAVORITED| MyAnimeList.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | MyAnimeList Favorited| #304DA6| 1| 1| 0| 1',
-        'POPULAR| MyAnimeList.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | MyAnimeList Popular| #304DA6| 1| 1| 0| 1',
-        'SEASON| MyAnimeList.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | MyAnimeList Season| #304DA6| 1| 1| 0| 1',
-        'TOP_AIRING| MyAnimeList.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | MyAnimeList Top Airing| #304DA6| 1| 1| 0| 1',
-        'TOP_RATED| MyAnimeList.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | MyAnimeList Top Rated| #304DA6| 1| 1| 0| 1',
-        'TOP_10| Netflix.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | netflix_top| #B4121D| 1| 1| 0| 1',
-        'TOP_10| Paramount+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | paramount_top| #1641C3| 1| 1| 0| 1',
-        'TOP_10_PIRATED| Pirated.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Top 10 Pirated Movies of the Week| #93561D| 1| 1| 0| 1',
-        'NEW_EPISODES| Plex.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | New Episodes| #DC9924| 1| 1| 0| 1',
-        'NEW_PREMIERES| Plex.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | New Premieres| #DC9924| 1| 1| 0| 1',
-        'NEWLY_RELEASED_EPISODES| Plex.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Newly Released Episodes| #DC9924| 1| 1| 0| 1',
-        'NEWLY_RELEASED| Plex.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Newly Released| #DC9924| 1| 1| 0| 1',
-        'PILOTS| Plex.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Pilots| #DC9924| 1| 1| 0| 1',
-        'PLEX_PEOPLE_WATCHING| Plex.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Plex People Watching| #DC9924| 1| 1| 0| 1',
-        'PLEX_PILOTS| Plex.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Plex Pilots| #DC9924| 1| 1| 0| 1',
-        'PLEX_POPULAR| Plex.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Plex Popular| #DC9924| 1| 1| 0| 1',
-        'PLEX_WATCHED| Plex.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Plex Watched| #DC9924| 1| 1| 0| 1',
-        'PLEX_MUST_SEE_MOVIES| Plex.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Must See Movies| #DC9924| 1| 1| 0| 1',
-        'PLEX_MUST_WATCH_MOVIES| Plex.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Must Watch Movies| #DC9924| 1| 1| 0| 1',
-        'PLEX_PERSONAL_MOVIES_PICKS| Plex.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | My Personal Movie Picks| #DC9924| 1| 1| 0| 1',
-        'PLEX_MUST_SEE_SHOWS| Plex.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Must See Shows| #DC9924| 1| 1| 0| 1',
-        'PLEX_MUST_WATCH_MOVIES| Plex.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Must Watch Shows| #DC9924| 1| 1| 0| 1',
-        'PLEX_PERSONAL_SHOWS_PICKS| Plex.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | My Personal Show Picks| #DC9924| 1| 1| 0| 1',
-        'RECENTLY_ADDED| Plex.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Recently Added| #DC9924| 1| 1| 0| 1',
-        'RECENTLY_AIRED| Plex.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Recently Aired| #DC9924| 1| 1| 0| 1',
-        'RETURNING_SOON| Plex.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Returning Soon| #DC9924| 1| 1| 0| 1',
-        'THIS_DAY_IN_HISTORY| Plex.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | This Day in History| #DC9924| 1| 1| 0| 1',
-        'THIS_WEEK_IN_HISTORY| Plex.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | This Week in History| #DC9924| 1| 1| 0| 1',
-        'THIS_MONTH_IN_HISTORY| Plex.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | This Month in History| #DC9924| 1| 1| 0| 1',
-        'TOP_10| Prime Video.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | prime_top| #43ABCE| 1| 1| 0| 1',
-        'STEVENLU''S_POPULAR_MOVIES| StevenLu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | StevenLu''s Popular Movies| #1D2D51| 1| 1| 0| 1',
-        'AIRING_TODAY| TMDb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | TMDb Airing Today| #062AC8| 1| 1| 0| 1',
-        'NOW_PLAYING| TMDb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | TMDb Now Playing| #062AC8| 1| 1| 0| 1',
-        'ON_THE_AIR| TMDb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | TMDb On The Air| #062AC8| 1| 1| 0| 1',
-        'POPULAR| TMDb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | TMDb Popular| #062AC8| 1| 1| 0| 1',
-        'TOP_RATED| TMDb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | TMDb Top Rated| #062AC8| 1| 1| 0| 1',
-        'TRENDING| TMDb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | TMDb Trending| #062AC8| 1| 1| 0| 1',
-        'POPULAR| Tautulli.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Tautulli Popular| #B9851F| 1| 1| 0| 1',
-        'WATCHED| Tautulli.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Tautulli Watched| #B9851F| 1| 1| 0| 1',
-        'COLLECTED| Trakt.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Trakt Collected| #CD1A20| 1| 1| 0| 1',
-        'NOW_PLAYING| Trakt.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Trakt Now Playing| #CD1A20| 1| 1| 0| 1',
-        'POPULAR| Trakt.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Trakt Popular| #CD1A20| 1| 1| 0| 1',
-        'RECOMMENDED| Trakt.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Trakt Recommended| #CD1A20| 1| 1| 0| 1',
-        'TRENDING| Trakt.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Trakt Trending| #CD1A20| 1| 1| 0| 1',
-        'WATCHED| Trakt.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Trakt Watched| #CD1A20| 1| 1| 0| 1',
-        'WATCHLIST| Trakt.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Trakt Watchlist| #CD1A20| 1| 1| 0| 1',
-        'FAMILIES| css.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Common Sense Selection| #1AA931| 1| 1| 0| 1',
-        'TOP_10| google_play.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | google_top| #B81282| 1| 1| 0| 1',
-        'TOP_10| hulu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hulu_top| #1BB68A| 1| 1| 0| 1',
-        'TOP_10| itunes.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | itunes_top| #D500CC| 1| 1| 0| 1',
-        'TOP_10| star_plus.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | star_plus_top| #4A3159| 1| 1| 0| 1',
-        'TOP_10| vudu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | vudu_top| #3567AC| 1| 1| 0| 1'
+        'MUST_SEE| Metacritic.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Metacritic Must See| #80B17A| 1| 1| 0| 0',
+        'CERTIFIED_FRESH| Rotten Tomatoes.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | RT Certified Fresh| #4726DC| 1| 1| 0| 0',
+        'RATED_100| Rotten Tomatoes.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | RT Rated 100| #4726DC| 1| 1| 0| 0',
+        'AIRING_TODAY| TMDb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | TMDb Airing Today| #062AC8| 1| 1| 0| 0',
+        'BOTTOM_RATED| IMDb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | IMDb Bottom Rated| #D7B00B| 1| 1| 0| 0',
+        'BOX_OFFICE| IMDb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | IMDb Box Office| #D7B00B| 1| 1| 0| 0',
+        'COLLECTED| Trakt.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Trakt Collected| #CD1A20| 1| 1| 0| 0',
+        'FAMILIES| css.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Common Sense Selection| #1AA931| 1| 1| 0| 0',
+        'FAVORITED| MyAnimeList.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | MyAnimeList Favorited| #304DA6| 1| 1| 0| 0',
+        'TOP_250| Letterboxd.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Letterboxd Top 250| #405162| 1| 1| 0| 0',
+        'BOX_OFFICE_MOJO_ALL_TIME_100| Letterboxd.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Box Office Mojo All Time 100| #405162| 1| 1| 0| 0',
+        'AFI_100_YEARS_100_MOVIES| Letterboxd.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | AFI 100 Years 100 Movies| #405162| 1| 1| 0| 0',
+        'SIGHT_AND_SOUND_GREATEST_FILMS| Letterboxd.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Sight & Sound Greatest Films| #405162| 1| 1| 0| 0',
+        '1001_MOVIES_TO_SEE_BEFORE_YOU_DIE| Letterboxd.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | 1,001 To See Before You Die| #405162| 1| 1| 0| 0',
+        'EDGAR_WRIGHTS_1000_FAVORITES| Letterboxd.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Edgar Wright''s 1,000 Favorites| #405162| 1| 1| 0| 0',
+        'ROGER_EBERTS_GREAT_MOVIES| Letterboxd.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Roger Ebert''s Great Movies| #405162| 1| 1| 0| 0',
+        'TOP_250_WOMEN_DIRECTED| Letterboxd.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Top 250 Women-Directed| #405162| 1| 1| 0| 0',
+        'TOP_100_BLACK_DIRECTED| Letterboxd.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Top 100 Black-Directed| #405162| 1| 1| 0| 0',
+        'TOP_250_MOST_FANS| Letterboxd.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Top 250 Most Fans| #405162| 1| 1| 0| 0',
+        'TOP_250_DOCUMENTARIES| Letterboxd.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Top 250 Documentaries| #405162| 1| 1| 0| 0',
+        'TOP_100_ANIMATION| Letterboxd.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Top 100 Animation| #405162| 1| 1| 0| 0',
+        'TOP_250_HORROR| Letterboxd.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Top 250 Horror| #405162| 1| 1| 0| 0',
+        'MOJO_TOP_100| Mojo.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Mojo Top 100| #B452FD| 1| 1| 0| 0',
+        'IMDB_TOP_250| Letterboxd.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | IMDb Top 250 (Letterboxd)| #405162| 1| 1| 0| 0',
+        'OSCARS_BEST_PICTURE_WINNERS| Letterboxd.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Oscar Best Picture Winners| #405162| 1| 1| 0| 0',
+        'CANNES_PALMES_DOR_WINNERS| Letterboxd.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Cannes Palme d''Or Winners| #405162| 1| 1| 0| 0',
+        'LOWEST_RATED| IMDb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | IMDb Lowest Rated| #D7B00B| 1| 1| 0| 0',
+        'NEWLY_RELEASED_EPISODES| Plex.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Newly Released Episodes| #DC9924| 1| 1| 0| 0',
+        'NEWLY_RELEASED| Plex.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Newly Released| #DC9924| 1| 1| 0| 0',
+        'NEW_EPISODES| Plex.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | New Episodes| #DC9924| 1| 1| 0| 0',
+        'NEW_PREMIERES| Plex.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | New Premieres| #DC9924| 1| 1| 0| 0',
+        'NOW_PLAYING| TMDb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | TMDb Now Playing| #062AC8| 1| 1| 0| 0',
+        'NOW_PLAYING| Trakt.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Trakt Now Playing| #CD1A20| 1| 1| 0| 0',
+        'ON_THE_AIR| TMDb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | TMDb On The Air| #062AC8| 1| 1| 0| 0',
+        'PILOTS| Plex.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Pilots| #DC9924| 1| 1| 0| 0',
+        'PLEX_MUST_SEE_MOVIES| Plex.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Must See Movies| #DC9924| 1| 1| 0| 0',
+        'PLEX_MUST_SEE_SHOWS| Plex.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Must See Shows| #DC9924| 1| 1| 0| 0',
+        'PLEX_MUST_WATCH_MOVIES| Plex.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Must Watch Movies| #DC9924| 1| 1| 0| 0',
+        'PLEX_MUST_WATCH_MOVIES| Plex.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Must Watch Shows| #DC9924| 1| 1| 0| 0',
+        'PLEX_PEOPLE_WATCHING| Plex.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Plex People Watching| #DC9924| 1| 1| 0| 0',
+        'PLEX_PERSONAL_MOVIES_PICKS| Plex.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | My Personal Movie Picks| #DC9924| 1| 1| 0| 0',
+        'PLEX_PERSONAL_SHOWS_PICKS| Plex.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | My Personal Show Picks| #DC9924| 1| 1| 0| 0',
+        'PLEX_PILOTS| Plex.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Plex Pilots| #DC9924| 1| 1| 0| 0',
+        'PLEX_POPULAR| Plex.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Plex Popular| #DC9924| 1| 1| 0| 0',
+        'PLEX_WATCHED| Plex.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Plex Watched| #DC9924| 1| 1| 0| 0',
+        'POPULAR| AniDB.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | AniDB Popular| #FF7E17| 1| 1| 0| 0',
+        'POPULAR| AniList.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | AniList Popular| #414A81| 1| 1| 0| 0',
+        'POPULAR| IMDb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | IMDb Popular| #D7B00B| 1| 1| 0| 0',
+        'POPULAR| MyAnimeList.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | MyAnimeList Popular| #304DA6| 1| 1| 0| 0',
+        'POPULAR| Tautulli.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Tautulli Popular| #B9851F| 1| 1| 0| 0',
+        'POPULAR| TMDb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | TMDb Popular| #062AC8| 1| 1| 0| 0',
+        'POPULAR| Trakt.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Trakt Popular| #CD1A20| 1| 1| 0| 0',
+        'RECENTLY_ADDED| Plex.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Recently Added| #DC9924| 1| 1| 0| 0',
+        'RECENTLY_AIRED| Plex.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Recently Aired| #DC9924| 1| 1| 0| 0',
+        'RECOMMENDED| Trakt.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Trakt Recommended| #CD1A20| 1| 1| 0| 0',
+        'RETURNING_SOON| Plex.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Returning Soon| #DC9924| 1| 1| 0| 0',
+        'NEXT_AIRING| Plex.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Next Airing| #DC9924| 1| 1| 0| 0',
+        'SEASON| AniList.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | AniList Season| #414A81| 1| 1| 0| 0',
+        'SEASON| MyAnimeList.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | MyAnimeList Season| #304DA6| 1| 1| 0| 0',
+        'POPULAR_MOVIES| StevenLu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | StevenLu''s Popular Movies| #1D2D51| 1| 1| 0| 0',
+        'THIS_DAY_IN_HISTORY| Plex.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | This Day in History| #DC9924| 1| 1| 0| 0',
+        'THIS_MONTH_IN_HISTORY| Plex.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | This Month in History| #DC9924| 1| 1| 0| 0',
+        'THIS_WEEK_IN_HISTORY| Plex.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | This Week in History| #DC9924| 1| 1| 0| 0',
+        'TOP_1| Starz.png| +-500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | starz_top_1| #464646| 1| 1| 0| 0',
+        'TOP_2| Starz.png| +-500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | starz_top_2| #464646| 1| 1| 0| 0',
+        'TOP_3| Starz.png| +-500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | starz_top_3| #464646| 1| 1| 0| 0',
+        'TOP_4| Starz.png| +-500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | starz_top_4| #464646| 1| 1| 0| 0',
+        'TOP_5| Starz.png| +-500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | starz_top_5| #464646| 1| 1| 0| 0',
+        'TOP_6| Starz.png| +-500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | starz_top_6| #464646| 1| 1| 0| 0',
+        'TOP_7| Starz.png| +-500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | starz_top_7| #464646| 1| 1| 0| 0',
+        'TOP_8| Starz.png| +-500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | starz_top_8| #464646| 1| 1| 0| 0',
+        'TOP_9| Starz.png| +-500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | starz_top_9| #464646| 1| 1| 0| 0',
+        'TOP_10| Starz.png| +-500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | starz_top_10| #464646| 1| 1| 0| 0',
+        'TOP_11| Starz.png| +-500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | starz_top_11| #464646| 1| 1| 0| 0',
+        'TOP_12| Starz.png| +-500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | starz_top_12| #464646| 1| 1| 0| 0',
+        'TOP_13| Starz.png| +-500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | starz_top_13| #464646| 1| 1| 0| 0',
+        'TOP_14| Starz.png| +-500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | starz_top_14| #464646| 1| 1| 0| 0',
+        'TOP_15| Starz.png| +-500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | starz_top_15| #464646| 1| 1| 0| 0',
+        'TOP_16| Starz.png| +-500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | starz_top_16| #464646| 1| 1| 0| 0',
+        'TOP_17| Starz.png| +-500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | starz_top_17| #464646| 1| 1| 0| 0',
+        'TOP_18| Starz.png| +-500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | starz_top_18| #464646| 1| 1| 0| 0',
+        'TOP_19| Starz.png| +-500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | starz_top_19| #464646| 1| 1| 0| 0',
+        'TOP_20| Starz.png| +-500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | starz_top_20| #464646| 1| 1| 0| 0',
+        'TOP_21| Starz.png| +-500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | starz_top_21| #464646| 1| 1| 0| 0',
+        'TOP_22| Starz.png| +-500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | starz_top_22| #464646| 1| 1| 0| 0',
+        'TOP_23| Starz.png| +-500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | starz_top_23| #464646| 1| 1| 0| 0',
+        'TOP_24| Starz.png| +-500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | starz_top_24| #464646| 1| 1| 0| 0',
+        'TOP_25| Starz.png| +-500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | starz_top_25| #464646| 1| 1| 0| 0',
+        'TOP_26| Starz.png| +-500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | starz_top_26| #464646| 1| 1| 0| 0',
+        'TOP_27| Starz.png| +-500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | starz_top_27| #464646| 1| 1| 0| 0',
+        'TOP_28| Starz.png| +-500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | starz_top_28| #464646| 1| 1| 0| 0',
+        'TOP_29| Starz.png| +-500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | starz_top_29| #464646| 1| 1| 0| 0',
+        'TOP_30| Starz.png| +-500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | starz_top_30| #464646| 1| 1| 0| 0',
+        'TOP_1| Apple TV+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | apple_top_1| #494949| 1| 1| 0| 0',
+        'TOP_1| Disney+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | disney_top_1| #002CA1| 1| 1| 0| 0',
+        'TOP_1| google_play.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | google_top_1| #910F6A| 1| 1| 0| 0',
+        'TOP_1| HBO Max.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hbo_top_1| #4C0870| 1| 1| 0| 0',
+        'TOP_1| hulu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hulu_top_1| #1BB68A| 1| 1| 0| 0',
+        'TOP_1| IMDb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | imdb_top_1| #D7B00B| 1| 1| 0| 0',
+        'TOP_1| itunes.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | itunes_top_1| #D500CC| 1| 1| 0| 0',
+        'TOP_1| Max.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | max_top_1| #002BE7| 1| 1| 0| 0',
+        'TOP_1| Netflix.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | netflix_top_1| #5E0A11| 1| 1| 0| 0',
+        'TOP_1| Paramount+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | paramount_top_1| #1641C3| 1| 1| 0| 0',
+        'TOP_1| Prime Video.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | prime_top_1| #43ABCE| 1| 1| 0| 0',
+        'TOP_1| star_plus.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | star_plus_top_1| #4A3159| 1| 1| 0| 0',
+        'TOP_1| vudu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | vudu_top_1| #26497F| 1| 1| 0| 0',
+        'TOP_2| Apple TV+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | apple_top_2| #494949| 1| 1| 0| 0',
+        'TOP_2| Disney+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | disney_top_2| #002CA1| 1| 1| 0| 0',
+        'TOP_2| google_play.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | google_top_2| #910F6A| 1| 1| 0| 0',
+        'TOP_2| HBO Max.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hbo_top_2| #4C0870| 1| 1| 0| 0',
+        'TOP_2| hulu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hulu_top_2| #1BB68A| 1| 1| 0| 0',
+        'TOP_2| IMDb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | imdb_top_2| #D7B00B| 1| 1| 0| 0',
+        'TOP_2| itunes.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | itunes_top_2| #D500CC| 1| 1| 0| 0',
+        'TOP_2| Max.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | max_top_2| #002BE7| 1| 1| 0| 0',
+        'TOP_2| Netflix.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | netflix_top_2| #5E0A11| 1| 1| 0| 0',
+        'TOP_2| Paramount+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | paramount_top_2| #1641C3| 1| 1| 0| 0',
+        'TOP_2| Prime Video.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | prime_top_2| #43ABCE| 1| 1| 0| 0',
+        'TOP_2| star_plus.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | star_plus_top_2| #4A3159| 1| 1| 0| 0',
+        'TOP_2| vudu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | vudu_top_2| #26497F| 1| 1| 0| 0',
+        'TOP_3| Apple TV+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | apple_top_3| #494949| 1| 1| 0| 0',
+        'TOP_3| Disney+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | disney_top_3| #002CA1| 1| 1| 0| 0',
+        'TOP_3| google_play.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | google_top_3| #910F6A| 1| 1| 0| 0',
+        'TOP_3| HBO Max.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hbo_top_3| #4C0870| 1| 1| 0| 0',
+        'TOP_3| hulu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hulu_top_3| #1BB68A| 1| 1| 0| 0',
+        'TOP_3| IMDb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | imdb_top_3| #D7B00B| 1| 1| 0| 0',
+        'TOP_3| itunes.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | itunes_top_3| #D500CC| 1| 1| 0| 0',
+        'TOP_3| Max.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | max_top_3| #002BE7| 1| 1| 0| 0',
+        'TOP_3| Netflix.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | netflix_top_3| #5E0A11| 1| 1| 0| 0',
+        'TOP_3| Paramount+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | paramount_top_3| #1641C3| 1| 1| 0| 0',
+        'TOP_3| Prime Video.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | prime_top_3| #43ABCE| 1| 1| 0| 0',
+        'TOP_3| star_plus.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | star_plus_top_3| #4A3159| 1| 1| 0| 0',
+        'TOP_3| vudu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | vudu_top_3| #26497F| 1| 1| 0| 0',
+        'TOP_4| Apple TV+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | apple_top_4| #494949| 1| 1| 0| 0',
+        'TOP_4| Disney+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | disney_top_4| #002CA1| 1| 1| 0| 0',
+        'TOP_4| google_play.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | google_top_4| #910F6A| 1| 1| 0| 0',
+        'TOP_4| HBO Max.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hbo_top_4| #4C0870| 1| 1| 0| 0',
+        'TOP_4| hulu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hulu_top_4| #1BB68A| 1| 1| 0| 0',
+        'TOP_4| IMDb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | imdb_top_4| #D7B00B| 1| 1| 0| 0',
+        'TOP_4| itunes.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | itunes_top_4| #D500CC| 1| 1| 0| 0',
+        'TOP_4| Max.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | max_top_4| #002BE7| 1| 1| 0| 0',
+        'TOP_4| Netflix.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | netflix_top_4| #5E0A11| 1| 1| 0| 0',
+        'TOP_4| Paramount+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | paramount_top_4| #1641C3| 1| 1| 0| 0',
+        'TOP_4| Prime Video.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | prime_top_4| #43ABCE| 1| 1| 0| 0',
+        'TOP_4| star_plus.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | star_plus_top_4| #4A3159| 1| 1| 0| 0',
+        'TOP_4| vudu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | vudu_top_4| #26497F| 1| 1| 0| 0',
+        'TOP_5| Apple TV+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | apple_top_5| #494949| 1| 1| 0| 0',
+        'TOP_5| Disney+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | disney_top_5| #002CA1| 1| 1| 0| 0',
+        'TOP_5| google_play.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | google_top_5| #910F6A| 1| 1| 0| 0',
+        'TOP_5| HBO Max.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hbo_top_5| #4C0870| 1| 1| 0| 0',
+        'TOP_5| hulu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hulu_top_5| #1BB68A| 1| 1| 0| 0',
+        'TOP_5| IMDb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | imdb_top_5| #D7B00B| 1| 1| 0| 0',
+        'TOP_5| itunes.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | itunes_top_5| #D500CC| 1| 1| 0| 0',
+        'TOP_5| Max.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | max_top_5| #002BE7| 1| 1| 0| 0',
+        'TOP_5| Netflix.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | netflix_top_5| #5E0A11| 1| 1| 0| 0',
+        'TOP_5| Paramount+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | paramount_top_5| #1641C3| 1| 1| 0| 0',
+        'TOP_5| Prime Video.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | prime_top_5| #43ABCE| 1| 1| 0| 0',
+        'TOP_5| star_plus.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | star_plus_top_5| #4A3159| 1| 1| 0| 0',
+        'TOP_5| vudu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | vudu_top_5| #26497F| 1| 1| 0| 0',
+        'TOP_6| Apple TV+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | apple_top_6| #494949| 1| 1| 0| 0',
+        'TOP_6| Disney+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | disney_top_6| #002CA1| 1| 1| 0| 0',
+        'TOP_6| google_play.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | google_top_6| #910F6A| 1| 1| 0| 0',
+        'TOP_6| HBO Max.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hbo_top_6| #4C0870| 1| 1| 0| 0',
+        'TOP_6| hulu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hulu_top_6| #1BB68A| 1| 1| 0| 0',
+        'TOP_6| IMDb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | imdb_top_6| #D7B00B| 1| 1| 0| 0',
+        'TOP_6| itunes.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | itunes_top_6| #D500CC| 1| 1| 0| 0',
+        'TOP_6| Max.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | max_top_6| #002BE7| 1| 1| 0| 0',
+        'TOP_6| Netflix.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | netflix_top_6| #5E0A11| 1| 1| 0| 0',
+        'TOP_6| Paramount+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | paramount_top_6| #1641C3| 1| 1| 0| 0',
+        'TOP_6| Prime Video.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | prime_top_6| #43ABCE| 1| 1| 0| 0',
+        'TOP_6| star_plus.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | star_plus_top_6| #4A3159| 1| 1| 0| 0',
+        'TOP_6| vudu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | vudu_top_6| #26497F| 1| 1| 0| 0',
+        'TOP_7| Apple TV+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | apple_top_7| #494949| 1| 1| 0| 0',
+        'TOP_7| Disney+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | disney_top_7| #002CA1| 1| 1| 0| 0',
+        'TOP_7| google_play.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | google_top_7| #910F6A| 1| 1| 0| 0',
+        'TOP_7| HBO Max.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hbo_top_7| #4C0870| 1| 1| 0| 0',
+        'TOP_7| hulu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hulu_top_7| #1BB68A| 1| 1| 0| 0',
+        'TOP_7| IMDb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | imdb_top_7| #D7B00B| 1| 1| 0| 0',
+        'TOP_7| itunes.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | itunes_top_7| #D500CC| 1| 1| 0| 0',
+        'TOP_7| Max.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | max_top_7| #002BE7| 1| 1| 0| 0',
+        'TOP_7| Netflix.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | netflix_top_7| #5E0A11| 1| 1| 0| 0',
+        'TOP_7| Paramount+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | paramount_top_7| #1641C3| 1| 1| 0| 0',
+        'TOP_7| Prime Video.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | prime_top_7| #43ABCE| 1| 1| 0| 0',
+        'TOP_7| star_plus.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | star_plus_top_7| #4A3159| 1| 1| 0| 0',
+        'TOP_7| vudu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | vudu_top_7| #26497F| 1| 1| 0| 0',
+        'TOP_8| Apple TV+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | apple_top_8| #494949| 1| 1| 0| 0',
+        'TOP_8| Disney+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | disney_top_8| #002CA1| 1| 1| 0| 0',
+        'TOP_8| google_play.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | google_top_8| #910F6A| 1| 1| 0| 0',
+        'TOP_8| HBO Max.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hbo_top_8| #4C0870| 1| 1| 0| 0',
+        'TOP_8| hulu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hulu_top_8| #1BB68A| 1| 1| 0| 0',
+        'TOP_8| IMDb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | imdb_top_8| #D7B00B| 1| 1| 0| 0',
+        'TOP_8| itunes.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | itunes_top_8| #D500CC| 1| 1| 0| 0',
+        'TOP_8| Max.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | max_top_8| #002BE7| 1| 1| 0| 0',
+        'TOP_8| Netflix.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | netflix_top_8| #5E0A11| 1| 1| 0| 0',
+        'TOP_8| Paramount+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | paramount_top_8| #1641C3| 1| 1| 0| 0',
+        'TOP_8| Prime Video.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | prime_top_8| #43ABCE| 1| 1| 0| 0',
+        'TOP_8| star_plus.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | star_plus_top_8| #4A3159| 1| 1| 0| 0',
+        'TOP_8| vudu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | vudu_top_8| #26497F| 1| 1| 0| 0',
+        'TOP_9| Apple TV+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | apple_top_9| #494949| 1| 1| 0| 0',
+        'TOP_9| Disney+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | disney_top_9| #002CA1| 1| 1| 0| 0',
+        'TOP_9| google_play.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | google_top_9| #910F6A| 1| 1| 0| 0',
+        'TOP_9| HBO Max.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hbo_top_9| #4C0870| 1| 1| 0| 0',
+        'TOP_9| hulu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hulu_top_9| #1BB68A| 1| 1| 0| 0',
+        'TOP_9| IMDb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | imdb_top_9| #D7B00B| 1| 1| 0| 0',
+        'TOP_9| itunes.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | itunes_top_9| #D500CC| 1| 1| 0| 0',
+        'TOP_9| Max.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | max_top_9| #002BE7| 1| 1| 0| 0',
+        'TOP_9| Netflix.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | netflix_top_9| #5E0A11| 1| 1| 0| 0',
+        'TOP_9| Paramount+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | paramount_top_9| #1641C3| 1| 1| 0| 0',
+        'TOP_9| Prime Video.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | prime_top_9| #43ABCE| 1| 1| 0| 0',
+        'TOP_9| star_plus.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | star_plus_top_9| #4A3159| 1| 1| 0| 0',
+        'TOP_9| vudu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | vudu_top_9| #26497F| 1| 1| 0| 0',
+        'TOP_10| Apple TV+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | apple_top_10| #494949| 1| 1| 0| 0',
+        'TOP_10| Disney+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | disney_top_10| #002CA1| 1| 1| 0| 0',
+        'TOP_10| google_play.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | google_top_10| #910F6A| 1| 1| 0| 0',
+        'TOP_10| HBO Max.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hbo_top_10| #4C0870| 1| 1| 0| 0',
+        'TOP_10| hulu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hulu_top_10| #1BB68A| 1| 1| 0| 0',
+        'TOP_10| IMDb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | imdb_top_10| #D7B00B| 1| 1| 0| 0',
+        'TOP_10| itunes.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | itunes_top_10| #D500CC| 1| 1| 0| 0',
+        'TOP_10| Max.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | max_top_10| #002BE7| 1| 1| 0| 0',
+        'TOP_10| Netflix.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | netflix_top_10| #5E0A11| 1| 1| 0| 0',
+        'TOP_10| Paramount+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | paramount_top_10| #1641C3| 1| 1| 0| 0',
+        'TOP_10| Prime Video.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | prime_top_10| #43ABCE| 1| 1| 0| 0',
+        'TOP_10| star_plus.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | star_plus_top_10| #4A3159| 1| 1| 0| 0',
+        'TOP_10| vudu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | vudu_top_10| #26497F| 1| 1| 0| 0',
+        'TOP_10_PIRATED| Pirated.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Top 10 Pirated Movies of the Week| #93561D| 1| 1| 0| 0',
+        'TOP_10| Apple TV+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | apple_top| #494949| 1| 1| 0| 0',
+        'TOP_10| Disney+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | disney_top| #002CA1| 1| 1| 0| 0',
+        'TOP_10| google_play.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | google_top| #910F6A| 1| 1| 0| 0',
+        'TOP_10| HBO Max.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hbo_top| #4C0870| 1| 1| 0| 0',
+        'TOP_10| hulu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hulu_top| #1BB68A| 1| 1| 0| 0',
+        'TOP_10| IMDb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | imdb_top| #D7B00B| 1| 1| 0| 0',
+        'TOP_10| itunes.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | itunes_top| #D500CC| 1| 1| 0| 0',
+        'TOP_10| Max.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | max_top| #002BE7| 1| 1| 0| 0',
+        'TOP_10| Netflix.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | netflix_top| #5E0A11| 1| 1| 0| 0',
+        'TOP_10| Paramount+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | paramount_top| #1641C3| 1| 1| 0| 0',
+        'TOP_10| Prime Video.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | prime_top| #43ABCE| 1| 1| 0| 0',
+        'TOP_10| star_plus.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | star_plus_top| #4A3159| 1| 1| 0| 0',
+        'TOP_10| vudu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | vudu_top| #26497F| 1| 1| 0| 0',
+        'TOP_11| Apple TV+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | apple_top_11| #494949| 1| 1| 0| 0',
+        'TOP_11| Disney+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | disney_top_11| #002CA1| 1| 1| 0| 0',
+        'TOP_11| google_play.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | google_top_11| #910F6A| 1| 1| 0| 0',
+        'TOP_11| HBO Max.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hbo_top_11| #4C0870| 1| 1| 0| 0',
+        'TOP_11| hulu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hulu_top_11| #1BB68A| 1| 1| 0| 0',
+        'TOP_11| IMDb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | imdb_top_11| #D7B00B| 1| 1| 0| 0',
+        'TOP_11| itunes.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | itunes_top_11| #D500CC| 1| 1| 0| 0',
+        'TOP_11| Max.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | max_top_11| #002BE7| 1| 1| 0| 0',
+        'TOP_11| Netflix.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | netflix_top_11| #5E0A11| 1| 1| 0| 0',
+        'TOP_11| Paramount+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | paramount_top_11| #1641C3| 1| 1| 0| 0',
+        'TOP_11| Prime Video.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | prime_top_11| #43ABCE| 1| 1| 0| 0',
+        'TOP_11| star_plus.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | star_plus_top_11| #4A3159| 1| 1| 0| 0',
+        'TOP_11| vudu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | vudu_top_11| #26497F| 1| 1| 0| 0',
+        'TOP_12| Apple TV+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | apple_top_12| #494949| 1| 1| 0| 0',
+        'TOP_12| Disney+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | disney_top_12| #002CA1| 1| 1| 0| 0',
+        'TOP_12| google_play.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | google_top_12| #910F6A| 1| 1| 0| 0',
+        'TOP_12| HBO Max.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hbo_top_12| #4C0870| 1| 1| 0| 0',
+        'TOP_12| hulu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hulu_top_12| #1BB68A| 1| 1| 0| 0',
+        'TOP_12| IMDb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | imdb_top_12| #D7B00B| 1| 1| 0| 0',
+        'TOP_12| itunes.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | itunes_top_12| #D500CC| 1| 1| 0| 0',
+        'TOP_12| Max.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | max_top_12| #002BE7| 1| 1| 0| 0',
+        'TOP_12| Netflix.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | netflix_top_12| #5E0A11| 1| 1| 0| 0',
+        'TOP_12| Paramount+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | paramount_top_12| #1641C3| 1| 1| 0| 0',
+        'TOP_12| Prime Video.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | prime_top_12| #43ABCE| 1| 1| 0| 0',
+        'TOP_12| star_plus.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | star_plus_top_12| #4A3159| 1| 1| 0| 0',
+        'TOP_12| vudu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | vudu_top_12| #26497F| 1| 1| 0| 0',
+        'TOP_13| Apple TV+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | apple_top_13| #494949| 1| 1| 0| 0',
+        'TOP_13| Disney+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | disney_top_13| #002CA1| 1| 1| 0| 0',
+        'TOP_13| google_play.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | google_top_13| #910F6A| 1| 1| 0| 0',
+        'TOP_13| HBO Max.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hbo_top_13| #4C0870| 1| 1| 0| 0',
+        'TOP_13| hulu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hulu_top_13| #1BB68A| 1| 1| 0| 0',
+        'TOP_13| IMDb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | imdb_top_13| #D7B00B| 1| 1| 0| 0',
+        'TOP_13| itunes.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | itunes_top_13| #D500CC| 1| 1| 0| 0',
+        'TOP_13| Max.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | max_top_13| #002BE7| 1| 1| 0| 0',
+        'TOP_13| Netflix.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | netflix_top_13| #5E0A11| 1| 1| 0| 0',
+        'TOP_13| Paramount+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | paramount_top_13| #1641C3| 1| 1| 0| 0',
+        'TOP_13| Prime Video.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | prime_top_13| #43ABCE| 1| 1| 0| 0',
+        'TOP_13| star_plus.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | star_plus_top_13| #4A3159| 1| 1| 0| 0',
+        'TOP_13| vudu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | vudu_top_13| #26497F| 1| 1| 0| 0',
+        'TOP_14| Apple TV+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | apple_top_14| #494949| 1| 1| 0| 0',
+        'TOP_14| Disney+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | disney_top_14| #002CA1| 1| 1| 0| 0',
+        'TOP_14| google_play.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | google_top_14| #910F6A| 1| 1| 0| 0',
+        'TOP_14| HBO Max.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hbo_top_14| #4C0870| 1| 1| 0| 0',
+        'TOP_14| hulu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hulu_top_14| #1BB68A| 1| 1| 0| 0',
+        'TOP_14| IMDb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | imdb_top_14| #D7B00B| 1| 1| 0| 0',
+        'TOP_14| itunes.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | itunes_top_14| #D500CC| 1| 1| 0| 0',
+        'TOP_14| Max.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | max_top_14| #002BE7| 1| 1| 0| 0',
+        'TOP_14| Netflix.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | netflix_top_14| #5E0A11| 1| 1| 0| 0',
+        'TOP_14| Paramount+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | paramount_top_14| #1641C3| 1| 1| 0| 0',
+        'TOP_14| Prime Video.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | prime_top_14| #43ABCE| 1| 1| 0| 0',
+        'TOP_14| star_plus.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | star_plus_top_14| #4A3159| 1| 1| 0| 0',
+        'TOP_14| vudu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | vudu_top_14| #26497F| 1| 1| 0| 0',
+        'TOP_15| Apple TV+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | apple_top_15| #494949| 1| 1| 0| 0',
+        'TOP_15| Disney+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | disney_top_15| #002CA1| 1| 1| 0| 0',
+        'TOP_15| google_play.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | google_top_15| #910F6A| 1| 1| 0| 0',
+        'TOP_15| HBO Max.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hbo_top_15| #4C0870| 1| 1| 0| 0',
+        'TOP_15| hulu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hulu_top_15| #1BB68A| 1| 1| 0| 0',
+        'TOP_15| IMDb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | imdb_top_15| #D7B00B| 1| 1| 0| 0',
+        'TOP_15| itunes.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | itunes_top_15| #D500CC| 1| 1| 0| 0',
+        'TOP_15| Max.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | max_top_15| #002BE7| 1| 1| 0| 0',
+        'TOP_15| Netflix.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | netflix_top_15| #5E0A11| 1| 1| 0| 0',
+        'TOP_15| Paramount+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | paramount_top_15| #1641C3| 1| 1| 0| 0',
+        'TOP_15| Prime Video.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | prime_top_15| #43ABCE| 1| 1| 0| 0',
+        'TOP_15| star_plus.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | star_plus_top_15| #4A3159| 1| 1| 0| 0',
+        'TOP_15| vudu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | vudu_top_15| #26497F| 1| 1| 0| 0',
+        'TOP_16| Apple TV+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | apple_top_16| #494949| 1| 1| 0| 0',
+        'TOP_16| Disney+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | disney_top_16| #002CA1| 1| 1| 0| 0',
+        'TOP_16| google_play.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | google_top_16| #910F6A| 1| 1| 0| 0',
+        'TOP_16| HBO Max.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hbo_top_16| #4C0870| 1| 1| 0| 0',
+        'TOP_16| hulu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hulu_top_16| #1BB68A| 1| 1| 0| 0',
+        'TOP_16| IMDb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | imdb_top_16| #D7B00B| 1| 1| 0| 0',
+        'TOP_16| itunes.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | itunes_top_16| #D500CC| 1| 1| 0| 0',
+        'TOP_16| Max.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | max_top_16| #002BE7| 1| 1| 0| 0',
+        'TOP_16| Netflix.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | netflix_top_16| #5E0A11| 1| 1| 0| 0',
+        'TOP_16| Paramount+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | paramount_top_16| #1641C3| 1| 1| 0| 0',
+        'TOP_16| Prime Video.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | prime_top_16| #43ABCE| 1| 1| 0| 0',
+        'TOP_16| star_plus.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | star_plus_top_16| #4A3159| 1| 1| 0| 0',
+        'TOP_16| vudu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | vudu_top_16| #26497F| 1| 1| 0| 0',
+        'TOP_17| Apple TV+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | apple_top_17| #494949| 1| 1| 0| 0',
+        'TOP_17| Disney+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | disney_top_17| #002CA1| 1| 1| 0| 0',
+        'TOP_17| google_play.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | google_top_17| #910F6A| 1| 1| 0| 0',
+        'TOP_17| HBO Max.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hbo_top_17| #4C0870| 1| 1| 0| 0',
+        'TOP_17| hulu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hulu_top_17| #1BB68A| 1| 1| 0| 0',
+        'TOP_17| IMDb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | imdb_top_17| #D7B00B| 1| 1| 0| 0',
+        'TOP_17| itunes.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | itunes_top_17| #D500CC| 1| 1| 0| 0',
+        'TOP_17| Max.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | max_top_17| #002BE7| 1| 1| 0| 0',
+        'TOP_17| Netflix.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | netflix_top_17| #5E0A11| 1| 1| 0| 0',
+        'TOP_17| Paramount+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | paramount_top_17| #1641C3| 1| 1| 0| 0',
+        'TOP_17| Prime Video.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | prime_top_17| #43ABCE| 1| 1| 0| 0',
+        'TOP_17| star_plus.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | star_plus_top_17| #4A3159| 1| 1| 0| 0',
+        'TOP_17| vudu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | vudu_top_17| #26497F| 1| 1| 0| 0',
+        'TOP_18| Apple TV+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | apple_top_18| #494949| 1| 1| 0| 0',
+        'TOP_18| Disney+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | disney_top_18| #002CA1| 1| 1| 0| 0',
+        'TOP_18| google_play.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | google_top_18| #910F6A| 1| 1| 0| 0',
+        'TOP_18| HBO Max.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hbo_top_18| #4C0870| 1| 1| 0| 0',
+        'TOP_18| hulu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hulu_top_18| #1BB68A| 1| 1| 0| 0',
+        'TOP_18| IMDb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | imdb_top_18| #D7B00B| 1| 1| 0| 0',
+        'TOP_18| itunes.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | itunes_top_18| #D500CC| 1| 1| 0| 0',
+        'TOP_18| Max.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | max_top_18| #002BE7| 1| 1| 0| 0',
+        'TOP_18| Netflix.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | netflix_top_18| #5E0A11| 1| 1| 0| 0',
+        'TOP_18| Paramount+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | paramount_top_18| #1641C3| 1| 1| 0| 0',
+        'TOP_18| Prime Video.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | prime_top_18| #43ABCE| 1| 1| 0| 0',
+        'TOP_18| star_plus.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | star_plus_top_18| #4A3159| 1| 1| 0| 0',
+        'TOP_18| vudu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | vudu_top_18| #26497F| 1| 1| 0| 0',
+        'TOP_19| Apple TV+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | apple_top_19| #494949| 1| 1| 0| 0',
+        'TOP_19| Disney+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | disney_top_19| #002CA1| 1| 1| 0| 0',
+        'TOP_19| google_play.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | google_top_19| #910F6A| 1| 1| 0| 0',
+        'TOP_19| HBO Max.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hbo_top_19| #4C0870| 1| 1| 0| 0',
+        'TOP_19| hulu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hulu_top_19| #1BB68A| 1| 1| 0| 0',
+        'TOP_19| IMDb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | imdb_top_19| #D7B00B| 1| 1| 0| 0',
+        'TOP_19| itunes.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | itunes_top_19| #D500CC| 1| 1| 0| 0',
+        'TOP_19| Max.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | max_top_19| #002BE7| 1| 1| 0| 0',
+        'TOP_19| Netflix.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | netflix_top_19| #5E0A11| 1| 1| 0| 0',
+        'TOP_19| Paramount+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | paramount_top_19| #1641C3| 1| 1| 0| 0',
+        'TOP_19| Prime Video.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | prime_top_19| #43ABCE| 1| 1| 0| 0',
+        'TOP_19| star_plus.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | star_plus_top_19| #4A3159| 1| 1| 0| 0',
+        'TOP_19| vudu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | vudu_top_19| #26497F| 1| 1| 0| 0',
+        'TOP_20| Apple TV+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | apple_top_20| #494949| 1| 1| 0| 0',
+        'TOP_20| Disney+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | disney_top_20| #002CA1| 1| 1| 0| 0',
+        'TOP_20| google_play.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | google_top_20| #910F6A| 1| 1| 0| 0',
+        'TOP_20| HBO Max.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hbo_top_20| #4C0870| 1| 1| 0| 0',
+        'TOP_20| hulu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hulu_top_20| #1BB68A| 1| 1| 0| 0',
+        'TOP_20| IMDb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | imdb_top_20| #D7B00B| 1| 1| 0| 0',
+        'TOP_20| itunes.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | itunes_top_20| #D500CC| 1| 1| 0| 0',
+        'TOP_20| Max.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | max_top_20| #002BE7| 1| 1| 0| 0',
+        'TOP_20| Netflix.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | netflix_top_20| #5E0A11| 1| 1| 0| 0',
+        'TOP_20| Paramount+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | paramount_top_20| #1641C3| 1| 1| 0| 0',
+        'TOP_20| Prime Video.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | prime_top_20| #43ABCE| 1| 1| 0| 0',
+        'TOP_20| star_plus.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | star_plus_top_20| #4A3159| 1| 1| 0| 0',
+        'TOP_20| vudu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | vudu_top_20| #26497F| 1| 1| 0| 0',
+        'TOP_21| Apple TV+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | apple_top_21| #494949| 1| 1| 0| 0',
+        'TOP_21| Disney+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | disney_top_21| #002CA1| 1| 1| 0| 0',
+        'TOP_21| google_play.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | google_top_21| #910F6A| 1| 1| 0| 0',
+        'TOP_21| HBO Max.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hbo_top_21| #4C0870| 1| 1| 0| 0',
+        'TOP_21| hulu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hulu_top_21| #1BB68A| 1| 1| 0| 0',
+        'TOP_21| IMDb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | imdb_top_21| #D7B00B| 1| 1| 0| 0',
+        'TOP_21| itunes.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | itunes_top_21| #D500CC| 1| 1| 0| 0',
+        'TOP_21| Max.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | max_top_21| #002BE7| 1| 1| 0| 0',
+        'TOP_21| Netflix.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | netflix_top_21| #5E0A11| 1| 1| 0| 0',
+        'TOP_21| Paramount+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | paramount_top_21| #1641C3| 1| 1| 0| 0',
+        'TOP_21| Prime Video.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | prime_top_21| #43ABCE| 1| 1| 0| 0',
+        'TOP_21| star_plus.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | star_plus_top_21| #4A3159| 1| 1| 0| 0',
+        'TOP_21| vudu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | vudu_top_21| #26497F| 1| 1| 0| 0',
+        'TOP_22| Apple TV+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | apple_top_22| #494949| 1| 1| 0| 0',
+        'TOP_22| Disney+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | disney_top_22| #002CA1| 1| 1| 0| 0',
+        'TOP_22| google_play.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | google_top_22| #910F6A| 1| 1| 0| 0',
+        'TOP_22| HBO Max.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hbo_top_22| #4C0870| 1| 1| 0| 0',
+        'TOP_22| hulu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hulu_top_22| #1BB68A| 1| 1| 0| 0',
+        'TOP_22| IMDb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | imdb_top_22| #D7B00B| 1| 1| 0| 0',
+        'TOP_22| itunes.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | itunes_top_22| #D500CC| 1| 1| 0| 0',
+        'TOP_22| Max.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | max_top_22| #002BE7| 1| 1| 0| 0',
+        'TOP_22| Netflix.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | netflix_top_22| #5E0A11| 1| 1| 0| 0',
+        'TOP_22| Paramount+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | paramount_top_22| #1641C3| 1| 1| 0| 0',
+        'TOP_22| Prime Video.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | prime_top_22| #43ABCE| 1| 1| 0| 0',
+        'TOP_22| star_plus.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | star_plus_top_22| #4A3159| 1| 1| 0| 0',
+        'TOP_22| vudu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | vudu_top_22| #26497F| 1| 1| 0| 0',
+        'TOP_23| Apple TV+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | apple_top_23| #494949| 1| 1| 0| 0',
+        'TOP_23| Disney+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | disney_top_23| #002CA1| 1| 1| 0| 0',
+        'TOP_23| google_play.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | google_top_23| #910F6A| 1| 1| 0| 0',
+        'TOP_23| HBO Max.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hbo_top_23| #4C0870| 1| 1| 0| 0',
+        'TOP_23| hulu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hulu_top_23| #1BB68A| 1| 1| 0| 0',
+        'TOP_23| IMDb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | imdb_top_23| #D7B00B| 1| 1| 0| 0',
+        'TOP_23| itunes.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | itunes_top_23| #D500CC| 1| 1| 0| 0',
+        'TOP_23| Max.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | max_top_23| #002BE7| 1| 1| 0| 0',
+        'TOP_23| Netflix.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | netflix_top_23| #5E0A11| 1| 1| 0| 0',
+        'TOP_23| Paramount+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | paramount_top_23| #1641C3| 1| 1| 0| 0',
+        'TOP_23| Prime Video.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | prime_top_23| #43ABCE| 1| 1| 0| 0',
+        'TOP_23| star_plus.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | star_plus_top_23| #4A3159| 1| 1| 0| 0',
+        'TOP_23| vudu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | vudu_top_23| #26497F| 1| 1| 0| 0',
+        'TOP_24| Apple TV+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | apple_top_24| #494949| 1| 1| 0| 0',
+        'TOP_24| Disney+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | disney_top_24| #002CA1| 1| 1| 0| 0',
+        'TOP_24| google_play.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | google_top_24| #910F6A| 1| 1| 0| 0',
+        'TOP_24| HBO Max.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hbo_top_24| #4C0870| 1| 1| 0| 0',
+        'TOP_24| hulu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hulu_top_24| #1BB68A| 1| 1| 0| 0',
+        'TOP_24| IMDb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | imdb_top_24| #D7B00B| 1| 1| 0| 0',
+        'TOP_24| itunes.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | itunes_top_24| #D500CC| 1| 1| 0| 0',
+        'TOP_24| Max.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | max_top_24| #002BE7| 1| 1| 0| 0',
+        'TOP_24| Netflix.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | netflix_top_24| #5E0A11| 1| 1| 0| 0',
+        'TOP_24| Paramount+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | paramount_top_24| #1641C3| 1| 1| 0| 0',
+        'TOP_24| Prime Video.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | prime_top_24| #43ABCE| 1| 1| 0| 0',
+        'TOP_24| star_plus.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | star_plus_top_24| #4A3159| 1| 1| 0| 0',
+        'TOP_24| vudu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | vudu_top_24| #26497F| 1| 1| 0| 0',
+        'TOP_25| Apple TV+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | apple_top_25| #494949| 1| 1| 0| 0',
+        'TOP_25| Disney+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | disney_top_25| #002CA1| 1| 1| 0| 0',
+        'TOP_25| google_play.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | google_top_25| #910F6A| 1| 1| 0| 0',
+        'TOP_25| HBO Max.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hbo_top_25| #4C0870| 1| 1| 0| 0',
+        'TOP_25| hulu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hulu_top_25| #1BB68A| 1| 1| 0| 0',
+        'TOP_25| IMDb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | imdb_top_25| #D7B00B| 1| 1| 0| 0',
+        'TOP_25| itunes.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | itunes_top_25| #D500CC| 1| 1| 0| 0',
+        'TOP_25| Max.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | max_top_25| #002BE7| 1| 1| 0| 0',
+        'TOP_25| Netflix.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | netflix_top_25| #5E0A11| 1| 1| 0| 0',
+        'TOP_25| Paramount+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | paramount_top_25| #1641C3| 1| 1| 0| 0',
+        'TOP_25| Prime Video.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | prime_top_25| #43ABCE| 1| 1| 0| 0',
+        'TOP_25| star_plus.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | star_plus_top_25| #4A3159| 1| 1| 0| 0',
+        'TOP_25| vudu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | vudu_top_25| #26497F| 1| 1| 0| 0',
+        'TOP_26| Apple TV+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | apple_top_26| #494949| 1| 1| 0| 0',
+        'TOP_26| Disney+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | disney_top_26| #002CA1| 1| 1| 0| 0',
+        'TOP_26| google_play.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | google_top_26| #910F6A| 1| 1| 0| 0',
+        'TOP_26| HBO Max.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hbo_top_26| #4C0870| 1| 1| 0| 0',
+        'TOP_26| hulu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hulu_top_26| #1BB68A| 1| 1| 0| 0',
+        'TOP_26| IMDb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | imdb_top_26| #D7B00B| 1| 1| 0| 0',
+        'TOP_26| itunes.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | itunes_top_26| #D500CC| 1| 1| 0| 0',
+        'TOP_26| Max.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | max_top_26| #002BE7| 1| 1| 0| 0',
+        'TOP_26| Netflix.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | netflix_top_26| #5E0A11| 1| 1| 0| 0',
+        'TOP_26| Paramount+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | paramount_top_26| #1641C3| 1| 1| 0| 0',
+        'TOP_26| Prime Video.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | prime_top_26| #43ABCE| 1| 1| 0| 0',
+        'TOP_26| star_plus.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | star_plus_top_26| #4A3159| 1| 1| 0| 0',
+        'TOP_26| vudu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | vudu_top_26| #26497F| 1| 1| 0| 0',
+        'TOP_27| Apple TV+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | apple_top_27| #494949| 1| 1| 0| 0',
+        'TOP_27| Disney+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | disney_top_27| #002CA1| 1| 1| 0| 0',
+        'TOP_27| google_play.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | google_top_27| #910F6A| 1| 1| 0| 0',
+        'TOP_27| HBO Max.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hbo_top_27| #4C0870| 1| 1| 0| 0',
+        'TOP_27| hulu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hulu_top_27| #1BB68A| 1| 1| 0| 0',
+        'TOP_27| IMDb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | imdb_top_27| #D7B00B| 1| 1| 0| 0',
+        'TOP_27| itunes.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | itunes_top_27| #D500CC| 1| 1| 0| 0',
+        'TOP_27| Max.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | max_top_27| #002BE7| 1| 1| 0| 0',
+        'TOP_27| Netflix.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | netflix_top_27| #5E0A11| 1| 1| 0| 0',
+        'TOP_27| Paramount+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | paramount_top_27| #1641C3| 1| 1| 0| 0',
+        'TOP_27| Prime Video.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | prime_top_27| #43ABCE| 1| 1| 0| 0',
+        'TOP_27| star_plus.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | star_plus_top_27| #4A3159| 1| 1| 0| 0',
+        'TOP_27| vudu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | vudu_top_27| #26497F| 1| 1| 0| 0',
+        'TOP_28| Apple TV+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | apple_top_28| #494949| 1| 1| 0| 0',
+        'TOP_28| Disney+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | disney_top_28| #002CA1| 1| 1| 0| 0',
+        'TOP_28| google_play.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | google_top_28| #910F6A| 1| 1| 0| 0',
+        'TOP_28| HBO Max.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hbo_top_28| #4C0870| 1| 1| 0| 0',
+        'TOP_28| hulu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hulu_top_28| #1BB68A| 1| 1| 0| 0',
+        'TOP_28| IMDb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | imdb_top_28| #D7B00B| 1| 1| 0| 0',
+        'TOP_28| itunes.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | itunes_top_28| #D500CC| 1| 1| 0| 0',
+        'TOP_28| Max.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | max_top_28| #002BE7| 1| 1| 0| 0',
+        'TOP_28| Netflix.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | netflix_top_28| #5E0A11| 1| 1| 0| 0',
+        'TOP_28| Paramount+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | paramount_top_28| #1641C3| 1| 1| 0| 0',
+        'TOP_28| Prime Video.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | prime_top_28| #43ABCE| 1| 1| 0| 0',
+        'TOP_28| star_plus.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | star_plus_top_28| #4A3159| 1| 1| 0| 0',
+        'TOP_28| vudu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | vudu_top_28| #26497F| 1| 1| 0| 0',
+        'TOP_29| Apple TV+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | apple_top_29| #494949| 1| 1| 0| 0',
+        'TOP_29| Disney+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | disney_top_29| #002CA1| 1| 1| 0| 0',
+        'TOP_29| google_play.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | google_top_29| #910F6A| 1| 1| 0| 0',
+        'TOP_29| HBO Max.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hbo_top_29| #4C0870| 1| 1| 0| 0',
+        'TOP_29| hulu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hulu_top_29| #1BB68A| 1| 1| 0| 0',
+        'TOP_29| IMDb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | imdb_top_29| #D7B00B| 1| 1| 0| 0',
+        'TOP_29| itunes.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | itunes_top_29| #D500CC| 1| 1| 0| 0',
+        'TOP_29| Max.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | max_top_29| #002BE7| 1| 1| 0| 0',
+        'TOP_29| Netflix.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | netflix_top_29| #5E0A11| 1| 1| 0| 0',
+        'TOP_29| Paramount+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | paramount_top_29| #1641C3| 1| 1| 0| 0',
+        'TOP_29| Prime Video.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | prime_top_29| #43ABCE| 1| 1| 0| 0',
+        'TOP_29| star_plus.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | star_plus_top_29| #4A3159| 1| 1| 0| 0',
+        'TOP_29| vudu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | vudu_top_29| #26497F| 1| 1| 0| 0',
+        'TOP_30| Apple TV+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | apple_top_30| #494949| 1| 1| 0| 0',
+        'TOP_30| Disney+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | disney_top_30| #002CA1| 1| 1| 0| 0',
+        'TOP_30| google_play.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | google_top_30| #910F6A| 1| 1| 0| 0',
+        'TOP_30| HBO Max.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hbo_top_30| #4C0870| 1| 1| 0| 0',
+        'TOP_30| hulu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hulu_top_30| #1BB68A| 1| 1| 0| 0',
+        'TOP_30| IMDb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | imdb_top_30| #D7B00B| 1| 1| 0| 0',
+        'TOP_30| itunes.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | itunes_top_30| #D500CC| 1| 1| 0| 0',
+        'TOP_30| Max.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | max_top_30| #002BE7| 1| 1| 0| 0',
+        'TOP_30| Netflix.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | netflix_top_30| #5E0A11| 1| 1| 0| 0',
+        'TOP_30| Paramount+.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | paramount_top_30| #1641C3| 1| 1| 0| 0',
+        'TOP_30| Prime Video.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | prime_top_30| #43ABCE| 1| 1| 0| 0',
+        'TOP_30| star_plus.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | star_plus_top_30| #4A3159| 1| 1| 0| 0',
+        'TOP_30| vudu.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | vudu_top_30| #26497F| 1| 1| 0| 0',
+        'TOP_250| IMDb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | IMDb Top 250| #D7B00B| 1| 1| 0| 0',
+        'TOP_AIRING| MyAnimeList.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | MyAnimeList Top Airing| #304DA6| 1| 1| 0| 0',
+        'TOP_RATED| AniList.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | AniList Top Rated| #414A81| 1| 1| 0| 0',
+        'TOP_RATED| MyAnimeList.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | MyAnimeList Top Rated| #304DA6| 1| 1| 0| 0',
+        'TOP_RATED| TMDb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | TMDb Top Rated| #062AC8| 1| 1| 0| 0',
+        'TRENDING| AniList.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | AniList Trending| #414A81| 1| 1| 0| 0',
+        'TRENDING| TMDb.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | TMDb Trending| #062AC8| 1| 1| 0| 0',
+        'TRENDING| Trakt.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Trakt Trending| #CD1A20| 1| 1| 0| 0',
+        'WATCHED| Tautulli.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Tautulli Watched| #B9851F| 1| 1| 0| 0',
+        'WATCHED| Trakt.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Trakt Watched| #CD1A20| 1| 1| 0| 0',
+        'WATCHLIST| Trakt.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Trakt Watchlist| #CD1A20| 1| 1| 0| 0'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
@@ -2264,11 +3201,25 @@ Function CreateChart {
         $arr += ".\create_poster.ps1 -logo `"$script_path\logos_chart\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
     }
     LaunchScripts -ScriptPaths $arr
+    Move-Item -Path output -Destination chart\color
 
-    Move-Item -Path output -Destination chart
+    $arr = @()
+    foreach ($item in $myArray) {
+        if ($($item.key_name).ToString() -eq "") {
+            $value = $null
+        }
+        else {
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+        }
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_chart\white\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
+    }
+
+
+    LaunchScripts -ScriptPaths $arr
+    Move-Item -Path output -Destination chart\white
     Copy-Item -Path logos_chart -Destination chart\logos -Recurse
     Move-Item -Path output-orig -Destination output
-
 }
 
 ################################################################################
@@ -2335,11 +3286,11 @@ Function CreateContentRating {
     LaunchScripts -ScriptPaths $arr
 
     Move-Item -Path output -Destination content_rating\cs
-    
+
     $content_rating = "G", "PG", "PG-13", "R", "R+", "Rx"
     $base_color = "#2444D1"
     $arr = @()
-    foreach ( $cr in $content_rating ) { 
+    foreach ( $cr in $content_rating ) {
         $value = (Get-YamlPropertyValue -PropertyPath "key_names.RATED" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
         $value = "$value $cr"
         $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
@@ -2349,9 +3300,9 @@ Function CreateContentRating {
     $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
     $arr += ".\create_poster.ps1 -logo `"$script_path\logos_content_rating\mal.png`" -logo_offset $logo_offset -logo_resize $logo_resize -text `"$value`" -text_offset $text_offset -font `"$font`" -font_size $optimalFontSize -font_color `"$font_color`" -border $border -border_width $border_width -border_color `"$border_color`" -avg_color_image `"$avg_color_image`" -out_name `"NR`" -base_color `"$base_color`" -gradient $gradient -avg_color $avg_color -clean $clean -white_wash $white_wash"
     LaunchScripts -ScriptPaths $arr
-    
+
     Move-Item -Path output -Destination content_rating\mal
-    
+
     $myArray = @(
         'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
         '| uk12.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | 12| #FF7D13| 1| 1| 0| 1',
@@ -2363,7 +3314,7 @@ Function CreateContentRating {
         '| ukr18.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | R18| #016ED3| 1| 1| 0| 1',
         '| uku.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | U| #0BC700| 1| 1| 0| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
-    
+
     $arr = @()
     foreach ($item in $myArray) {
         if ($($item.key_name).ToString() -eq "") {
@@ -2381,6 +3332,89 @@ Function CreateContentRating {
 
     $myArray = @(
         'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        '| de0c.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | 0| #868786| 1| 1| 0| 1',
+        '| de6c.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | 6| #FFEA3E| 1| 1| 0| 1',
+        '| de12c.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | 12| #37B653| 1| 1| 0| 1',
+        '| de16c.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | 16| #3CA9E7| 1| 1| 0| 1',
+        '| de18c.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | 18| #F51924| 1| 1| 0| 1',
+        '| debpjmc.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | BPjM| #DC1924| 1| 1| 0| 1',
+        '| denr.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | NR| #0E84A3| 1| 1| 0| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        if ($($item.key_name).ToString() -eq "") {
+            $value = $null
+        }
+        else {
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+        }
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_content_rating\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
+    }
+    LaunchScripts -ScriptPaths $arr
+
+    Move-Item -Path output -Destination content_rating\de
+
+    $myArray = @(
+        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        '| au_g.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | G| #0DB14B| 1| 1| 0| 1',
+        '| au_ma.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | MA15+| #ED1C24| 1| 1| 0| 1',
+        '| au_m.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | M| #00AEEF| 1| 1| 0| 1',
+        '| au_pg.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | PG| #FFF200| 1| 1| 0| 1',
+        '| au_r.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | R18+| #231F20| 1| 1| 0| 1',
+        '| au_x.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | X18+| #221f20| 1| 1| 0| 1',
+        '| au_nr.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | NR| #0D3843| 1| 1| 0| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        if ($($item.key_name).ToString() -eq "") {
+            $value = $null
+        }
+        else {
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+        }
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_content_rating\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
+    }
+    LaunchScripts -ScriptPaths $arr
+
+    Move-Item -Path output -Destination content_rating\au
+
+    $myArray = @(
+        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        '| nz_g.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | G| #04934F| 1| 1| 0| 1',
+        '| nz_m.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | M| #FFEC00| 1| 1| 0| 1',
+        '| nz_pg.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | PG| #FFEC00| 1| 1| 0| 1',
+        '| nz_r13.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | R13| #FF0000| 1| 1| 0| 1',
+        '| nz_r15.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | R15| #FF0000| 1| 1| 0| 1',
+        '| nz_r16.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | R16| #FF0000| 1| 1| 0| 1',
+        '| nz_r18.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | R18| #FF0000| 1| 1| 0| 1',
+        '| nz_r.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | R| #FF0000| 1| 1| 0| 1',
+        '| nz_rp13.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | RP13| #FF0000| 1| 1| 0| 1',
+        '| nz_rp16.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | RP16| #FF0000| 1| 1| 0| 1',
+        '| nz_RP18.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | RP18| #FF0000| 1| 1| 0| 1',
+        '| nz_nr.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | NR| #0D3843| 1| 1| 0| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        if ($($item.key_name).ToString() -eq "") {
+            $value = $null
+        }
+        else {
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+        }
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_content_rating\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
+    }
+    LaunchScripts -ScriptPaths $arr
+
+    Move-Item -Path output -Destination content_rating\nz
+
+    $myArray = @(
+        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
         '| usg.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | G| #79EF06| 1| 1| 0| 1',
         '| usnc-17.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | NC-17| #EE45A4| 1| 1| 0| 1',
         '| usnr.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | NR| #0E84A3| 1| 1| 0| 1',
@@ -2393,7 +3427,7 @@ Function CreateContentRating {
         '| ustv-pg.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | TV-PG| #5B0EFD| 1| 1| 0| 1',
         '| ustv-y.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | TV-Y| #3EB3C1| 1| 1| 0| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
-    
+
     $arr = @()
     foreach ($item in $myArray) {
         if ($($item.key_name).ToString() -eq "") {
@@ -2525,7 +3559,7 @@ Function CreateCountry {
         'CYPRUS| cy.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Cyprus| #BF5DEE| 1| 1| 0| 0',
         'CZECH_REPUBLIC| cz.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Czech Republic| #9ECE8F| 1| 1| 0| 0',
         'CÔTE_DIVOIRE| ci.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Côte d''Ivoire| #70D5FC| 1| 1| 0| 0',
-        'DEMOCRATIC_REPUBLIC_OF_THE_CONGO| cg.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Democratic Republic of the Congo| #301A79| 1| 1| 0| 0',
+        'DEMOCRATIC_REPUBLIC_OF_THE_CONGO| cd.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Democratic Republic of the Congo| #301A79| 1| 1| 0| 0',
         'DENMARK| dk.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Denmark| #685ECB| 1| 1| 0| 0',
         'DJIBOUTI| dj.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Djibouti| #6D1F93| 1| 1| 0| 0',
         'DOMINICAN_REPUBLIC| do.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Dominican Republic| #83F0A2| 1| 1| 0| 0',
@@ -2601,7 +3635,7 @@ Function CreateCountry {
         'KOSOVO| kosovo.png| -500| 1000| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Kosovo| #6A50B1| 1| 1| 0| 0',
         'KUWAIT| kw.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Kuwait| #4DC94B| 1| 1| 0| 0',
         'KYRGYZSTAN| kg.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Kyrgyzstan| #25EA7B| 1| 1| 0| 0',
-        'LAO| la.png| -500| 1200| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Lao| #DDC651| 1| 1| 0| 0',
+        'LAOS| la.png| -500| 1200| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Laos| #DDC651| 1| 1| 0| 0',
         'LATIN_AMERICA| latin america.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Latin America| #3785B6| 1| 1| 0| 0',
         'LATVIA| lv.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Latvia| #5326A3| 1| 1| 0| 0',
         'LEBANON| lb.png| -500| 1200| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Lebanon| #C9C826| 1| 1| 0| 0',
@@ -2668,6 +3702,10 @@ Function CreateCountry {
         'PORTUGAL| pt.png| -500| 1000| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Portugal| #A1DE3F| 1| 1| 0| 0',
         'PUERTO_RICO| pr.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Puerto Rico| #48ED66| 1| 1| 0| 0',
         'QATAR| qa.png| -500| 750| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Qatar| #4C1FCC| 1| 1| 0| 0',
+        'REPUBLIC_OF_THE_CONGO| cg.png| -500| 1000| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Republic of the Congo| #9D3C85| 1| 1| 0| 0',
+        'SAINT_PIERRE_AND_MIQUELON| pm.png| -500| 1000| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Saint Pierre and Miquelon| #29C4C6| 1| 1| 0| 0',
+        'CAYMAN_ISLANDS| ky.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Cayman Islands| #9589CC| 1| 1| 0| 0',
+        'RÉUNION| re.png| -500| 750| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Réunion| #502892| 1| 1| 0| 0',
         'ROMANIA| ro.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Romania| #ABD0CF| 1| 1| 0| 0',
         'RUSSIAN| Russian.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Russian| #05C9B6| 1| 1| 0| 0',
         'RUSSIA| ru.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Russia| #97D820| 1| 1| 0| 0',
@@ -2746,8 +3784,8 @@ Function CreateCountry {
         'ZAMBIA| zm.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Zambia| #AB1780| 1| 1| 0| 0',
         'ZIMBABWE| zw.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Zimbabwe| #A44C98| 1| 1| 0| 0',
         'ÅLAND_ISLANDS| ax.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Åland Islands| #B7E412| 1| 1| 0| 0'
-        ) | ConvertFrom-Csv -Delimiter '|'
-    
+    ) | ConvertFrom-Csv -Delimiter '|'
+
     $arr = @()
     foreach ($item in $myArray) {
         if ($($item.key_name).ToString() -eq "") {
@@ -2841,7 +3879,7 @@ Function CreateCountry {
         'CYPRUS| cy.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Cyprus| #BF5DEE| 1| 1| 0| 1',
         'CZECH_REPUBLIC| cz.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Czech Republic| #9ECE8F| 1| 1| 0| 1',
         'CÔTE_DIVOIRE| ci.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Côte d''Ivoire| #70D5FC| 1| 1| 0| 1',
-        'DEMOCRATIC_REPUBLIC_OF_THE_CONGO| cg.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Democratic Republic of the Congo| #301A79| 1| 1| 0| 1',
+        'DEMOCRATIC_REPUBLIC_OF_THE_CONGO| cd.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Democratic Republic of the Congo| #301A79| 1| 1| 0| 1',
         'DENMARK| dk.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Denmark| #685ECB| 1| 1| 0| 1',
         'DJIBOUTI| dj.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Djibouti| #6D1F93| 1| 1| 0| 1',
         'DOMINICAN_REPUBLIC| do.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Dominican Republic| #83F0A2| 1| 1| 0| 1',
@@ -2917,7 +3955,7 @@ Function CreateCountry {
         'KOSOVO| kosovo.png| -500| 1000| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Kosovo| #6A50B1| 1| 1| 0| 1',
         'KUWAIT| kw.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Kuwait| #4DC94B| 1| 1| 0| 1',
         'KYRGYZSTAN| kg.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Kyrgyzstan| #25EA7B| 1| 1| 0| 1',
-        'LAO| la.png| -500| 1200| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Lao| #DDC651| 1| 1| 0| 1',
+        'LAOS| la.png| -500| 1200| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Laos| #DDC651| 1| 1| 0| 1',
         'LATIN_AMERICA| latin america.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Latin America| #3785B6| 1| 1| 0| 1',
         'LATVIA| lv.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Latvia| #5326A3| 1| 1| 0| 1',
         'LEBANON| lb.png| -500| 1200| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Lebanon| #C9C826| 1| 1| 0| 1',
@@ -2984,6 +4022,10 @@ Function CreateCountry {
         'PORTUGAL| pt.png| -500| 1000| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Portugal| #A1DE3F| 1| 1| 0| 1',
         'PUERTO_RICO| pr.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Puerto Rico| #48ED66| 1| 1| 0| 1',
         'QATAR| qa.png| -500| 750| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Qatar| #4C1FCC| 1| 1| 0| 1',
+        'REPUBLIC_OF_THE_CONGO| cg.png| -500| 1000| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Republic of the Congo| #9D3C85| 1| 1| 0| 1',
+        'SAINT_PIERRE_AND_MIQUELON| pm.png| -500| 1000| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Saint Pierre and Miquelon| #29C4C6| 1| 1| 0| 1',
+        'CAYMAN_ISLANDS| ky.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Cayman Islands| #9589CC| 1| 1| 0| 1',
+        'RÉUNION| re.png| -500| 750| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Réunion| #502892| 1| 1| 0| 1',
         'ROMANIA| ro.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Romania| #ABD0CF| 1| 1| 0| 1',
         'RUSSIAN| Russian.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Russian| #05C9B6| 1| 1| 0| 1',
         'RUSSIA| ru.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Russia| #97D820| 1| 1| 0| 1',
@@ -3062,7 +4104,7 @@ Function CreateCountry {
         'ZAMBIA| zm.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Zambia| #AB1780| 1| 1| 0| 1',
         'ZIMBABWE| zw.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Zimbabwe| #A44C98| 1| 1| 0| 1',
         'ÅLAND_ISLANDS| ax.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Åland Islands| #B7E412| 1| 1| 0| 1'
-        ) | ConvertFrom-Csv -Delimiter '|'
+    ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
     foreach ($item in $myArray) {
@@ -3100,7 +4142,7 @@ Function CreateCountry {
     Move-Item -Path output -Destination country\white
     Copy-Item -Path logos_country -Destination country\logos -Recurse
     Move-Item -Path output-orig -Destination output
-    
+
 }
 
 ################################################################################
@@ -3161,7 +4203,7 @@ Function CreateDecade {
         '2010s| transparent.png| +0| 0| +0| Barlow-Regular| 500| #FFFFFF| 0| 15| #FFFFFF| | 2010| #44EF10| 1| 1| 0| 1',
         '2020s| transparent.png| +0| 0| +0| Helvetica-Bold| 500| #FFFFFF| 0| 15| #FFFFFF| | 2020| #44EF10| 1| 1| 0| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
-    
+
     $arr = @()
     foreach ($item in $myArray) {
         $value = $($item.key_name)
@@ -3173,7 +4215,7 @@ Function CreateDecade {
     WriteToLogFile "MonitorProcess               : Waiting for all processes to end before continuing..."
     Start-Sleep -Seconds 3
     MonitorProcess -ProcessName "magick.exe"
-    
+
     Move-Item -Path output -Destination decade
 
     $pre_value = Get-YamlPropertyValue -PropertyPath "key_names.BEST_OF" -ConfigObject $global:ConfigObj -CaseSensitivity Upper
@@ -3210,112 +4252,114 @@ Function CreateFranchise {
 
     $myArray = @(
         'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
-        '| 28 Days Weeks Later.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | 28 Days Weeks Later| #B93033| 1| 1| 0| 0',
-        '| 9-1-1.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | 9-1-1| #C62B2B| 1| 1| 0| 1',
-        '| A Nightmare on Elm Street.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | A Nightmare on Elm Street| #BE3C3E| 1| 1| 0| 1',
-        '| Alien Predator.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Alien Predator| #1EAC1B| 1| 1| 0| 1',
-        '| Alien.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Alien| #18BC56| 1| 1| 0| 1',
-        '| American Pie.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | American Pie| #C24940| 1| 1| 0| 1',
-        '| Anaconda.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Anaconda| #A42E2D| 1| 1| 0| 1',
-        '| Angels In The.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Angels In The| #4869BD| 1| 1| 0| 1',
-        '| Appleseed.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Appleseed| #986E22| 1| 1| 0| 1',
-        '| Archie Comics.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Archie Comics| #DFB920| 1| 1| 0| 1',
-        '| Arrowverse.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Arrowverse| #2B8F40| 1| 1| 0| 1',
-        '| Barbershop.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Barbershop| #2399AF| 1| 1| 0| 1',
-        '| Batman.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Batman| #525252| 1| 1| 0| 1',
-        '| Bourne.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Bourne| #383838| 1| 1| 0| 0',
-        '| Charlie Brown.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Charlie Brown| #C8BF2B| 1| 1| 0| 1',
-        '| Cloverfield.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Cloverfield| #0E1672| 1| 1| 0| 1',
-        '| Cornetto Trilogy.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Cornetto Trilogy| #6C9134| 1| 1| 0| 1',
-        '| CSI.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | CSI| #969322| 1| 1| 0| 1',
-        '| DC Super Hero Girls.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | DC Super Hero Girls| #299CB1| 1| 1| 0| 1',
-        '| DC Universe.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | DC Universe| #213DB6| 1| 1| 0| 1',
-        '| Deadpool.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Deadpool| #BD393C| 1| 1| 0| 1',
-        '| Despicable Me.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Despicable Me| #C77344| 1| 1| 0| 1',
-        '| Doctor Who.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Doctor Who| #1C38B4| 1| 1| 0| 1',
-        '| Escape From.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Escape From| #B82026| 1| 1| 0| 1',
-        '| Fantastic Beasts.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Fantastic Beasts| #9E972B| 1| 1| 0| 1',
-        '| Fast & Furious.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Fast & Furious| #8432C4| 1| 1| 0| 1',
-        '| FBI.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | FBI| #FFD32C| 1| 1| 0| 1',
-        '| Final Fantasy.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Final Fantasy| #86969F| 1| 1| 0| 1',
-        '| Friday the 13th.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Friday the 13th| #B9242A| 1| 1| 0| 1',
-        '| Frozen.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Frozen| #2A5994| 1| 1| 0| 1',
-        '| Garfield.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Garfield| #C28117| 1| 1| 0| 1',
-        '| Ghostbusters.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Ghostbusters| #414141| 1| 1| 0| 1',
-        '| Godzilla (Heisei).png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Godzilla (Heisei)| #BFB330| 1| 1| 0| 1',
-        '| Godzilla (Showa).png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Godzilla (Showa)| #BDB12A| 1| 1| 0| 1',
-        '| Godzilla.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Godzilla| #B82737| 1| 1| 0| 1',
-        '| Halloween.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Halloween| #BB2D22| 1| 1| 0| 1',
-        '| Halo.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Halo| #556A92| 1| 1| 0| 1',
-        '| Hannibal Lecter.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Hannibal Lecter| #383838| 1| 1| 0| 1',
-        '| Harry Potter.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Harry Potter| #9D9628| 1| 1| 0| 1',
-        '| Has Fallen.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Has Fallen| #3B3B3B| 1| 1| 0| 1',
-        '| Ice Age.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Ice Age| #5EA0BB| 1| 1| 0| 1',
-        '| In Association with Marvel.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | In Association with Marvel| #C42424| 1| 1| 0| 1',
-        '| Indiana Jones.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Indiana Jones| #D97724| 1| 1| 0| 1',
-        '| IP Man.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | IP Man| #8D7E63| 1| 1| 0| 0',
-        '| James Bond 007.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | James Bond 007| #414141| 1| 1| 0| 1',
-        '| Jurassic Park.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Jurassic Park| #902E32| 1| 1| 0| 1',
-        '| Karate Kid.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Karate Kid| #AC6822| 1| 1| 0| 1',
-        '| Law & Order.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Law & Order| #5B87AB| 1| 1| 0| 1',
-        '| Lord of the Rings.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Lord of the Rings| #C38B27| 1| 1| 0| 1',
-        '| Madagascar.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Madagascar| #AD8F27| 1| 1| 0| 1',
-        '| Marvel Cinematic Universe.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Marvel Cinematic Universe| #AD2B2B| 1| 1| 0| 1',
-        '| Marx Brothers.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Marx Brothers| #347294| 1| 1| 0| 1',
-        '| Middle Earth.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Middle Earth| #C28A25| 1| 1| 0| 1',
-        '| Mission Impossible.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Mission Impossible| #BF1616| 1| 1| 0| 1',
-        '| Monty Python.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Monty Python| #B61C22| 1| 1| 0| 1',
-        '| Mortal Kombat.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Mortal Kombat| #BA4D29| 1| 1| 0| 1',
-        '| Mothra.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Mothra| #9C742A| 1| 1| 0| 1',
-        '| NCIS.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | NCIS| #AC605F| 1| 1| 0| 1',
-        '| One Chicago.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | One Chicago| #BE7C30| 1| 1| 0| 1',
-        '| Oz.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Oz| #AD8F27| 1| 1| 0| 1',
-        '| Pet Sematary.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Pet Sematary| #B71F25| 1| 1| 0| 1',
-        '| Pirates of the Caribbean.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Pirates of the Caribbean| #7F6936| 1| 1| 0| 1',
-        '| Planet of the Apes.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Planet of the Apes| #4E4E4E| 1| 1| 0| 1',
-        '| Pokémon.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Pokémon| #FECA06| 1| 1| 0| 1',
-        '| Power Rangers.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Power Rangers| #24AA60| 1| 1| 0| 1',
-        '| Pretty Little Liars.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Pretty Little Liars| #BD0F0F| 1| 1| 0| 1',
-        '| Resident Evil Biohazard.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Resident Evil Biohazard| #930B0B| 1| 1| 0| 1',
-        '| Resident Evil.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Resident Evil| #940E0F| 1| 1| 0| 1',
-        '| Rocky Creed.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Rocky Creed| #C52A2A| 1| 1| 0| 1',
-        '| Rocky.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Rocky| #C22121| 1| 1| 0| 1',
-        '| RuPaul''s Drag Race.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | RuPaul''s Drag Race| #FF5757| 1| 1| 0| 1',
-        '| Scooby-Doo!.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Scooby-Doo!| #5F3879| 1| 1| 0| 1',
-        '| Shaft.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Shaft| #382637| 1| 1| 0| 1',
-        '| Shrek.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Shrek| #3DB233| 1| 1| 0| 1',
-        '| Spider-Man.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Spider-Man| #C11B1B| 1| 1| 0| 1',
-        '| Star Trek Alternate Reality.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Star Trek Alternate Reality| #C78639| 1| 1| 0| 1',
-        '| Star Trek The Next Generation.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Star Trek The Next Generation| #B7AE4C| 1| 1| 0| 1',
-        '| Star Trek The Original Series.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Star Trek The Original Series| #BB5353| 1| 1| 0| 1',
-        '| Star Trek.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Star Trek| #C2A533| 1| 1| 0| 1',
-        '| Star Wars Legends.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Star Wars Legends| #BAA416| 1| 1| 0| 1',
-        '| Star Wars Skywalker Saga.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Star Wars Skywalker Saga| #5C5C5C| 1| 1| 0| 1',
-        '| Star Wars.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Star Wars| #C2A21B| 1| 1| 0| 1',
-        '| Stargate.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Stargate| #6C73A1| 1| 1| 0| 1',
-        '| Street Fighter.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Street Fighter| #C5873F| 1| 1| 0| 1',
-        '| Superman.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Superman| #C34544| 1| 1| 0| 1',
-        '| Teenage Mutant Ninja Turtles.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Teenage Mutant Ninja Turtles| #78A82E| 1| 1| 0| 1',
-        '| The Hunger Games.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | The Hunger Games| #619AB5| 1| 1| 0| 1',
-        '| The Man With No Name.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | The Man With No Name| #9A7B40| 1| 1| 0| 1',
-        '| The Mummy.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | The Mummy| #C28A25| 1| 1| 0| 1',
-        '| The Real Housewives.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | The Real Housewives| #400EA4| 1| 1| 0| 1',
-        '| The Rookie.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | The Rookie| #DC5A2B| 1| 1| 0| 1',
-        '| The Texas Chainsaw Massacre.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | The Texas Chainsaw Massacre| #B15253| 1| 1| 0| 1',
-        '| The Three Stooges.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | The Three Stooges| #B9532A| 1| 1| 0| 1',
-        '| The Twilight Zone.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | The Twilight Zone| #16245F| 1| 1| 0| 1',
-        '| The Walking Dead.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | The Walking Dead| #797F48| 1| 1| 0| 1',
-        '| Tom and Jerry.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Tom and Jerry| #B9252B| 1| 1| 0| 1',
-        '| Tomb Raider.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Tomb Raider| #620D0E| 1| 1| 0| 1',
-        '| Toy Story.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Toy Story| #CEB423| 1| 1| 0| 1',
-        '| Transformers.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Transformers| #B02B2B| 1| 1| 0| 1',
-        '| Tron.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Tron| #5798B2| 1| 1| 0| 1',
-        '| Twilight.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Twilight| #3B3B3B| 1| 1| 0| 1',
-        '| Unbreakable.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Unbreakable| #445DBB| 1| 1| 0| 1',
-        '| Wallace & Gromit.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Wallace & Gromit| #BA2A20| 1| 1| 0| 1',
-        '| Wizarding World.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Wizarding World| #7B7A33| 1| 1| 0| 1',
-        '| X-Men.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | X-Men| #636363| 1| 1| 0| 1',
-        '| Yellowstone.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Yellowstone| #441515| 1| 1| 0| 1'
+        '| 28 Days Weeks Later.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | 28 Days Weeks Later| #B93033| 1| 1| 0| 0',
+        '| Power.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Power| #63E2C5| 1| 1| 0| 0',
+        '| Game of Thrones.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Game of Thrones| #25972E| 1| 1| 0| 0',
+        '| 9-1-1.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | 9-1-1| #C62B2B| 1| 1| 0| 1',
+        '| A Nightmare on Elm Street.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | A Nightmare on Elm Street| #BE3C3E| 1| 1| 0| 1',
+        '| Alien Predator.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Alien Predator| #1EAC1B| 1| 1| 0| 1',
+        '| Alien.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Alien| #18BC56| 1| 1| 0| 1',
+        '| American Pie.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | American Pie| #C24940| 1| 1| 0| 1',
+        '| Anaconda.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Anaconda| #A42E2D| 1| 1| 0| 1',
+        '| Angels In The.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Angels In The| #4869BD| 1| 1| 0| 1',
+        '| Appleseed.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Appleseed| #986E22| 1| 1| 0| 1',
+        '| Archie Comics.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Archie Comics| #DFB920| 1| 1| 0| 1',
+        '| Arrowverse.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Arrowverse| #2B8F40| 1| 1| 0| 1',
+        '| Barbershop.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Barbershop| #2399AF| 1| 1| 0| 1',
+        '| Batman.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Batman| #525252| 1| 1| 0| 1',
+        '| Bourne.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Bourne| #383838| 1| 1| 0| 0',
+        '| Charlie Brown.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Charlie Brown| #C8BF2B| 1| 1| 0| 1',
+        '| Cloverfield.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Cloverfield| #0E1672| 1| 1| 0| 1',
+        '| Cornetto Trilogy.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Cornetto Trilogy| #6C9134| 1| 1| 0| 1',
+        '| CSI.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | CSI| #969322| 1| 1| 0| 1',
+        '| DC Super Hero Girls.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | DC Super Hero Girls| #299CB1| 1| 1| 0| 1',
+        '| DC Universe.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | DC Universe| #213DB6| 1| 1| 0| 1',
+        '| Deadpool.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Deadpool| #BD393C| 1| 1| 0| 1',
+        '| Despicable Me.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Despicable Me| #C77344| 1| 1| 0| 1',
+        '| Doctor Who.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Doctor Who| #1C38B4| 1| 1| 0| 1',
+        '| Escape From.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Escape From| #B82026| 1| 1| 0| 1',
+        '| Fantastic Beasts.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Fantastic Beasts| #9E972B| 1| 1| 0| 1',
+        '| Fast & Furious.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Fast & Furious| #8432C4| 1| 1| 0| 1',
+        '| FBI.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | FBI| #FFD32C| 1| 1| 0| 1',
+        '| Final Fantasy.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Final Fantasy| #86969F| 1| 1| 0| 1',
+        '| Friday the 13th.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Friday the 13th| #B9242A| 1| 1| 0| 1',
+        '| Frozen.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Frozen| #2A5994| 1| 1| 0| 1',
+        '| Garfield.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Garfield| #C28117| 1| 1| 0| 1',
+        '| Ghostbusters.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Ghostbusters| #414141| 1| 1| 0| 1',
+        '| Godzilla (Heisei).png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Godzilla (Heisei)| #BFB330| 1| 1| 0| 1',
+        '| Godzilla (Showa).png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Godzilla (Showa)| #BDB12A| 1| 1| 0| 1',
+        '| Godzilla.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Godzilla| #B82737| 1| 1| 0| 1',
+        '| Halloween.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Halloween| #BB2D22| 1| 1| 0| 1',
+        '| Halo.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Halo| #556A92| 1| 1| 0| 1',
+        '| Hannibal Lecter.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Hannibal Lecter| #383838| 1| 1| 0| 1',
+        '| Harry Potter.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Harry Potter| #9D9628| 1| 1| 0| 1',
+        '| Has Fallen.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Has Fallen| #3B3B3B| 1| 1| 0| 1',
+        '| Ice Age.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Ice Age| #5EA0BB| 1| 1| 0| 1',
+        '| In Association with Marvel.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | In Association with Marvel| #C42424| 1| 1| 0| 1',
+        '| Indiana Jones.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Indiana Jones| #D97724| 1| 1| 0| 1',
+        '| IP Man.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | IP Man| #8D7E63| 1| 1| 0| 0',
+        '| James Bond 007.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | James Bond 007| #414141| 1| 1| 0| 1',
+        '| Jurassic Park.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Jurassic Park| #902E32| 1| 1| 0| 1',
+        '| Karate Kid.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Karate Kid| #AC6822| 1| 1| 0| 1',
+        '| Law & Order.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Law & Order| #5B87AB| 1| 1| 0| 1',
+        '| Lord of the Rings.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Lord of the Rings| #C38B27| 1| 1| 0| 1',
+        '| Madagascar.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Madagascar| #AD8F27| 1| 1| 0| 1',
+        '| Marvel Cinematic Universe.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Marvel Cinematic Universe| #AD2B2B| 1| 1| 0| 1',
+        '| Marx Brothers.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Marx Brothers| #347294| 1| 1| 0| 1',
+        '| Middle Earth.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Middle Earth| #C28A25| 1| 1| 0| 1',
+        '| Mission Impossible.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Mission Impossible| #BF1616| 1| 1| 0| 1',
+        '| Monty Python.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Monty Python| #B61C22| 1| 1| 0| 1',
+        '| Mortal Kombat.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Mortal Kombat| #BA4D29| 1| 1| 0| 1',
+        '| Mothra.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Mothra| #9C742A| 1| 1| 0| 1',
+        '| NCIS.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | NCIS| #AC605F| 1| 1| 0| 1',
+        '| One Chicago.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | One Chicago| #BE7C30| 1| 1| 0| 1',
+        '| Oz.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Oz| #AD8F27| 1| 1| 0| 1',
+        '| Pet Sematary.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Pet Sematary| #B71F25| 1| 1| 0| 1',
+        '| Pirates of the Caribbean.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Pirates of the Caribbean| #7F6936| 1| 1| 0| 1',
+        '| Planet of the Apes.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Planet of the Apes| #4E4E4E| 1| 1| 0| 1',
+        '| Pokémon.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Pokémon| #FECA06| 1| 1| 0| 1',
+        '| Power Rangers.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Power Rangers| #24AA60| 1| 1| 0| 1',
+        '| Pretty Little Liars.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Pretty Little Liars| #BD0F0F| 1| 1| 0| 1',
+        '| Resident Evil Biohazard.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Resident Evil Biohazard| #930B0B| 1| 1| 0| 1',
+        '| Resident Evil.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Resident Evil| #940E0F| 1| 1| 0| 1',
+        '| Rocky Creed.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Rocky Creed| #C52A2A| 1| 1| 0| 1',
+        '| Rocky.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Rocky| #C22121| 1| 1| 0| 1',
+        '| RuPaul''s Drag Race.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | RuPaul''s Drag Race| #FF5757| 1| 1| 0| 1',
+        '| Scooby-Doo!.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Scooby-Doo!| #5F3879| 1| 1| 0| 1',
+        '| Shaft.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Shaft| #382637| 1| 1| 0| 1',
+        '| Shrek.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Shrek| #3DB233| 1| 1| 0| 1',
+        '| Spider-Man.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Spider-Man| #C11B1B| 1| 1| 0| 1',
+        '| Star Trek Alternate Reality.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Star Trek Alternate Reality| #C78639| 1| 1| 0| 1',
+        '| Star Trek The Next Generation.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Star Trek The Next Generation| #B7AE4C| 1| 1| 0| 1',
+        '| Star Trek The Original Series.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Star Trek The Original Series| #BB5353| 1| 1| 0| 1',
+        '| Star Trek.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Star Trek| #C2A533| 1| 1| 0| 1',
+        '| Star Wars Legends.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Star Wars Legends| #BAA416| 1| 1| 0| 1',
+        '| Star Wars Skywalker Saga.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Star Wars Skywalker Saga| #5C5C5C| 1| 1| 0| 1',
+        '| Star Wars.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Star Wars| #C2A21B| 1| 1| 0| 1',
+        '| Stargate.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Stargate| #6C73A1| 1| 1| 0| 1',
+        '| Street Fighter.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Street Fighter| #C5873F| 1| 1| 0| 1',
+        '| Superman.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Superman| #C34544| 1| 1| 0| 1',
+        '| Teenage Mutant Ninja Turtles.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Teenage Mutant Ninja Turtles| #78A82E| 1| 1| 0| 1',
+        '| The Hunger Games.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | The Hunger Games| #619AB5| 1| 1| 0| 1',
+        '| The Man With No Name.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | The Man With No Name| #9A7B40| 1| 1| 0| 1',
+        '| The Mummy.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | The Mummy| #C28A25| 1| 1| 0| 1',
+        '| The Real Housewives.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | The Real Housewives| #400EA4| 1| 1| 0| 1',
+        '| The Rookie.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | The Rookie| #DC5A2B| 1| 1| 0| 1',
+        '| The Texas Chainsaw Massacre.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | The Texas Chainsaw Massacre| #B15253| 1| 1| 0| 1',
+        '| The Three Stooges.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | The Three Stooges| #B9532A| 1| 1| 0| 1',
+        '| The Twilight Zone.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | The Twilight Zone| #16245F| 1| 1| 0| 1',
+        '| The Walking Dead.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | The Walking Dead| #797F48| 1| 1| 0| 1',
+        '| Tom and Jerry.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Tom and Jerry| #B9252B| 1| 1| 0| 1',
+        '| Tomb Raider.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Tomb Raider| #620D0E| 1| 1| 0| 1',
+        '| Toy Story.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Toy Story| #CEB423| 1| 1| 0| 1',
+        '| Transformers.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Transformers| #B02B2B| 1| 1| 0| 1',
+        '| Tron.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Tron| #5798B2| 1| 1| 0| 1',
+        '| Twilight.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Twilight| #3B3B3B| 1| 1| 0| 1',
+        '| Unbreakable.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Unbreakable| #445DBB| 1| 1| 0| 1',
+        '| Wallace & Gromit.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Wallace & Gromit| #BA2A20| 1| 1| 0| 1',
+        '| Wizarding World.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Wizarding World| #7B7A33| 1| 1| 0| 1',
+        '| X-Men.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | X-Men| #636363| 1| 1| 0| 1',
+        '| Yellowstone.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Yellowstone| #441515| 1| 1| 0| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
@@ -3334,7 +4378,7 @@ Function CreateFranchise {
     Move-Item -Path output -Destination franchise
     Copy-Item -Path logos_franchise -Destination franchise\logos -Recurse
     Move-Item -Path output-orig -Destination output
-    
+
 }
 
 ################################################################################
@@ -3373,6 +4417,15 @@ Function CreateGenre {
     $myArray = @(
         'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
         '1001_MOVIES_YOU_MUST_SEE_BEFORE_YOU_DIE| 1001 Movies You Must See Before You Die.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | 1001 Movies You Must See Before You Die| #606723| 1| 1| 0| 1',
+        'MAY_THE_FOURTH| May the Fourth.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | May the Fourth | #14F001| 1| 1| 0| 1',
+        'NEW_YEARS_EVE| New Years Eve.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | New Years Eve | #E315C9| 1| 1| 0| 1',
+        'DISNEY| Disney.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Disney | #8AD6D2| 1| 1| 0| 1',
+        'PIXAR| Pixar.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Pixar| #0195C1| 1| 1| 0| 1',
+        'DREAMWORKS| Dreamworks.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Dreamworks| #4CECB4| 1| 1| 0| 0',
+        'DISNEY_PIXAR_DREAMWORKS| Disney Pixar Dreamworks.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Disney Pixar Dreamworks| #D4C687| 1| 1| 0| 0',
+        'VISUALLY_INSANE| Visually Insane.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Visually Insane| #8328A0| 1| 1| 0| 1',
+        'GUILTY_PLEASURE| Guilty Pleasure.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Guilty Pleasure| #B721A3| 1| 1| 0| 1',
+        'LOST_TREASURE| Lost Treasure.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Lost Treasure| #A8AF16| 1| 1| 0| 1',
         'ABSURDISM| Absurdism.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Absurdism| #032E2E| 1| 1| 0| 1',
         'ABSURD_COMEDY| Absurd Comedy.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Absurd Comedy| #D16496| 1| 1| 0| 0',
         'ACTION_ADVENTURE| Action & adventure.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Action & adventure| #65AEA5| 1| 1| 0| 1',
@@ -3431,6 +4484,7 @@ Function CreateGenre {
         'CRIME_COMEDY| Crime Comedy.png| -500| 1500| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Crime Comedy| #22EADE| 1| 1| 0| 0',
         'CRIME| Crime.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Crime| #888888| 1| 1| 0| 1',
         'CRITERION_COLLECTION| Criterion Collection.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Criterion Collection| #7E1D03| 1| 1| 0| 1',
+        'CULT_CLASSICS| Cult Classics.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Cult Classics| #156D88| 1| 1| 0| 1',
         'CYBERPUNK| Cyberpunk.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Cyberpunk| #0A0D7E| 1| 1| 0| 1',
         'CYBER_THRILLER| Cyber-Thriller.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Cyber-Thriller| #8F0520| 1| 1| 0| 1',
         'DARK_COMEDY| Dark Comedy.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Dark Comedy| #09F1A3| 1| 1| 0| 1',
@@ -3541,6 +4595,7 @@ Function CreateGenre {
         'POLITICS| Politics.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Politics| #3F5FC0| 1| 1| 0| 1',
         'POST_APOCALYPTIC| Post-Apocalyptic.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Post-Apocalyptic| #399A30| 1| 1| 0| 1',
         'PREHISTORIC| Prehistoric.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Prehistoric| #CB5825| 1| 1| 0| 1',
+        'PRESIDENT| President.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | President| #76979A| 1| 1| 0| 1',
         'PRISON| Prison.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Prison| #3A3686| 1| 1| 0| 1',
         'PSYCHEDELIC| Psychedelic.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Psychedelic| #E973F6| 1| 1| 0| 0',
         'PSYCHOLOGICAL_HORROR| Psychological Horror.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Psychological Horror| #AC5969| 1| 1| 0| 1',
@@ -3601,8 +4656,10 @@ Function CreateGenre {
         'THE_ARTS| The Arts.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | The Arts| #E1F6D6| 1| 1| 0| 1',
         'THRILLER| Thriller.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Thriller| #C3602B| 1| 1| 0| 1',
         'TIME_TRAVEL| Time Travel.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Time Travel| #2C3294| 1| 1| 0| 1',
+        'TIME_LOOP| Time Travel.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Time Loop| #88D761| 1| 1| 0| 1',
         'TOP_GROSSING_FILMS_ANNUALLY| Top Grossing Films Annually.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Top Grossing Films Annually| #CA1E1B| 1| 1| 0| 1',
         'TOP_GROSSING_FILMS_OF_ALL-TIME| Top Grossing Films of All-Time.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Top Grossing Films of All-Time| #8ED310| 1| 1| 0| 1',
+        'TRAINS| Trains.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Trains| #430CB1| 1| 1| 0| 1',
         'TRAVEL| Travel.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Travel| #B6BA6D| 1| 1| 0| 1',
         'TREASURE_HUNT| Treasure Hunt.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Treasure Hunt| #AFBE09| 1| 1| 0| 1',
         'TRUE_CRIME| True Crime.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | True Crime| #C706DE| 1| 1| 0| 1',
@@ -3628,7 +4685,7 @@ Function CreateGenre {
         'ZOMBIE_COMEDY| Zombie Comedy.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Zombie Comedy| #04B69C| 1| 1| 0| 0',
         'ZOMBIE_HORROR| Zombie Horror.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Zombie Horror| #909513| 1| 1| 0| 1',
         'ZOMBIE| Zombie.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Zombie| #909513| 1| 1| 0| 0'
-        ) | ConvertFrom-Csv -Delimiter '|'
+    ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
     foreach ($item in $myArray) {
@@ -3656,7 +4713,7 @@ Function CreateGenre {
 Function CreateNetwork {
     Write-Host "Creating Network"
     Set-Location $script_path
-    # Find-Path "$script_path\network"
+    Find-Path "$script_path\network"
     $theMaxWidth = 1800
     $theMaxHeight = 1000
     $minPointSize = 100
@@ -3686,11 +4743,12 @@ Function CreateNetwork {
     $myArray = @(
         'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
         ' | #0.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | #0| #7BE7A1| 1| 1| 0| 0',
+        ' | ANIMAX.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ANIMAX| #6301F6| 1| 1| 0| 0',
+        ' | 7mate.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | 7mate| #2F3C13| 1| 1| 0| 0',
         ' | A&E.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | A&E| #676767| 1| 1| 0| 0',
-        ' | ABC (AU).png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ABC (AU)| #CEC281| 1| 1| 0| 0',
-        ' | ABC (AU).png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ABC TV| #CEC281| 1| 1| 0| 0',
         ' | ABC Family.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ABC Family| #73D444| 1| 1| 0| 0',
         ' | ABC Kids.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ABC Kids| #6172B9| 1| 1| 0| 0',
+        ' | ABC TV.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ABC TV| #CEC281| 1| 1| 0| 0',
         ' | ABC.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ABC| #403993| 1| 1| 0| 0',
         ' | ABS-CBN.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ABS-CBN| #127B09| 1| 1| 0| 0',
         ' | Acorn TV.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Acorn TV| #182034| 1| 1| 0| 0',
@@ -3702,6 +4760,7 @@ Function CreateNetwork {
         ' | Amazon.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Amazon| #9B8832| 1| 1| 0| 0',
         ' | AMC+.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | AMC+| #B80F05| 1| 1| 0| 0',
         ' | AMC.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | AMC| #4A9472| 1| 1| 0| 0',
+        ' | Angel Studios.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Angel Studios| #98FC35| 1| 1| 0| 0',
         ' | Animal Planet.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Animal Planet| #390ACB| 1| 1| 0| 0',
         ' | Antena 3.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Antena 3| #306A94| 1| 1| 0| 0',
         ' | Apple TV+.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Apple TV+| #313131| 1| 1| 0| 0',
@@ -3716,12 +4775,14 @@ Function CreateNetwork {
         ' | BBC Four.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | BBC Four| #F3E9E3| 1| 1| 0| 0',
         ' | BBC iPlayer.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | BBC iPlayer| #467CE9| 1| 1| 0| 0',
         ' | BBC One.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | BBC One| #3A38C6| 1| 1| 0| 0',
+        ' | BBC Scotland.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | BBC Scotland| #16204F| 1| 1| 0| 0',
         ' | BBC Three.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | BBC Three| #550BAA| 1| 1| 0| 0',
         ' | BBC Two.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | BBC Two| #6A08E0| 1| 1| 0| 0',
         ' | BBC.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | BBC| #A24649| 1| 1| 0| 0',
         ' | BET+.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | BET+| #FCAD65| 1| 1| 0| 0',
         ' | BET.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | BET| #942C2C| 1| 1| 0| 0',
         ' | bilibili.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | bilibili| #FB4A88| 1| 1| 0| 0',
+        ' | Binge.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Binge| #0D29C9| 1| 1| 0| 0',
         ' | BluTV.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | BluTV| #1E6DA3| 1| 1| 0| 0',
         ' | Boomerang.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Boomerang| #6190B3| 1| 1| 0| 0',
         ' | Bravo.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Bravo| #6D6D6D| 1| 1| 0| 0',
@@ -3745,6 +4806,7 @@ Function CreateNetwork {
         ' | Comedy Central.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Comedy Central| #BFB516| 1| 1| 0| 0',
         ' | Cooking Channel.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Cooking Channel| #C29B16| 1| 1| 0| 0',
         ' | Crackle.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Crackle| #88D6B9| 1| 1| 0| 0',
+        ' | Crave.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Crave| #F2C019| 1| 1| 0| 0',
         ' | Criterion Channel.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Criterion Channel| #810BA7| 1| 1| 0| 0',
         ' | Crunchyroll.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Crunchyroll| #8372D1| 1| 1| 0| 0',
         ' | CTV.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | CTV| #1FAA3C| 1| 1| 0| 0',
@@ -3760,12 +4822,15 @@ Function CreateNetwork {
         ' | Disney XD.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Disney XD| #6BAB6D| 1| 1| 0| 0',
         ' | Disney+.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Disney+| #0F2FA4| 1| 1| 0| 0',
         ' | DR1.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | DR1| #DEFF1E| 1| 1| 0| 0',
+        ' | Dropout.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Dropout| #853211| 1| 1| 0| 0',
         ' | E!.png| +0| 500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | E!| #BF3137| 1| 1| 0| 0',
         ' | Eden.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Eden| #D1A72C| 1| 1| 0| 0',
         ' | Elisa Viihde Viaplay.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Elisa Viihde Viaplay| #692C72| 1| 1| 0| 0',
         ' | Elisa Viihde.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Elisa Viihde| #1DF3B7| 1| 1| 0| 0',
+        ' | ENA.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ENA| #0F2590| 1| 1| 0| 0',
         ' | Epix.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Epix| #8E782B| 1| 1| 0| 0',
         ' | ESPN.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ESPN| #2C8B0A| 1| 1| 0| 0',
+        ' | EXXEN.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | EXXEN| #5996D4| 1| 1| 0| 0',
         ' | Facebook Watch.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Facebook Watch| #E7F7B1| 1| 1| 0| 0',
         ' | Family Channel.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Family Channel| #3841B6| 1| 1| 0| 0',
         ' | Ficción Producciones.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Ficción Producciones| #DE282F| 1| 1| 0| 0',
@@ -3777,6 +4842,7 @@ Function CreateNetwork {
         ' | Freeform.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Freeform| #3C9C3E| 1| 1| 0| 0',
         ' | Freevee.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Freevee| #B5CF1B| 1| 1| 0| 0',
         ' | Fuji TV.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Fuji TV| #29319C| 1| 1| 0| 0',
+        ' | funnyordie.com.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | funnyordie.com| #1F80A8| 1| 1| 0| 0',
         ' | FX.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | FX| #4A51A9| 1| 1| 0| 0',
         ' | FXX.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | FXX| #5070A7| 1| 1| 0| 0',
         ' | Game Show Network.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Game Show Network| #BA27BF| 1| 1| 0| 0',
@@ -3785,7 +4851,6 @@ Function CreateNetwork {
         ' | Globoplay.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Globoplay| #775E92| 1| 1| 0| 0',
         ' | GMA Network.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | GMA Network| #A755A4| 1| 1| 0| 0',
         ' | Hallmark.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Hallmark| #601CB4| 1| 1| 0| 0',
-        ' | HBO Max.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | HBO Max| #2DE80E| 1| 1| 0| 0',
         ' | HBO.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | HBO| #458EAD| 1| 1| 0| 0',
         ' | HGTV.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | HGTV| #3CA38F| 1| 1| 0| 0',
         ' | History.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | History| #A57E2E| 1| 1| 0| 0',
@@ -3805,8 +4870,11 @@ Function CreateNetwork {
         ' | ITV4.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ITV4| #346DF9| 1| 1| 0| 0',
         ' | ITVBe.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ITVBe| #CC4EE9| 1| 1| 0| 0',
         ' | ITVX.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ITVX| #E8298D| 1| 1| 0| 0',
+        ' | JioCinema.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | JioCinema| #6A3B33| 1| 1| 0| 0',
         ' | joyn.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | joyn| #D35503| 1| 1| 0| 0',
+        ' | JTBC.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | JTBC| #2E8D84| 1| 1| 0| 0',
         ' | Kan 11.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Kan 11| #F73F64| 1| 1| 0| 0',
+        ' | Kanal 5.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Kanal 5| #19805A| 1| 1| 0| 0',
         ' | KBS2.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | KBS2| #0D197B| 1| 1| 0| 0',
         ' | Kids WB.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Kids WB| #B52429| 1| 1| 0| 0',
         ' | La 1.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | La 1| #21FEF9| 1| 1| 0| 0',
@@ -3816,9 +4884,11 @@ Function CreateNetwork {
         ' | Lionsgate+.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Lionsgate+| #F627E7| 1| 1| 0| 0',
         ' | Logo.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Logo| #E5DA88| 1| 1| 0| 0',
         ' | M-Net.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | M-Net| #29C617| 1| 1| 0| 0',
+        ' | Magnolia Network.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Magnolia Network| #F958C2| 1| 1| 0| 0',
         ' | MasterClass.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | MasterClass| #4D4D4D| 1| 1| 0| 0',
         ' | Max.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Max| #DE9F02| 1| 1| 0| 0',
         ' | MBC.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | MBC| #AF1287| 1| 1| 0| 0',
+        ' | MBN.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | MBN| #E40023| 1| 1| 0| 0',
         ' | MGM+.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | MGM+| #3F35AD| 1| 1| 0| 0',
         ' | mitele.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | mitele| #DAF0CE| 1| 1| 0| 0',
         ' | Movistar Plus+.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Movistar Plus+| #A6C708| 1| 1| 0| 0',
@@ -3827,6 +4897,7 @@ Function CreateNetwork {
         ' | NBC.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | NBC| #703AAC| 1| 1| 0| 0',
         ' | Netflix.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Netflix| #748EC2| 1| 1| 0| 0',
         ' | Network 10.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Network 10| #28846E| 1| 1| 0| 0',
+        ' | NFL Network.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | NFL Network| #78BDFF| 1| 1| 0| 0',
         ' | NHK.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | NHK| #F3D015| 1| 1| 0| 0',
         ' | Nick Jr.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Nick Jr| #4290A4| 1| 1| 0| 0',
         ' | Nick.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Nick| #B68021| 1| 1| 0| 0',
@@ -3847,8 +4918,9 @@ Function CreateNetwork {
         ' | Peacock.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Peacock| #DA4428| 1| 1| 0| 0',
         ' | Planète+ A&E.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Planète+ A&E| #038502| 1| 1| 0| 0',
         ' | Prime Video.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Prime Video| #CB2770| 1| 1| 0| 0',
+        ' | Quibi.png| +0| 1400| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Quibi| #FFF9C4| 1| 1| 0| 0',
         ' | Rai 1.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Rai 1| #BC1E71| 1| 1| 0| 0',
-        ' | ReelzChannel.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ReelzChannel| #0C1668| 1| 1| 0| 0',
+        ' | Reelz.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Reelz| #0C1668| 1| 1| 0| 0',
         ' | RTL Télé.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | RTL Télé| #6790B5| 1| 1| 0| 0',
         ' | RTL.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | RTL| #21354A| 1| 1| 0| 0',
         ' | RTP1.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | RTP1| #7C7906| 1| 1| 0| 0',
@@ -3858,6 +4930,8 @@ Function CreateNetwork {
         ' | SAT.1.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | SAT.1| #E1847D| 1| 1| 0| 0',
         ' | SBS.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | SBS| #BEBC19| 1| 1| 0| 0',
         ' | Science.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Science| #DA2988| 1| 1| 0| 0',
+        ' | Seeso.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Seeso| #0A0379| 1| 1| 0| 0',
+        ' | Seven Network.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Seven Network| #DA54DA| 1| 1| 0| 0',
         ' | Shahid.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Shahid| #7FEB9A| 1| 1| 0| 0',
         ' | Showcase.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Showcase| #4D4D4D| 1| 1| 0| 0',
         ' | Showmax.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Showmax| #22D2D6| 1| 1| 0| 0',
@@ -3871,7 +4945,10 @@ Function CreateNetwork {
         ' | Stan.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Stan| #227CC0| 1| 1| 0| 0',
         ' | STAR+.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | STAR+| #B263B8| 1| 1| 0| 0',
         ' | Starz.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Starz| #464646| 1| 1| 0| 0',
+        ' | Stöð 2.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Stöð 2| #83CC89| 1| 1| 0| 0',
         ' | Sundance TV.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Sundance TV| #424242| 1| 1| 0| 0',
+        ' | SVT Play.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | SVT Play| #5B4F8F| 1| 1| 0| 0',
+        ' | SVT.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | SVT| #C3ACE5| 1| 1| 0| 0',
         ' | SVT1.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | SVT1| #94BE7C| 1| 1| 0| 0',
         ' | Syfy.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Syfy| #BEB42D| 1| 1| 0| 0',
         ' | Syndication.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Syndication| #523E40| 1| 1| 0| 0',
@@ -3884,6 +4961,7 @@ Function CreateNetwork {
         ' | Tencent Video.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Tencent Video| #DE90F0| 1| 1| 0| 0',
         ' | TF1.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | TF1| #43D582| 1| 1| 0| 0',
         ' | The CW.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | The CW| #397F96| 1| 1| 0| 0',
+        ' | The Daily Wire.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | The Daily Wire| #5C3BC9| 1| 1| 0| 0',
         ' | The Roku Channel.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | The Roku Channel| #4C5C75| 1| 1| 0| 0',
         ' | The WB.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | The WB| #08F615| 1| 1| 0| 0',
         ' | TLC.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | TLC| #BA6C70| 1| 1| 0| 0',
@@ -3898,12 +4976,15 @@ Function CreateNetwork {
         ' | TV Land.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | TV Land| #78AFB4| 1| 1| 0| 0',
         ' | TV Tokyo.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | TV Tokyo| #EC00E2| 1| 1| 0| 0',
         ' | TV3.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | TV3| #FACED0| 1| 1| 0| 0',
+        ' | TV4 Play.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | TV4 Play| #AE56EC| 1| 1| 0| 0',
         ' | TV4.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | TV4| #82E7BF| 1| 1| 0| 0',
         ' | TVB Jade.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | TVB Jade| #C6582F| 1| 1| 0| 0',
         ' | tving.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | tving| #B2970D| 1| 1| 0| 0',
         ' | tvN.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | tvN| #510F23| 1| 1| 0| 0',
         ' | TVNZ 1.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | TVNZ 1| #BF8B82| 1| 1| 0| 0',
+        ' | TVNZ 2.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | TVNZ 2| #895639| 1| 1| 0| 0',
         ' | TVP1.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | TVP1| #412AF2| 1| 1| 0| 0',
+        ' | U+ Mobile TV.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | U+ Mobile TV| #10F57D| 1| 1| 0| 0',
         ' | UKTV.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | UKTV| #2EADB1| 1| 1| 0| 0',
         ' | UniMás.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | UniMás| #3A4669| 1| 1| 0| 0',
         ' | Universal Kids.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Universal Kids| #2985A1| 1| 1| 0| 0',
@@ -3911,7 +4992,6 @@ Function CreateNetwork {
         ' | Univision.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Univision| #28BE59| 1| 1| 0| 0',
         ' | UPN.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | UPN| #C6864E| 1| 1| 0| 0',
         ' | USA Network.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | USA Network| #F7EB20| 1| 1| 0| 0',
-        ' | USA.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | USA| #C0565B| 1| 1| 0| 0',
         ' | VH1.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | VH1| #8E3BB1| 1| 1| 0| 0',
         ' | Viaplay.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Viaplay| #30F7FB| 1| 1| 0| 0',
         ' | Vice.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Vice| #D3D3D3| 1| 1| 0| 0',
@@ -3920,16 +5000,17 @@ Function CreateNetwork {
         ' | ViX+.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ViX+| #00AA96| 1| 1| 0| 0',
         ' | ViX.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ViX| #586CA6| 1| 1| 0| 0',
         ' | VRT 1.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | VRT 1| #680F46| 1| 1| 0| 0',
+        ' | VRT Max.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | VRT Max| #0BDA4C| 1| 1| 0| 0',
         ' | VTM.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | VTM| #9164A7| 1| 1| 0| 0',
         ' | W.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | W| #E60A55| 1| 1| 0| 0',
-        ' | Warner Bros..png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Warner Bros.| #39538F| 1| 1| 0| 0',
         ' | WE tv.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | WE tv| #15DD51| 1| 1| 0| 0',
+        ' | Xbox Live.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Xbox Live| #1771F3| 1| 1| 0| 0',
         ' | YLE.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | YLE| #3A8722| 1| 1| 0| 0',
         ' | Youku.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Youku| #42809E| 1| 1| 0| 0',
         ' | YouTube.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | YouTube| #C51414| 1| 1| 0| 0',
         ' | ZDF.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ZDF| #C58654| 1| 1| 0| 0',
         ' | ZEE5.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ZEE5| #8704C1| 1| 1| 0| 0'
-        ) | ConvertFrom-Csv -Delimiter '|'
+    ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
     foreach ($item in $myArray) {
@@ -3944,10 +5025,45 @@ Function CreateNetwork {
     }
 
     LaunchScripts -ScriptPaths $arr
-    Move-Item -Path output -Destination network
+    Move-Item -Path output -Destination network\color
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        if ($($item.key_name).ToString() -eq "") {
+            $value = $null
+        }
+        else {
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+        }
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_network\white\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
+    }
+
+    LaunchScripts -ScriptPaths $arr
+
+    $myArray = @(
+        'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
+        'network_kids_other| transparent.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Other Kids Networks| #FF2000| 1| 1| 0| 1',
+        'network_other| transparent.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Other Networks| #FF2000| 1| 1| 0| 1'
+    ) | ConvertFrom-Csv -Delimiter '|'
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        if ($($item.key_name).ToString() -eq "") {
+            $value = $null
+        }
+        else {
+            $value = (Get-YamlPropertyValue -PropertyPath "collections.$($item.key_name).name" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+        }
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
+    }
+
+    LaunchScripts -ScriptPaths $arr
+    Move-Item -Path output -Destination network\white
     Copy-Item -Path logos_network -Destination network\logos -Recurse
     Move-Item -Path output-orig -Destination output
-    
+
 }
 
 ################################################################################
@@ -4009,7 +5125,7 @@ Function CreateResolution {
     $theMaxHeight = 1000
     $minPointSize = 100
     $maxPointSize = 250
-    
+
     Move-Item -Path output -Destination output-orig
 
     $myArray = @(
@@ -4032,15 +5148,15 @@ Function CreateResolution {
 
     $myArray = @(
         'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
-        '| 4K.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | 4k| #8A46CF| 1| 1| 0| 1',
-        '| 8K.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | 8k| #95BCDC| 1| 1| 0| 1',
-        '| 144p.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | 144| #F0C5E5| 1| 1| 0| 1',
-        '| 240p.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | 240| #DFA172| 1| 1| 0| 1',
-        '| 360p.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | 360| #6D3FDC| 1| 1| 0| 1',
-        '| 480p.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | 480| #3996D3| 1| 1| 0| 1',
-        '| 576p.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | 576| #DED1B2| 1| 1| 0| 1',
-        '| 720p.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | 720| #30DC76| 1| 1| 0| 1',
-        '| 1080p.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | 1080| #D60C0C| 1| 1| 0| 1'
+        '| 4K.png| +0| 1800| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | 4k| #8A46CF| 1| 1| 0| 1',
+        '| 8K.png| +0| 1800| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | 8k| #95BCDC| 1| 1| 0| 1',
+        '| 144p.png| +0| 1800| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | 144| #F0C5E5| 1| 1| 0| 1',
+        '| 240p.png| +0| 1800| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | 240| #DFA172| 1| 1| 0| 1',
+        '| 360p.png| +0| 1800| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | 360| #6D3FDC| 1| 1| 0| 1',
+        '| 480p.png| +0| 1800| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | 480| #3996D3| 1| 1| 0| 1',
+        '| 576p.png| +0| 1800| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | 576| #DED1B2| 1| 1| 0| 1',
+        '| 720p.png| +0| 1800| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | 720| #30DC76| 1| 1| 0| 1',
+        '| 1080p.png| +0| 1800| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | 1080| #D60C0C| 1| 1| 0| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
 
@@ -4059,7 +5175,7 @@ Function CreateResolution {
     LaunchScripts -ScriptPaths $arr
 
     Move-Item -Path output -Destination resolution
-    
+
     $myArray = @(
         'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
         'resolutions_other| transparent.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | other| #FF2000| 1| 1| 0| 1'
@@ -4080,10 +5196,10 @@ Function CreateResolution {
 
     $myArray = @(
         'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
-        '| ultrahd.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | 4k| #8A46CF| 1| 1| 0| 1',
-        '| sd.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | 480| #95BCDC| 1| 1| 0| 1',
-        '| hdready.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | 720| #F0C5E5| 1| 1| 0| 1',
-        '| fullhd.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | 1080| #DFA172| 1| 1| 0| 1'
+        '| ultrahd.png| +0| 1800| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | 4k| #8A46CF| 1| 1| 0| 1',
+        '| sd.png| +0| 1800| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | 480| #95BCDC| 1| 1| 0| 1',
+        '| hdready.png| +0| 1800| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | 720| #F0C5E5| 1| 1| 0| 1',
+        '| fullhd.png| +0| 1800| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | 1080| #DFA172| 1| 1| 0| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
@@ -4103,7 +5219,7 @@ Function CreateResolution {
     Move-Item -Path output -Destination resolution\standards
     Copy-Item -Path logos_resolution -Destination resolution\logos -Recurse
     Move-Item -Path output-orig -Destination output
-    
+
 }
 
 ################################################################################
@@ -4252,33 +5368,103 @@ Function CreateSeparators {
 Function CreateStreaming {
     Write-Host "Creating Streaming"
     Set-Location $script_path
-    # Find-Path "$script_path\streaming"
+    Find-Path "$script_path\streaming"
     Move-Item -Path output -Destination output-orig
 
     $myArray = @(
         'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
-        '| All 4.png| +0| 1000| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | All 4| #14AE9A| 1| 1| 0| 1',
-        '| Apple TV+.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Apple TV+| #494949| 1| 1| 0| 1',
-        '| BET+.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | BET+| #B3359C| 1| 1| 0| 1',
-        '| BritBox.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | BritBox| #198CA8| 1| 1| 0| 1',
-        '| Crave.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Crave| #29C2F1| 1| 1| 0| 1',
-        '| Crunchyroll.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Crunchyroll| #C9761D| 1| 1| 0| 1',
-        '| discovery+.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | discovery+| #2175D9| 1| 1| 0| 1',
-        '| Disney+.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Disney+| #0F2FA4| 1| 1| 0| 1',
-        '| Funimation.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Funimation| #513790| 1| 1| 0| 1',
-        '| hayu.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | hayu| #C9516D| 1| 1| 0| 1',
-        '| HBO Max.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | HBO Max| #7870B9| 1| 1| 0| 1',
-        '| Hulu.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Hulu| #1BC073| 1| 1| 0| 1',
-        '| Max.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Max| #002BE7| 1| 1| 0| 1',
-        '| My 5.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | My 5| #426282| 1| 1| 0| 1',
-        '| Netflix.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Netflix| #B42A33| 1| 1| 0| 1',
-        '| NOW.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | NOW| #215659| 1| 1| 0| 1',
-        '| Paramount+.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Paramount+| #2A67CC| 1| 1| 0| 1',
-        '| Peacock.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Peacock| #DA4428| 1| 1| 0| 1',
-        '| Prime Video.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Prime Video| #11607E| 1| 1| 0| 1',
-        '| Quibi.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Quibi| #AB5E73| 1| 1| 0| 1',
-        '| Showtime.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Showtime| #BC1818| 1| 1| 0| 1',
-        '| Stan.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Stan| #227CC0| 1| 1| 0| 1'
+        '| All 4.png| +0| 1000| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | All 4| #14AE9A| 1| 1| 0| 0',
+        '| Apple TV+.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Apple TV+| #494949| 1| 1| 0| 0',
+        '| BET+.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | BET+| #8A2978| 1| 1| 0| 0',
+        '| BritBox.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | BritBox| #198CA8| 1| 1| 0| 0',
+        '| Crave.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Crave| #29C2F1| 1| 1| 0| 0',
+        '| Crunchyroll.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Crunchyroll| #9A5C16| 1| 1| 0| 0',
+        '| discovery+.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | discovery+| #2175D9| 1| 1| 0| 0',
+        '| Disney+.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Disney+| #0F2FA4| 1| 1| 0| 0',
+        '| Funimation.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Funimation| #D6CFF1| 1| 1| 0| 0',
+        '| hayu.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hayu| #9B3E55| 1| 1| 0| 0',
+        '| HBO Max.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | HBO Max| #4C0870| 1| 1| 0| 0',
+        '| Hulu.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Hulu| #1BC073| 1| 1| 0| 0',
+        '| Max.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Max| #002BE7| 1| 1| 0| 0',
+        '| My 5.png| +0| 1000| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | My 5| #426282| 1| 1| 0| 0',
+        '| Netflix.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Netflix| #5E0A11| 1| 1| 0| 0',
+        '| NOW.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | NOW| #215659| 1| 1| 0| 0',
+        '| Paramount+.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Paramount+| #2A67CC| 1| 1| 0| 0',
+        '| Peacock.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Peacock| #DA4428| 1| 1| 0| 0',
+        '| Prime Video.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Prime Video| #11607E| 1| 1| 0| 0',
+        '| Quibi.png| +0| 1400| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Quibi| #FFF9C4| 1| 1| 0| 0',
+        '| Showtime.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Showtime| #8F1212| 1| 1| 0| 0',
+        '| Stan.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Stan| #227CC0| 1| 1| 0| 0',
+        '| YouTube.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | YouTube| #CD201F| 1| 1| 0| 0',
+        'MOVIES| All 4.png| -500| 1000| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | All 4_movies| #14AE9A| 1| 1| 0| 0',
+        'MOVIES| Apple TV+.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Apple TV+_movies| #494949| 1| 1| 0| 0',
+        'MOVIES| BET+.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | BET+_movies| #8A2978| 1| 1| 0| 0',
+        'MOVIES| BritBox.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | BritBox_movies| #198CA8| 1| 1| 0| 0',
+        'MOVIES| Crave.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Crave_movies| #29C2F1| 1| 1| 0| 0',
+        'MOVIES| Crunchyroll.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Crunchyroll_movies| #9A5C16| 1| 1| 0| 0',
+        'MOVIES| discovery+.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | discovery+_movies| #2175D9| 1| 1| 0| 0',
+        'MOVIES| Disney+.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Disney+_movies| #0F2FA4| 1| 1| 0| 0',
+        'MOVIES| Funimation.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Funimation_movies| #D6CFF1| 1| 1| 0| 0',
+        'MOVIES| hayu.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hayu_movies| #9B3E55| 1| 1| 0| 0',
+        'MOVIES| HBO Max.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | HBO Max_movies| #4C0870| 1| 1| 0| 0',
+        'MOVIES| Hulu.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Hulu_movies| #1BC073| 1| 1| 0| 0',
+        'MOVIES| Max.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Max_movies| #002BE7| 1| 1| 0| 0',
+        'MOVIES| My 5.png| -500| 1000| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | My 5_movies| #426282| 1| 1| 0| 0',
+        'MOVIES| Netflix.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Netflix_movies| #5E0A11| 1| 1| 0| 0',
+        'MOVIES| NOW.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | NOW_movies| #215659| 1| 1| 0| 0',
+        'MOVIES| Paramount+.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Paramount+_movies| #2A67CC| 1| 1| 0| 0',
+        'MOVIES| Peacock.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Peacock_movies| #DA4428| 1| 1| 0| 0',
+        'MOVIES| Prime Video.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Prime Video_movies| #11607E| 1| 1| 0| 0',
+        'MOVIES| Quibi.png| -500| 1400| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Quibi_movies| #FFF9C4| 1| 1| 0| 0',
+        'MOVIES| Showtime.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Showtime_movies| #8F1212| 1| 1| 0| 0',
+        'MOVIES| Stan.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Stan_movies| #227CC0| 1| 1| 0| 0',
+        'MOVIES| YouTube.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | YouTube_movies| #CD201F| 1| 1| 0| 0',
+        'SHOWS| All 4.png| -500| 1000| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | All 4_shows| #14AE9A| 1| 1| 0| 0',
+        'SHOWS| Apple TV+.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Apple TV+_shows| #494949| 1| 1| 0| 0',
+        'SHOWS| BET+.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | BET+_shows| #8A2978| 1| 1| 0| 0',
+        'SHOWS| BritBox.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | BritBox_shows| #198CA8| 1| 1| 0| 0',
+        'SHOWS| Crave.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Crave_shows| #29C2F1| 1| 1| 0| 0',
+        'SHOWS| Crunchyroll.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Crunchyroll_shows| #9A5C16| 1| 1| 0| 0',
+        'SHOWS| discovery+.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | discovery+_shows| #2175D9| 1| 1| 0| 0',
+        'SHOWS| Disney+.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Disney+_shows| #0F2FA4| 1| 1| 0| 0',
+        'SHOWS| Funimation.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Funimation_shows| #D6CFF1| 1| 1| 0| 0',
+        'SHOWS| hayu.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hayu_shows| #9B3E55| 1| 1| 0| 0',
+        'SHOWS| HBO Max.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | HBO Max_shows| #4C0870| 1| 1| 0| 0',
+        'SHOWS| Hulu.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Hulu_shows| #1BC073| 1| 1| 0| 0',
+        'SHOWS| Max.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Max_shows| #002BE7| 1| 1| 0| 0',
+        'SHOWS| My 5.png| -500| 1000| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | My 5_shows| #426282| 1| 1| 0| 0',
+        'SHOWS| Netflix.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Netflix_shows| #5E0A11| 1| 1| 0| 0',
+        'SHOWS| NOW.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | NOW_shows| #215659| 1| 1| 0| 0',
+        'SHOWS| Paramount+.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Paramount+_shows| #2A67CC| 1| 1| 0| 0',
+        'SHOWS| Peacock.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Peacock_shows| #DA4428| 1| 1| 0| 0',
+        'SHOWS| Prime Video.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Prime Video_shows| #11607E| 1| 1| 0| 0',
+        'SHOWS| Quibi.png| -500| 1400| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Quibi_shows| #FFF9C4| 1| 1| 0| 0',
+        'SHOWS| Showtime.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Showtime_shows| #8F1212| 1| 1| 0| 0',
+        'SHOWS| Stan.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Stan_shows| #227CC0| 1| 1| 0| 0',
+        'SHOWS| YouTube.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | YouTube_shows| #CD201F| 1| 1| 0| 0',
+        'ORIGINALS| All 4.png| -500| 1000| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | All 4_originals| #14AE9A| 1| 1| 0| 0',
+        'ORIGINALS| Apple TV+.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Apple TV+_originals| #494949| 1| 1| 0| 0',
+        'ORIGINALS| BET+.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | BET+_originals| #8A2978| 1| 1| 0| 0',
+        'ORIGINALS| BritBox.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | BritBox_originals| #198CA8| 1| 1| 0| 0',
+        'ORIGINALS| Crave.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Crave_originals| #29C2F1| 1| 1| 0| 0',
+        'ORIGINALS| Crunchyroll.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Crunchyroll_originals| #9A5C16| 1| 1| 0| 0',
+        'ORIGINALS| discovery+.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | discovery+_originals| #2175D9| 1| 1| 0| 0',
+        'ORIGINALS| Disney+.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Disney+_originals| #0F2FA4| 1| 1| 0| 0',
+        'ORIGINALS| Funimation.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Funimation_originals| #D6CFF1| 1| 1| 0| 0',
+        'ORIGINALS| hayu.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hayu_originals| #9B3E55| 1| 1| 0| 0',
+        'ORIGINALS| HBO Max.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | HBO Max_originals| #4C0870| 1| 1| 0| 0',
+        'ORIGINALS| Hulu.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Hulu_originals| #1BC073| 1| 1| 0| 0',
+        'ORIGINALS| Max.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Max_originals| #002BE7| 1| 1| 0| 0',
+        'ORIGINALS| My 5.png| -500| 1000| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | My 5_originals| #426282| 1| 1| 0| 0',
+        'ORIGINALS| Netflix.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Netflix_originals| #5E0A11| 1| 1| 0| 0',
+        'ORIGINALS| NOW.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | NOW_originals| #215659| 1| 1| 0| 0',
+        'ORIGINALS| Paramount+.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Paramount+_originals| #2A67CC| 1| 1| 0| 0',
+        'ORIGINALS| Peacock.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Peacock_originals| #DA4428| 1| 1| 0| 0',
+        'ORIGINALS| Prime Video.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Prime Video_originals| #11607E| 1| 1| 0| 0',
+        'ORIGINALS| Quibi.png| -500| 1400| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Quibi_originals| #FFF9C4| 1| 1| 0| 0',
+        'ORIGINALS| Showtime.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Showtime_originals| #8F1212| 1| 1| 0| 0',
+        'ORIGINALS| Stan.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Stan_originals| #227CC0| 1| 1| 0| 0',
+        'ORIGINALS| YouTube.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | YouTube_originals| #CD201F| 1| 1| 0| 0'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
@@ -4294,7 +5480,23 @@ Function CreateStreaming {
     }
 
     LaunchScripts -ScriptPaths $arr
-    Move-Item -Path output -Destination streaming
+    Move-Item -Path output -Destination streaming\color
+
+
+    $arr = @()
+    foreach ($item in $myArray) {
+        if ($($item.key_name).ToString() -eq "") {
+            $value = $null
+        }
+        else {
+            $value = (Get-YamlPropertyValue -PropertyPath "key_names.$($item.key_name)" -ConfigObject $global:ConfigObj -CaseSensitivity Upper)
+        }
+        $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
+        $arr += ".\create_poster.ps1 -logo `"$script_path\logos_streaming\white\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
+    }
+
+    LaunchScripts -ScriptPaths $arr
+    Move-Item -Path output -Destination streaming\white
     Copy-Item -Path logos_streaming -Destination streaming\logos -Recurse
     Move-Item -Path output-orig -Destination output
 }
@@ -4335,469 +5537,493 @@ Function CreateStudio {
 
     $myArray = @(
         'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
-        '| 101 Studios.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | 101 Studios| #B69367| 1| 1| 0| 0',
-        '| 1492 Pictures.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | 1492 Pictures| #2BACFC| 1| 1| 0| 0',
-        '| 20th Century Animation.png| +0| 1500| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | 20th Century Animation| #9F3137| 1| 1| 0| 0',
-        '| 20th Century Fox Television.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | 20th Century Fox Television| #EF3F42| 1| 1| 0| 0',
-        '| 20th Century Studios.png| +0| 1500| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | 20th Century Studios| #3387C6| 1| 1| 0| 0',
-        '| 21 Laps Entertainment.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | 21 Laps Entertainment| #FEC130| 1| 1| 0| 0',
-        '| 3 Arts Entertainment.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | 3 Arts Entertainment| #245674| 1| 1| 0| 0',
-        '| 6th & Idaho.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | 6th & Idaho| #9539BB| 1| 1| 0| 0',
-        '| 87Eleven.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | 87Eleven| #00B982| 1| 1| 0| 0',
-        '| 87North Productions.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | 87North Productions| #3C13A1| 1| 1| 0| 0',
-        '| 8bit.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | 8bit| #365F71| 1| 1| 0| 0',
+        '| 101 Studios.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | 101 Studios| #B69367| 1| 1| 0| 0',
+        '| Disney Television Animation.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| #D19068| Disney Television Animation| #D19068| 1| 1| 0| 0',
+        '| DisneyToon Studios.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | DisneyToon Studios| #867CE1| 1| 1| 0| 0',
+        '| Dynamic Planning.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Dynamic Planning| #1316DE| 1| 1| 0| 0',
+        '| Film4 Productions.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Film4 Productions| #B2FCEC| 1| 1| 0| 0',
+        '| Golden Harvest.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Golden Harvest| #A21FBF| 1| 1| 0| 0',
+        '| Hungry Man.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Hungry Man| #7C3476| 1| 1| 0| 0',
+        '| Screen Gems.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Screen Gems| #7A7A70| 1| 1| 0| 0',
+        '| Shaw Brothers.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Shaw Brothers| #F45C0B| 1| 1| 0| 0',
+        '| Studio Live.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Studio Live| #62C64A| 1| 1| 0| 0',
+        '| The Stone Quarry.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | The Stone Quarry| #6727FA| 1| 1| 0| 0',
+        '| Codeblack Entertainment.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Codeblack Entertainment| #0CE02A| 1| 1| 0| 0',
+        '| Dimension Films.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Dimension Films| #D13B12| 1| 1| 0| 0',
+        '| Broken Lizard Industries.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Broken Lizard Industries| #DA4FD2| 1| 1| 0| 0',
+        '| Magic Light Pictures.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Magic Light Pictures| #BD5DEF| 1| 1| 0| 0',
+        '| 1492 Pictures.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | 1492 Pictures| #2BACFC| 1| 1| 0| 0',
+        '| 20th Century Animation.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | 20th Century Animation| #9F3137| 1| 1| 0| 0',
+        '| 20th Century Fox Television.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | 20th Century Fox Television| #EF3F42| 1| 1| 0| 0',
+        '| 20th Century Studios.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | 20th Century Studios| #3387C6| 1| 1| 0| 0',
+        '| 21 Laps Entertainment.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | 21 Laps Entertainment| #FEC130| 1| 1| 0| 0',
+        '| 3 Arts Entertainment.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | 3 Arts Entertainment| #245674| 1| 1| 0| 0',
+        '| 6th & Idaho.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | 6th & Idaho| #9539BB| 1| 1| 0| 0',
+        '| 87Eleven.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | 87Eleven| #00B982| 1| 1| 0| 0',
+        '| 87North Productions.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | 87North Productions| #3C13A1| 1| 1| 0| 0',
+        '| 8bit.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | 8bit| #365F71| 1| 1| 0| 0',
         '| A Bigger Boat.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | A Bigger Boat| #681664| 1| 1| 0| 0',
-        '| A+E Studios.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | A+E Studios| #35359B| 1| 1| 0| 0',
-        '| A-1 Pictures.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | A-1 Pictures| #5776A8| 1| 1| 0| 0',
-        '| A.C.G.T..png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | A.C.G.T.| #9C46DE| 1| 1| 0| 0',
-        '| A24.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | A24| #B13098| 1| 1| 0| 0',
-        '| Aamir Khan Productions.png| +0| 1000| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Aamir Khan Productions| #F2A153| 1| 1| 0| 0',
-        '| Aardman.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Aardman| #259EA2| 1| 1| 0| 0',
-        '| ABC Signature.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | ABC Signature| #C127DA| 1| 1| 0| 0',
-        '| ABC Studios.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | ABC Studios| #62D6AC| 1| 1| 0| 0',
-        '| Acca effe.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Acca effe| #1485D0| 1| 1| 0| 0',
-        '| Ace Entertainment.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Ace Entertainment| #C39769| 1| 1| 0| 0',
-        '| Actas.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Actas| #C9C4FF| 1| 1| 0| 0',
-        '| AGBO.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | AGBO| #3D976E| 1| 1| 0| 0',
-        '| AIC.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | AIC| #6DF7FB| 1| 1| 0| 0',
-        '| Ajia-Do.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Ajia-Do| #665AC4| 1| 1| 0| 0',
-        '| Akatsuki.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Akatsuki| #8CC0AE| 1| 1| 0| 0',
-        '| Amazon Studios.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Amazon Studios| #D28109| 1| 1| 0| 0',
-        '| Amblin Entertainment.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Amblin Entertainment| #394E76| 1| 1| 0| 0',
-        '| AMC Studios.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | AMC Studios| #AE8434| 1| 1| 0| 0',
-        '| Anima Sola Productions.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Anima Sola Productions| #2F6DBA| 1| 1| 0| 0',
-        '| Animation Do.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Animation Do| #408FE3| 1| 1| 0| 0',
-        '| Ankama.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Ankama| #CD717E| 1| 1| 0| 0',
-        '| Annapurna Pictures.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Annapurna Pictures| #204682| 1| 1| 0| 0',
-        '| APPP.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | APPP| #4D4AAD| 1| 1| 0| 0',
-        '| Ardustry Entertainment.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Ardustry Entertainment| #DDC8F4| 1| 1| 0| 0',
-        '| Arms.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Arms| #50A8C3| 1| 1| 0| 0',
-        '| Artisan Entertainment.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Artisan Entertainment| #DE7427| 1| 1| 0| 0',
-        '| Artists First.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Artists First| #85858F| 1| 1| 0| 0',
-        '| Artland.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Artland| #6157CB| 1| 1| 0| 0',
-        '| Artmic.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Artmic| #7381BE| 1| 1| 0| 0',
-        '| Arvo Animation.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Arvo Animation| #6117D1| 1| 1| 0| 0',
-        '| Asahi Production.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Asahi Production| #BC9A43| 1| 1| 0| 0',
-        '| Ashi Productions.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Ashi Productions| #6AB420| 1| 1| 0| 0',
-        '| asread..png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | asread.| #6CCDB4| 1| 1| 0| 0',
-        '| AtelierPontdarc.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | AtelierPontdarc| #CD0433| 1| 1| 0| 0',
-        '| Atlas Entertainment.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Atlas Entertainment| #5F3C91| 1| 1| 0| 0',
-        '| Atresmedia.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Atresmedia| #822EC8| 1| 1| 0| 0',
-        '| B.CMAY PICTURES.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | B.CMAY PICTURES| #873E7F| 1| 1| 0| 0',
-        '| Bad Hat Harry Productions.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Bad Hat Harry Productions| #FFFF00| 1| 1| 0| 0',
-        '| Bad Robot.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Bad Robot| #DCCCF6| 1| 1| 0| 0',
-        '| Bad Wolf.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Bad Wolf| #54F762| 1| 1| 0| 0',
-        '| Bakken Record.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Bakken Record| #4B3EDE| 1| 1| 0| 0',
-        '| Bandai Namco Pictures.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Bandai Namco Pictures| #4FC739| 1| 1| 0| 0',
-        '| Bardel Entertainment.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Bardel Entertainment| #5009A5| 1| 1| 0| 0',
-        '| Barunson E&A.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Barunson E&A| #E67BB5| 1| 1| 0| 0',
-        '| BBC Studios.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | BBC Studios| #8E9BF1| 1| 1| 0| 0',
-        '| Bee Train.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Bee Train| #804F23| 1| 1| 0| 0',
-        '| Berlanti Productions.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Berlanti Productions| #03F5AB| 1| 1| 0| 0',
-        '| Bibury Animation Studios.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Bibury Animation Studios| #A7FAAA| 1| 1| 0| 0',
-        '| bilibili.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | bilibili| #E85486| 1| 1| 0| 0',
-        '| Bill Melendez Productions.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Bill Melendez Productions| #88B0AB| 1| 1| 0| 0',
-        '| Blade.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Blade| #17D53B| 1| 1| 0| 0',
-        '| Blown Deadline Productions.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Blown Deadline Productions| #134419| 1| 1| 0| 0',
-        '| Blue Ice Pictures.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Blue Ice Pictures| #072F0B| 1| 1| 0| 0',
-        '| Blue Sky Studios.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Blue Sky Studios| #1E4678| 1| 1| 0| 0',
-        '| Bluegrass Films.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Bluegrass Films| #2ABD7F| 1| 1| 0| 0',
-        '| Blueprint Pictures.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Blueprint Pictures| #57F934| 1| 1| 0| 0',
-        '| Blumhouse Productions.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Blumhouse Productions| #353535| 1| 1| 0| 0',
-        '| Blur Studio.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Blur Studio| #88623F| 1| 1| 0| 0',
-        '| Bold Films.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Bold Films| #853DC3| 1| 1| 0| 0',
-        '| Bona Film Group.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Bona Film Group| #401248| 1| 1| 0| 0',
-        '| Bonanza Productions.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Bonanza Productions| #B131DE| 1| 1| 0| 0',
-        '| Bones.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Bones| #C4AE14| 1| 1| 0| 0',
-        '| Boo Pictures.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Boo Pictures| #830777| 1| 1| 0| 0',
-        '| Bosque Ranch Productions.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Bosque Ranch Productions| #604BA1| 1| 1| 0| 0',
-        '| Box to Box Films.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Box to Box Films| #D87A5A| 1| 1| 0| 0',
-        '| Brain''s Base.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Brain''s Base| #8A530E| 1| 1| 0| 0',
-        '| Brandywine Productions.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Brandywine Productions| #C47FF8| 1| 1| 0| 0',
-        '| Bridge.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Bridge| #F0FF7F| 1| 1| 0| 0',
-        '| Broken Road Productions.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Broken Road Productions| #28460E| 1| 1| 0| 0',
-        '| BUG FILMS.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | BUG FILMS| #A4024F| 1| 1| 0| 0',
-        '| C-Station.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | C-Station| #B40C76| 1| 1| 0| 0',
-        '| C2C.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | C2C| #320AE4| 1| 1| 0| 0',
-        '| Calt Production.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Calt Production| #F4572C| 1| 1| 0| 0',
-        '| Canal+.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Canal+| #488681| 1| 1| 0| 0',
-        '| Carnival Films.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Carnival Films| #ABD477| 1| 1| 0| 0',
+        '| A+E Studios.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | A+E Studios| #35359B| 1| 1| 0| 0',
+        '| A-1 Pictures.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | A-1 Pictures| #5776A8| 1| 1| 0| 0',
+        '| A.C.G.T..png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | A.C.G.T.| #9C46DE| 1| 1| 0| 0',
+        '| A24.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | A24| #B13098| 1| 1| 0| 0',
+        '| Aamir Khan Productions.png| +0| 1000| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Aamir Khan Productions| #F2A153| 1| 1| 0| 0',
+        '| Aardman.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Aardman| #259EA2| 1| 1| 0| 0',
+        '| ABC Signature.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ABC Signature| #C127DA| 1| 1| 0| 0',
+        '| ABC Studios.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ABC Studios| #62D6AC| 1| 1| 0| 0',
+        '| Acca effe.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Acca effe| #1485D0| 1| 1| 0| 0',
+        '| Ace Entertainment.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Ace Entertainment| #C39769| 1| 1| 0| 0',
+        '| Actas.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Actas| #C9C4FF| 1| 1| 0| 0',
+        '| AGBO.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | AGBO| #3D976E| 1| 1| 0| 0',
+        '| AIC.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | AIC| #6DF7FB| 1| 1| 0| 0',
+        '| Ajia-Do.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Ajia-Do| #665AC4| 1| 1| 0| 0',
+        '| Akatsuki.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Akatsuki| #8CC0AE| 1| 1| 0| 0',
+        '| Amazon Studios.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Amazon Studios| #D28109| 1| 1| 0| 0',
+        '| Amblin Entertainment.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Amblin Entertainment| #394E76| 1| 1| 0| 0',
+        '| AMC Studios.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | AMC Studios| #AE8434| 1| 1| 0| 0',
+        '| Anima Sola Productions.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Anima Sola Productions| #2F6DBA| 1| 1| 0| 0',
+        '| Animation Do.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Animation Do| #408FE3| 1| 1| 0| 0',
+        '| Ankama.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Ankama| #CD717E| 1| 1| 0| 0',
+        '| Annapurna Pictures.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Annapurna Pictures| #204682| 1| 1| 0| 0',
+        '| APPP.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | APPP| #4D4AAD| 1| 1| 0| 0',
+        '| Ardustry Entertainment.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Ardustry Entertainment| #DDC8F4| 1| 1| 0| 0',
+        '| Arms.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Arms| #50A8C3| 1| 1| 0| 0',
+        '| Artisan Entertainment.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Artisan Entertainment| #DE7427| 1| 1| 0| 0',
+        '| Artists First.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Artists First| #85858F| 1| 1| 0| 0',
+        '| Artland.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Artland| #6157CB| 1| 1| 0| 0',
+        '| Artmic.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Artmic| #7381BE| 1| 1| 0| 0',
+        '| Arvo Animation.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Arvo Animation| #6117D1| 1| 1| 0| 0',
+        '| Asahi Production.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Asahi Production| #BC9A43| 1| 1| 0| 0',
+        '| Ashi Productions.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Ashi Productions| #6AB420| 1| 1| 0| 0',
+        '| asread..png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | asread.| #6CCDB4| 1| 1| 0| 0',
+        '| AtelierPontdarc.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | AtelierPontdarc| #CD0433| 1| 1| 0| 0',
+        '| Atlas Entertainment.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Atlas Entertainment| #5F3C91| 1| 1| 0| 0',
+        '| Atresmedia.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Atresmedia| #822EC8| 1| 1| 0| 0',
+        '| B.CMAY PICTURES.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | B.CMAY PICTURES| #873E7F| 1| 1| 0| 0',
+        '| Bad Hat Harry Productions.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Bad Hat Harry Productions| #FFFF00| 1| 1| 0| 0',
+        '| Bad Robot.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Bad Robot| #DCCCF6| 1| 1| 0| 0',
+        '| Bad Wolf.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Bad Wolf| #54F762| 1| 1| 0| 0',
+        '| Bakken Record.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Bakken Record| #4B3EDE| 1| 1| 0| 0',
+        '| Bandai Namco Pictures.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Bandai Namco Pictures| #4FC739| 1| 1| 0| 0',
+        '| Bardel Entertainment.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Bardel Entertainment| #5009A5| 1| 1| 0| 0',
+        '| Barunson E&A.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Barunson E&A| #E67BB5| 1| 1| 0| 0',
+        '| BBC Studios.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | BBC Studios| #8E9BF1| 1| 1| 0| 0',
+        '| Bee Train.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Bee Train| #804F23| 1| 1| 0| 0',
+        '| Berlanti Productions.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Berlanti Productions| #03F5AB| 1| 1| 0| 0',
+        '| Bibury Animation Studios.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Bibury Animation Studios| #A7FAAA| 1| 1| 0| 0',
+        '| bilibili.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | bilibili| #E85486| 1| 1| 0| 0',
+        '| Bill Melendez Productions.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Bill Melendez Productions| #88B0AB| 1| 1| 0| 0',
+        '| Blade.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Blade| #17D53B| 1| 1| 0| 0',
+        '| Bleecker Street.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Bleecker Street| #6561E4| 1| 1| 0| 0',
+        '| Blown Deadline Productions.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Blown Deadline Productions| #134419| 1| 1| 0| 0',
+        '| Blue Ice Pictures.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Blue Ice Pictures| #072F0B| 1| 1| 0| 0',
+        '| Blue Sky Studios.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Blue Sky Studios| #1E4678| 1| 1| 0| 0',
+        '| Bluegrass Films.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Bluegrass Films| #2ABD7F| 1| 1| 0| 0',
+        '| Blueprint Pictures.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Blueprint Pictures| #57F934| 1| 1| 0| 0',
+        '| Blumhouse Productions.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Blumhouse Productions| #353535| 1| 1| 0| 0',
+        '| Blur Studio.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Blur Studio| #88623F| 1| 1| 0| 0',
+        '| Bold Films.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Bold Films| #853DC3| 1| 1| 0| 0',
+        '| Bona Film Group.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Bona Film Group| #401248| 1| 1| 0| 0',
+        '| Bonanza Productions.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Bonanza Productions| #B131DE| 1| 1| 0| 0',
+        '| Bones.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Bones| #C4AE14| 1| 1| 0| 0',
+        '| Boo Pictures.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Boo Pictures| #830777| 1| 1| 0| 0',
+        '| Bosque Ranch Productions.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Bosque Ranch Productions| #604BA1| 1| 1| 0| 0',
+        '| Box to Box Films.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Box to Box Films| #D87A5A| 1| 1| 0| 0',
+        '| Brain''s Base.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Brain''s Base| #8A530E| 1| 1| 0| 0',
+        '| Brandywine Productions.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Brandywine Productions| #C47FF8| 1| 1| 0| 0',
+        '| Bridge.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Bridge| #F0FF7F| 1| 1| 0| 0',
+        '| Broken Road Productions.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Broken Road Productions| #28460E| 1| 1| 0| 0',
+        '| BUG FILMS.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | BUG FILMS| #A4024F| 1| 1| 0| 0',
+        '| C-Station.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | C-Station| #B40C76| 1| 1| 0| 0',
+        '| C2C.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | C2C| #320AE4| 1| 1| 0| 0',
+        '| Calt Production.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Calt Production| #F4572C| 1| 1| 0| 0',
+        '| Canal+.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Canal+| #488681| 1| 1| 0| 0',
+        '| Carnival Films.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Carnival Films| #ABD477| 1| 1| 0| 0',
         '| Carolco.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Carolco| #684F0D| 1| 1| 0| 0',
         '| Carsey-Werner Company.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Carsey-Werner Company| #DCB758| 1| 1| 0| 0',
-        '| Cartoon Saloon.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Cartoon Saloon| #A6CB32 | 1| 1| 0| 0',
-        '| Castle Rock Entertainment.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Castle Rock Entertainment| #7C2843| 1| 1| 0| 0',
-        '| CBS Productions.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | CBS Productions| #8E6C3C| 1| 1| 0| 0',
-        '| CBS Studios.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | CBS Studios| #E6DE92| 1| 1| 0| 0',
+        '| Cartoon Saloon.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Cartoon Saloon| #A6CB32| 1| 1| 0| 0',
+        '| Castle Rock Entertainment.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Castle Rock Entertainment| #7C2843| 1| 1| 0| 0',
+        '| CBS Productions.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | CBS Productions| #8E6C3C| 1| 1| 0| 0',
+        '| CBS Studios.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | CBS Studios| #E6DE92| 1| 1| 0| 0',
         '| CBS Television Studios.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | CBS Television Studios| #D34ABC| 1| 1| 0| 0',
-        '| Centropolis Entertainment.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Centropolis Entertainment| #AE1939| 1| 1| 0| 0',
-        '| Chernin Entertainment.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Chernin Entertainment| #3D4A64| 1| 1| 0| 0',
-        '| Children''s Playground Entertainment.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Children''s Playground Entertainment| #151126| 1| 1| 0| 0',
-        '| Chimp Television.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Chimp Television| #1221EB| 1| 1| 0| 0',
-        '| Chris Morgan Productions.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Chris Morgan Productions| #DC55D3| 1| 1| 0| 0',
-        '| Cinergi Pictures Entertainment.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Cinergi Pictures Entertainment| #A9B9D2| 1| 1| 0| 0',
-        '| Cloud Hearts.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Cloud Hearts| #47EBDC| 1| 1| 0| 0',
-        '| CloverWorks.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | CloverWorks| #6D578F| 1| 1| 0| 0',
-        '| Colored Pencil Animation.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Colored Pencil Animation| #FB6DFD| 1| 1| 0| 0',
-        '| Columbia Pictures.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Columbia Pictures| #329763| 1| 1| 0| 0',
-        '| CoMix Wave Films.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | CoMix Wave Films| #715AD3| 1| 1| 0| 0',
-        '| Connect.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Connect| #2B3FA4| 1| 1| 0| 0',
-        '| Constantin Film.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Constantin Film| #343B44| 1| 1| 0| 0',
-        '| Cowboy Films.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Cowboy Films| #93F80E| 1| 1| 0| 0',
-        '| Craftar Studios.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Craftar Studios| #362BFF| 1| 1| 0| 0',
-        '| Creators in Pack.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Creators in Pack| #6057C4| 1| 1| 0| 0',
-        '| Cross Creek Pictures.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Cross Creek Pictures| #BA5899| 1| 1| 0| 0',
-        '| CygamesPictures.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | CygamesPictures| #8C5677| 1| 1| 0| 0',
-        '| Dark Horse Entertainment.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Dark Horse Entertainment| #11F499| 1| 1| 0| 0',
-        '| David Production.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | David Production| #AB104E| 1| 1| 0| 0',
-        '| Davis Entertainment.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Davis Entertainment| #000080| 1| 1| 0| 0',
-        '| DC Comics.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | DC Comics| #4277D7| 1| 1| 0| 0',
-        '| Dino De Laurentiis Company.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Dino De Laurentiis Company| #FDA8EB| 1| 1| 0| 0',
-        '| Diomedéa.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Diomedéa| #E6A604| 1| 1| 0| 0',
-        '| DLE.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | DLE| #65450D| 1| 1| 0| 0',
-        '| Doga Kobo.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Doga Kobo| #BD0F0F| 1| 1| 0| 0',
-        '| domerica.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | domerica| #4CC65F| 1| 1| 0| 0',
-        '| Don Simpson Jerry Bruckheimer Films.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Don Simpson Jerry Bruckheimer Films| #1A1453| 1| 1| 0| 0',
-        '| Doozer.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Doozer| #38A897| 1| 1| 0| 0',
-        '| Dreams Salon Entertainment Culture.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Dreams Salon Entertainment Culture| #138F97| 1| 1| 0| 0',
-        '| DreamWorks Pictures.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | DreamWorks Pictures| #7F8EE7| 1| 1| 0| 0',
-        '| DreamWorks Studios.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | DreamWorks Studios| #F1A7BC| 1| 1| 0| 0',
-        '| Drive.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Drive| #C80A46| 1| 1| 0| 0',
-        '| Eleventh Hour Films.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Eleventh Hour Films| #301637| 1| 1| 0| 0',
-        '| EMJAG Productions.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | EMJAG Productions| #3CD9B2| 1| 1| 0| 0',
-        '| EMT Squared.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | EMT Squared| #62F7A1| 1| 1| 0| 0',
-        '| Encourage Films.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Encourage Films| #357C76| 1| 1| 0| 0',
-        '| Endeavor Content.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Endeavor Content| #24682A| 1| 1| 0| 0',
-        '| ENGI.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | ENGI| #B5D798| 1| 1| 0| 0',
-        '| Entertainment 360.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Entertainment 360| #FC0D41| 1| 1| 0| 0',
-        '| Entertainment One.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Entertainment One| #F3A9F9| 1| 1| 0| 0',
-        '| Eon Productions.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Eon Productions| #DA52FB| 1| 1| 0| 0',
-        '| Everest Entertainment.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Everest Entertainment| #75F3AB| 1| 1| 0| 0',
-        '| Expectation Entertainment.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Expectation Entertainment| #AE9483| 1| 1| 0| 0',
-        '| Exposure Labs.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Exposure Labs| #A14553| 1| 1| 0| 0',
-        '| Fandango.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Fandango| #BEC0B6| 1| 1| 0| 0',
-        '| feel..png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | feel.| #9268C7| 1| 1| 0| 0',
-        '| Felix Film.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Felix Film| #7B2557| 1| 1| 0| 0',
-        '| Fenz.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Fenz| #A6AD7F| 1| 1| 0| 0',
-        '| Fields Entertainment.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Fields Entertainment| #18C40E| 1| 1| 0| 0',
-        '| FilmDistrict.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | FilmDistrict| #E5FC8C| 1| 1| 0| 0',
-        '| FilmNation Entertainment.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | FilmNation Entertainment| #98D9EE| 1| 1| 0| 0',
-        '| Flynn Picture Company.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Flynn Picture Company| #35852E| 1| 1| 0| 0',
-        '| Focus Features.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Focus Features| #BA30A8| 1| 1| 0| 0',
+        '| Centropolis Entertainment.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Centropolis Entertainment| #AE1939| 1| 1| 0| 0',
+        '| Chernin Entertainment.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Chernin Entertainment| #3D4A64| 1| 1| 0| 0',
+        '| Children''s Playground Entertainment.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Children''s Playground Entertainment| #151126| 1| 1| 0| 0',
+        '| Chimp Television.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Chimp Television| #1221EB| 1| 1| 0| 0',
+        '| Chris Morgan Productions.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Chris Morgan Productions| #DC55D3| 1| 1| 0| 0',
+        '| Cinergi Pictures Entertainment.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Cinergi Pictures Entertainment| #A9B9D2| 1| 1| 0| 0',
+        '| Cloud Hearts.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Cloud Hearts| #47EBDC| 1| 1| 0| 0',
+        '| CloverWorks.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | CloverWorks| #6D578F| 1| 1| 0| 0',
+        '| Colored Pencil Animation.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Colored Pencil Animation| #FB6DFD| 1| 1| 0| 0',
+        '| Columbia Pictures.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Columbia Pictures| #329763| 1| 1| 0| 0',
+        '| CoMix Wave Films.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | CoMix Wave Films| #715AD3| 1| 1| 0| 0',
+        '| Connect.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Connect| #2B3FA4| 1| 1| 0| 0',
+        '| Constantin Film.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Constantin Film| #343B44| 1| 1| 0| 0',
+        '| Cowboy Films.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Cowboy Films| #93F80E| 1| 1| 0| 0',
+        '| Craftar Studios.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Craftar Studios| #362BFF| 1| 1| 0| 0',
+        '| Creators in Pack.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Creators in Pack| #6057C4| 1| 1| 0| 0',
+        '| Cross Creek Pictures.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Cross Creek Pictures| #BA5899| 1| 1| 0| 0',
+        '| CygamesPictures.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | CygamesPictures| #8C5677| 1| 1| 0| 0',
+        '| Dark Horse Entertainment.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Dark Horse Entertainment| #11F499| 1| 1| 0| 0',
+        '| David Production.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | David Production| #AB104E| 1| 1| 0| 0',
+        '| Davis Entertainment.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Davis Entertainment| #000080| 1| 1| 0| 0',
+        '| DC Comics.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | DC Comics| #4277D7| 1| 1| 0| 0',
+        '| Dino De Laurentiis Company.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Dino De Laurentiis Company| #FDA8EB| 1| 1| 0| 0',
+        '| Diomedéa.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Diomedéa| #E6A604| 1| 1| 0| 0',
+        '| DLE.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | DLE| #65450D| 1| 1| 0| 0',
+        '| Doga Kobo.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Doga Kobo| #BD0F0F| 1| 1| 0| 0',
+        '| domerica.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | domerica| #4CC65F| 1| 1| 0| 0',
+        '| Don Simpson Jerry Bruckheimer Films.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Don Simpson Jerry Bruckheimer Films| #1A1453| 1| 1| 0| 0',
+        '| Doozer.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Doozer| #38A897| 1| 1| 0| 0',
+        '| Dreams Salon Entertainment Culture.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Dreams Salon Entertainment Culture| #138F97| 1| 1| 0| 0',
+        '| DreamWorks Pictures.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | DreamWorks Pictures| #7F8EE7| 1| 1| 0| 0',
+        '| DreamWorks Studios.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | DreamWorks Studios| #F1A7BC| 1| 1| 0| 0',
+        '| Drive.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Drive| #C80A46| 1| 1| 0| 0',
+        '| Eleventh Hour Films.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Eleventh Hour Films| #301637| 1| 1| 0| 0',
+        '| EMJAG Productions.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | EMJAG Productions| #3CD9B2| 1| 1| 0| 0',
+        '| EMT Squared.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | EMT Squared| #62F7A1| 1| 1| 0| 0',
+        '| Encourage Films.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Encourage Films| #357C76| 1| 1| 0| 0',
+        '| Endeavor Content.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Endeavor Content| #24682A| 1| 1| 0| 0',
+        '| ENGI.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ENGI| #B5D798| 1| 1| 0| 0',
+        '| Entertainment 360.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Entertainment 360| #FC0D41| 1| 1| 0| 0',
+        '| Entertainment One.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Entertainment One| #F3A9F9| 1| 1| 0| 0',
+        '| Eon Productions.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Eon Productions| #DA52FB| 1| 1| 0| 0',
+        '| Everest Entertainment.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Everest Entertainment| #75F3AB| 1| 1| 0| 0',
+        '| Expectation Entertainment.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Expectation Entertainment| #AE9483| 1| 1| 0| 0',
+        '| Exposure Labs.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Exposure Labs| #A14553| 1| 1| 0| 0',
+        '| Fandango.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Fandango| #BEC0B6| 1| 1| 0| 0',
+        '| feel..png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | feel.| #9268C7| 1| 1| 0| 0',
+        '| Felix Film.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Felix Film| #7B2557| 1| 1| 0| 0',
+        '| Fenz.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Fenz| #A6AD7F| 1| 1| 0| 0',
+        '| Fields Entertainment.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Fields Entertainment| #18C40E| 1| 1| 0| 0',
+        '| FilmDistrict.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | FilmDistrict| #E5FC8C| 1| 1| 0| 0',
+        '| FilmNation Entertainment.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | FilmNation Entertainment| #98D9EE| 1| 1| 0| 0',
+        '| Flynn Picture Company.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Flynn Picture Company| #35852E| 1| 1| 0| 0',
+        '| Focus Features.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Focus Features| #BA30A8| 1| 1| 0| 0',
         '| Food Network.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Food Network| #4634E5| 1| 1| 0| 0',
-        '| Fortiche Production.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Fortiche Production| #63505B| 1| 1| 0| 0',
+        '| Fortiche Production.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Fortiche Production| #63505B| 1| 1| 0| 0',
         '| Fox Television Studios.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Fox Television Studios| #46184A| 1| 1| 0| 0',
-        '| Freckle Films.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Freckle Films| #E1A0D8| 1| 1| 0| 0',
-        '| Frederator Studios.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Frederator Studios| #10DF97| 1| 1| 0| 0',
-        '| FremantleMedia.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | FremantleMedia| #2C70CC| 1| 1| 0| 0',
-        '| Fuqua Films.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Fuqua Films| #329026| 1| 1| 0| 0',
-        '| GAINAX.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | GAINAX| #A73034| 1| 1| 0| 0',
-        '| Gallagher Films Ltd.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Gallagher Films Ltd| #71ADBB| 1| 1| 0| 0',
-        '| Gallop.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Gallop| #5EC0A0| 1| 1| 0| 0',
-        '| Gary Sanchez Productions.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Gary Sanchez Productions| #FED36B| 1| 1| 0| 0',
-        '| Gaumont.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Gaumont| #8F2734| 1| 1| 0| 0',
-        '| Geek Toys.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Geek Toys| #5B5757| 1| 1| 0| 0',
-        '| Gekkou.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Gekkou| #02AB76| 1| 1| 0| 0',
-        '| Gemba.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Gemba| #BEE8C2| 1| 1| 0| 0',
-        '| GENCO.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | GENCO| #705D63| 1| 1| 0| 0',
-        '| Generator Entertainment.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Generator Entertainment| #5C356A| 1| 1| 0| 0',
-        '| Geno Studio.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Geno Studio| #D504AB| 1| 1| 0| 0',
-        '| GoHands.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | GoHands| #A683DD| 1| 1| 0| 0',
-        '| Gonzo.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Gonzo| #C92A69| 1| 1| 0| 0',
+        '| Freckle Films.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Freckle Films| #E1A0D8| 1| 1| 0| 0',
+        '| Frederator Studios.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Frederator Studios| #10DF97| 1| 1| 0| 0',
+        '| FremantleMedia.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | FremantleMedia| #2C70CC| 1| 1| 0| 0',
+        '| Fuqua Films.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Fuqua Films| #329026| 1| 1| 0| 0',
+        '| GAINAX.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | GAINAX| #A73034| 1| 1| 0| 0',
+        '| Gallagher Films Ltd.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Gallagher Films Ltd| #71ADBB| 1| 1| 0| 0',
+        '| Gallop.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Gallop| #5EC0A0| 1| 1| 0| 0',
+        '| Gary Sanchez Productions.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Gary Sanchez Productions| #FED36B| 1| 1| 0| 0',
+        '| Gaumont.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Gaumont| #8F2734| 1| 1| 0| 0',
+        '| Geek Toys.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Geek Toys| #5B5757| 1| 1| 0| 0',
+        '| Gekkou.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Gekkou| #02AB76| 1| 1| 0| 0',
+        '| Gemba.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Gemba| #BEE8C2| 1| 1| 0| 0',
+        '| GENCO.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | GENCO| #705D63| 1| 1| 0| 0',
+        '| Generator Entertainment.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Generator Entertainment| #5C356A| 1| 1| 0| 0',
+        '| Geno Studio.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Geno Studio| #D504AB| 1| 1| 0| 0',
+        '| GoHands.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | GoHands| #A683DD| 1| 1| 0| 0',
+        '| Gonzo.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Gonzo| #C92A69| 1| 1| 0| 0',
         '| Gracie Films.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Gracie Films| #8094D0| 1| 1| 0| 0',
-        '| Graphinica.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Graphinica| #935FBB| 1| 1| 0| 0',
-        '| Green Hat Films.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Green Hat Films| #42F453| 1| 1| 0| 0',
-        '| Grindstone Entertainment Group.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Grindstone Entertainment Group| #B66736| 1| 1| 0| 0',
-        '| Group Tac.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Group Tac| #157DB4| 1| 1| 0| 0',
-        '| Hal Film Maker.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Hal Film Maker| #E085A4| 1| 1| 0| 0',
-        '| Hallmark.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Hallmark| #601CB4| 1| 1| 0| 0',
+        '| Graphinica.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Graphinica| #935FBB| 1| 1| 0| 0',
+        '| Green Hat Films.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Green Hat Films| #42F453| 1| 1| 0| 0',
+        '| Grindstone Entertainment Group.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Grindstone Entertainment Group| #B66736| 1| 1| 0| 0',
+        '| Group Tac.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Group Tac| #157DB4| 1| 1| 0| 0',
+        '| Hal Film Maker.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Hal Film Maker| #E085A4| 1| 1| 0| 0',
+        '| Hallmark.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Hallmark| #601CB4| 1| 1| 0| 0',
         '| HandMade Films.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | HandMade Films| #AAB5B2| 1| 1| 0| 0',
-        '| Haoliners Animation League.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Haoliners Animation League| #A616E8| 1| 1| 0| 0',
-        '| Happy Madison Productions.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Happy Madison Productions| #278761| 1| 1| 0| 0',
-        '| HartBeat Productions.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | HartBeat Productions| #85F4C5| 1| 1| 0| 0',
-        '| Hartswood Films.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Hartswood Films| #904D79| 1| 1| 0| 0',
+        '| Haoliners Animation League.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Haoliners Animation League| #A616E8| 1| 1| 0| 0',
+        '| Happy Madison Productions.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Happy Madison Productions| #278761| 1| 1| 0| 0',
+        '| HartBeat Productions.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | HartBeat Productions| #85F4C5| 1| 1| 0| 0',
+        '| Hartswood Films.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Hartswood Films| #904D79| 1| 1| 0| 0',
         '| Hasbro.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Hasbro| #5804EB| 1| 1| 0| 0',
-        '| HBO.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | HBO| #4B35CD| 1| 1| 0| 0',
-        '| Heyday Films.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Heyday Films| #7ABB2E| 1| 1| 0| 0',
-        '| Hoods Entertainment.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Hoods Entertainment| #F5F5D1| 1| 1| 0| 0',
-        '| Hotline.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Hotline| #45AB9A| 1| 1| 0| 0',
+        '| HBO.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | HBO| #4B35CD| 1| 1| 0| 0',
+        '| Heyday Films.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Heyday Films| #7ABB2E| 1| 1| 0| 0',
+        '| Hoods Entertainment.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Hoods Entertainment| #F5F5D1| 1| 1| 0| 0',
+        '| Hotline.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Hotline| #45AB9A| 1| 1| 0| 0',
         '| Hughes Entertainment.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Hughes Entertainment| #BC25E4| 1| 1| 0| 0',
-        '| Hurwitz & Schlossberg Productions.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Hurwitz & Schlossberg Productions| #E903F8| 1| 1| 0| 0',
-        '| Hyperobject Industries.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Hyperobject Industries| #C41B1F| 1| 1| 0| 0',
-        '| Icon Entertainment International.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Icon Entertainment International| #516F95| 1| 1| 0| 0',
-        '| Illumination Entertainment.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Illumination Entertainment| #C7C849| 1| 1| 0| 0',
-        '| Imagin.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Imagin| #241EFD| 1| 1| 0| 0',
-        '| Imperative Entertainment.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Imperative Entertainment| #39136F| 1| 1| 0| 0',
-        '| Impossible Factual.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Impossible Factual| #D2E972| 1| 1| 0| 0',
-        '| Ingenious Media.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Ingenious Media| #729A3B| 1| 1| 0| 0',
-        '| Irwin Entertainment.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Irwin Entertainment| #831F12| 1| 1| 0| 0',
-        '| J.C.Staff.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | J.C.Staff| #986BF3| 1| 1| 0| 0',
-        '| Jerry Bruckheimer Films.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Jerry Bruckheimer Films| #70C954| 1| 1| 0| 0',
-        '| Jessie Films.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Jessie Films| #5CF716| 1| 1| 0| 0',
-        '| Jinks-Cohen Company.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Jinks-Cohen Company| #449670| 1| 1| 0| 0',
-        '| Jumondou.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Jumondou| #AA58AA| 1| 1| 0| 0',
-        '| Kadokawa.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Kadokawa| #648E1A| 1| 1| 0| 0',
-        '| Kazak Productions.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Kazak Productions| #BE6070| 1| 1| 0| 0',
-        '| Kennedy Miller Productions.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Kennedy Miller Productions| #336937| 1| 1| 0| 0',
-        '| Khara.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Khara| #538150| 1| 1| 0| 0',
-        '| Kilter Films.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Kilter Films| #CA1893| 1| 1| 0| 0',
-        '| Kinema Citrus.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Kinema Citrus| #87A92B| 1| 1| 0| 0',
-        '| Kjam Media.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Kjam Media| #CC0604| 1| 1| 0| 0',
-        '| Kudos.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Kudos| #4D11E8| 1| 1| 0| 0',
-        '| Kurtzman Orci.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Kurtzman Orci| #4022D9| 1| 1| 0| 0',
-        '| Kyoto Animation.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Kyoto Animation| #1C4744| 1| 1| 0| 0',
-        '| Laika Entertainment.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Laika Entertainment| #CEB2DE| 1| 1| 0| 0',
-        '| Lan Studio.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Lan Studio| #989DED| 1| 1| 0| 0',
-        '| LandQ Studio.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | LandQ Studio| #4667C3| 1| 1| 0| 0',
-        '| Landscape Entertainment.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Landscape Entertainment| #3CBE98| 1| 1| 0| 0',
-        '| Laura Ziskin Productions.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Laura Ziskin Productions| #82883F| 1| 1| 0| 0',
-        '| Lay-duce.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Lay-duce| #0A1988| 1| 1| 0| 0',
-        '| Leftfield Pictures.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Leftfield Pictures| #4DDAC3| 1| 1| 0| 0',
-        '| Legendary Pictures.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Legendary Pictures| #303841| 1| 1| 0| 0',
-        '| Lerche.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Lerche| #D42DAE| 1| 1| 0| 0',
-        '| Let''s Not Turn This Into a Whole Big Production.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Let''s Not Turn This Into a Whole Big Production| #7597E6| 1| 1| 0| 0',
-        '| Levity Entertainment Group.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Levity Entertainment Group| #612A6D| 1| 1| 0| 0',
-        '| LIDENFILMS.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | LIDENFILMS| #EF8907| 1| 1| 0| 0',
-        '| Lifetime.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Lifetime| #2831EE| 1| 1| 0| 0',
+        '| Hurwitz & Schlossberg Productions.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Hurwitz & Schlossberg Productions| #E903F8| 1| 1| 0| 0',
+        '| Hyperobject Industries.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Hyperobject Industries| #C41B1F| 1| 1| 0| 0',
+        '| Icon Entertainment International.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Icon Entertainment International| #516F95| 1| 1| 0| 0',
+        '| IFC Films.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | IFC Films| #5CC0D5| 1| 1| 0| 0',
+        '| Illumination Entertainment.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Illumination Entertainment| #C7C849| 1| 1| 0| 0',
+        '| Imagin.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Imagin| #241EFD| 1| 1| 0| 0',
+        '| Imperative Entertainment.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Imperative Entertainment| #39136F| 1| 1| 0| 0',
+        '| Impossible Factual.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Impossible Factual| #D2E972| 1| 1| 0| 0',
+        '| Ingenious Media.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Ingenious Media| #729A3B| 1| 1| 0| 0',
+        '| Irwin Entertainment.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Irwin Entertainment| #831F12| 1| 1| 0| 0',
+        '| J.C.Staff.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | J.C.Staff| #986BF3| 1| 1| 0| 0',
+        '| Jerry Bruckheimer Films.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Jerry Bruckheimer Films| #70C954| 1| 1| 0| 0',
+        '| Jessie Films.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Jessie Films| #5CF716| 1| 1| 0| 0',
+        '| Jinks-Cohen Company.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Jinks-Cohen Company| #449670| 1| 1| 0| 0',
+        '| Jumondou.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Jumondou| #AA58AA| 1| 1| 0| 0',
+        '| Kadokawa.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Kadokawa| #648E1A| 1| 1| 0| 0',
+        '| Kazak Productions.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Kazak Productions| #BE6070| 1| 1| 0| 0',
+        '| Kennedy Miller Productions.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Kennedy Miller Productions| #336937| 1| 1| 0| 0',
+        '| Khara.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Khara| #538150| 1| 1| 0| 0',
+        '| Kilter Films.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Kilter Films| #CA1893| 1| 1| 0| 0',
+        '| Kinema Citrus.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Kinema Citrus| #87A92B| 1| 1| 0| 0',
+        '| Kjam Media.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Kjam Media| #CC0604| 1| 1| 0| 0',
+        '| Kudos.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Kudos| #4D11E8| 1| 1| 0| 0',
+        '| Kurtzman Orci.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Kurtzman Orci| #4022D9| 1| 1| 0| 0',
+        '| Kyoto Animation.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Kyoto Animation| #1C4744| 1| 1| 0| 0',
+        '| Laika Entertainment.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Laika Entertainment| #CEB2DE| 1| 1| 0| 0',
+        '| Lan Studio.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Lan Studio| #989DED| 1| 1| 0| 0',
+        '| LandQ Studio.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | LandQ Studio| #4667C3| 1| 1| 0| 0',
+        '| Landscape Entertainment.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Landscape Entertainment| #3CBE98| 1| 1| 0| 0',
+        '| Laura Ziskin Productions.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Laura Ziskin Productions| #82883F| 1| 1| 0| 0',
+        '| Lay-duce.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Lay-duce| #0A1988| 1| 1| 0| 0',
+        '| Leftfield Pictures.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Leftfield Pictures| #4DDAC3| 1| 1| 0| 0',
+        '| Legendary Pictures.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Legendary Pictures| #303841| 1| 1| 0| 0',
+        '| Lerche.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Lerche| #D42DAE| 1| 1| 0| 0',
+        '| Let''s Not Turn This Into a Whole Big Production.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Let''s Not Turn This Into a Whole Big Production| #7597E6| 1| 1| 0| 0',
+        '| Levity Entertainment Group.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Levity Entertainment Group| #612A6D| 1| 1| 0| 0',
+        '| LIDENFILMS.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | LIDENFILMS| #EF8907| 1| 1| 0| 0',
+        '| Lifetime.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Lifetime| #2831EE| 1| 1| 0| 0',
         '| Lightstorm Entertainment.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Lightstorm Entertainment| #75FF24| 1| 1| 0| 0',
-        '| Likely Story.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Likely Story| #2F33CA| 1| 1| 0| 0',
-        '| Lionsgate.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Lionsgate| #7D22A3| 1| 1| 0| 0',
-        '| Live Entertainment.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Live Entertainment| #EB7894| 1| 1| 0| 0',
-        '| Lord Miller Productions.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Lord Miller Productions| #0F543F| 1| 1| 0| 0',
-        '| Lucasfilm Ltd.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Lucasfilm Ltd| #22669B| 1| 1| 0| 0',
-        '| M.S.C.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | M.S.C| #44FD9A| 1| 1| 0| 0',
-        '| Madhouse.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Madhouse| #C58E2C| 1| 1| 0| 0',
-        '| Magic Bus.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Magic Bus| #732AF6| 1| 1| 0| 0',
-        '| Magnolia Pictures.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Magnolia Pictures| #8B1233| 1| 1| 0| 0',
-        '| Maho Film.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Maho Film| #B95BEB| 1| 1| 0| 0',
-        '| Malevolent Films.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Malevolent Films| #5A6B7B| 1| 1| 0| 0',
+        '| Likely Story.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Likely Story| #2F33CA| 1| 1| 0| 0',
+        '| Lionsgate.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Lionsgate| #7D22A3| 1| 1| 0| 0',
+        '| Live Entertainment.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Live Entertainment| #EB7894| 1| 1| 0| 0',
+        '| Lord Miller Productions.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Lord Miller Productions| #0F543F| 1| 1| 0| 0',
+        '| Lucasfilm Ltd.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Lucasfilm Ltd| #22669B| 1| 1| 0| 0',
+        '| M.S.C.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | M.S.C| #44FD9A| 1| 1| 0| 0',
+        '| Madhouse.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Madhouse| #C58E2C| 1| 1| 0| 0',
+        '| Magic Bus.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Magic Bus| #732AF6| 1| 1| 0| 0',
+        '| Magnolia Pictures.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Magnolia Pictures| #8B1233| 1| 1| 0| 0',
+        '| Maho Film.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Maho Film| #B95BEB| 1| 1| 0| 0',
+        '| Malevolent Films.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Malevolent Films| #5A6B7B| 1| 1| 0| 0',
         '| Mandalay Entertainment.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Mandalay Entertainment| #756373| 1| 1| 0| 0',
-        '| Mandarin Motion Pictures Limited.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Mandarin Motion Pictures Limited| #509445| 1| 1| 0| 0',
-        '| Mandarin.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Mandarin| #827715| 1| 1| 0| 0',
-        '| Manglobe.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Manglobe| #085B61| 1| 1| 0| 0',
-        '| MAPPA.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | MAPPA| #376430| 1| 1| 0| 0',
-        '| Mars Media Beteiligungs.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Mars Media Beteiligungs| #15C81E| 1| 1| 0| 0',
-        '| Marv Films.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Marv Films| #958F42| 1| 1| 0| 0',
-        '| Marvel Animation.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Marvel Animation| #ED171F| 1| 1| 0| 0',
-        '| Marvel Studios.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Marvel Studios| #1ED8E3| 1| 1| 0| 0',
-        '| Matt Tolmach Productions.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Matt Tolmach Productions| #EAB150| 1| 1| 0| 0',
-        '| Maximum Effort.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Maximum Effort| #CE4D0E| 1| 1| 0| 0',
-        '| Media Res.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Media Res| #51251D| 1| 1| 0| 0',
-        '| Metro-Goldwyn-Mayer.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Metro-Goldwyn-Mayer| #A48221| 1| 1| 0| 0',
-        '| Michael Patrick King Productions.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Michael Patrick King Productions| #79FE34| 1| 1| 0| 0',
-        '| Millennium Films.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Millennium Films| #911213| 1| 1| 0| 0',
-        '| Millepensee.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Millepensee| #7D9EAC| 1| 1| 0| 0',
-        '| Miramax.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Miramax| #344B75| 1| 1| 0| 0',
-        '| Namu Animation.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Namu Animation| #FDD8D9| 1| 1| 0| 0',
-        '| NAZ.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | NAZ| #476C7A| 1| 1| 0| 0',
-        '| Netflix.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Netflix| #001f3f| 1| 1| 0| 0',
-        '| New Line Cinema.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | New Line Cinema| #67857E| 1| 1| 0| 0',
-        '| Nexus.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Nexus| #F8D946| 1| 1| 0| 0',
-        '| Nickelodeon Animation Studio.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Nickelodeon Animation Studio| #5E9BFB| 1| 1| 0| 0',
-        '| Nippon Animation.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Nippon Animation| #4A688B| 1| 1| 0| 0',
-        '| Nomad.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Nomad| #9FE1BF| 1| 1| 0| 0',
-        '| NorthSouth Productions.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | NorthSouth Productions| #69718E| 1| 1| 0| 0',
-        '| Nu Boyana Film Studios.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Nu Boyana Film Studios| #D08C1E| 1| 1| 0| 0',
-        '| Nut.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Nut| #0DAB93| 1| 1| 0| 0',
-        '| O2 Filmes.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | O2 Filmes| #F8EEC0| 1| 1| 0| 0',
-        '| Okuruto Noboru.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Okuruto Noboru| #88B27E| 1| 1| 0| 0',
-        '| OLM.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | OLM| #98FA51| 1| 1| 0| 0',
-        '| Open Road Films.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Open Road Films| #DC0127| 1| 1| 0| 0',
-        '| Orange.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Orange| #C4BEF5| 1| 1| 0| 0',
-        '| Ordet.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Ordet| #0EEEF6| 1| 1| 0| 0',
-        '| Original Film.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Original Film| #364B61| 1| 1| 0| 0',
-        '| Orion Pictures.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Orion Pictures| #6E6E6E| 1| 1| 0| 0',
-        '| OZ.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | OZ| #2EF68F| 1| 1| 0| 0',
-        '| P.A. Works.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | P.A. Works| #A21B4B| 1| 1| 0| 0',
-        '| P.I.C.S..png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | P.I.C.S.| #A63FA8| 1| 1| 0| 0',
-        '| Palomar.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Palomar| #F818FD| 1| 1| 0| 0',
-        '| Paramount Animation.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Paramount Animation| #3C3C3C| 1| 1| 0| 0',
-        '| Paramount Pictures.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Paramount Pictures| #5D94B4| 1| 1| 0| 0',
-        '| Paramount Television Studios.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Paramount Television Studios| #E2D6BE| 1| 1| 0| 0',
-        '| Participant.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Participant| #F92025| 1| 1| 0| 0',
-        '| Passione.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Passione| #970A59| 1| 1| 0| 0',
-        '| Pb Animation Co. Ltd.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Pb Animation Co. Ltd| #003EB9| 1| 1| 0| 0',
-        '| Phoenix Pictures.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Phoenix Pictures| #AB0ECF| 1| 1| 0| 0',
-        '| Pierrot.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Pierrot| #C1CFBC| 1| 1| 0| 0',
-        '| Piki Films.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Piki Films| #52CB78| 1| 1| 0| 0',
-        '| Pine Jam.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Pine Jam| #4C9C3F| 1| 1| 0| 0',
-        '| Pixar.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Pixar| #1668B0| 1| 1| 0| 0',
-        '| Plan B Entertainment.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Plan B Entertainment| #9084B5| 1| 1| 0| 0',
-        '| Platinum Vision.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Platinum Vision| #70A8B4| 1| 1| 0| 0',
-        '| PlayStation Productions.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | PlayStation Productions| #478D03| 1| 1| 0| 0',
-        '| Playtone.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Playtone| #98ED7F| 1| 1| 0| 0',
-        '| Plum Pictures.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Plum Pictures| #ACCB76| 1| 1| 0| 0',
-        '| Polygon Pictures.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Polygon Pictures| #741E67| 1| 1| 0| 0',
-        '| Pony Canyon.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Pony Canyon| #EECA46| 1| 1| 0| 0',
-        '| Powerhouse Animation Studios.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Powerhouse Animation Studios| #42A545| 1| 1| 0| 0',
-        '| PRA.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | PRA| #DFA26E| 1| 1| 0| 0',
-        '| Prescience.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Prescience| #03057A| 1| 1| 0| 0',
-        '| Production +h..png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Production +h.| #FC07C6| 1| 1| 0| 0',
-        '| Production I.G.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Production I.G| #8843C2| 1| 1| 0| 0',
-        '| Production IMS.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Production IMS| #169AB7| 1| 1| 0| 0',
-        '| Production Reed.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Production Reed| #92F588| 1| 1| 0| 0',
-        '| Project No.9.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Project No.9| #FDC471| 1| 1| 0| 0',
-        '| Prospect Park.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Prospect Park| #F28C17| 1| 1| 0| 0',
-        '| Pulse Films.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Pulse Films| #8EEB80| 1| 1| 0| 0',
-        '| Quad.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Quad| #0CA0BE| 1| 1| 0| 0',
-        '| Radar Pictures.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Radar Pictures| #DBD684| 1| 1| 0| 0',
-        '| RadicalMedia.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | RadicalMedia| #E34304| 1| 1| 0| 0',
-        '| Radix.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Radix| #1F2D33| 1| 1| 0| 0',
-        '| Railsplitter Pictures.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Railsplitter Pictures| #9BE2A4| 1| 1| 0| 0',
-        '| RatPac Entertainment.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | RatPac Entertainment| #91E130| 1| 1| 0| 0',
-        '| Red Dog Culture House.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Red Dog Culture House| #46FDF5| 1| 1| 0| 0',
-        '| Regency Pictures.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Regency Pictures| #1DD664| 1| 1| 0| 0',
-        '| Reveille Productions.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Reveille Productions| #1A527C| 1| 1| 0| 0',
-        '| Revoroot.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Revoroot| #E8DEB3| 1| 1| 0| 0',
-        '| Rip Cord Productions.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Rip Cord Productions| #90580D| 1| 1| 0| 0',
-        '| RocketScience.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | RocketScience| #5767E4| 1| 1| 0| 0',
-        '| Saetta.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Saetta| #46476A| 1| 1| 0| 0',
-        '| SANZIGEN.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | SANZIGEN| #068509| 1| 1| 0| 0',
-        '| Satelight.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Satelight| #D1B2CD| 1| 1| 0| 0',
-        '| Savoy Pictures.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Savoy Pictures| #9EDDDF| 1| 1| 0| 0',
-        '| Scenic Labs.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Scenic Labs| #0B31A8| 1| 1| 0| 0',
-        '| Science SARU.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Science SARU| #6948C1| 1| 1| 0| 0',
-        '| Scion Films.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Scion Films| #4FEAC8| 1| 1| 0| 0',
-        '| Scott Free Productions.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Scott Free Productions| #A425E7| 1| 1| 0| 0',
-        '| Sculptor Media.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Sculptor Media| #599D96| 1| 1| 0| 0',
-        '| Sean Daniel Company.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Sean Daniel Company| #16EC29| 1| 1| 0| 0',
-        '| Secret Hideout.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Secret Hideout| #3B18AD| 1| 1| 0| 0',
-        '| See-Saw Films.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | See-Saw Films| #2D7D0F| 1| 1| 0| 0',
-        '| Sentai Filmworks.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Sentai Filmworks| #E00604| 1| 1| 0| 0',
+        '| Mandarin Motion Pictures Limited.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Mandarin Motion Pictures Limited| #509445| 1| 1| 0| 0',
+        '| Mandarin.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Mandarin| #827715| 1| 1| 0| 0',
+        '| Manglobe.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Manglobe| #085B61| 1| 1| 0| 0',
+        '| MAPPA.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | MAPPA| #376430| 1| 1| 0| 0',
+        '| Mars Media Beteiligungs.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Mars Media Beteiligungs| #15C81E| 1| 1| 0| 0',
+        '| Marv Films.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Marv Films| #958F42| 1| 1| 0| 0',
+        '| Marvel Animation.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Marvel Animation| #ED171F| 1| 1| 0| 0',
+        '| Marvel Studios.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Marvel Studios| #1ED8E3| 1| 1| 0| 0',
+        '| Matt Tolmach Productions.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Matt Tolmach Productions| #EAB150| 1| 1| 0| 0',
+        '| Maximum Effort.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Maximum Effort| #CE4D0E| 1| 1| 0| 0',
+        '| Media Res.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Media Res| #51251D| 1| 1| 0| 0',
+        '| Metro-Goldwyn-Mayer.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Metro-Goldwyn-Mayer| #A48221| 1| 1| 0| 0',
+        '| Michael Patrick King Productions.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Michael Patrick King Productions| #79FE34| 1| 1| 0| 0',
+        '| Millennium Films.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Millennium Films| #911213| 1| 1| 0| 0',
+        '| Millepensee.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Millepensee| #7D9EAC| 1| 1| 0| 0',
+        '| Miramax.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Miramax| #344B75| 1| 1| 0| 0',
+        '| Namu Animation.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Namu Animation| #FDD8D9| 1| 1| 0| 0',
+        '| NAZ.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | NAZ| #476C7A| 1| 1| 0| 0',
+        '| NEON.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | NEON| #e63e3e| 1| 1| 0| 0',
+        '| Netflix.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Netflix| #001f3f| 1| 1| 0| 0',
+        '| New Line Cinema.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | New Line Cinema| #67857E| 1| 1| 0| 0',
+        '| Nexus.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Nexus| #F8D946| 1| 1| 0| 0',
+        '| Nickelodeon Animation Studio.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Nickelodeon Animation Studio| #5E9BFB| 1| 1| 0| 0',
+        '| Nippon Animation.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Nippon Animation| #4A688B| 1| 1| 0| 0',
+        '| Nomad.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Nomad| #9FE1BF| 1| 1| 0| 0',
+        '| NorthSouth Productions.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | NorthSouth Productions| #69718E| 1| 1| 0| 0',
+        '| Nu Boyana Film Studios.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Nu Boyana Film Studios| #D08C1E| 1| 1| 0| 0',
+        '| Nut.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Nut| #0DAB93| 1| 1| 0| 0',
+        '| O2 Filmes.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | O2 Filmes| #F8EEC0| 1| 1| 0| 0',
+        '| Okuruto Noboru.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Okuruto Noboru| #88B27E| 1| 1| 0| 0',
+        '| OLM.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | OLM| #98FA51| 1| 1| 0| 0',
+        '| Open Road Films.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Open Road Films| #DC0127| 1| 1| 0| 0',
+        '| Orange.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Orange| #C4BEF5| 1| 1| 0| 0',
+        '| Ordet.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Ordet| #0EEEF6| 1| 1| 0| 0',
+        '| Original Film.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Original Film| #364B61| 1| 1| 0| 0',
+        '| Orion Pictures.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Orion Pictures| #6E6E6E| 1| 1| 0| 0',
+        '| OZ.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | OZ| #2EF68F| 1| 1| 0| 0',
+        '| P.A. Works.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | P.A. Works| #A21B4B| 1| 1| 0| 0',
+        '| P.I.C.S..png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | P.I.C.S.| #A63FA8| 1| 1| 0| 0',
+        '| Palomar.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Palomar| #F818FD| 1| 1| 0| 0',
+        '| Paramount Animation.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Paramount Animation| #3C3C3C| 1| 1| 0| 0',
+        '| Paramount Pictures.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Paramount Pictures| #5D94B4| 1| 1| 0| 0',
+        '| Paramount Television Studios.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Paramount Television Studios| #E2D6BE| 1| 1| 0| 0',
+        '| Participant.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Participant| #F92025| 1| 1| 0| 0',
+        '| Passione.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Passione| #970A59| 1| 1| 0| 0',
+        '| Pb Animation Co. Ltd.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Pb Animation Co. Ltd| #003EB9| 1| 1| 0| 0',
+        '| Phoenix Pictures.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Phoenix Pictures| #AB0ECF| 1| 1| 0| 0',
+        '| Pierrot.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Pierrot| #C1CFBC| 1| 1| 0| 0',
+        '| Piki Films.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Piki Films| #52CB78| 1| 1| 0| 0',
+        '| Pine Jam.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Pine Jam| #4C9C3F| 1| 1| 0| 0',
+        '| Pixar.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Pixar| #1668B0| 1| 1| 0| 0',
+        '| Plan B Entertainment.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Plan B Entertainment| #9084B5| 1| 1| 0| 0',
+        '| Platinum Vision.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Platinum Vision| #70A8B4| 1| 1| 0| 0',
+        '| PlayStation Productions.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | PlayStation Productions| #478D03| 1| 1| 0| 0',
+        '| Playtone.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Playtone| #98ED7F| 1| 1| 0| 0',
+        '| Plum Pictures.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Plum Pictures| #ACCB76| 1| 1| 0| 0',
+        '| Polygon Pictures.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Polygon Pictures| #741E67| 1| 1| 0| 0',
+        '| Pony Canyon.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Pony Canyon| #EECA46| 1| 1| 0| 0',
+        '| Powerhouse Animation Studios.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Powerhouse Animation Studios| #42A545| 1| 1| 0| 0',
+        '| PRA.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | PRA| #DFA26E| 1| 1| 0| 0',
+        '| Prescience.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Prescience| #03057A| 1| 1| 0| 0',
+        '| Production +h..png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Production +h.| #FC07C6| 1| 1| 0| 0',
+        '| Production I.G.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Production I.G| #8843C2| 1| 1| 0| 0',
+        '| Production IMS.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Production IMS| #169AB7| 1| 1| 0| 0',
+        '| Production Reed.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Production Reed| #92F588| 1| 1| 0| 0',
+        '| Project No.9.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Project No.9| #FDC471| 1| 1| 0| 0',
+        '| Prospect Park.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Prospect Park| #F28C17| 1| 1| 0| 0',
+        '| Pulse Films.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Pulse Films| #8EEB80| 1| 1| 0| 0',
+        '| Quad.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Quad| #0CA0BE| 1| 1| 0| 0',
+        '| Radar Pictures.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Radar Pictures| #DBD684| 1| 1| 0| 0',
+        '| RadicalMedia.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | RadicalMedia| #E34304| 1| 1| 0| 0',
+        '| Radix.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Radix| #1F2D33| 1| 1| 0| 0',
+        '| Railsplitter Pictures.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Railsplitter Pictures| #9BE2A4| 1| 1| 0| 0',
+        '| Rankin Bass Productions.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Rankin Bass Productions| #A9B1D8| 1| 1| 0| 0',
+        '| RatPac Entertainment.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | RatPac Entertainment| #91E130| 1| 1| 0| 0',
+        '| Red Dog Culture House.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Red Dog Culture House| #46FDF5| 1| 1| 0| 0',
+        '| Regency Pictures.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Regency Pictures| #1DD664| 1| 1| 0| 0',
+        '| Reveille Productions.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Reveille Productions| #1A527C| 1| 1| 0| 0',
+        '| Revoroot.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Revoroot| #E8DEB3| 1| 1| 0| 0',
+        '| Rip Cord Productions.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Rip Cord Productions| #90580D| 1| 1| 0| 0',
+        '| RocketScience.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | RocketScience| #5767E4| 1| 1| 0| 0',
+        '| Saetta.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Saetta| #46476A| 1| 1| 0| 0',
+        '| SANZIGEN.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | SANZIGEN| #068509| 1| 1| 0| 0',
+        '| Satelight.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Satelight| #D1B2CD| 1| 1| 0| 0',
+        '| Savoy Pictures.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Savoy Pictures| #9EDDDF| 1| 1| 0| 0',
+        '| Scenic Labs.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Scenic Labs| #0B31A8| 1| 1| 0| 0',
+        '| Science SARU.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Science SARU| #6948C1| 1| 1| 0| 0',
+        '| Scion Films.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Scion Films| #4FEAC8| 1| 1| 0| 0',
+        '| Scott Free Productions.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Scott Free Productions| #A425E7| 1| 1| 0| 0',
+        '| Sculptor Media.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Sculptor Media| #599D96| 1| 1| 0| 0',
+        '| Sean Daniel Company.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Sean Daniel Company| #16EC29| 1| 1| 0| 0',
+        '| Searchlight Pictures.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Searchlight Pictures| #354672| 1| 1| 0| 0',
+        '| Secret Hideout.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Secret Hideout| #3B18AD| 1| 1| 0| 0',
+        '| See-Saw Films.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | See-Saw Films| #2D7D0F| 1| 1| 0| 0',
+        '| Sentai Filmworks.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Sentai Filmworks| #E00604| 1| 1| 0| 0',
         '| Serendipity Pictures.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Serendipity Pictures| #391C49| 1| 1| 0| 0',
-        '| Seven Arcs.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Seven Arcs| #7B82BA| 1| 1| 0| 0',
-        '| Shaft.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Shaft| #2BA8A4| 1| 1| 0| 0',
-        '| Shin-Ei Animation.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Shin-Ei Animation| #2798DA| 1| 1| 0| 0',
-        '| Shogakukan.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Shogakukan| #739D5A| 1| 1| 0| 0',
-        '| Show East.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Show East| #C1096E| 1| 1| 0| 0',
-        '| Showtime Networks.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Showtime Networks| #3EA9E8| 1| 1| 0| 0',
-        '| Shuka.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Shuka| #925BD1| 1| 1| 0| 0',
-        '| Signal.MD.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Signal.MD| #29113A| 1| 1| 0| 0',
-        '| Sil-Metropole Organisation.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Sil-Metropole Organisation| #48D4F2| 1| 1| 0| 0',
-        '| Silver.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Silver| #808080| 1| 1| 0| 0',
-        '| SILVER LINK..png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | SILVER LINK.| #06FF01| 1| 1| 0| 0',
-        '| Silverback Films.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Silverback Films| #72D71C| 1| 1| 0| 0',
-        '| Siren Pictures.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Siren Pictures| #323658| 1| 1| 0| 0',
-        '| SISTER.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | SISTER| #BD6B5C| 1| 1| 0| 0',
-        '| Sixteen String Jack Productions.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Sixteen String Jack Productions| #6D7D9E| 1| 1| 0| 0',
-        '| SKA Films.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | SKA Films| #A2DDB0| 1| 1| 0| 0',
-        '| Sky studios.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Sky studios| #5F1D61| 1| 1| 0| 0',
-        '| Skydance.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Skydance| #B443B5| 1| 1| 0| 0',
-        '| Sony Pictures Animation.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Sony Pictures Animation| #498BA9| 1| 1| 0| 0',
-        '| Sony Pictures.png| +0| 1200| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Sony Pictures| #943EBD| 1| 1| 0| 0',
-        '| Sphère Média Plus.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Sphère Média Plus| #AEBC44| 1| 1| 0| 0',
-        '| Spyglass Entertainment.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Spyglass Entertainment| #472659| 1| 1| 0| 0',
-        '| Staple Entertainment.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Staple Entertainment| #E1EB06| 1| 1| 0| 0',
-        '| Star Thrower Entertainment.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Star Thrower Entertainment| #D52526| 1| 1| 0| 0',
-        '| Stark Raving Black Productions.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Stark Raving Black Productions| #46D38B| 1| 1| 0| 0',
-        '| Studio 3Hz.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Studio 3Hz| #F7F5BC| 1| 1| 0| 0',
-        '| Studio 8.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Studio 8| #ABC2C3| 1| 1| 0| 0',
-        '| Studio A-CAT.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Studio A-CAT| #049ABA| 1| 1| 0| 0',
-        '| Studio Babelsberg.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Studio Babelsberg| #7CAE06| 1| 1| 0| 0',
-        '| Studio Bind.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Studio Bind| #E20944| 1| 1| 0| 0',
-        '| Studio Blanc..png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Studio Blanc.| #6308CC| 1| 1| 0| 0',
-        '| Studio Chizu.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Studio Chizu| #68ACAA| 1| 1| 0| 0',
-        '| Studio Comet.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Studio Comet| #2D1337| 1| 1| 0| 0',
-        '| Studio Deen.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Studio Deen| #3A6EA8| 1| 1| 0| 0',
-        '| Studio Dragon.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Studio Dragon| #3ECAF1| 1| 1| 0| 0',
-        '| Studio Elle.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Studio Elle| #511DD7| 1| 1| 0| 0',
-        '| Studio Flad.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Studio Flad| #996396| 1| 1| 0| 0',
-        '| Studio Ghibli.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Studio Ghibli| #AB2F46| 1| 1| 0| 0',
-        '| Studio Gokumi.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Studio Gokumi| #D9C7A0| 1| 1| 0| 0',
-        '| Studio Guts.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Studio Guts| #832A64| 1| 1| 0| 0',
-        '| Studio Hibari.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Studio Hibari| #4F9E24| 1| 1| 0| 0',
-        '| Studio Kafka.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Studio Kafka| #7A2917| 1| 1| 0| 0',
-        '| Studio Kai.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Studio Kai| #CA3EC8| 1| 1| 0| 0',
-        '| Studio Mir.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Studio Mir| #723564| 1| 1| 0| 0',
-        '| studio MOTHER.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | studio MOTHER| #203953| 1| 1| 0| 0',
-        '| Studio Palette.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Studio Palette| #5A17AC| 1| 1| 0| 0',
-        '| Studio Rikka.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Studio Rikka| #DB5318| 1| 1| 0| 0',
-        '| Studio Signpost.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Studio Signpost| #597F70| 1| 1| 0| 0',
-        '| Studio VOLN.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Studio VOLN| #6FDDE8| 1| 1| 0| 0',
-        '| STUDIO4°C.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | STUDIO4°C| #33352C| 1| 1| 0| 0',
+        '| Seven Arcs.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Seven Arcs| #7B82BA| 1| 1| 0| 0',
+        '| Shaft.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Shaft| #2BA8A4| 1| 1| 0| 0',
+        '| Shin-Ei Animation.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Shin-Ei Animation| #2798DA| 1| 1| 0| 0',
+        '| Shogakukan.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Shogakukan| #739D5A| 1| 1| 0| 0',
+        '| Show East.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Show East| #C1096E| 1| 1| 0| 0',
+        '| Showtime Networks.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Showtime Networks| #3EA9E8| 1| 1| 0| 0',
+        '| Shuka.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Shuka| #925BD1| 1| 1| 0| 0',
+        '| Signal.MD.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Signal.MD| #29113A| 1| 1| 0| 0',
+        '| Sil-Metropole Organisation.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Sil-Metropole Organisation| #48D4F2| 1| 1| 0| 0',
+        '| SILVER LINK..png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | SILVER LINK.| #06FF01| 1| 1| 0| 0',
+        '| Silver.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Silver| #808080| 1| 1| 0| 0',
+        '| Silverback Films.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Silverback Films| #72D71C| 1| 1| 0| 0',
+        '| Siren Pictures.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Siren Pictures| #323658| 1| 1| 0| 0',
+        '| SISTER.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | SISTER| #BD6B5C| 1| 1| 0| 0',
+        '| Sixteen String Jack Productions.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Sixteen String Jack Productions| #6D7D9E| 1| 1| 0| 0',
+        '| SKA Films.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | SKA Films| #A2DDB0| 1| 1| 0| 0',
+        '| Sky studios.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Sky studios| #5F1D61| 1| 1| 0| 0',
+        '| Skydance.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Skydance| #B443B5| 1| 1| 0| 0',
+        '| Sony Pictures Animation.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Sony Pictures Animation| #498BA9| 1| 1| 0| 0',
+        '| Sony Pictures.png| +0| 1200| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Sony Pictures| #943EBD| 1| 1| 0| 0',
+        '| Sphère Média Plus.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Sphère Média Plus| #AEBC44| 1| 1| 0| 0',
+        '| Spyglass Entertainment.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Spyglass Entertainment| #472659| 1| 1| 0| 0',
+        '| Square Enix.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Square Enix| #1C0EC5| 1| 1| 0| 0',
+        '| Staple Entertainment.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Staple Entertainment| #E1EB06| 1| 1| 0| 0',
+        '| Star Thrower Entertainment.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Star Thrower Entertainment| #D52526| 1| 1| 0| 0',
+        '| Stark Raving Black Productions.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Stark Raving Black Productions| #46D38B| 1| 1| 0| 0',
+        '| Stöð 2.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Stöð 2| #539F2C| 1| 1| 0| 0',
+        '| Studio 3Hz.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Studio 3Hz| #F7F5BC| 1| 1| 0| 0',
+        '| Studio 8.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Studio 8| #ABC2C3| 1| 1| 0| 0',
+        '| Studio A-CAT.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Studio A-CAT| #049ABA| 1| 1| 0| 0',
+        '| Studio Babelsberg.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Studio Babelsberg| #7CAE06| 1| 1| 0| 0',
+        '| Studio Bind.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Studio Bind| #E20944| 1| 1| 0| 0',
+        '| Studio Blanc..png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Studio Blanc.| #6308CC| 1| 1| 0| 0',
+        '| Studio Chizu.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Studio Chizu| #68ACAA| 1| 1| 0| 0',
+        '| Studio Comet.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Studio Comet| #2D1337| 1| 1| 0| 0',
+        '| Studio Deen.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Studio Deen| #3A6EA8| 1| 1| 0| 0',
+        '| Studio Dragon.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Studio Dragon| #3ECAF1| 1| 1| 0| 0',
+        '| Studio Elle.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Studio Elle| #511DD7| 1| 1| 0| 0',
+        '| Studio Flad.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Studio Flad| #996396| 1| 1| 0| 0',
+        '| Studio Ghibli.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Studio Ghibli| #AB2F46| 1| 1| 0| 0',
+        '| Studio Gokumi.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Studio Gokumi| #D9C7A0| 1| 1| 0| 0',
+        '| Studio Guts.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Studio Guts| #832A64| 1| 1| 0| 0',
+        '| Studio Hibari.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Studio Hibari| #4F9E24| 1| 1| 0| 0',
+        '| Studio Kafka.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Studio Kafka| #7A2917| 1| 1| 0| 0',
+        '| Studio Kai.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Studio Kai| #CA3EC8| 1| 1| 0| 0',
+        '| Studio Mir.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Studio Mir| #723564| 1| 1| 0| 0',
+        '| studio MOTHER.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | studio MOTHER| #203953| 1| 1| 0| 0',
+        '| Studio Palette.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Studio Palette| #5A17AC| 1| 1| 0| 0',
+        '| Studio Rikka.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Studio Rikka| #DB5318| 1| 1| 0| 0',
+        '| Studio Signpost.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Studio Signpost| #597F70| 1| 1| 0| 0',
+        '| Studio VOLN.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Studio VOLN| #6FDDE8| 1| 1| 0| 0',
+        '| STUDIO4°C.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | STUDIO4°C| #33352C| 1| 1| 0| 0',
         '| StudioCanal.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | StudioCanal| #5150CA| 1| 1| 0| 0',
-        '| Summit Entertainment.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Summit Entertainment| #3898B6| 1| 1| 0| 0',
-        '| Sunrise Beyond.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Sunrise Beyond| #F6E84F| 1| 1| 0| 0',
-        '| Sunrise.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Sunrise| #864B89| 1| 1| 0| 0',
-        '| Syfy.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Syfy| #535FA5| 1| 1| 0| 0',
-        '| Syncopy.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Syncopy| #1E940B| 1| 1| 0| 0',
-        '| SynergySP.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | SynergySP| #0E82C8| 1| 1| 0| 0',
-        '| T-Street Productions.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | T-Street Productions| #30A4DD| 1| 1| 0| 0',
-        '| Tall Ship Productions.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Tall Ship Productions| #BD95BF| 1| 1| 0| 0',
-        '| Tatsunoko Production.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Tatsunoko Production| #5A76B8| 1| 1| 0| 0',
-        '| Team Downey.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Team Downey| #2EE0DD| 1| 1| 0| 0',
-        '| Telecom Animation Film.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Telecom Animation Film| #2F562B| 1| 1| 0| 0',
-        '| Temple Street Productions.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Temple Street Productions| #FDB359| 1| 1| 0| 0',
-        '| Tezuka Productions.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Tezuka Productions| #10259A| 1| 1| 0| 0',
-        '| The Cat in the Hat Productions.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | The Cat in the Hat Productions| #FDC2D4| 1| 1| 0| 0',
-        '| The Donners'' Company.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | The Donners'' Company| #625B26| 1| 1| 0| 0',
-        '| The Jim Henson Company.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | The Jim Henson Company| #478D6A| 1| 1| 0| 0',
-        '| The Kennedy-Marshall Company.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | The Kennedy-Marshall Company| #78A91F| 1| 1| 0| 0',
-        '| The Linson Company.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | The Linson Company| #773D61| 1| 1| 0| 0',
-        '| The Littlefield Company.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | The Littlefield Company| #9FE1C5| 1| 1| 0| 0',
-        '| The Mark Gordon Company.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | The Mark Gordon Company| #9FD3D8| 1| 1| 0| 0',
-        '| The Sea Change Project.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | The Sea Change Project| #0EC29F| 1| 1| 0| 0',
-        '| The Weinstein Company.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | The Weinstein Company| #927358| 1| 1| 0| 0',
-        '| Thunder Road.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Thunder Road| #167CEE| 1| 1| 0| 0',
+        '| STX Entertainment.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | STX Entertainment| #7DEF19| 1| 1| 0| 0',
+        '| Summit Entertainment.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Summit Entertainment| #3898B6| 1| 1| 0| 0',
+        '| Sunrise Beyond.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Sunrise Beyond| #F6E84F| 1| 1| 0| 0',
+        '| Sunrise.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Sunrise| #864B89| 1| 1| 0| 0',
+        '| Syfy.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Syfy| #535FA5| 1| 1| 0| 0',
+        '| Syncopy.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Syncopy| #1E940B| 1| 1| 0| 0',
+        '| SynergySP.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | SynergySP| #0E82C8| 1| 1| 0| 0',
+        '| T-Street Productions.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | T-Street Productions| #30A4DD| 1| 1| 0| 0',
+        '| Tall Ship Productions.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Tall Ship Productions| #BD95BF| 1| 1| 0| 0',
+        '| Tatsunoko Production.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Tatsunoko Production| #5A76B8| 1| 1| 0| 0',
+        '| Team Downey.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Team Downey| #2EE0DD| 1| 1| 0| 0',
+        '| Telecom Animation Film.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Telecom Animation Film| #2F562B| 1| 1| 0| 0',
+        '| Temple Street Productions.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Temple Street Productions| #FDB359| 1| 1| 0| 0',
+        '| Tezuka Productions.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Tezuka Productions| #10259A| 1| 1| 0| 0',
+        '| The Cat in the Hat Productions.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | The Cat in the Hat Productions| #FDC2D4| 1| 1| 0| 0',
+        '| The Donners'' Company.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | The Donners'' Company| #625B26| 1| 1| 0| 0',
+        '| The Jim Henson Company.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | The Jim Henson Company| #478D6A| 1| 1| 0| 0',
+        '| The Kennedy-Marshall Company.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | The Kennedy-Marshall Company| #78A91F| 1| 1| 0| 0',
+        '| The Linson Company.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | The Linson Company| #773D61| 1| 1| 0| 0',
+        '| The Littlefield Company.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | The Littlefield Company| #9FE1C5| 1| 1| 0| 0',
+        '| The Mark Gordon Company.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | The Mark Gordon Company| #9FD3D8| 1| 1| 0| 0',
+        '| The Sea Change Project.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | The Sea Change Project| #0EC29F| 1| 1| 0| 0',
+        '| The Weinstein Company.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | The Weinstein Company| #927358| 1| 1| 0| 0',
+        '| Thunder Road.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Thunder Road| #167CEE| 1| 1| 0| 0',
         '| Tim Burton Productions.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Tim Burton Productions| #1D5B96| 1| 1| 0| 0',
-        '| Titmouse.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Titmouse| #E5DCBD| 1| 1| 0| 0',
-        '| TMS Entertainment.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | TMS Entertainment| #68B823| 1| 1| 0| 0',
-        '| TNK.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | TNK| #B7D0AF| 1| 1| 0| 0',
-        '| Toei Animation.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Toei Animation| #63A2B1| 1| 1| 0| 0',
-        '| Tomorrow Studios.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Tomorrow Studios| #397DC4| 1| 1| 0| 0',
-        '| Topcraft.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Topcraft| #285732| 1| 1| 0| 0',
-        '| Touchstone Pictures.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Touchstone Pictures| #0C8F4D| 1| 1| 0| 0',
-        '| Touchstone Television.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Touchstone Television| #1C493D| 1| 1| 0| 0',
-        '| Trademark Films.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Trademark Films| #430F87| 1| 1| 0| 0',
-        '| Triage Entertainment.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Triage Entertainment| #A0C730| 1| 1| 0| 0',
-        '| Triangle Staff.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Triangle Staff| #F01AFA| 1| 1| 0| 0',
-        '| Tribeca Productions.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Tribeca Productions| #E25EF3| 1| 1| 0| 0',
-        '| Trigger.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Trigger| #5C5C5C| 1| 1| 0| 0',
-        '| TriStar Pictures.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | TriStar Pictures| #F24467| 1| 1| 0| 0',
-        '| TROYCA.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | TROYCA| #2F562B| 1| 1| 0| 0',
+        '| Titmouse.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Titmouse| #E5DCBD| 1| 1| 0| 0',
+        '| TMS Entertainment.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | TMS Entertainment| #68B823| 1| 1| 0| 0',
+        '| TNK.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | TNK| #B7D0AF| 1| 1| 0| 0',
+        '| Toei Animation.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Toei Animation| #63A2B1| 1| 1| 0| 0',
+        '| TOHO.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | TOHO| #639BEF| 1| 1| 0| 0',
+        '| Tomorrow Studios.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Tomorrow Studios| #397DC4| 1| 1| 0| 0',
+        '| Topcraft.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Topcraft| #285732| 1| 1| 0| 0',
+        '| Touchstone Pictures.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Touchstone Pictures| #0C8F4D| 1| 1| 0| 0',
+        '| Touchstone Television.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Touchstone Television| #1C493D| 1| 1| 0| 0',
+        '| Trademark Films.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Trademark Films| #430F87| 1| 1| 0| 0',
+        '| Triage Entertainment.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Triage Entertainment| #A0C730| 1| 1| 0| 0',
+        '| Triangle Staff.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Triangle Staff| #F01AFA| 1| 1| 0| 0',
+        '| Tribeca Productions.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Tribeca Productions| #E25EF3| 1| 1| 0| 0',
+        '| Trigger.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Trigger| #5C5C5C| 1| 1| 0| 0',
+        '| TriStar Pictures.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | TriStar Pictures| #F24467| 1| 1| 0| 0',
+        '| TROYCA.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | TROYCA| #2F562B| 1| 1| 0| 0',
+        '| TSG Entertainment.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | TSG Entertainment| #F9FEC0| 1| 1| 0| 0',
         '| Twisted Pictures.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Twisted Pictures| #DBBE3A| 1| 1| 0| 0',
-        '| TYO Animations.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | TYO Animations| #83CC1D| 1| 1| 0| 0',
-        '| Typhoon Graphics.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Typhoon Graphics| #C84B2E| 1| 1| 0| 0',
-        '| UCP.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | UCP| #2221DA| 1| 1| 0| 0',
-        '| ufotable.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | ufotable| #F39942| 1| 1| 0| 0',
-        '| United Artists.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | United Artists| #89C9A9| 1| 1| 0| 0',
-        '| Universal Animation Studios.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Universal Animation Studios| #1C508F| 1| 1| 0| 0',
-        '| Universal Pictures.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Universal Pictures| #207AAB| 1| 1| 0| 0',
-        '| Universal Television.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Universal Television| #AADDF6| 1| 1| 0| 0',
-        '| V1 Studio.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | V1 Studio| #961982| 1| 1| 0| 0',
-        '| Vancouver Media.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Vancouver Media| #999D92| 1| 1| 0| 0',
-        '| Vertigo Entertainment.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Vertigo Entertainment| #C44810| 1| 1| 0| 0',
-        '| Videocraft International.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Videocraft International| #FB7379| 1| 1| 0| 0',
-        '| Village Roadshow Pictures.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Village Roadshow Pictures| #A76B29| 1| 1| 0| 0',
-        '| W-Toon Studio.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | W-Toon Studio| #9EAFE3| 1| 1| 0| 0',
-        '| W. Chump and Sons.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | W. Chump and Sons| #0125F4| 1| 1| 0| 0',
-        '| Walden Media.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Walden Media| #F8CD5D| 1| 1| 0| 0',
-        '| Walt Disney Animation Studios.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Walt Disney Animation Studios| #1290C0| 1| 1| 0| 0',
-        '| Walt Disney Pictures.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Walt Disney Pictures| #2944AA| 1| 1| 0| 0',
-        '| Walt Disney Productions.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Walt Disney Productions| #1E75E1| 1| 1| 0| 0',
-        '| Warner Animation Group.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Warner Animation Group| #2C80EE| 1| 1| 0| 0',
-        '| Warner Bros. Pictures.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Warner Bros. Pictures| #39538F| 1| 1| 0| 0',
-        '| Warner Bros. Television.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Warner Bros. Television| #B65CF3| 1| 1| 0| 0',
-        '| Warner Premiere.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Warner Premiere| #A46AE0| 1| 1| 0| 0',
-        '| warparty.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | warparty| #FE5A77| 1| 1| 0| 0',
-        '| Waverly Films.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Waverly Films| #7CBD11| 1| 1| 0| 0',
-        '| Wawayu Animation.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Wawayu Animation| #EB7786| 1| 1| 0| 0',
-        '| Wayfare Entertainment.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Wayfare Entertainment| #4FD631| 1| 1| 0| 0',
-        '| Whitaker Entertainment.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Whitaker Entertainment| #EF1BA5| 1| 1| 0| 0',
-        '| White Fox.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | White Fox| #A86633| 1| 1| 0| 0',
-        '| Wiedemann & Berg Television.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Wiedemann & Berg Television| #9A2F9F| 1| 1| 0| 0',
-        '| Williams Street.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Williams Street| #B5A6C5| 1| 1| 0| 0',
-        '| Winkler Films.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Winkler Films| #A55752| 1| 1| 0| 0',
-        '| Wit Studio.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Wit Studio| #1F3BB6| 1| 1| 0| 0',
+        '| TYO Animations.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | TYO Animations| #83CC1D| 1| 1| 0| 0',
+        '| Typhoon Graphics.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Typhoon Graphics| #C84B2E| 1| 1| 0| 0',
+        '| UCP.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | UCP| #2221DA| 1| 1| 0| 0',
+        '| ufotable.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ufotable| #F39942| 1| 1| 0| 0',
+        '| United Artists.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | United Artists| #89C9A9| 1| 1| 0| 0',
+        '| Universal Animation Studios.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Universal Animation Studios| #1C508F| 1| 1| 0| 0',
+        '| Universal Pictures.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Universal Pictures| #207AAB| 1| 1| 0| 0',
+        '| Universal Television.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Universal Television| #AADDF6| 1| 1| 0| 0',
+        '| V1 Studio.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | V1 Studio| #961982| 1| 1| 0| 0',
+        '| Vancouver Media.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Vancouver Media| #999D92| 1| 1| 0| 0',
+        '| Vertigo Entertainment.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Vertigo Entertainment| #C44810| 1| 1| 0| 0',
+        '| Videocraft International.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Videocraft International| #FB7379| 1| 1| 0| 0',
+        '| Village Roadshow Pictures.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Village Roadshow Pictures| #A76B29| 1| 1| 0| 0',
+        '| W-Toon Studio.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | W-Toon Studio| #9EAFE3| 1| 1| 0| 0',
+        '| W. Chump and Sons.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | W. Chump and Sons| #0125F4| 1| 1| 0| 0',
+        '| Walden Media.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Walden Media| #F8CD5D| 1| 1| 0| 0',
+        '| Walt Disney Animation Studios.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Walt Disney Animation Studios| #1290C0| 1| 1| 0| 0',
+        '| Walt Disney Pictures.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Walt Disney Pictures| #2944AA| 1| 1| 0| 0',
+        '| Walt Disney Productions.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Walt Disney Productions| #1E75E1| 1| 1| 0| 0',
+        '| Warner Animation Group.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Warner Animation Group| #2C80EE| 1| 1| 0| 0',
+        '| Warner Bros. Pictures.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Warner Bros. Pictures| #39538F| 1| 1| 0| 0',
+        '| Warner Bros. Television.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Warner Bros. Television| #B65CF3| 1| 1| 0| 0',
+        '| Warner Premiere.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Warner Premiere| #A46AE0| 1| 1| 0| 0',
+        '| warparty.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | warparty| #FE5A77| 1| 1| 0| 0',
+        '| Waverly Films.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Waverly Films| #7CBD11| 1| 1| 0| 0',
+        '| Wawayu Animation.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Wawayu Animation| #EB7786| 1| 1| 0| 0',
+        '| Wayfare Entertainment.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Wayfare Entertainment| #4FD631| 1| 1| 0| 0',
+        '| Whitaker Entertainment.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Whitaker Entertainment| #EF1BA5| 1| 1| 0| 0',
+        '| White Fox.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | White Fox| #A86633| 1| 1| 0| 0',
+        '| Wiedemann & Berg Television.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Wiedemann & Berg Television| #9A2F9F| 1| 1| 0| 0',
+        '| Williams Street.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Williams Street| #B5A6C5| 1| 1| 0| 0',
+        '| Winkler Films.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Winkler Films| #A55752| 1| 1| 0| 0',
+        '| Wit Studio.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Wit Studio| #1F3BB6| 1| 1| 0| 0',
         '| Wolf Entertainment.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Wolf Entertainment| #281D15| 1| 1| 0| 0',
-        '| Wolfsbane.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Wolfsbane| #8E7689| 1| 1| 0| 0',
-        '| Working Title Films.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Working Title Films| #E34945| 1| 1| 0| 0',
-        '| Xebec.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Xebec| #051D31| 1| 1| 0| 0',
-        '| Yokohama Animation Lab.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Yokohama Animation Lab| #2C3961| 1| 1| 0| 0',
-        '| Yostar Pictures.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Yostar Pictures| #9A3DC1| 1| 1| 0| 0',
-        '| Yumeta Company.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Yumeta Company| #945E75| 1| 1| 0| 0',
-        '| Zero-G.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Zero-G| #460961| 1| 1| 0| 0',
-        '| Zexcs.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | Zexcs| #E60CB2| 1| 1| 0| 0'
-        ) | ConvertFrom-Csv -Delimiter '|'
+        '| Wolfsbane.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Wolfsbane| #8E7689| 1| 1| 0| 0',
+        '| Working Title Films.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Working Title Films| #E34945| 1| 1| 0| 0',
+        '| Xebec.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Xebec| #051D31| 1| 1| 0| 0',
+        '| Yokohama Animation Lab.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Yokohama Animation Lab| #2C3961| 1| 1| 0| 0',
+        '| Yostar Pictures.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Yostar Pictures| #9A3DC1| 1| 1| 0| 0',
+        '| Yumeta Company.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Yumeta Company| #945E75| 1| 1| 0| 0',
+        '| Zero-G.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Zero-G| #460961| 1| 1| 0| 0',
+        '| Zexcs.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Zexcs| #E60CB2| 1| 1| 0| 0'
+    ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
     foreach ($item in $myArray) {
@@ -4810,7 +6036,7 @@ Function CreateStudio {
         $optimalFontSize = Get-OptimalPointSize -text $value -font $($item.font) -box_width $theMaxWidth -box_height $theMaxHeight -min_pointsize $minPointSize -max_pointsize $maxPointSize
         $arr += ".\create_poster.ps1 -logo `"$script_path\logos_studio\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
     }
-    
+
     LaunchScripts -ScriptPaths $arr
     Move-Item -Path output -Destination studio
     Copy-Item -Path logos_studio -Destination studio\logos -Recurse
@@ -4945,7 +6171,7 @@ Function CreateSubtitleLanguage {
         'KOREAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ko| #F5C630| 1| 1| 0| 1',
         'KUANYAMA| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | kj| #D8CB60| 1| 1| 0| 1',
         'KURDISH| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | ku| #467330| 1| 1| 0| 1',
-        'LAO| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | lo| #DD3B78| 1| 1| 0| 1',
+        'LAOS| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | lo| #DD3B78| 1| 1| 0| 1',
         'LATIN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | la| #A73376| 1| 1| 0| 1',
         'LATVIAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | lv| #A65EC1| 1| 1| 0| 1',
         'LIMBURGAN| transparent.png| +0| 0| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | li| #13C252| 1| 1| 0| 1',
@@ -5055,7 +6281,7 @@ Function CreateSubtitleLanguage {
         $arr += ".\create_poster.ps1 -logo `"$script_path\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
     }
     LaunchScripts -ScriptPaths $arr
-    
+
     Move-Item -Path output -Destination subtitle_language
     Move-Item -Path output-orig -Destination output
 }
@@ -5068,14 +6294,16 @@ Function CreateVideoFormat {
     Write-Host "Creating Video Format"
     Set-Location $script_path
     # Find-Path "$script_path\video_format" 77A5B2
-    Move-Item -Path output -Destination output-orig    
+    Move-Item -Path output -Destination output-orig
 
     $myArray = @(
         'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
-        '| BluRay.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | BluRay| #A66321| 1| 1| 0| 0',
-        '| DVD.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | DVD| #E4CB63| 1| 1| 0| 0',
-        '| MoviesAnywhere.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | MoviesAnywhere| #77A5B2| 1| 1| 0| 0',
-        '| WEBDL.png| +0| 1600| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | WEBDL| #56CECE| 1| 1| 0| 0'
+        '| bluray.png| +0| 1800| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | bluray| #A66321| 1| 1| 0| 0',
+        '| dvd.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | dvd| #E4CB63| 1| 1| 0| 0',
+        '| hdtv.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | hdtv| #27B618| 1| 1| 0| 0',
+        '| MoviesAnywhere.png| +0| 1800| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | MoviesAnywhere| #77A5B2| 1| 1| 0| 0',
+        '| remux.png| +0| 1800| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | remux| #32C493| 1| 1| 0| 0',
+        '| web.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | web| #56CECE| 1| 1| 0| 0'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
@@ -5090,7 +6318,7 @@ Function CreateVideoFormat {
         $arr += ".\create_poster.ps1 -logo `"$script_path\logos_video_format\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
     }
     LaunchScripts -ScriptPaths $arr
-    
+
     Move-Item -Path output -Destination video_format
     Copy-Item -Path logos_video_format -Destination video_format\logos -Recurse
     Move-Item -Path output-orig -Destination output
@@ -5104,27 +6332,28 @@ Function CreateUniverse {
     Write-Host "Creating Universe"
     Set-Location $script_path
     # Find-Path "$script_path\universe"
-    Move-Item -Path output -Destination output-orig    
+    Move-Item -Path output -Destination output-orig
 
     $myArray = @(
         'key_name| logo| logo_offset| logo_resize| text_offset| font| font_size| font_color| border| border_width| border_color| avg_color_image| out_name| base_color| gradient| clean| avg_color| white_wash',
-        '| askew.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | askew| #0F66AD| 1| 1| 0| 1',
-        '| avp.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | avp| #2FC926| 1| 1| 0| 1',
-        '| arrow.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | arrow| #03451A| 1| 1| 0| 1',
-        '| dca.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | dca| #2832C5| 1| 1| 0| 1',
-        '| dcu.png| +0| 1500| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | dcu| #2832C4| 1| 1| 0| 1',
-        '| fast.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | fast| #7F1FC8| 1| 1| 0| 1',
-        '| marvel.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | marvel| #ED171F| 1| 1| 0| 1',
-        '| mcu.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | mcu| #C62D21| 1| 1| 0| 1',
-        '| middle.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | middle| #D79C2B| 1| 1| 0| 1',
-        '| mummy.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | mummy| #DBA02F| 1| 1| 0| 1',
-        '| rocky.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | rocky| #CC1F10| 1| 1| 0| 1',
-        '| star.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | star| #FFD64F| 1| 1| 0| 1',
-        '| star (1).png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | star (1)| #F2DC1D| 1| 1| 0| 1',
-        '| starsky.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | starsky| #0595FB| 1| 1| 0| 1',
-        '| trek.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | trek| #ffe15f| 1| 1| 0| 1',
-        '| wizard.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | wizard| #878536| 1| 1| 0| 1',
-        '| xmen.png| +0| 1800| +0| ComfortAa-Medium| 250| #FFFFFF| 0| 15| #FFFFFF| | xmen| #636363| 1| 1| 0| 1'
+        '| askew.png| +0| 1800| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | askew| #0F66AD| 1| 1| 0| 1',
+        '| avp.png| +0| 1800| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | avp| #2FC926| 1| 1| 0| 1',
+        '| arrow.png| +0| 1800| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | arrow| #03451A| 1| 1| 0| 1',
+        '| dca.png| +0| 1800| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | dca| #2832C5| 1| 1| 0| 1',
+        '| dcu.png| +0| 1500| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | dcu| #2832C4| 1| 1| 0| 1',
+        '| fast.png| +0| 1800| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | fast| #7F1FC8| 1| 1| 0| 1',
+        '| marvel.png| +0| 1800| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | marvel| #ED171F| 1| 1| 0| 1',
+        '| mcu.png| +0| 1800| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | mcu| #C62D21| 1| 1| 0| 1',
+        '| middle.png| +0| 1800| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | middle| #D79C2B| 1| 1| 0| 1',
+        '| monsterverse.png| +0| 1800| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | monsterverse| #016A15| 1| 1| 0| 0',
+        '| mummy.png| +0| 1800| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | mummy| #DBA02F| 1| 1| 0| 1',
+        '| rocky.png| +0| 1800| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | rocky| #CC1F10| 1| 1| 0| 1',
+        '| star.png| +0| 1800| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | star| #FFD64F| 1| 1| 0| 1',
+        '| star (1).png| +0| 1800| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | star (1)| #F2DC1D| 1| 1| 0| 1',
+        '| starsky.png| +0| 1800| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | starsky| #0595FB| 1| 1| 0| 1',
+        '| trek.png| +0| 1800| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | trek| #ffe15f| 1| 1| 0| 1',
+        '| wizard.png| +0| 1800| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | wizard| #878536| 1| 1| 0| 1',
+        '| xmen.png| +0| 1800| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | xmen| #636363| 1| 1| 0| 1'
     ) | ConvertFrom-Csv -Delimiter '|'
 
     $arr = @()
@@ -5139,7 +6368,7 @@ Function CreateUniverse {
         $arr += ".\create_poster.ps1 -logo `"$script_path\logos_universe\$($item.logo)`" -logo_offset $($item.logo_offset) -logo_resize $($item.logo_resize) -text `"$value`" -text_offset $($item.text_offset) -font `"$($item.font)`" -font_size $optimalFontSize -font_color `"$($item.font_color)`" -border $($item.border) -border_width $($item.border_width) -border_color `"$($item.border_color)`" -avg_color_image `"$($item.avg_color_image)`" -out_name `"$($item.out_name)`" -base_color `"$($item.base_color)`" -gradient $($item.gradient) -avg_color $($item.avg_color) -clean $($item.clean) -white_wash $($item.white_wash)"
     }
     LaunchScripts -ScriptPaths $arr
-    
+
     Move-Item -Path output -Destination universe
     Copy-Item -Path logos_universe -Destination universe\logos -Recurse
     Move-Item -Path output-orig -Destination output
@@ -5353,7 +6582,7 @@ Function CreateYear {
     WriteToLogFile "MonitorProcess               : Waiting for all processes to end before continuing..."
     Start-Sleep -Seconds 3
     MonitorProcess -ProcessName "magick.exe"
-    
+
     Move-Item -Path output -Destination year
 
     $pre_value = Get-YamlPropertyValue -PropertyPath "key_names.BEST_OF" -ConfigObject $global:ConfigObj -CaseSensitivity Upper
@@ -5385,12 +6614,12 @@ Function CreateYear {
 Function CreateOverlays {
     Write-Host "Creating Overlays"
     Set-Location $script_path
-    
-    $directories = @("award", "chart", "country", "franchise", "network", "playlist", "resolution", "streaming", "universe", "video_format")
-    $directories_no_trim = @("aspect", "content_rating", "genre", "seasonal", "studio")
-    $size1 = "285x85>"
-    $size2 = "440x100>"
-    
+
+    $directories = @("award", "chart", "chart\white", "country", "franchise", "network", "network\white", "playlist", "resolution", "streaming", "streaming\white", "universe")
+    $directories_no_trim = @("aspect", "content_rating", "genre", "seasonal", "studio", "video_format")
+    $size1 = "285x85"
+    $size2 = "440x100"
+
     Foreach ($dir in $directories_no_trim) {
         $path = Join-Path $script_path $dir
         $outputPath = Join-Path $path "overlays"
@@ -5514,15 +6743,15 @@ Function Get-Checksum-Files {
     $ttf15 = "Barlow-Regular.ttf"
     $ttf16 = "SpecialElite-Regular.ttf"
     $ttf17 = "Trochut-Regular.ttf"
-    
+
     $fade1 = "@bottom-top-fade.png"
     $fade2 = "@bottom-up-fade.png"
     $fade3 = "@center-out-fade.png"
     $fade4 = "@none.png"
     $fade5 = "@top-down-fade.png"
-    
+
     $trans1 = "transparent.png"
-    
+
     $expectedChecksum_sep1 = "8FFEF200F9AA2126052684FBAF5BB1B96F402FAF3055532FBBFFCABF610D9573"
     $expectedChecksum_sep2 = "940E5F5BD81B0C7388BDA0B6E639D59BAEFAABAD78F04F41982440D49BAE8871"
     $expectedChecksum_sep3 = "AB8DBC5FCE661BDFC643F9697EEC1463CD2CDE90E4594B232A6B92C272DE0561"
@@ -5597,7 +6826,7 @@ Function Get-Checksum-Files {
     Compare-FileChecksum -Path $script_path\@base\$sep20 -ExpectedChecksum $expectedChecksum_sep20 -failFlag $failFlag
     Compare-FileChecksum -Path $script_path\@base\$sep21 -ExpectedChecksum $expectedChecksum_sep21 -failFlag $failFlag
     Compare-FileChecksum -Path $script_path\@base\$sep22 -ExpectedChecksum $expectedChecksum_sep22 -failFlag $failFlag
-    
+
     Compare-FileChecksum -Path $script_path\fonts\$ttf1 -ExpectedChecksum $expectedChecksum_ttf1 -failFlag $failFlag
     Compare-FileChecksum -Path $script_path\fonts\$ttf2 -ExpectedChecksum $expectedChecksum_ttf2 -failFlag $failFlag
     Compare-FileChecksum -Path $script_path\fonts\$ttf3 -ExpectedChecksum $expectedChecksum_ttf3 -failFlag $failFlag
@@ -5615,15 +6844,15 @@ Function Get-Checksum-Files {
     Compare-FileChecksum -Path $script_path\fonts\$ttf15 -ExpectedChecksum $expectedChecksum_ttf15 -failFlag $failFlag
     Compare-FileChecksum -Path $script_path\fonts\$ttf16 -ExpectedChecksum $expectedChecksum_ttf16 -failFlag $failFlag
     Compare-FileChecksum -Path $script_path\fonts\$ttf17 -ExpectedChecksum $expectedChecksum_ttf17 -failFlag $failFlag
-    
+
     Compare-FileChecksum -Path $script_path\fades\$fade1 -ExpectedChecksum $expectedChecksum_fade1 -failFlag $failFlag
     Compare-FileChecksum -Path $script_path\fades\$fade2 -ExpectedChecksum $expectedChecksum_fade2 -failFlag $failFlag
     Compare-FileChecksum -Path $script_path\fades\$fade3 -ExpectedChecksum $expectedChecksum_fade3 -failFlag $failFlag
     Compare-FileChecksum -Path $script_path\fades\$fade4 -ExpectedChecksum $expectedChecksum_fade4 -failFlag $failFlag
     Compare-FileChecksum -Path $script_path\fades\$fade5 -ExpectedChecksum $expectedChecksum_fade5 -failFlag $failFlag
-    
+
     Compare-FileChecksum -Path $script_path\$trans1 -ExpectedChecksum $expectedChecksum_trans1 -failFlag $failFlag
-        
+
     Write-Output "End:" $failFlag.Value
 
     if ($failFlag.Value) {
@@ -5718,6 +6947,7 @@ Read-Yaml
 #################################
 # Imagemagick version check
 #################################
+. .\create_poster.ps1
 Test-ImageMagick
 $test = $global:magick
 
@@ -5944,3 +7174,29 @@ WriteToLogFile $string
 $string = "Posters per minute                    : " + $speed.ToString()
 WriteToLogFile $string
 WriteToLogFile "#### END ####"
+
+# Check for errors
+if ($errorCount1 -ne 0 -or $errorCount2 -ne 0) {
+    # Display a flashing red console message with more details
+    $flashCount = 20
+
+    Write-Host ("*" * 100) -ForegroundColor Red
+    Write-Host ("* Errors detected in script. Check the log file for details:") -ForegroundColor Red
+    Write-Host ("* [ERROR] lines in create_default_poster: $errorCount1") -ForegroundColor Red
+    Write-Host ("* [ERROR] lines in create_poster        : $errorCount2") -ForegroundColor Red
+    Write-Host ("*" * 100) -ForegroundColor Red
+
+
+    for ($i = 0; $i -lt $flashCount; $i++) {
+        if ($i % 2 -eq 0) {
+            Write-Host "Flashing message. Check the log for details." -ForegroundColor Red -NoNewline
+        }
+        else {
+            Write-Host "Flashing message. Check the log for details." -ForegroundColor Yellow -NoNewline
+        }
+
+        Start-Sleep -Milliseconds 500
+        Write-Host -NoNewline ("`r" + (" " * [System.Console]::BufferWidth) + "`r")
+        Start-Sleep -Milliseconds 500
+    }
+}

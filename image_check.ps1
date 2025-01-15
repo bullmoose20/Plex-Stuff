@@ -3,7 +3,7 @@
 # v1.2
 # author: bullmoose20
 #
-# DESCRIPTION: 
+# DESCRIPTION:
 # In a powershell window this will go through all your images in the images folder mentioned to scan and report anomalies
 # It will create an output log that you can review and fix issues by uploading to https://www.themoviedb.org/ and ensuring that its a primary so that when it gets downloaded, the proper image can be processed by other scripts
 #
@@ -14,7 +14,7 @@
 #
 # PARAMETERS:
 # -images_location          (specify the images folder location with transparent images for script to scan and report on)
-# 
+#
 # EXAMPLE:
 # .\image_check.ps1 -images_location c:\temp\people\transparent
 ####################################################
@@ -103,7 +103,7 @@ Function Test-Image {
     $global:Counter3++
     WriteToLogFile "WARNING                      : WARNING3!~$filepre~$noextension is most likely a HEAD CHOP and should be reviewed and changed for a better headshot!~Headchop values~$string"
   }
-  
+
   if ($baseImageRatio -eq $imageRatio) {
   }
   else {
@@ -182,7 +182,7 @@ foreach ($filepre in $filespre) {
     PercentComplete = $([math]::Round($percentComplete, 2))
   }
   Write-Progress @Progress -Id 1
-  # Increment the counter. 
+  # Increment the counter.
   $Counter++
 
   $noextension = [System.IO.Path]::GetFileNameWithoutExtension($filepre.FullName)
@@ -192,7 +192,7 @@ foreach ($filepre in $filespre) {
   # Validate quality of image
   WriteToLogFile "Image-Check                  : $noextension"
   Image-Check
-    
+
 }
 
 
@@ -246,7 +246,7 @@ else {
   $issues_pct = [math]::Round(0, 2)
 }
 $string = "Total files                  : " + ($filespre.count).ToString()
-WriteToLogFile $string 
+WriteToLogFile $string
 WriteToLogFile "Total issues                 : $tot"
 WriteToLogFile "Total checks                 : $tot_chks"
 WriteToLogFile "Percent Issues               : $issues_pct %"
