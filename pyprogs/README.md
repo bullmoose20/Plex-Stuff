@@ -436,9 +436,7 @@ Or how to call it to run from the venv
 .\venv\scripts\python orchestrator.py
 ```
 
-Additionally, there is a `visualize_task_stats.py` script that will read the output of times from the json logs to share stats in 2 types of images so you can see anomalies with the loops and runs for your tasks.
-
-The logs will be sent to the `logs` subdirectory. Stats to the `stats` directory. Images to the `images` directory
+The logs will be sent to the `logs` subdirectory.
 
 [Back to top](#Scripts)
 

@@ -3,5 +3,3 @@ python-dotenv
 requests
 psutil
 pyyaml
-matplotlib
-numpy
