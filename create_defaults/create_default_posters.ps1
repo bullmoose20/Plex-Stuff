@@ -4973,6 +4973,7 @@ Function CreateNetwork {
         ' | Tokyo MX.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Tokyo MX| #0407A9| 1| 1| 0| 0',
         ' | Travel Channel.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Travel Channel| #D4FFD9| 1| 1| 0| 0',
         ' | truTV.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | truTV| #C79F26| 1| 1| 0| 0',
+        ' | tubi.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | tubi| #873AEF| 1| 1| 0| 0',
         ' | Turner Classic Movies.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Turner Classic Movies| #616161| 1| 1| 0| 0',
         ' | TV 2.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | TV 2| #8040C7| 1| 1| 0| 0',
         ' | tv asahi.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | tv asahi| #97A092| 1| 1| 0| 0',
@@ -5401,6 +5402,7 @@ Function CreateStreaming {
         '| Quibi.png| +0| 1400| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Quibi| #FFF9C4| 1| 1| 0| 0',
         '| Showtime.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Showtime| #8F1212| 1| 1| 0| 0',
         '| Stan.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Stan| #227CC0| 1| 1| 0| 0',
+        '| tubi.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | tubi| #873AEF| 1| 1| 0| 0',
         '| YouTube.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | YouTube| #CD201F| 1| 1| 0| 0',
         'MOVIES| All 4.png| -500| 1000| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | All 4_movies| #14AE9A| 1| 1| 0| 0',
         'MOVIES| Apple TV+.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Apple TV+_movies| #494949| 1| 1| 0| 0',
@@ -5426,6 +5428,7 @@ Function CreateStreaming {
         'MOVIES| Quibi.png| -500| 1400| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Quibi_movies| #FFF9C4| 1| 1| 0| 0',
         'MOVIES| Showtime.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Showtime_movies| #8F1212| 1| 1| 0| 0',
         'MOVIES| Stan.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Stan_movies| #227CC0| 1| 1| 0| 0',
+        'MOVIES| tubi.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | tubi_movies| #873AEF| 1| 1| 0| 0',
         'MOVIES| YouTube.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | YouTube_movies| #CD201F| 1| 1| 0| 0',
         'SHOWS| All 4.png| -500| 1000| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | All 4_shows| #14AE9A| 1| 1| 0| 0',
         'SHOWS| Apple TV+.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Apple TV+_shows| #494949| 1| 1| 0| 0',
@@ -5451,6 +5454,7 @@ Function CreateStreaming {
         'SHOWS| Quibi.png| -500| 1400| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Quibi_shows| #FFF9C4| 1| 1| 0| 0',
         'SHOWS| Showtime.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Showtime_shows| #8F1212| 1| 1| 0| 0',
         'SHOWS| Stan.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Stan_shows| #227CC0| 1| 1| 0| 0',
+        'SHOWS| tubi.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | tubi_shows| #873AEF| 1| 1| 0| 0',
         'SHOWS| YouTube.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | YouTube_shows| #CD201F| 1| 1| 0| 0',
         'ORIGINALS| All 4.png| -500| 1000| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | All 4_originals| #14AE9A| 1| 1| 0| 0',
         'ORIGINALS| Apple TV+.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Apple TV+_originals| #494949| 1| 1| 0| 0',
@@ -5476,6 +5480,7 @@ Function CreateStreaming {
         'ORIGINALS| Quibi.png| -500| 1400| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Quibi_originals| #FFF9C4| 1| 1| 0| 0',
         'ORIGINALS| Showtime.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Showtime_originals| #8F1212| 1| 1| 0| 0',
         'ORIGINALS| Stan.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Stan_originals| #227CC0| 1| 1| 0| 0',
+        'ORIGINALS| tubi.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | tubi_originals| #873AEF| 1| 1| 0| 0',
         'ORIGINALS| YouTube.png| -500| 1600| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | YouTube_originals| #CD201F| 1| 1| 0| 0'
     ) | ConvertFrom-Csv -Delimiter '|'
 
