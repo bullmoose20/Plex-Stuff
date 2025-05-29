@@ -4454,6 +4454,7 @@ Function CreateGenre {
         'ARTIFICIAL_INTELLIGENCE| Artificial Intelligence.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Artificial Intelligence| #299206| 1| 1| 0| 1',
         'ASSASSIN| Assassin.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Assassin| #C52124| 1| 1| 0| 1',
         'ASTRONAUT| Astronaut.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Astronaut| #773A54| 1| 1| 0| 1',
+        'BACKROADS_HORROR| Backroads Horror.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Backroads Horror| #6EAB36| 1| 1| 0| 1',
         'BETRAYAL| Betrayal.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Betrayal| #06CE03| 1| 1| 0| 1',
         'BIOGRAPHY| Biography.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Biography| #C1A13E| 1| 1| 0| 1',
         'BIOPIC| Biopic.png| -500| 1800| +850| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Biopic| #C1A13E| 1| 1| 0| 1',
