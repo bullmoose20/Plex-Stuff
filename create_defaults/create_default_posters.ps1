@@ -4862,6 +4862,7 @@ Function CreateNetwork {
         ' | GMA Network.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | GMA Network| #A755A4| 1| 1| 0| 0',
         ' | Hallmark.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | Hallmark| #601CB4| 1| 1| 0| 0',
         ' | HBO.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | HBO| #458EAD| 1| 1| 0| 0',
+        ' | HBO Max.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | HBO Max| #4C0870| 1| 1| 0| 0',
         ' | HGTV.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | HGTV| #3CA38F| 1| 1| 0| 0',
         ' | History.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | History| #A57E2E| 1| 1| 0| 0',
         ' | HOT3.png| +0| 1600| +0| ComfortAa-Medium| | #FFFFFF| 0| 15| #FFFFFF| | HOT3| #934C19| 1| 1| 0| 0',
