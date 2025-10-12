@@ -55,7 +55,7 @@ $global:CurrentImagemagickversion = $null
 $global:LatestImagemagickversion = $null
 $global:AutoUpdateIM = $true
 $global:HeaderWritten = $false
-$CurrentScriptVersion = "2.1"
+$CurrentScriptVersion = "2.2"
 
 #################################
 # collect paths
@@ -176,6 +176,83 @@ function Get-Platform {
   }
 }
 
+# ===== Helpers for nested .7z.zip extraction (auto-install 7Zip4Powershell) =====
+function Ensure-7Zip4Powershell {
+  $mod = Get-Module -ListAvailable 7Zip4Powershell -ErrorAction SilentlyContinue
+  if (-not $mod) {
+    try {
+      try { [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 } catch {}
+      $repo = Get-PSRepository -Name PSGallery -ErrorAction SilentlyContinue
+      if (-not $repo) { Register-PSRepository -Default }
+      if ((Get-PSRepository PSGallery).InstallationPolicy -ne 'Trusted') {
+        Set-PSRepository -Name PSGallery -InstallationPolicy Trusted -ErrorAction SilentlyContinue
+      }
+      $null = Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force -ErrorAction SilentlyContinue
+      Install-Module -Name 7Zip4Powershell -Scope CurrentUser -Force -AllowClobber -ErrorAction Stop
+    } catch { }
+  }
+  $mod = Get-Module -ListAvailable 7Zip4Powershell -ErrorAction SilentlyContinue
+  if ($mod) {
+    Import-Module 7Zip4Powershell -ErrorAction SilentlyContinue | Out-Null
+    return [bool](Get-Command Expand-7Zip -ErrorAction SilentlyContinue -Module 7Zip4Powershell `
+                  -or (Get-Command Expand-7ZipArchive -ErrorAction SilentlyContinue -Module 7Zip4Powershell))
+  }
+  return $false
+}
+function Get-7zExe {
+  foreach ($name in '7z.exe','7za.exe','7zr.exe') {
+    $cmd = Get-Command $name -ErrorAction SilentlyContinue
+    if ($cmd) { return $cmd.Path }
+  }
+  foreach ($p in @(
+    (Join-Path ${env:ProgramFiles} '7-Zip\7z.exe'),
+    (Join-Path ${env:ProgramFiles(x86)} '7-Zip\7z.exe')
+  )) { if (Test-Path $p) { return $p } }
+  return $null
+}
+function Expand-Inner7z {
+  param([Parameter(Mandatory)] [string] $Archive7z,
+        [Parameter(Mandatory)] [string] $DestinationPath)
+  if (Get-Command Expand-7Zip -ErrorAction SilentlyContinue -Module 7Zip4Powershell) {
+    Expand-7Zip -ArchiveFileName $Archive7z -TargetPath $DestinationPath; return
+  }
+  if (Get-Command Expand-7ZipArchive -ErrorAction SilentlyContinue -Module 7Zip4Powershell) {
+    Expand-7ZipArchive -ArchiveFileName $Archive7z -TargetPath $DestinationPath; return
+  }
+  $sevenZip = Get-7zExe
+  if ($sevenZip) {
+    New-Item -ItemType Directory -Force -Path $DestinationPath | Out-Null
+    & $sevenZip x -y ("-o$DestinationPath") -- "$Archive7z"
+    if ($LASTEXITCODE -ne 0) { throw "7z.exe failed ($LASTEXITCODE) extracting: $Archive7z" }
+    return
+  }
+  throw "No 7Zip4Powershell cmdlets and no 7z.exe found; cannot extract $Archive7z."
+}
+function Expand-NestedArchive {
+  param([Parameter(Mandatory)] [string] $ArchivePath, [Parameter(Mandatory)] [string] $DestinationPath)
+  $ArchiveFull = (Resolve-Path $ArchivePath).Path
+  New-Item -ItemType Directory -Force -Path $DestinationPath | Out-Null
+  $null = Ensure-7Zip4Powershell
+
+  if ($ArchiveFull -match '\.7z\.zip$') {
+    $tmp = Join-Path $env:TEMP ("exzip_" + [guid]::NewGuid().Guid)
+    New-Item -ItemType Directory -Force -Path $tmp | Out-Null
+    Expand-Archive -Path $ArchiveFull -DestinationPath $tmp -Force
+    $inner = Get-ChildItem -Path $tmp -Recurse -File -Filter '*.7z' | Select-Object -First 1
+    if (-not $inner) { Remove-Item -Recurse -Force $tmp; throw "No .7z found inside $ArchivePath." }
+    Expand-Inner7z -Archive7z $inner.FullName -DestinationPath $DestinationPath
+    Remove-Item -Recurse -Force $tmp
+  }
+  elseif ($ArchiveFull -like '*.zip') {
+    Expand-Archive -Path $ArchiveFull -DestinationPath $DestinationPath -Force
+  }
+  elseif ($ArchiveFull -like '*.7z') {
+    Expand-Inner7z -Archive7z $ArchiveFull -DestinationPath $DestinationPath
+  }
+  else { throw "Unsupported archive type: $ArchiveFull" }
+}
+# ===== End helpers =====
+
 #################################
 # Get-LatestScriptVersion function
 #################################
@@ -186,59 +263,6 @@ function Get-LatestScriptVersion {
   catch {
     Write-Host "Could not query latest script version, Error: $($_.Exception.Message)"
     return $null
-  }
-}
-
-#################################
-# CheckImageMagick function
-#################################
-function CheckImageMagick {
-  param (
-    [string]$magick,
-    [string]$magickinstalllocation
-  )
-
-  if (!(Test-Path $magick)) {
-    if ($global:OSType -ne "Win32NT") {
-      if ($global:OSType -ne "Docker") {
-        Write-Host "ImageMagick missing, downloading the portable version for you..."
-        $magickUrl = "https://imagemagick.org/archive/binaries/magick"
-        Invoke-WebRequest -Uri $magickUrl -OutFile "$global:ScriptRoot/magick"
-        chmod +x "$global:ScriptRoot/magick"
-        Write-Host "Made the portable Magick executable..."
-      }
-    }
-    else {
-      Write-Host "ImageMagick missing, downloading it for you..."
-      $errorCount++
-      $result = Invoke-WebRequest "https://imagemagick.org/archive/binaries/?C=M;O=D"
-      $LatestRelease = ($result.links.href | Where-Object { $_ -like '*portable-Q16-HDRI-x64.zip' } | Sort-Object -Descending)[0]
-      $DownloadPath = Join-Path -Path $global:ScriptRoot -ChildPath (Join-Path -Path 'temp' -ChildPath $LatestRelease)
-
-      # Ensure the $temp directory exists
-      if (-not (Test-Path -LiteralPath $global:ScriptRoot\temp)) {
-        New-Item -ItemType Directory -Path $global:ScriptRoot\temp | Out-Null
-      }
-
-      Invoke-WebRequest "https://imagemagick.org/archive/binaries/$LatestRelease" -OutFile $DownloadPath
-
-      # Ensure the $magickinstalllocation directory exists
-      if (-not (Test-Path -LiteralPath $magickinstalllocation)) {
-        New-Item -ItemType Directory -Path $magickinstalllocation | Out-Null
-      }
-
-      Expand-Archive -Path $DownloadPath -DestinationPath $magickinstalllocation -Force
-      if ((Get-ChildItem -Directory -LiteralPath $magickinstalllocation).name -eq $($LatestRelease.replace('.zip', ''))) {
-        Copy-item -Force -Recurse "$magickinstalllocation\$((Get-ChildItem -Directory -LiteralPath $magickinstalllocation).name)\*" $magickinstalllocation
-        Remove-Item -Recurse -LiteralPath "$magickinstalllocation\$((Get-ChildItem -Directory -LiteralPath $magickinstalllocation).name)" -Force
-      }
-      if (Test-Path -LiteralPath $magickinstalllocation\magick.exe) {
-        Write-Host "Placed Portable ImageMagick here: $magickinstalllocation"
-      }
-      Else {
-        Write-Host "Error During extraction, please manually install/copy portable Imagemagick from here: https://imagemagick.org/archive/binaries/$LatestRelease"
-      }
-    }
   }
 }
 
@@ -270,35 +294,30 @@ function SetMagickLocation {
     }
     catch {
       Write-Host "Could not query installed Imagemagick"
-      # Clear Running File
-      if (Test-Path $CurrentlyRunning) {
-        Remove-Item -LiteralPath $CurrentlyRunning | out-null
-      }
+      if (Test-Path $CurrentlyRunning) { Remove-Item -LiteralPath $CurrentlyRunning | Out-Null }
       Exit
     }
     $CurrentImagemagickversion = [regex]::Match($CurrentImagemagickversion, 'Version: ImageMagick (\d+(\.\d+){1,2}-\d+)')
     $CurrentImagemagickversion = $CurrentImagemagickversion.Groups[1].Value.replace('-', '.')
     $global:CurrentImagemagickversion = $CurrentImagemagickversion
-    # Write-Host "Current Imagemagick Version: $CurrentImagemagickversion"
   }
   Else {
-    # Check ImageMagick now:
+    # Ensure it's present (installs on first run if missing)
     CheckImageMagick -magick $magick -magickinstalllocation $magickinstalllocation
 
     $CurrentImagemagickversion = & $magick -version
     $CurrentImagemagickversion = [regex]::Match($CurrentImagemagickversion, 'Version: ImageMagick (\d+(\.\d+){1,2}-\d+)')
     $CurrentImagemagickversion = $CurrentImagemagickversion.Groups[1].Value.replace('-', '.')
     $global:CurrentImagemagickversion = $CurrentImagemagickversion
-    # Write-Host "Current Imagemagick Version: $CurrentImagemagickversion"
   }
+
+  # Discover latest available version
   if ($global:OSType -eq "Docker") {
     $Url = "https://pkgs.alpinelinux.org/package/edge/community/x86_64/imagemagick"
     $response = Invoke-WebRequest -Uri $url
     $htmlContent = $response.Content
-    #$regexPattern = '<th class="header">Version<\/th>\s*<td>\s*<strong>\s*<a[^>]*>([^<]+)<\/a>\s*<\/strong>\s*<\/td>' # Old Pattern 20240929
     $regexPattern = '<th class="header">Version<\/th>\s*<td>\s*<strong>([\d\.]+-r\d+)<\/strong>\s*<\/td>'
     $Versionmatching = [regex]::Matches($htmlContent, $regexPattern)
-
     if ($Versionmatching.Count -gt 0) {
       $LatestImagemagickversion = $Versionmatching[0].Groups[1].Value.split('-')[0]
     }
@@ -306,25 +325,52 @@ function SetMagickLocation {
   Elseif ($global:OSType -eq "Win32NT") {
     $Url = "https://imagemagick.org/archive/binaries/?C=M;O=D"
     $result = Invoke-WebRequest -Uri $Url
-    $LatestImagemagickversion = ($result.links.href | Where-Object { $_ -like '*portable-Q16-HDRI-x64.zip' } | Sort-Object -Descending)[0].Replace('-portable-Q16-HDRI-x64.zip', '').Replace('ImageMagick-', '')
+
+    # Prefer HDRI, then fallback to non-HDRI; allow optional .7z before .zip and x64|win64
+    $links = @()
+    if ($result.Links) { $links = @($result.Links.href) }
+
+    $imFile = ($links |
+      Where-Object { $_ -match 'ImageMagick-.*-portable-Q16-HDRI-(?:x64|win64)(?:\.7z)?\.zip$' } |
+      Sort-Object -Descending | Select-Object -First 1)
+
+    if (-not $imFile) {
+      $imFile = ($links |
+        Where-Object { $_ -match 'ImageMagick-.*-portable-Q16-(?:x64|win64)(?:\.7z)?\.zip$' } |
+        Sort-Object -Descending | Select-Object -First 1)
+    }
+
+    if (-not $imFile) {
+      # Fallback to parsing raw HTML if .Links is null/empty
+      $rx = 'href="([^"]*ImageMagick-[^"]*-portable-Q16-(?:HDRI-)?(?:x64|win64)(?:\.7z)?\.zip)"'
+      $m  = [regex]::Matches($result.Content, $rx, 'IgnoreCase')
+      $imFile = ($m | ForEach-Object { $_.Groups[1].Value } | Sort-Object -Descending | Select-Object -First 1)
+    }
+
+    if ($imFile) {
+      $LatestImagemagickversion = $imFile `
+        -replace '^.*ImageMagick-','' `
+        -replace '-portable-Q16-(?:HDRI-)?(?:x64|win64)(?:\.7z)?\.zip$',''
+    }
   }
   Else {
     $LatestImagemagickversion = (Invoke-RestMethod -Uri "https://api.github.com/repos/ImageMagick/ImageMagick/releases/latest" -Method Get).tag_name
   }
+
   if ($LatestImagemagickversion) {
     $LatestImagemagickversion = $LatestImagemagickversion.replace('-', '.')
     $global:LatestImagemagickversion = $LatestImagemagickversion
-    # Write-Host "Latest Imagemagick Version: $LatestImagemagickversion"
   }
 
-  # Auto Update Magick
+  # Auto Update Magick (prefer HDRI on Windows)
   if ($global:AutoUpdateIM -eq 'true' -and $global:OSType -ne "Docker" -and $LatestImagemagickversion -gt $CurrentImagemagickversion -and $global:OSarch -ne "Arm64") {
     if ($global:OSType -eq "Win32NT") {
-      Remove-Item -LiteralPath $magickinstalllocation -Recurse -Force
+      Remove-Item -LiteralPath $magickinstalllocation -Recurse -Force -ErrorAction SilentlyContinue
     }
     Else {
-      Remove-Item -LiteralPath "$global:ScriptRoot/magick" -Force
+      Remove-Item -LiteralPath "$global:ScriptRoot/magick" -Force -ErrorAction SilentlyContinue
     }
+
     if ($global:OSType -ne "Win32NT") {
       if ($global:OSType -ne "Docker") {
         Write-Host "Downloading the latest Imagemagick portable version for you..."
@@ -337,18 +383,137 @@ function SetMagickLocation {
     else {
       Write-Host "Downloading the latest Imagemagick portable version for you..."
       $result = Invoke-WebRequest "https://imagemagick.org/archive/binaries/?C=M;O=D"
-      $LatestRelease = ($result.links.href | Where-Object { $_ -like '*portable-Q16-HDRI-x64.zip' } | Sort-Object -Descending)[0]
-      $DownloadPath = Join-Path -Path $global:ScriptRoot -ChildPath (Join-Path -Path 'temp' -ChildPath $LatestRelease)
-      Invoke-WebRequest "https://imagemagick.org/archive/binaries/$LatestRelease" -OutFile $DownloadPath
-      Expand-Archive -Path $DownloadPath -DestinationPath $magickinstalllocation -Force
-      if ((Get-ChildItem -Directory -LiteralPath $magickinstalllocation).name -eq $($LatestRelease.replace('.zip', ''))) {
-        Copy-item -Force -Recurse "$magickinstalllocation\$((Get-ChildItem -Directory -LiteralPath $magickinstalllocation).name)\*" $magickinstalllocation
-        Remove-Item -Recurse -LiteralPath "$magickinstalllocation\$((Get-ChildItem -Directory -LiteralPath $magickinstalllocation).name)" -Force
+
+      $links = @()
+      if ($result.Links) { $links = @($result.Links.href) }
+
+      $LatestRelease = ($links |
+        Where-Object { $_ -match 'ImageMagick-.*-portable-Q16-HDRI-(?:x64|win64)(?:\.7z)?\.zip$' } |
+        Sort-Object -Descending | Select-Object -First 1)
+
+      if (-not $LatestRelease) {
+        $LatestRelease = ($links |
+          Where-Object { $_ -match 'ImageMagick-.*-portable-Q16-(?:x64|win64)(?:\.7z)?\.zip$' } |
+          Sort-Object -Descending | Select-Object -First 1)
       }
-      if (Test-Path -LiteralPath $magickinstalllocation\magick.exe) {
+
+      if (-not $LatestRelease) {
+        $rx = 'href="([^"]*ImageMagick-[^"]*-portable-Q16-(?:HDRI-)?(?:x64|win64)(?:\.7z)?\.zip)"'
+        $m  = [regex]::Matches($result.Content, $rx, 'IgnoreCase')
+        $LatestRelease = ($m | ForEach-Object { $_.Groups[1].Value } | Sort-Object -Descending | Select-Object -First 1)
+      }
+
+      $tempDir = Join-Path $global:ScriptRoot 'temp'
+      New-Item -ItemType Directory -Path $tempDir -Force | Out-Null
+      $DownloadPath = Join-Path -Path $tempDir -ChildPath $LatestRelease
+      Invoke-WebRequest "https://imagemagick.org/archive/binaries/$LatestRelease" -OutFile $DownloadPath
+
+      if ($LatestRelease -match '\.7z\.zip$') {
+        Expand-NestedArchive -ArchivePath $DownloadPath -DestinationPath $magickinstalllocation
+      } else {
+        Expand-Archive -Path $DownloadPath -DestinationPath $magickinstalllocation -Force
+      }
+
+      # Flatten extracted folder if present
+      $baseName = ($LatestRelease -replace '\.7z\.zip$','' -replace '\.zip$','')
+      $sub = Get-ChildItem -Directory -LiteralPath $magickinstalllocation -ErrorAction SilentlyContinue | Select-Object -First 1
+      if ($sub -and ($sub.Name -eq $baseName -or $sub.Name -like 'ImageMagick-*')) {
+        Copy-Item -Force -Recurse (Join-Path $magickinstalllocation "$($sub.Name)\*") $magickinstalllocation
+        Remove-Item -Recurse -LiteralPath (Join-Path $magickinstalllocation $sub.Name) -Force
+      }
+
+      if (Test-Path -LiteralPath (Join-Path $magickinstalllocation 'magick.exe')) {
         Write-Host "Placed Portable ImageMagick here: $magickinstalllocation"
       }
-      Else {
+      else {
+        Write-Host "Error During extraction, please manually install/copy portable Imagemagick from here: https://imagemagick.org/archive/binaries/$LatestRelease"
+      }
+    }
+  }
+}
+
+
+#################################
+# CheckImageMagick function
+#################################
+function CheckImageMagick {
+  param (
+    [string]$magick,
+    [string]$magickinstalllocation
+  )
+
+  if (!(Test-Path $magick)) {
+    if ($global:OSType -ne "Win32NT") {
+      if ($global:OSType -ne "Docker") {
+        Write-Host "ImageMagick missing, downloading the portable version for you..."
+        $magickUrl = "https://imagemagick.org/archive/binaries/magick"
+        Invoke-WebRequest -Uri $magickUrl -OutFile "$global:ScriptRoot/magick"
+        chmod +x "$global:ScriptRoot/magick"
+        Write-Host "Made the portable Magick executable..."
+      }
+    }
+    else {
+      Write-Host "ImageMagick missing, downloading it for you..."
+      $errorCount++
+
+      $result = Invoke-WebRequest "https://imagemagick.org/archive/binaries/?C=M;O=D"
+
+      # Prefer HDRI first, then non-HDRI; handle .7z.zip and x64|win64
+      $links = @()
+      if ($result.Links) { $links = @($result.Links.href) }
+
+      $LatestRelease = ($links |
+        Where-Object { $_ -match 'ImageMagick-.*-portable-Q16-HDRI-(?:x64|win64)(?:\.7z)?\.zip$' } |
+        Sort-Object -Descending | Select-Object -First 1)
+
+      if (-not $LatestRelease) {
+        $LatestRelease = ($links |
+          Where-Object { $_ -match 'ImageMagick-.*-portable-Q16-(?:x64|win64)(?:\.7z)?\.zip$' } |
+          Sort-Object -Descending | Select-Object -First 1)
+      }
+
+      if (-not $LatestRelease) {
+        $rx = 'href="([^"]*ImageMagick-[^"]*-portable-Q16-(?:HDRI-)?(?:x64|win64)(?:\.7z)?\.zip)"'
+        $m  = [regex]::Matches($result.Content, $rx, 'IgnoreCase')
+        $LatestRelease = ($m | ForEach-Object { $_.Groups[1].Value } | Sort-Object -Descending | Select-Object -First 1)
+      }
+
+      if (-not $LatestRelease) {
+        throw "Could not discover a Windows portable Q16 (HDRI preferred) x64 ImageMagick build."
+      }
+
+      # Ensure temp/install directories
+      $tempDir = Join-Path $global:ScriptRoot 'temp'
+      if (-not (Test-Path -LiteralPath $tempDir)) {
+        New-Item -ItemType Directory -Path $tempDir | Out-Null
+      }
+      if (-not (Test-Path -LiteralPath $magickinstalllocation)) {
+        New-Item -ItemType Directory -Path $magickinstalllocation | Out-Null
+      }
+
+      # Download
+      $DownloadPath = Join-Path -Path $tempDir -ChildPath $LatestRelease
+      Invoke-WebRequest "https://imagemagick.org/archive/binaries/$LatestRelease" -OutFile $DownloadPath
+
+      # Extract (.zip OR .7z.zip)
+      if ($LatestRelease -match '\.7z\.zip$') {
+        Expand-NestedArchive -ArchivePath $DownloadPath -DestinationPath $magickinstalllocation
+      } else {
+        Expand-Archive -Path $DownloadPath -DestinationPath $magickinstalllocation -Force
+      }
+
+      # Flatten if a subfolder was created
+      $baseName = ($LatestRelease -replace '\.7z\.zip$','' -replace '\.zip$','')
+      $sub = Get-ChildItem -Directory -LiteralPath $magickinstalllocation -ErrorAction SilentlyContinue | Select-Object -First 1
+      if ($sub -and ($sub.Name -eq $baseName -or $sub.Name -like 'ImageMagick-*')) {
+        Copy-Item -Force -Recurse (Join-Path $magickinstalllocation "$($sub.Name)\*") $magickinstalllocation
+        Remove-Item -Recurse -LiteralPath (Join-Path $magickinstalllocation $sub.Name) -Force
+      }
+
+      if (Test-Path -LiteralPath (Join-Path $magickinstalllocation 'magick.exe')) {
+        Write-Host "Placed Portable ImageMagick here: $magickinstalllocation"
+      }
+      else {
         Write-Host "Error During extraction, please manually install/copy portable Imagemagick from here: https://imagemagick.org/archive/binaries/$LatestRelease"
       }
     }
