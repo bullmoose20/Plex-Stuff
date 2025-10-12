@@ -36,10 +36,10 @@ D:\PLEX-STUFF\PYPROGS
 3. [process-tcards.cmd](#process-tcards) - Windows script to create properly sized PLEX titlecards to use with TCM or for other purposes
 4. [pumpanddump.sh](#pumpanddump) - Unraid script to automate the plex db repair when using hotio plex container
 5. [chk-video-codec.sh](#chk-video-codec) - Unraid script to find and sort files that have been converted to HEVC/H265 and those that have not been
-6. [create_poster.ps1](#create_poster) - Powershell script to create posters/images for PMM/PLEX/EMBY/JELLYFIN/OTHER
-7. [get_missing_people.ps1](#get_missing_people) - Scans your PMM meta* logs to find missing people posters to download and create the bw, rainier, orig, etc. style poster for PMM/PLEX/EMBY/JELLYFIN/OTHER
-8. [image_check.ps1](#image_check) - Scans your transparent images for anomalies like head-chops, backgrounds not removed, and black and white photos instead of a color photo to give you a report so you can go and fix those by uploading new and better options to https://www.themoviedb.org/
-9. [create_people_poster.ps1](#create_people_poster) - Scans your PMM meta* logs to find missing people posters and will download and create the bw, rainier, orig, transparent. style poster for PMM/PLEX/EMBY/JELLYFIN/OTHER. This script was put together by using the image_check, get_missing_people, and Power Automate Desktop Flow (remove background) all into 1
+6. [create_poster.ps1](#create_poster) - Powershell script to create posters/images for KOMETA/PMM/PLEX/EMBY/JELLYFIN/OTHER
+~~7. [get_missing_people.ps1](#get_missing_people) - Scans your PMM meta* logs to find missing people posters to download and create the bw, rainier, orig, etc. style poster for PMM/PLEX/EMBY/JELLYFIN/OTHER~~ moved to: https://github.com/Kometa-Team/Defaults-Image-Creation
+~~8. [image_check.ps1](#image_check) - Scans your transparent images for anomalies like head-chops, backgrounds not removed, and black and white photos instead of a color photo to give you a report so you can go and fix those by uploading new and better options to https://www.themoviedb.org/~~ moved to: https://github.com/Kometa-Team/Defaults-Image-Creation
+~~9. [create_people_poster.ps1](#create_people_poster) - Scans your PMM meta* logs to find missing people posters and will download and create the bw, rainier, orig, transparent. style poster for PMM/PLEX/EMBY/JELLYFIN/OTHER. This script was put together by using the image_check, get_missing_people, and Power Automate Desktop Flow (remove background) all into 1~~ moved to: https://github.com/Kometa-Team/Defaults-Image-Creation
 10. [PAD Flows](#pad_flows) - Various PAD flows for RPA stuff for PLEX, PMM, Other
     1.  [1-Convert Warning- No TMDb ID Found for IMDb ID](#1-Convert_Warning_No_TMDb_ID_Found_for_IMDb_ID) - PAD flow to deal with Convert Warnings in your meta.log file from PMM
           2. [1-Convert Warning- No TMDb ID Found for IMDb ID-Subflow-close_browsers]
