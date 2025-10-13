@@ -55,7 +55,7 @@ $global:CurrentImagemagickversion = $null
 $global:LatestImagemagickversion = $null
 $global:AutoUpdateIM = $true
 $global:HeaderWritten = $false
-$CurrentScriptVersion = "2.2"
+$CurrentScriptVersion = "2.3"
 
 #################################
 # collect paths
@@ -544,7 +544,7 @@ if ($Platform -ne 'Docker' -and $CurrentScriptVersion -ne $LatestScriptVersion) 
   Write-Host  "Backup current Script to: $CurrentScriptPath.bak"
   Copy-Item -Path $CurrentScriptPath -Destination "$CurrentScriptPath.bak" -Force
   try {
-    Invoke-WebRequest -Uri "https://github.com/fscorrupt/create_poster/raw/main/create_poster1.ps1" -OutFile $CurrentScriptPath -ErrorAction Stop
+    Invoke-WebRequest -Uri "https://github.com/bullmoose20/Plex-Stuff/raw/main/create_poster.ps1" -OutFile $CurrentScriptPath -ErrorAction Stop
     Write-Host "create_poster script updated to v$LatestScriptVersion, please restart script..."
   }
   catch {
