@@ -1,8 +1,10 @@
+# from multiprocessing import process
 import os
 import time
 import psutil
 from datetime import datetime, timedelta
 import logging
+import shutil
 import subprocess
 from plexapi.server import PlexServer
 from dotenv import load_dotenv
@@ -10,6 +12,8 @@ import requests
 from qbittorrentapi import Client, LoginFailed, APIConnectionError
 import yaml
 import argparse
+import json
+from pathlib import Path
 
 # Load environment variables
 load_dotenv()
@@ -18,7 +22,7 @@ RUNNING_PROCESSES = set()
 PAUSED_PROCESSES = set()
 SHUTDOWN_FLAG = False
 
-# For testing maintenance times, 
+# For testing maintenance times,
 # In UNIX: "touch mock.flg", "rm mock.flg"
 # In powershell: "New-Item -ItemType File -Name mock.flg", "Remove-Item mock.flg"
 MOCK_FLAG_FILE = os.getenv("MOCK_FLAG_FILE", "mock.flg")  # Default: "mock.flg"
@@ -48,7 +52,7 @@ NZBGET_PASSWORD = os.getenv("NZBGET_PASSWORD", "tegbzn6789")
 
 # === Helper Functions ===
 
-def execute_task(task, start, end):
+def execute_task(task, start, end, loop_count=None, current_task_idx=None, total_tasks=None, loop_start_mon=None):
     """Execute a task and return its duration and maintenance time."""
     log_and_print(f"Executing task: {task.get('description')}", "info")
     try:
@@ -59,7 +63,12 @@ def execute_task(task, start, end):
                 start,
                 end,
                 use_venv=task.get("use_venv"),
+                loop_count=loop_count,
+                current_task_idx=current_task_idx,
+                total_tasks=total_tasks,
+                loop_start_mon=loop_start_mon,
             )
+
         elif "action" in task:  # For Python function-based tasks
             action_function = globals().get(task["action"])
             if not action_function:
@@ -80,16 +89,16 @@ def ensure_return_value(func, *args, **kwargs):
 
 def setup_logging(max_logs=5):
     """
-    Configure logging to rotate logs with a timestamp.
-    The current log will always be named after the script, and previous logs will be archived
-    with a timestamp. The number of logs is limited to `max_logs`.
+    Configure logging to rotate logs with a timestamp in the 'logs/' directory.
     """
+    max_logs = int(max_logs)
 
-    max_logs = int(max_logs)  # Ensure max_logs is an integer
+    # Ensure logs directory exists
+    log_dir = "logs"
+    os.makedirs(log_dir, exist_ok=True)
 
     # Get the current script name without extension
     script_name = os.path.splitext(os.path.basename(__file__))[0]
-    log_dir = os.path.dirname(os.path.abspath(__file__))
     current_log_file = os.path.join(log_dir, f"{script_name}.log")
 
     # Generate a timestamp for the rotated log
@@ -105,7 +114,7 @@ def setup_logging(max_logs=5):
         [
             os.path.join(log_dir, f)
             for f in os.listdir(log_dir)
-            if f.startswith(script_name) and f.endswith(".log") and f != os.path.basename(current_log_file)
+            if f.startswith(script_name) and f.endswith(".log")
         ],
         key=os.path.getmtime,
     )
@@ -120,7 +129,6 @@ def setup_logging(max_logs=5):
         format="%(asctime)s - %(levelname)s - %(message)s",
     )
 
-    # Log the rotation action
     logging.info("Rotated log file to %s", rotated_log_file)
     logging.info("Logging started in %s", current_log_file)
 
@@ -130,6 +138,21 @@ def format_time(seconds):
     hours, remainder = divmod(int(seconds), 3600)
     minutes, seconds = divmod(remainder, 60)
     return f"{hours:02}:{minutes:02}:{seconds:02}"
+
+
+def elapsed_str(start_monotonic: float) -> str:
+    """Return HH:MM:SS elapsed since start_monotonic (monotonic clock)."""
+    return format_time(time.monotonic() - start_monotonic)
+
+
+def setup_directories():
+    """
+    Create directories for logs, images, and stats if they don't exist.
+    """
+    os.makedirs("logs", exist_ok=True)
+    os.makedirs("images", exist_ok=True)
+    os.makedirs("stats", exist_ok=True)
+    log_and_print("Directories set up: logs/, images/, stats/", "info")
 
 
 def connect_to_plex(retries=3, delay=5):
@@ -185,40 +208,77 @@ def log_process_tree_with_delay(parent_pid, delay=2.0):
         log_and_print(f"Parent process {parent_pid} no longer exists.", "warning")
 
 
-def run_task_with_pause_check(command, start, end):
-    """Run a task as a subprocess, pausing if maintenance starts."""
+def run_task_with_pause_check(command, start, end, loop_count=None, current_task_idx=None, total_tasks=None, loop_start_mon=None):
+    # Set default values if None
+    loop_count = loop_count or "?"
+    current_task_idx = current_task_idx or "?"
+    total_tasks = total_tasks or "?"
+    task_start_mon = time.monotonic()
+    run_task_with_pause_check._tick = 0
+
     log_and_print(TASK_DIVIDER, "info")
-    log_and_print(f"Starting task: {' '.join(command)}", "info")
+    loop_elapsed = elapsed_str(loop_start_mon) if loop_start_mon else "??:??:??"
+    task_elapsed = elapsed_str(task_start_mon)
+
+    task_info = f"Loop {loop_count} - Task {current_task_idx} / {total_tasks}"
+    log_and_print(
+        f"{task_info} (Loop Elapsed: {loop_elapsed}, Task Elapsed {task_elapsed}): "
+        f"Starting task: {' '.join(command)}",
+        "info"
+    )
 
     process = subprocess.Popen(command)
-    maintenance_time = 0  # Track the total maintenance time for this task
-    task_start_time = time.time()  # Track the task start time
+    RUNNING_PROCESSES.add(process.pid)
+    PAUSED_PROCESSES.discard(process.pid)
+    maintenance_time = 0
+    task_start_time = time.time()
 
     try:
-        # Log the process tree at launch
         log_process_tree_with_delay(process.pid, delay=0.1)
-        maintenance_start = None
 
-        while process.poll() is None:  # Check if the process is still running
-            if is_maintenance_time(start, end):
-                if not maintenance_start:
-                    maintenance_start = time.time()  # Start tracking maintenance time
-                log_and_print("Maintenance detected. Pausing task...", "info")
-                pause_process(process.pid)  # Pause the process
+        while process.poll() is None:
+            if is_maintenance_time(start, end, loop_count, current_task_idx, total_tasks):
+                loop_elapsed = elapsed_str(loop_start_mon) if loop_start_mon else "??:??:??"
+                task_elapsed = elapsed_str(task_start_mon)
 
-                # Wait until maintenance ends
-                while is_maintenance_time(start, end):
+                log_and_print(
+                    f"{task_info} (Loop Elapsed: {loop_elapsed}, Task Elapsed {task_elapsed}): "
+                    f"Maintenance detected. Pausing task...",
+                    "info"
+                    )
+                pause_start = time.time()
+                pause_process(process.pid)
+
+                while is_maintenance_time(start, end, loop_count, current_task_idx, total_tasks):
+                    loop_elapsed = elapsed_str(loop_start_mon) if loop_start_mon else "??:??:??"
+                    task_elapsed = elapsed_str(task_start_mon)
+
+                    log_and_print(
+                        f"{task_info} (Loop Elapsed: {loop_elapsed}, Task Elapsed {task_elapsed}): "
+                        f"Still within the maintenance window. Waiting...",
+                        "info"
+                    )
                     time.sleep(10)
 
-                log_and_print("Maintenance ended. Resuming task...", "info")
-                resume_process(process.pid)  # Resume the process
+                pause_end = time.time()
+                maintenance_time += pause_end - pause_start
+                log_and_print(f"{task_info}: Maintenance ended. Resuming task...", "info")
+                resume_process(process.pid)
 
-                if maintenance_start:
-                    maintenance_time += time.time() - maintenance_start  # Add to maintenance time
-                    maintenance_start = None  # Reset maintenance start time
-            else:
-                maintenance_start = None  # Ensure maintenance time is reset
-            time.sleep(5)  # Check periodically
+            run_task_with_pause_check._tick += 1
+
+            if run_task_with_pause_check._tick >= LOG_EVERY_N_CHECKS:
+                run_task_with_pause_check._tick = 0
+                loop_elapsed = elapsed_str(loop_start_mon) if loop_start_mon else "??:??:??"
+                task_elapsed = elapsed_str(task_start_mon)
+                log_and_print(
+                    f"{task_info} (Loop Elapsed: {loop_elapsed}, Task Elapsed {task_elapsed}): "
+                    f"Task still running...",
+                    "info"
+                )
+
+            time.sleep(5)
+
     except KeyboardInterrupt:
         log_and_print("Ctrl-C detected. Terminating subprocess...", "warning")
         process.terminate()
@@ -232,6 +292,8 @@ def run_task_with_pause_check(command, start, end):
 
     finally:
         # Ensure the process is terminated if still running
+        RUNNING_PROCESSES.discard(process.pid)
+        PAUSED_PROCESSES.discard(process.pid)
         if process.poll() is None:
             process.terminate()
             process.wait()
@@ -240,7 +302,7 @@ def run_task_with_pause_check(command, start, end):
     task_end_time = time.time()
     task_duration = task_end_time - task_start_time
 
-    log_and_print(f"Task completed: {' '.join(command)}", "info")
+    log_and_print(f"{task_info}: Task completed.", "info")
     log_and_print(f"Total time: {format_time(task_duration)}", "info")
     log_and_print(f"Active task time (excluding maintenance): {format_time(task_duration - maintenance_time)}", "info")
     log_and_print(f"Total maintenance time: {format_time(maintenance_time)}", "info")
@@ -289,62 +351,43 @@ def is_mock_maintenance_enabled():
     return None, None
 
 
-def is_maintenance_time(start, end):
-    """
-    Check if the current time falls within either the mock or real maintenance window.
-    Log status changes immediately and periodically log ongoing states every N checks.
-    """
+def is_maintenance_time(start, end, loop_count=None, current_task_idx=None, total_tasks=None):
     now = datetime.now()
-    if not hasattr(is_maintenance_time, "_state"):
-        is_maintenance_time._state = {
-            "last_status": None,
-            "log_counter": 0,  # Counter to track periodic logging
-        }
+    loop_count = loop_count or "?"
+    current_task_idx = current_task_idx or "?"
+    total_tasks = total_tasks or "?"
 
-    # Check mock maintenance first
+    task_info = f"Loop {loop_count} - Task {current_task_idx} / {total_tasks}"
+
     mock_start, mock_end = is_mock_maintenance_enabled()
     if mock_start and mock_end:
         in_maintenance = mock_start <= now <= mock_end
         current_status = "mock_maintenance" if in_maintenance else "no_maintenance"
     else:
-        # Check the real maintenance window
         try:
             now_time = now.time()
             start_time = datetime.strptime(start, "%H:%M").time()
             end_time = datetime.strptime(end, "%H:%M").time()
-            in_window = start_time <= now_time <= end_time
-            current_status = "real_maintenance" if in_window else "no_maintenance"
+            in_maintenance = start_time <= now_time <= end_time
+            current_status = "real_maintenance" if in_maintenance else "no_maintenance"
         except Exception as e:
-            log_and_print(f"Failed to check maintenance time: {e}", "error")
+            log_and_print(f"{task_info}: Error checking maintenance time: {e}", "error")
             return False
 
-    # Immediate logging if status changes
+    # Log status changes
+    if not hasattr(is_maintenance_time, "_state"):
+        is_maintenance_time._state = {"last_status": None, "log_counter": 0}
+
     if current_status != is_maintenance_time._state["last_status"]:
         is_maintenance_time._state["last_status"] = current_status
-        is_maintenance_time._state["log_counter"] = 0  # Reset counter on state change
-        if current_status == "mock_maintenance":
-            log_and_print("Currently within the mock maintenance window.", "info")
-        elif current_status == "real_maintenance":
-            log_and_print(f"Currently within the real maintenance window: {start} to {end}.", "info")
+        is_maintenance_time._state["log_counter"] = 0
+        if in_maintenance:
+            log_and_print(f"{task_info}: Entered maintenance window.", "info")
         else:
-            log_and_print("Currently outside any maintenance window.", "info")
+            log_and_print(f"{task_info}: Outside maintenance window.", "info")
+    return in_maintenance
 
-    # Periodic logging if the status remains the same
-    elif is_maintenance_time._state["log_counter"] >= LOG_EVERY_N_CHECKS:
-        is_maintenance_time._state["log_counter"] = 0  # Reset counter
-        if current_status == "mock_maintenance":
-            log_and_print("Still within the mock maintenance window.", "info")
-        elif current_status == "real_maintenance":
-            log_and_print(f"Still within the real maintenance window: {start} to {end}.", "info")
-        else:
-            log_and_print("Still outside any maintenance window.", "info")
 
-    # Increment the counter for periodic logging
-    is_maintenance_time._state["log_counter"] += 1
-
-    return current_status in {"mock_maintenance", "real_maintenance"}
-    
-    
 def get_child_processes(parent_pid):
     """
     Get all child processes for a given parent PID.
@@ -694,38 +737,67 @@ def resume_nzbget_downloads():
         raise Exception(f"Failed to resume NZBGet downloads: {resume_response.text}")
 
 
-def run_script_with_context(script_path, args, start, end, use_venv=None):
-    """
-    Run a script from its directory with specified arguments, pausing during maintenance.
-    """
+def run_script_with_context(script_path, args, start, end, use_venv=None,
+                            loop_count=None, current_task_idx=None, total_tasks=None,
+                            loop_start_mon=None):
+    loop_count = loop_count or "?"
+    current_task_idx = current_task_idx or "?"
+    total_tasks = total_tasks or "?"
+
+    task_info = f"Loop {loop_count} - Task {current_task_idx} / {total_tasks}"
+    log_and_print(f"{task_info}: Running script '{script_path}' with arguments {args}", "info")
+
+    # Change to the script's directory
     script_dir = os.path.dirname(script_path)
     script_name = os.path.basename(script_path)
     log_and_print(TASK_DIVIDER, "info")
     log_and_print(f"Running script '{script_name}' from directory '{script_dir}' with arguments {args}", "info")
 
-    # Change to the script's directory
     original_dir = os.getcwd()
     os.chdir(script_dir)
 
     try:
+        # Construct the command based on script type
         if script_name.endswith(".py"):
             command = ["python", script_name] + args
             if use_venv:
                 activate_venv = os.path.join(use_venv, "Scripts", "activate.bat")
-                command = f'cmd.exe /c "{activate_venv} && python {script_name} ' + " ".join(args) + '"'
+                command = [
+                    "cmd.exe",
+                    "/c",
+                    f"{activate_venv} && python {script_name} {' '.join(args)}"
+                ]
         elif script_name.endswith(".ps1"):
-            command = ["powershell", "-ExecutionPolicy", "Bypass", "-File", script_name] + args
+            pwsh = shutil.which("pwsh")
+            ps = pwsh if pwsh else "powershell"
+
+            command = [
+                ps,
+                "-NoProfile",
+                "-ExecutionPolicy", "Bypass",
+                "-File", script_name
+            ] + args
+
         else:
-            raise ValueError("Unsupported script type. Only .py and .ps1 are supported.")
+            raise ValueError(f"Unsupported script type: {script_name}. Only .py and .ps1 are supported.")
 
         log_and_print(TASK_DIVIDER, "info")
-        log_and_print(f"Starting task: {command}", "info")
-        return run_task_with_pause_check(command, start, end)  # Return the results directly
+        log_and_print(f"Starting task with command: {' '.join(command)}", "info")
+
+        # Run the task and return the results
+        return run_task_with_pause_check(
+            command,
+            start,
+            end,
+            loop_count=loop_count,
+            current_task_idx=current_task_idx,
+            total_tasks=total_tasks,
+            loop_start_mon=loop_start_mon,
+        )
     except Exception as e:
         log_and_print(f"Error while running script '{script_name}': {e}", "error")
         return 0, 0  # Return fallback values in case of an exception
     finally:
-        # Revert back to the original directory
         os.chdir(original_dir)
 
 
@@ -741,7 +813,8 @@ def monitor_maintenance_and_tasks(config_file):
         while True:
             loop_count += 1
             log_and_print(f"Starting Loop {loop_count}...", "info")
-            loop_start_time = time.time()
+
+            loop_start_mon = time.monotonic()
             total_maintenance_time = 0
             total_active_time = 0
             total_task_time = 0
@@ -749,10 +822,19 @@ def monitor_maintenance_and_tasks(config_file):
             start, end = get_plex_maintenance_window()
 
             for idx, task in enumerate(tasks, start=1):
-                task_progress = f"Loop {loop_count} - Starting Task {idx}/{len(tasks)}: {task.get('description')}"
+                task_progress = f"Loop {loop_count} - Task {idx} / {len(tasks)}: {task.get('description')}"
                 log_and_print(task_progress, "info")
+
                 try:
-                    task_duration, maintenance_time = execute_task(task, start, end)
+                    task_duration, maintenance_time = execute_task(
+                        task,
+                        start,
+                        end,
+                        loop_count=loop_count,
+                        current_task_idx=idx,
+                        total_tasks=len(tasks),
+                        loop_start_mon=loop_start_mon
+                    )
                     active_time = task_duration - maintenance_time
                     total_maintenance_time += maintenance_time
                     total_active_time += active_time
@@ -788,6 +870,13 @@ def monitor_maintenance_and_tasks(config_file):
             log_and_print(f"  Total Loop Time (excluding maintenance): {format_time(total_active_time)}", "info")
             log_and_print(f"  Total Maintenance Time: {format_time(total_maintenance_time)}", "info")
             log_and_print(LOG_DIVIDER, "info")
+            save_loop_stats(
+                loop_count,
+                task_summaries,
+                total_task_time,
+                total_active_time,
+                total_maintenance_time
+            )
 
             # Delay before next loop
             log_and_print(f"Loop {loop_count} - All tasks completed. Restarting the loop after a delay...", "info")
@@ -796,20 +885,27 @@ def monitor_maintenance_and_tasks(config_file):
         log_and_print("Ctrl-C detected. Exiting script...", "warning")
 
 
-def delete_temp_files():
+def delete_temp_files(config_file):
     """
-    Delete specific temporary files if they exist.
+    Delete specific temporary files if they exist, based on the tasks configuration.
     """
-    # Paths from environment variables
-    posterizarr_script_dir = os.path.dirname(os.getenv("POSTERIZARR_SCRIPT_PATH", ""))
-    posterizarr2_script_dir = os.path.dirname(os.getenv("POSTERIZARR2_SCRIPT_PATH", ""))
+    # Load tasks from the configuration file
+    tasks_config = validate_and_load_config(config_file)
 
-    # Append the temp file paths
+    # Extract script directories from tasks configuration
+    script_dirs = []
+    for task in tasks_config.get("tasks", []):  # Ensure "tasks" key exists in the config
+        if "script_path" in task:
+            script_dir = os.path.dirname(task["script_path"])
+            script_dirs.append(script_dir)
+
+    # Define the temp file paths to check
     temp_files = [
-        os.path.join(posterizarr_script_dir, "temp", "Posterizarr.Running"),
-        os.path.join(posterizarr2_script_dir, "temp", "Posterizarr.Running"),
+        os.path.join(script_dir, "temp", "Posterizarr.Running")
+        for script_dir in script_dirs
     ]
 
+    # Check and delete temp files
     for file_path in temp_files:
         try:
             if os.path.exists(file_path):
@@ -888,8 +984,37 @@ def validate_tasks_config(tasks):
             raise ValueError(f"Task {idx}: 'use_venv' must be a string or null.")
 
 
+def save_loop_stats(loop_count, task_summaries, total_task_time, total_active_time, total_maintenance_time):
+    stats_file = "stats/task_stats.json"
+    data = {
+        "loop": loop_count,
+        "timestamp": datetime.now().isoformat(),
+        "tasks": task_summaries,
+        "totals": {
+            "total_tasks": len(task_summaries),
+            "total_task_time": format_time(total_task_time),
+            "total_active_time": format_time(total_active_time),
+            "total_maintenance_time": format_time(total_maintenance_time),
+        },
+    }
+
+    # Append to stats file
+    stats_path = Path(stats_file)
+    if stats_path.exists():
+        with open(stats_file, "r") as file:
+            existing_data = json.load(file)
+            existing_data.append(data)
+    else:
+        existing_data = [data]
+
+    with open(stats_file, "w") as file:
+        json.dump(existing_data, file, indent=4)
+    log_and_print(f"Saved loop stats to {stats_file}", "info")
+
+
 def main():
     try:
+        setup_directories()
         log_and_print(LOG_DIVIDER, "info")
         log_and_print("Script started.", "info")
 
@@ -901,6 +1026,7 @@ def main():
             log_and_print("Plex connection failed. Exiting script.", "error")
             return
 
+        delete_temp_files(args.config)
         monitor_maintenance_and_tasks(args.config)
     except KeyboardInterrupt:
         log_and_print("Ctrl-C detected. Exiting script and cleaning up...", "warning")
@@ -909,7 +1035,7 @@ def main():
     finally:
         log_and_print("Performing cleanup: Resuming all paused services and downloads.", "info")
         try:
-            delete_temp_files()
+            delete_temp_files(args.config)
             terminate_all_processes()
             # Ensure all paused services and downloads are resumed
             log_and_continue("enable Sonarr downloaders", enable_sonarr_download_clients)
@@ -925,7 +1051,8 @@ def main():
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Orchestrator Script")
-    parser.add_argument("--config", help="Path to tasks configuration file", default=None)
+    parser.add_argument("--config", help="Path to tasks configuration file", default="tasks.yml")
+
     args = parser.parse_args()
 
     max_logs = int(os.getenv("MAX_LOGS", "5"))
