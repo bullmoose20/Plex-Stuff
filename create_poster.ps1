@@ -55,7 +55,7 @@ $global:CurrentImagemagickversion = $null
 $global:LatestImagemagickversion = $null
 $global:AutoUpdateIM = $true
 $global:HeaderWritten = $false
-$CurrentScriptVersion = "2.4"
+$CurrentScriptVersion = "2.5"
 
 #################################
 # collect paths
@@ -366,7 +366,14 @@ function SetMagickLocation {
   }
 
   # Auto Update Magick (prefer HDRI on Windows)
-  if ($global:AutoUpdateIM -eq 'true' -and $global:OSType -ne "Docker" -and $LatestImagemagickversion -gt $CurrentImagemagickversion -and $global:OSarch -ne "Arm64") {
+  if (
+    $global:AutoUpdateIM -and
+    $global:OSType -ne "Docker" -and
+    $global:OSarch -ne "Arm64" -and
+    $LatestImagemagickversion -and
+    $CurrentImagemagickversion -and
+    ([version]$LatestImagemagickversion -gt [version]$CurrentImagemagickversion)
+  ) {    
     if ($global:OSType -eq "Win32NT") {
       Remove-Item -LiteralPath $magickinstalllocation -Recurse -Force -ErrorAction SilentlyContinue
     }
@@ -439,6 +446,29 @@ function SetMagickLocation {
       }
       else {
         Write-Host "Error During extraction, please manually install/copy portable Imagemagick from here: https://imagemagick.org/archive/binaries/$LatestRelease"
+      }
+      # Re-check ImageMagick version after install/update
+      if (Test-Path $magick) {
+        try {
+          # Get full version output as text
+          $verText = & $magick -version 2>$null | Out-String
+
+          # Your dash-version regex
+          $imMatch = [regex]::Match($verText, 'Version: ImageMagick (\d+(\.\d+){1,2}-\d+)')
+
+          if ($imMatch.Success) {
+            # Normalize dash → dot (7.1.2-11 → 7.1.2.11)
+            $global:CurrentImagemagickversion = $imMatch.Groups[1].Value.Replace('-', '.')
+
+            Write-Host "ImageMagick updated successfully → $global:CurrentImagemagickversion"
+          }
+          else {
+            Write-Warning "Could not parse ImageMagick version from magick -version output"
+          }
+        }
+        catch {
+          Write-Warning "ImageMagick update completed, but version re-check failed: $($_.Exception.Message)"
+        }
       }
     }  
   }
