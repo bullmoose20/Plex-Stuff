@@ -2,9 +2,12 @@
 version: 2
 
 updates:
-  # Python packages from requirements.txt
+  # Include every per-script manifest and the aggregate development environment.
   - package-ecosystem: "pip"
-    directory: "/"
+    directories:
+      - "/"
+      - "/pyprogs"
+      - "/pyprogs/*"
     schedule:
       interval: "weekly"
       day: "monday"
@@ -12,6 +15,9 @@ updates:
       timezone: "America/Toronto"
     target-branch: "main"
     open-pull-requests-limit: 5
+    groups:
+      compatible-python-updates:
+        update-types: ["minor", "patch"]
 
   # GitHub Actions dependencies
   - package-ecosystem: "github-actions"
@@ -23,3 +29,6 @@ updates:
       timezone: "America/Toronto"
     target-branch: "main"
     open-pull-requests-limit: 5
+    groups:
+      compatible-action-updates:
+        update-types: ["minor", "patch"]
