@@ -54,6 +54,8 @@ archival, has no active entry point, and is outside the supported runtime.
 * [MoviePy package metadata](https://pypi.org/pypi/moviepy/json)
 * [MoviePy 2 migration](https://zulko.github.io/moviepy/getting_started/updating_to_v2.html)
 * [Pillow deprecations](https://pillow.readthedocs.io/en/stable/deprecations.html)
+* [PyAV package metadata](https://pypi.org/pypi/av/json)
+* [imageio-ffmpeg recommends PyAV](https://github.com/imageio/imageio-ffmpeg#purpose)
 * [setup-python releases](https://github.com/actions/setup-python/releases)
 * [checkout releases](https://github.com/actions/checkout/releases)
 
@@ -61,9 +63,13 @@ archival, has no active entry point, and is outside the supported runtime.
 
 The planned MoviePy isolation was rejected after checking security advisories:
 Pillow 11.3 and 12.x have known advisories fixed in later versions. MoviePy
-2.2.1 still requires Pillow <12. Title-card extraction now uses the underlying
-imageio-ffmpeg reader directly, preserves RGB JPEG output and timestamp selection,
-and closes the decoder on success and failure. No dependency metadata overrides,
+2.2.1 still requires Pillow <12. Title-card extraction now uses PyAV's direct
+FFmpeg bindings, preserves RGB JPEG output and timestamp selection, and closes
+the decoder on success and failure. PyAV replaces the initial imageio-ffmpeg
+implementation: that project's maintainers recommend PyAV, whose current wheels
+support Python 3.12–3.14 without declared Pillow/NumPy constraints. Seeking uses
+presentation timestamps, including for variable-rate videos and stream offsets.
+No dependency metadata overrides,
 vulnerability allowlists or EOL Python workarounds are used. Pillow >=13 is the
 supported security baseline; Pillow 12 and MoviePy 1/2 are intentionally excluded.
 See [MoviePy metadata](https://pypi.org/pypi/moviepy/json) and
@@ -84,7 +90,7 @@ shell-free Python venv execution. Requests queries encode person names correctly
 Intentional behavior changes and manual checks are in
 [the maintenance guide](python-maintenance.md).
 
-Initial local Windows verification passed installation, pip check and 111 offline
+Local Windows verification passed installation, pip check and 123 offline
 pytest cases on Python 3.12.15, 3.13.17 and 3.14.9. Ruff passed. The final PR and
 CI runs provide the authoritative Linux/Windows results for the committed code.
 Security scans use the current advisory database and must be repeated on updates.

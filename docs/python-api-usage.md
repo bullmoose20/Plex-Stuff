@@ -24,5 +24,5 @@ Generated with `python tools/audit_python.py`. Active standalone entry points al
 | `pyprogs/resizer/resizer.py` | PIL.Image, dotenv.load_dotenv | PIL.Image.open, dotenv.load_dotenv |
 | `pyprogs/sel_remove_bg/sel_remove_bg.py` | PIL.Image, dotenv.load_dotenv, selenium.webdriver, selenium.webdriver.chrome.options.Options, selenium.webdriver.chrome.service.Service, selenium.webdriver.common.action_chains.ActionChains, selenium.webdriver.support.expected_conditions | PIL.Image.open, dotenv.load_dotenv, selenium.webdriver.Chrome, selenium.webdriver.chrome.options.Options, selenium.webdriver.chrome.service.Service, selenium.webdriver.common.action_chains.ActionChains |
 | `pyprogs/strip_columns/strip_columns.py` | stdlib only | none |
-| `pyprogs/tcc/title_card_clips.py` | PIL.Image, dotenv.load_dotenv, imageio_ffmpeg.read_frames, numpy | PIL.Image.fromarray, dotenv.load_dotenv, imageio_ffmpeg.read_frames, numpy.frombuffer, numpy.frombuffer(data, dtype=np.uint8).reshape |
+| `pyprogs/tcc/title_card_clips.py` | av, dotenv.load_dotenv | av.open, dotenv.load_dotenv |
 | `pyprogs/update_plex_artist_art/update_plex_artist_art.py` | dotenv.load_dotenv, plexapi, plexapi.server.PlexServer, requests, requests.exceptions.RequestException | dotenv.load_dotenv, plexapi.server.PlexServer, requests.get |

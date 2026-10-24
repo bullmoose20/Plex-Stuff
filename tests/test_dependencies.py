@@ -11,7 +11,6 @@ import pytest
 from conftest import ROOT
 
 IMPORT_DISTRIBUTIONS = {
-    "imageio_ffmpeg": "imageio-ffmpeg",
     "PIL": "Pillow",
     "dotenv": "python-dotenv",
     "plexapi": "PlexAPI",
@@ -67,7 +66,7 @@ def test_dependency_manifests_are_utf8_and_installed_versions_satisfy_them(path)
 
 def test_no_stdlib_or_retired_dependencies_remain():
     declared = {canonicalize_name(req.name) for req in requirements(ROOT / "requirements.txt")}
-    assert not declared & {"argparse", "sqlalchemy", "setuptools", "moviepy"}
+    assert not declared & {"argparse", "sqlalchemy", "setuptools", "moviepy", "imageio-ffmpeg"}
 
 
 def test_aggregate_includes_all_script_manifests():

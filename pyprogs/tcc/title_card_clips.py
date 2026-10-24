@@ -3,7 +3,9 @@ import argparse
 import gc
 import glob
 import logging
-import numpy as np
+import av
+from fractions import Fraction
+import math
 import os
 import os.path
 import re
@@ -11,9 +13,6 @@ import sys
 import time
 from datetime import datetime as dt
 from dotenv import load_dotenv
-from PIL import Image
-
-from imageio_ffmpeg import read_frames
 
 
 max_log_files = int(os.getenv("MAX_LOG_FILES", 10))  # Default number of logs: 10
@@ -107,27 +106,39 @@ def take_screenshots(video_file, output_file, frame_extraction_time):
 
     if not os.path.isfile(video_file):
         raise FileNotFoundError("Video file not found")
-    if frame_extraction_time < 0:
+    if not math.isfinite(frame_extraction_time) or frame_extraction_time < 0:
         raise ValueError("Frame extraction time must be within the video duration")
-    frames = read_frames(
-        os.fspath(video_file),
-        pix_fmt="rgb24",
-        output_params=["-ss", str(frame_extraction_time), "-frames:v", "1"],
-    )
-    try:
-        metadata = next(frames)
-        if metadata["duration"] and frame_extraction_time >= metadata["duration"]:
+    requested_time = Fraction(str(frame_extraction_time))
+    with av.open(os.fspath(video_file)) as container:
+        if not container.streams.video:
+            raise ValueError("Input contains no video stream")
+        stream = container.streams.video[0]
+        start_time = (stream.start_time or 0) * stream.time_base
+        duration = (
+            stream.duration * stream.time_base
+            if stream.duration is not None
+            else Fraction(container.duration, av.time_base)
+            if container.duration is not None
+            else None
+        )
+        if duration is not None and requested_time >= duration:
             raise ValueError("Frame extraction time must be within the video duration")
-        try:
-            data = next(frames)
-        except StopIteration:
-            raise ValueError("No video frame at the requested time") from None
-        width, height = metadata["size"]
-        frame = np.frombuffer(data, dtype=np.uint8).reshape(height, width, 3)
-        with Image.fromarray(frame) as image:
-            image.save(output_file)
-    finally:
-        frames.close()
+        target = start_time + requested_time
+        # Seek to the preceding keyframe, then decode to the requested presentation
+        # timestamp. Frame rate arithmetic is inaccurate for variable-rate video.
+        container.seek(int(target / stream.time_base), stream=stream, backward=True, any_frame=False)
+        for frame in container.decode(stream):
+            if frame.pts is None:
+                raise ValueError("Video frame has no presentation timestamp")
+            if frame.pts * frame.time_base >= target:
+                with frame.to_image() as image:
+                    if frame.rotation:
+                        with image.rotate(frame.rotation, expand=True) as oriented:
+                            oriented.save(output_file)
+                    else:
+                        image.save(output_file)
+                return
+        raise ValueError("No video frame at the requested time")
 
 
 def scan_directory(source_path, frame_extraction_time):

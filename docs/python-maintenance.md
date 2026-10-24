@@ -41,7 +41,7 @@ even when another installed package happens to provide it transitively.
 | NumPy | 2.x APIs and current binary wheels; image/template/metrics tests cover usage |
 | Pillow | Public resampling, pixel and EXIF APIs; >=13 required by current security advisories |
 | MoviePy | Removed: 2.2.1 requires Pillow <12, conflicting with current security fixes |
-| imageio-ffmpeg | Direct frame decoder replaces the only MoviePy use; generated video verifies timestamps, dimensions, RGB output and file release |
+| PyAV (`av`) | Direct FFmpeg library binding replaces MoviePy; current wheels support Python 3.12–3.14 without declared Pillow/NumPy version constraints. Generated videos verify timestamps, variable frame rates, stream start offsets, rotation, RGB output and file release |
 | SQLAlchemy | Removed: no consumers; retired cleaner uses sqlite3 and stays unsupported |
 | PlexAPI | Current 4.x API; mocked report/apply, label locks, art, metadata and timeout checks |
 | OpenCV | Headless package: no GUI usage; NumPy 2 binary integration tested with generated templates |
@@ -69,10 +69,17 @@ disabled and service variables are removed. Use fake `.invalid` hosts and mock
 tokens only. Never enable a live-service exception in the default suite.
 
 Installing packages and `pip-audit` advisory retrieval require internet. pytest
-does not: FFmpeg is supplied by the installed wheel, with no runtime downloads.
-pip-audit checks Python distribution advisories, not every codec bundled in the
-FFmpeg executable. Review upstream imageio-ffmpeg/FFmpeg security releases when
-updating video dependencies.
+does not: FFmpeg libraries are supplied by the PyAV wheel, with no runtime
+downloads or external FFmpeg executable. pip-audit checks Python distribution
+advisories, not every bundled codec. Review upstream PyAV and FFmpeg security
+releases when updating video dependencies.
+
+PyAV was selected over imageio-ffmpeg because its
+[maintainers recommend PyAV](https://github.com/imageio/imageio-ffmpeg#purpose),
+and [PyAV's current metadata](https://pypi.org/pypi/av/json) provides compatible
+binary wheels with no declared runtime dependency pins. This removes MoviePy's
+Pillow restriction; it does not guarantee future upgrades will be compatible.
+The version matrix and output regressions remain the compatibility gate.
 
 ## Dependabot review
 
@@ -102,7 +109,10 @@ python -X utf8 tools/audit_python.py
 * Importing modules performs no CLI work. Run the same script paths as before.
   Optional .env loading happens at command startup. Reports and existing apply
   confirmations remain; an out-of-range video timestamp now fails explicitly
-  instead of silently reporting a created title card.
+  instead of silently reporting a created title card. PyAV seeks to a preceding
+  keyframe and selects the first presented frame at or after the requested time,
+  relative to the video stream's start. It uses presentation timestamps rather
+  than assumed frame rates, including for variable-rate media.
 * Image cropping fixes remove off-by-one crop asymmetry and black padding from
   small/non-16:9 artwork. Collage uses Pillow's bundled default font if Arial is
   absent; text appearance can differ on machines without Arial.
