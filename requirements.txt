@@ -1,5 +1,5 @@
 PlexAPI~=4.12.0
-python-dotenv~=0.20.0
+python-dotenv~=1.2.4
 SQLAlchemy
 psutil~=5.9.4
 requests~=2.31.0
