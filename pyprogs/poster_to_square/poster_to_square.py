@@ -1,5 +1,4 @@
 from __future__ import annotations
-
 import argparse
 import glob
 import logging
@@ -44,13 +43,7 @@ class Stats:
 
 
 def initialize_pillow() -> bool:
-    global Image
-    global ImageDraw
-    global ImageEnhance
-    global ImageFilter
-    global ImageOps
-    global PIL_IMPORT_ERROR
-    global RESAMPLING_LANCZOS
+    global Image, ImageDraw, ImageEnhance, ImageFilter, ImageOps, PIL_IMPORT_ERROR, RESAMPLING_LANCZOS
 
     if Image is not None:
         return True
@@ -70,7 +63,7 @@ def initialize_pillow() -> bool:
         try:
             RESAMPLING_LANCZOS = Image.Resampling.LANCZOS
         except AttributeError:
-            RESAMPLING_LANCZOS = Image.LANCZOS
+            RESAMPLING_LANCZOS = Image.Resampling.LANCZOS
         return True
     except ImportError as exc:
         PIL_IMPORT_ERROR = exc
@@ -80,8 +73,7 @@ def initialize_pillow() -> bool:
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=(
-            "Create Plex/Kometa-style square art from portrait posters without "
-            "cropping the original poster content."
+            "Create Plex/Kometa-style square art from portrait posters without cropping the original poster content."
         )
     )
     parser.add_argument(
@@ -92,10 +84,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--source-names",
         default="poster",
-        help=(
-            "Comma-separated base filenames to process, without extensions. "
-            "Default: poster"
-        ),
+        help=("Comma-separated base filenames to process, without extensions. Default: poster"),
     )
     parser.add_argument(
         "--all-images",
@@ -498,6 +487,7 @@ def get_items_per_second(completed: int, elapsed_seconds: float) -> str:
 
 
 def main() -> int:
+    global args, elapsed_seconds, input_folder, logs_directory, output_path, recursive, script_name, source_names, source_path, stats
     args = parse_args()
     logs_directory, script_name = configure_logging(args.verbose)
     started_at = dt.now()

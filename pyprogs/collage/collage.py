@@ -6,43 +6,48 @@ import os
 import sys
 import time
 from datetime import datetime as dt
-from dotenv import load_dotenv, find_dotenv
+from dotenv import load_dotenv
 from PIL import Image, ImageDraw, ImageFont
 
-try:
-    # Find the .env file
-    dotenv_path = find_dotenv(raise_error_if_not_found=True)
 
-    # Load environment variables from .env file
-    load_dotenv(dotenv_path)
-except OSError:
-    print("Error: The .env file was not found. Please make sure it exists in the script's directory.")
-    exit(1)
+max_log_files = int(os.getenv("MAX_LOG_FILES", 10))  # Default number of logs: 10
 
-# Retrieve Plex server details from environment variables
-# plex_url = os.getenv('PLEX_URL')
-# plex_token = os.getenv('PLEX_TOKEN')
-# timeout_seconds = int(os.getenv('PLEX_TIMEOUT', 60))  # Default timeout: 60 seconds
-max_log_files = int(os.getenv('MAX_LOG_FILES', 10))  # Default number of logs: 10
-log_level = os.getenv('LOG_LEVEL', 'INFO').upper()  # Default logging level: INFO
+log_level = os.getenv("LOG_LEVEL", "INFO").upper()  # Default logging level: INFO
 
-# Extract the script name without the '.py' extension
 script_name = os.path.splitext(os.path.basename(sys.argv[0]))[0]
 
-# Define the logs directory
 logs_directory = "logs"
 
-# Ensure the "logs" directory exists
-if not os.path.exists(logs_directory):
-    os.makedirs(logs_directory)
-
-# Generate a unique log filename with timestamp and script name
 timestamp = dt.now().strftime("%Y%m%d_%H%M%S_%f")[:-3]
+
 log_filename = os.path.join(logs_directory, f"{script_name}_{timestamp}.log")
 
-# Set up logging with timestamps and the specified logging level
-log_format = '%(asctime)s - %(levelname)s - %(message)s'
-logging.basicConfig(filename=log_filename, level=getattr(logging, log_level), format=log_format)
+log_format = "%(asctime)s - %(levelname)s - %(message)s"
+
+
+def configure_runtime():
+    """Load optional local configuration and initialize CLI output."""
+    global logs_directory, max_log_files, script_name, timestamp
+    load_dotenv()
+
+    max_log_files = int(os.getenv("MAX_LOG_FILES", 10))  # Default number of logs: 10
+
+    log_level = os.getenv("LOG_LEVEL", "INFO").upper()  # Default logging level: INFO
+
+    script_name = os.path.splitext(os.path.basename(sys.argv[0]))[0]
+
+    logs_directory = "logs"
+
+    if not os.path.exists(logs_directory):
+        os.makedirs(logs_directory)
+
+    timestamp = dt.now().strftime("%Y%m%d_%H%M%S_%f")[:-3]
+
+    log_filename = os.path.join(logs_directory, f"{script_name}_{timestamp}.log")
+
+    log_format = "%(asctime)s - %(levelname)s - %(message)s"
+
+    logging.basicConfig(filename=log_filename, level=getattr(logging, log_level), format=log_format)
 
 
 def clean_up_old_logs():
@@ -62,39 +67,56 @@ def clean_up_old_logs():
 
 
 def get_formatted_duration(seconds):
-    units = [('day', 86400), ('hour', 3600), ('minute', 60), ('second', 1)]
+    units = [("day", 86400), ("hour", 3600), ("minute", 60), ("second", 1)]
     result = []
 
     for unit_name, unit_seconds in units:
         value, seconds = divmod(seconds, unit_seconds)
         if value > 0:
-            unit_name = unit_name if value == 1 else unit_name + 's'
+            unit_name = unit_name if value == 1 else unit_name + "s"
             result.append(f"{int(value):.0f} {unit_name}")
 
     if not result:
         milliseconds = seconds * 1000
-        return "{:.3f} millisecond".format(milliseconds) if milliseconds == 1 else "{:.3f} milliseconds".format(milliseconds)
+        return f"{milliseconds:.3f} millisecond" if milliseconds == 1 else f"{milliseconds:.3f} milliseconds"
 
-    return ' '.join(result)
+    return " ".join(result)
 
 
 def str_to_bool(value):
     if isinstance(value, bool):
         return value
-    if value.lower() in {'true', 't', 'yes', 'y', '1'}:
+    if value.lower() in {"true", "t", "yes", "y", "1"}:
         return True
-    elif value.lower() in {'false', 'f', 'no', 'n', '0'}:
+    elif value.lower() in {"false", "f", "no", "n", "0"}:
         return False
     else:
         raise argparse.ArgumentTypeError(f"Invalid boolean value: {value}")
 
 
 def get_image_files(folder_path):
-    return [f.decode('utf-8') for f in os.listdir(folder_path) if
-            os.path.isfile(os.path.join(folder_path, f)) and (f.endswith(b'.jpg') or f.endswith(b'.png')) and not f.decode('utf-8').startswith('!_')]
+    folder_path = os.fsdecode(folder_path)
+    return sorted(
+        f
+        for f in os.listdir(folder_path)
+        if os.path.isfile(os.path.join(folder_path, f))
+        and f.lower().endswith((".jpg", ".jpeg", ".png"))
+        and not f.startswith("!_")
+    )
 
 
-def create_image_grid(folder_path, num_columns, thumb_size, show_text, save_output_folder, save_original_folder, output_format, jpg_quality):
+def create_image_grid(
+    folder_path,
+    num_columns,
+    thumb_size,
+    show_text,
+    save_output_folder,
+    save_original_folder,
+    output_format,
+    jpg_quality,
+):
+    if num_columns < 1 or min(thumb_size) < 1:
+        raise ValueError("Columns and thumbnail dimensions must be positive")
     thumb_width, thumb_height = thumb_size
     # Determine text color based on show_text value
     text_color = (255, 255, 255) if show_text else (0, 0, 0)
@@ -104,8 +126,8 @@ def create_image_grid(folder_path, num_columns, thumb_size, show_text, save_outp
 
     # Check if there are no image files
     if not files:
-        print(f"No image files found in the folder: {folder_path.decode('utf-8')}")
-        logging.info(f"No image files found in the folder: {folder_path.decode('utf-8')}")
+        print(f"No image files found in the folder: {os.fsdecode(folder_path)}")
+        logging.info(f"No image files found in the folder: {os.fsdecode(folder_path)}")
         return None  # or any other action you want to take
 
     # Calculate the number of rows needed based on the number of columns and the number of images
@@ -113,7 +135,7 @@ def create_image_grid(folder_path, num_columns, thumb_size, show_text, save_outp
 
     # Create a new blank image to hold the grid
     grid_size = (num_columns * thumb_size[0], num_rows * (thumb_size[1] + 20) + 20)
-    grid_image = Image.new('RGB', grid_size, (0, 0, 0))
+    grid_image = Image.new("RGB", grid_size, (0, 0, 0))
 
     # Create a drawing context
     draw = ImageDraw.Draw(grid_image)
@@ -121,18 +143,22 @@ def create_image_grid(folder_path, num_columns, thumb_size, show_text, save_outp
     # Calculate the font size based on the size of the thumbnail image
     font_size = max(int(thumb_height / 16), 8)  # Ensure a minimum font size of 8
     font_size = 12
-    font = ImageFont.truetype('arial.ttf', size=font_size)
+    try:
+        font = ImageFont.truetype("arial.ttf", size=font_size)
+    except OSError:
+        font = ImageFont.load_default(size=font_size)
 
     # Loop through each image and add it to the grid
     for i, file in enumerate(files):
         # Open the image and resize it to the thumbnail size
-        image_path = os.path.join(folder_path.decode('utf-8'), file)  # Decode folder_path to string
-        image = Image.open(image_path)
+        image_path = os.path.join(os.fsdecode(folder_path), file)  # Decode folder_path to string
+        with Image.open(image_path) as source:
+            image = source.convert("RGB")
         # Replace this line
         # image.thumbnail(thumb_size, Image.ANTIALIAS)
 
         # With one of these alternatives:
-        image.thumbnail(thumb_size, Image.LANCZOS)
+        image.thumbnail(thumb_size, Image.Resampling.LANCZOS)
         # image.thumbnail(thumb_size, Image.BOX)
 
         # Calculate the position of the image on the grid
@@ -187,28 +213,48 @@ def create_image_grid(folder_path, num_columns, thumb_size, show_text, save_outp
 
     # Save in the output folder with a timestamp if specified
     if save_output_folder:
-        timestamp = dt.now().strftime('%Y%m%d%H%M%S')
-        final_image_name = f"!_{os.path.basename(folder_path.decode('utf-8'))}_grid_{timestamp}"
+        timestamp = dt.now().strftime("%Y%m%d%H%M%S")
+        final_image_name = f"!_{os.path.basename(os.fsdecode(folder_path))}_grid_{timestamp}"
         final_image_path_output = os.path.join(output_folder, final_image_name + f".{output_format.lower()}")
-        if output_format.upper() == 'JPG':
-            grid_image.save(final_image_path_output, format=output_format, quality=jpg_quality)
-        elif output_format.upper() == 'WEBP':
-            grid_image.save(final_image_path_output, format=output_format, lossless=True)
+        if output_format.upper() == "JPG":
+            grid_image.save(
+                final_image_path_output,
+                format="JPEG" if output_format.upper() == "JPG" else output_format,
+                quality=jpg_quality,
+            )
+        elif output_format.upper() == "WEBP":
+            grid_image.save(
+                final_image_path_output,
+                format="JPEG" if output_format.upper() == "JPG" else output_format,
+                lossless=True,
+            )
         else:
-            grid_image.save(final_image_path_output, format=output_format)
+            grid_image.save(final_image_path_output, format="JPEG" if output_format.upper() == "JPG" else output_format)
         print(f"Final grid image saved in the output folder as {final_image_path_output}")
         logging.info(f"Final grid image saved in the output folder as {final_image_path_output}")
 
     # Save in the original folder if specified
     if save_original_folder:
-        final_image_name = f"!_{os.path.basename(folder_path.decode('utf-8'))}_grid"
-        final_image_path_original = os.path.join(folder_path.decode('utf-8'), final_image_name + f".{output_format.lower()}")
-        if output_format.upper() == 'JPG':
-            grid_image.save(final_image_path_original, format=output_format, quality=jpg_quality)
-        elif output_format.upper() == 'WEBP':
-            grid_image.save(final_image_path_original, format=output_format, lossless=True)
+        final_image_name = f"!_{os.path.basename(os.fsdecode(folder_path))}_grid"
+        final_image_path_original = os.path.join(
+            os.fsdecode(folder_path), final_image_name + f".{output_format.lower()}"
+        )
+        if output_format.upper() == "JPG":
+            grid_image.save(
+                final_image_path_original,
+                format="JPEG" if output_format.upper() == "JPG" else output_format,
+                quality=jpg_quality,
+            )
+        elif output_format.upper() == "WEBP":
+            grid_image.save(
+                final_image_path_original,
+                format="JPEG" if output_format.upper() == "JPG" else output_format,
+                lossless=True,
+            )
         else:
-            grid_image.save(final_image_path_original, format=output_format)
+            grid_image.save(
+                final_image_path_original, format="JPEG" if output_format.upper() == "JPG" else output_format
+            )
         print(f"Final grid image saved in the original folder as {final_image_path_original}")
         logging.info(f"Final grid image saved in the original folder as {final_image_path_original}")
 
@@ -216,18 +262,26 @@ def create_image_grid(folder_path, num_columns, thumb_size, show_text, save_outp
 
 
 if __name__ == "__main__":
+    configure_runtime()
     start_time = time.time()
     parser = argparse.ArgumentParser(description="Create a grid of thumbnails from a folder of images.")
     parser.add_argument("folder_path", type=str, help="Path to the folder containing images")
-    parser.add_argument("--num_columns", type=int, default=None,
-                        help="Number of columns (default is sqrt of the number of files)")
+    parser.add_argument(
+        "--num_columns", type=int, default=None, help="Number of columns (default is sqrt of the number of files)"
+    )
     parser.add_argument("--thumb_width", type=int, default=200, help="Thumbnail width (default 200)")
     parser.add_argument("--thumb_height", type=int, default=200, help="Thumbnail height (default 200)")
     parser.add_argument("--show_text", default=True, help="Show text under images")
     parser.add_argument("--show_image", action="store_true", help="Show the grid image")
-    parser.add_argument("--save_output_folder", default=True, type=str_to_bool, help="Save the grid image in the output folder")
-    parser.add_argument("--save_original_folder", default=False, type=str_to_bool, help="Save the grid image in the original folder")
-    parser.add_argument("--output_format", type=str, choices=["PNG", "JPG", "WEBP"], default="JPG", help="Output format (default JPG)")
+    parser.add_argument(
+        "--save_output_folder", default=True, type=str_to_bool, help="Save the grid image in the output folder"
+    )
+    parser.add_argument(
+        "--save_original_folder", default=False, type=str_to_bool, help="Save the grid image in the original folder"
+    )
+    parser.add_argument(
+        "--output_format", type=str, choices=["PNG", "JPG", "WEBP"], default="JPG", help="Output format (default JPG)"
+    )
     parser.add_argument("--jpg_quality", type=int, default=95, help="Quality for JPG format (default 95)")
 
     args = parser.parse_args()
@@ -237,7 +291,7 @@ if __name__ == "__main__":
     logging.info(f"Arguments: {args}")
 
     # Encode the folder path to handle non-ASCII characters
-    folder_path = os.fsencode(args.folder_path)
+    folder_path = args.folder_path
 
     # Check if the folder exists
     if not os.path.exists(folder_path):
@@ -246,23 +300,28 @@ if __name__ == "__main__":
     else:
         # List files in the folder
         files = get_image_files(folder_path)
-        num_columns = args.num_columns if args.num_columns is not None else int(math.sqrt(len(files)))
+        num_columns = args.num_columns if args.num_columns is not None else max(1, int(math.sqrt(len(files))))
         thumb_size = (args.thumb_width, args.thumb_height)
         # Ensure show_text defaults to True if not specified
         show_text = args.show_text if args.show_text is not None else True
 
         # Create the image grid
         grid_image = create_image_grid(
-            folder_path, num_columns, thumb_size, show_text,
-            args.save_output_folder, args.save_original_folder,
-            args.output_format, args.jpg_quality
+            folder_path,
+            num_columns,
+            thumb_size,
+            show_text,
+            args.save_output_folder,
+            args.save_original_folder,
+            args.output_format,
+            args.jpg_quality,
         )
 
         # Call the clean_up_old_logs function
         clean_up_old_logs()
 
         # Show the grid image if specified
-        if args.show_image:
+        if args.show_image and grid_image is not None:
             grid_image.show()
 
         end_time = time.time()  # Record the end time after script execution

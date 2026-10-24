@@ -1,59 +1,88 @@
-# sel_remove_bg.py
-import os, time, shutil, subprocess
+import os
+import time
+import shutil
+import subprocess
 from pathlib import Path
-from dataclasses import dataclass, field
-from typing import Optional, List, Tuple
+from dataclasses import dataclass
 
 from PIL import Image
 import tempfile
-
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.action_chains import ActionChains
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC  # noqa: F401 (kept for future use)
 
+from selenium.webdriver.support import expected_conditions as EC  # noqa: F401 (kept for future use)
 from dotenv import load_dotenv
 
-# ===============================
-# Load env + constants
-# ===============================
-load_dotenv()
 
 URL = os.getenv("SEL_URL", "https://new.express.adobe.com/tools/remove-background")
 
-# Chrome profile (keeps you signed in)
 USER_DATA_DIR = os.getenv("SEL_USER_DATA_DIR", str(Path.cwd() / "chrome-profile"))
+
 PROFILE_DIR = os.getenv("SEL_PROFILE_DIR", "Profile 1")
 
-# Where JPGs live / originals go
 SRC_DIR = Path(os.getenv("SEL_SRC_DIR", str(Path.cwd())))
+
 ORIG_DIR = Path(os.getenv("SEL_ORIG_DIR", str(Path.cwd() / "original")))
 
-# Temp download dir (Chrome writes files here)
 DOWNLOAD_DIR = os.getenv("SEL_DOWNLOAD_DIR", str((Path.cwd() / "sel_downloads").resolve()))
 
-# Flow & patience knobs
 MAX_WAIT_READY_SEC = int(os.getenv("SEL_MAX_WAIT_READY_SEC", "120"))
+
 PROC_TIMEOUT = int(os.getenv("SEL_PROC_TIMEOUT", "120"))  # wait for processing (Download visible)
+
 MAX_WAIT_DL_SEC = int(os.getenv("SEL_MAX_WAIT_DL_SEC", "240"))  # wait for file to appear
+
 DL_BTN_TIMEOUT = int(os.getenv("SEL_DL_BUTTON_TIMEOUT", "20"))  # how long to wait for button to be found
+
 RELOAD_EACH_FILE = os.getenv("SEL_RELOAD_EACH_FILE", "true").lower() in ("1", "true", "yes", "y")
 
-# Size enforcement
 EXPECT_W = int(os.getenv("SEL_EXPECT_WIDTH", "2000"))
+
 EXPECT_H = int(os.getenv("SEL_EXPECT_HEIGHT", "3000"))
+
 ENFORCE_SIZE = os.getenv("SEL_ENFORCE_SIZE", "true").lower() in ("1", "true", "yes", "y")
 
-# Make sure folders exist
-Path(DOWNLOAD_DIR).mkdir(parents=True, exist_ok=True)
-ORIG_DIR.mkdir(parents=True, exist_ok=True)
+
+def configure_runtime():
+    """Load optional local configuration and initialize CLI output."""
+    global DL_BTN_TIMEOUT, DOWNLOAD_DIR, ENFORCE_SIZE, EXPECT_H, EXPECT_W, MAX_WAIT_DL_SEC, MAX_WAIT_READY_SEC, ORIG_DIR, PROC_TIMEOUT, PROFILE_DIR, RELOAD_EACH_FILE, SRC_DIR, URL, USER_DATA_DIR
+    load_dotenv()
+
+    URL = os.getenv("SEL_URL", "https://new.express.adobe.com/tools/remove-background")
+
+    USER_DATA_DIR = os.getenv("SEL_USER_DATA_DIR", str(Path.cwd() / "chrome-profile"))
+
+    PROFILE_DIR = os.getenv("SEL_PROFILE_DIR", "Profile 1")
+
+    SRC_DIR = Path(os.getenv("SEL_SRC_DIR", str(Path.cwd())))
+
+    ORIG_DIR = Path(os.getenv("SEL_ORIG_DIR", str(Path.cwd() / "original")))
+
+    DOWNLOAD_DIR = os.getenv("SEL_DOWNLOAD_DIR", str((Path.cwd() / "sel_downloads").resolve()))
+
+    MAX_WAIT_READY_SEC = int(os.getenv("SEL_MAX_WAIT_READY_SEC", "120"))
+
+    PROC_TIMEOUT = int(os.getenv("SEL_PROC_TIMEOUT", "120"))  # wait for processing (Download visible)
+
+    MAX_WAIT_DL_SEC = int(os.getenv("SEL_MAX_WAIT_DL_SEC", "240"))  # wait for file to appear
+
+    DL_BTN_TIMEOUT = int(os.getenv("SEL_DL_BUTTON_TIMEOUT", "20"))  # how long to wait for button to be found
+
+    RELOAD_EACH_FILE = os.getenv("SEL_RELOAD_EACH_FILE", "true").lower() in ("1", "true", "yes", "y")
+
+    EXPECT_W = int(os.getenv("SEL_EXPECT_WIDTH", "2000"))
+
+    EXPECT_H = int(os.getenv("SEL_EXPECT_HEIGHT", "3000"))
+
+    ENFORCE_SIZE = os.getenv("SEL_ENFORCE_SIZE", "true").lower() in ("1", "true", "yes", "y")
+
+    Path(DOWNLOAD_DIR).mkdir(parents=True, exist_ok=True)
+
+    ORIG_DIR.mkdir(parents=True, exist_ok=True)
 
 
-# ===============================
-# Tiny logging helpers
-# ===============================
 def now_ts() -> str:
     return time.strftime("%H:%M:%S")
 
@@ -70,9 +99,9 @@ class StepTimer:
     def done(self, extra: str = "") -> float:
         dt = time.perf_counter() - self.t0
         if extra:
-            log(f"{self.label} — {dt:.2f}s ({extra})")
+            log(f"{self.label} â€” {dt:.2f}s ({extra})")
         else:
-            log(f"{self.label} — {dt:.2f}s")
+            log(f"{self.label} â€” {dt:.2f}s")
         return dt
 
 
@@ -101,13 +130,16 @@ def build_driver():
     opts.add_argument("--disable-features=PrivacySandboxAdsAPIs")
     opts.add_argument("--start-maximized")
     opts.add_experimental_option("excludeSwitches", ["enable-logging", "enable-automation"])
-    opts.add_experimental_option("prefs", {
-        "download.default_directory": DOWNLOAD_DIR,
-        "download.prompt_for_download": False,
-        "download.directory_upgrade": True,
-        "safebrowsing.enabled": True,
-        "profile.default_content_setting_values.automatic_downloads": 1,
-    })
+    opts.add_experimental_option(
+        "prefs",
+        {
+            "download.default_directory": DOWNLOAD_DIR,
+            "download.prompt_for_download": False,
+            "download.directory_upgrade": True,
+            "safebrowsing.enabled": True,
+            "profile.default_content_setting_values.automatic_downloads": 1,
+        },
+    )
     service = Service(log_output=subprocess.DEVNULL)
     driver = webdriver.Chrome(options=opts, service=service)
     try:
@@ -117,10 +149,7 @@ def build_driver():
 
     # Force download path via CDP (helps SPA downloads)
     try:
-        driver.execute_cdp_cmd("Page.setDownloadBehavior", {
-            "behavior": "allow",
-            "downloadPath": DOWNLOAD_DIR
-        })
+        driver.execute_cdp_cmd("Page.setDownloadBehavior", {"behavior": "allow", "downloadPath": DOWNLOAD_DIR})
     except Exception:
         pass
     return driver
@@ -210,7 +239,9 @@ def deep_click(driver, el):
 # Route / consent / promos
 # ===============================
 def pin_tool_route(driver):
-    js(driver, """
+    js(
+        driver,
+        """
     (function(TARGET){
       if(window.__pinRoute)return;
       window.__pinRoute=setInterval(()=>{
@@ -220,14 +251,19 @@ def pin_tool_route(driver):
         }
       },500);
     })(arguments[0]);
-    """, URL)
+    """,
+        URL,
+    )
 
 
 def remove_promos(driver):
-    js(driver, """
+    js(
+        driver,
+        """
       for(const sel of ["a[href*='tiktok']","a[href*='/create/']","a[href*='quick-actions']"])
         document.querySelectorAll(sel).forEach(a=>a.remove());
-    """)
+    """,
+    )
 
 
 def reassert_route(driver):
@@ -238,10 +274,13 @@ def reassert_route(driver):
 
 
 def hide_onetrust(driver):
-    js(driver, """
+    js(
+        driver,
+        """
       const o=document.querySelector('#onetrust-consent-sdk');
       if(o){o.style.display='none';o.style.visibility='hidden';o.style.pointerEvents='none';}
-    """)
+    """,
+    )
 
 
 # ===============================
@@ -292,7 +331,7 @@ def upload_file(driver, path_str):
         inp.send_keys(path_str)
         return
 
-    log("[upload] clicking drop-zone container…")
+    log("[upload] clicking drop-zone containerâ€¦")
     # 1) click the big container (not just the icon)
     for sel in [
         ".dropzone-content",
@@ -312,9 +351,9 @@ def upload_file(driver, path_str):
                 return
 
     # 2) click obvious upload CTAs
-    for (regex, tag) in [
+    for regex, tag in [
         (r"(tap to upload|upload image|drag.*drop|upload)", "*"),
-        (r"\bupload\b", "button,sp-button,label,a,div,span,[role='button']")
+        (r"\bupload\b", "button,sp-button,label,a,div,span,[role='button']"),
     ]:
         hit = deep_query_text_iframes(driver, regex, tag)
         if hit:
@@ -375,11 +414,12 @@ def wait_until_processed_controls(driver, timeout=PROC_TIMEOUT):
         "[data-export-target='Download']",
         "[data-export-option-id='downloadExportOption']",
         # Export entry points as well:
-        "sp-button#export", "sp-action-group [role='menuitem']",
+        "sp-button#export",
+        "sp-action-group [role='menuitem']",
     ]
 
     t = StepTimer("process")
-    log("[wait] waiting for processing to finish (Download/Export)…")
+    log("[wait] waiting for processing to finish (Download/Export)â€¦")
     end = time.time() + timeout
     next_beep = 0.0
     while time.time() < end:
@@ -401,11 +441,11 @@ def wait_until_processed_controls(driver, timeout=PROC_TIMEOUT):
             return True
 
         if time.time() >= next_beep:
-            log("[wait] still processing…")
+            log("[wait] still processingâ€¦")
             next_beep = time.time() + 2
         time.sleep(0.25)
 
-    log("[wait] gave up – no Download/Export detected before timeout")
+    log("[wait] gave up â€“ no Download/Export detected before timeout")
     t.done("TIMEOUT")
     return False
 
@@ -443,7 +483,8 @@ def _find_download_button_with_frames(driver, timeout=DL_BTN_TIMEOUT):
             host = deep_query_text_iframes(driver, r"^\s*download\s*$", "*")
         if host:
             inner = _inner_button(driver, host)
-            frame_chain = driver.execute_script("""
+            frame_chain = driver.execute_script(
+                """
                 const el = arguments[0];
                 function framesFor(node){
                   const chain=[];
@@ -456,7 +497,9 @@ def _find_download_button_with_frames(driver, timeout=DL_BTN_TIMEOUT):
                   return chain.reverse();
                 }
                 return framesFor(el);
-            """, host)
+            """,
+                host,
+            )
             return host, inner, frame_chain or []
         time.sleep(0.25)
     return None, None, []
@@ -487,7 +530,7 @@ def click_js_then_native(driver, wait_new):
             js(driver, "arguments[0].scrollIntoView({block:'center'}); arguments[0].click();", host)
             log(f"[dl] JS click attempt {attempt}")
         except Exception as e:
-            log(f"[dl] JS click failed on attempt {attempt}: {e}")
+            log(f"[dl] JS click failed on attempt {attempt}: {type(e).__name__}")
             time.sleep(0.5)
             continue
 
@@ -509,8 +552,8 @@ def click_download_NATIVE(driver, post_click_wait_secs=1.2) -> bool:
     Robust to re-renders: re-finds the button inside the iframe a few times.
     Returns True if we sent a (native or JS) click.
     """
-    reassert_route(driver);
-    hide_onetrust(driver);
+    reassert_route(driver)
+    hide_onetrust(driver)
     _disable_overlays_temporarily(driver)
 
     # Locate the download host + iframe chain from top-level context
@@ -530,7 +573,7 @@ def click_download_NATIVE(driver, post_click_wait_secs=1.2) -> bool:
         except Exception:
             return False
 
-    # Inside the correct iframe now — re-find & click a few times to ride out re-renders
+    # Inside the correct iframe now â€” re-find & click a few times to ride out re-renders
     try:
         sels = [
             "sp-button#downloadExportOption",
@@ -574,14 +617,17 @@ def click_download_NATIVE(driver, post_click_wait_secs=1.2) -> bool:
                 hit = None
             if hit:
                 try:
-                    return driver.execute_script("""
+                    return driver.execute_script(
+                        """
                       let n=arguments[0];
                       while(n){
                         if(n.tagName && n.tagName.toLowerCase()==='sp-button') return n;
                         n=n.parentNode||n.host;
                       }
                       return arguments[0];
-                    """, hit)
+                    """,
+                        hit,
+                    )
                 except Exception:
                     return hit
             return None
@@ -590,7 +636,7 @@ def click_download_NATIVE(driver, post_click_wait_secs=1.2) -> bool:
             try:
                 b = driver.execute_script(
                     "return arguments[0] && arguments[0].shadowRoot && arguments[0].shadowRoot.querySelector('button');",
-                    host_el
+                    host_el,
                 )
                 return b or host_el
             except Exception:
@@ -615,7 +661,7 @@ def click_download_NATIVE(driver, post_click_wait_secs=1.2) -> bool:
                 ActionChains(driver).move_to_element(target).pause(0.05).click().perform()
                 time.sleep(post_click_wait_secs)
                 return True
-            except Exception as e:
+            except Exception:
                 # Try a direct element.click as a second swing this attempt
                 try:
                     target.click()
@@ -644,7 +690,9 @@ def click_download_NATIVE(driver, post_click_wait_secs=1.2) -> bool:
 
 
 def _disable_overlays_temporarily(driver):
-    js(driver, """
+    js(
+        driver,
+        """
       const hide=(el)=>{ if(!el) return; el.__pe=el.style.pointerEvents; el.style.pointerEvents='none'; };
       const sels=[
         '#onetrust-consent-sdk','#onetrust-banner-sdk',
@@ -652,7 +700,8 @@ def _disable_overlays_temporarily(driver):
         '[data-nosnippet="true"]','sp-toast'
       ];
       for(const sel of sels){ document.querySelectorAll(sel).forEach(hide); }
-    """)
+    """,
+    )
 
 
 def wait_for_new_download():
@@ -679,7 +728,7 @@ def wait_for_new_download():
                     t.done()
                     return f
             if time.time() - last_print > 2:
-                log("[dl] waiting for file …")
+                log("[dl] waiting for file â€¦")
                 last_print = time.time()
             time.sleep(0.3)
         log("[dl] no file detected before timeout")
@@ -693,8 +742,9 @@ def wait_for_new_download():
 # Main
 # ===============================
 def main():
+    global driver, host, inner, new_file, target, wait_new
     session_t0 = time.perf_counter()
-    results: List[FileResult] = []
+    results: list[FileResult] = []
 
     driver = build_driver()
     try:
@@ -727,15 +777,15 @@ def main():
                         if (w, h) != (EXPECT_W, EXPECT_H):
                             log(f"[resize] {jpg.name} is {w}x{h}, resizing to {EXPECT_W}x{EXPECT_H}")
                             tmpfile = Path(tempfile.gettempdir()) / f"{jpg.stem}_{EXPECT_W}x{EXPECT_H}{jpg.suffix}"
-                            resized = im.resize((EXPECT_W, EXPECT_H), Image.LANCZOS)
+                            resized = im.resize((EXPECT_W, EXPECT_H), Image.Resampling.LANCZOS)
                             resized.save(tmpfile)
                             upload_path = str(tmpfile)
                 except Exception as e:
                     fr.status = "SKIPPED"
-                    fr.detail = f"size check failed: {e}"
+                    fr.detail = f"size check failed: {type(e).__name__}"
                     fr.sec_total = time.perf_counter() - per_t0
                     results.append(fr)
-                    log(f"[skip] {jpg.name} – {fr.detail}")
+                    log(f"[skip] {jpg.name} â€“ {fr.detail}")
                     continue
 
             # Upload
@@ -752,7 +802,7 @@ def main():
                 fr.detail = "Processing did not expose controls in time"
                 fr.sec_total = time.perf_counter() - per_t0
                 results.append(fr)
-                log(f"[error] {jpg.name} – {fr.detail}")
+                log(f"[error] {jpg.name} â€“ {fr.detail}")
                 # cleanup temp resized file if any
                 if tmpfile and tmpfile.exists():
                     try:
@@ -843,10 +893,11 @@ def main():
     err = sum(1 for r in results if r.status == "ERROR")
     log("====== SUMMARY ======")
     log(f"Files processed: {len(results)}  (OK: {ok}  Skipped: {skipped}  Errors: {err})")
-    avg_ok = (sum(r.sec_total for r in results if r.status == 'OK') / max(1, ok))
+    avg_ok = sum(r.sec_total for r in results if r.status == "OK") / max(1, ok)
     log(f"Total time: {total_sec:.2f}s  (avg per OK: {avg_ok:.2f}s )")
 
 
 # Entrypoint
 if __name__ == "__main__":
+    configure_runtime()
     main()

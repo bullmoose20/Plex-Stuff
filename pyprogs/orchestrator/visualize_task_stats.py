@@ -8,7 +8,8 @@ import glob
 from dotenv import load_dotenv
 
 # Load environment variables
-load_dotenv()
+if __name__ == "__main__":
+    load_dotenv()
 
 MAX_IMAGES = int(os.getenv("MAX_IMAGES", "50"))  # Default to 50 images if not specified
 THRESHOLD = float(os.getenv("ANOMALY_THRESHOLD", "1.5"))  # Default is 1.5
@@ -37,14 +38,14 @@ def cleanup_images_directory(directory="images", max_images=MAX_IMAGES):
 # Load stats from the JSON file
 def load_stats(file_path="stats/task_stats.json"):
     try:
-        with open(file_path, "r") as file:
+        with open(file_path) as file:
             data = json.load(file)
         return data
     except FileNotFoundError:
         print(f"Stats file '{file_path}' not found. Returning empty dataset.")
         sys.exit(1)  # Exit with an error code
     except json.JSONDecodeError as e:
-        print(f"Failed to parse JSON in stats file '{file_path}': {e}. Returning empty dataset.")
+        print(f"Failed to parse JSON in stats file '{file_path}': {type(e).__name__}. Returning empty dataset.")
         sys.exit(1)  # Exit with an error code
 
 
@@ -73,25 +74,28 @@ def extract_metrics(data):
     for loop in data:
         loops.append(loop["loop"])
         total_times.append(
-            sum(int(x) * 60 ** i for i, x in enumerate(reversed(loop["totals"]["total_task_time"].split(":"))))
+            sum(int(x) * 60**i for i, x in enumerate(reversed(loop["totals"]["total_task_time"].split(":"))))
         )
         active_times.append(
-            sum(int(x) * 60 ** i for i, x in enumerate(reversed(loop["totals"]["total_active_time"].split(":"))))
+            sum(int(x) * 60**i for i, x in enumerate(reversed(loop["totals"]["total_active_time"].split(":"))))
         )
         maintenance_times.append(
-            sum(int(x) * 60 ** i for i, x in enumerate(reversed(loop["totals"]["total_maintenance_time"].split(":"))))
+            sum(int(x) * 60**i for i, x in enumerate(reversed(loop["totals"]["total_maintenance_time"].split(":"))))
         )
-        task_stats.extend([
-            {
-                "loop": loop["loop"],
-                "description": task["description"],
-                "total_time": sum(int(x) * 60 ** i for i, x in enumerate(reversed(task["total_time"].split(":")))),
-                "active_time": sum(int(x) * 60 ** i for i, x in enumerate(reversed(task["active_time"].split(":")))),
-                "maintenance_time": sum(
-                    int(x) * 60 ** i for i, x in enumerate(reversed(task["maintenance_time"].split(":")))),
-            }
-            for task in loop["tasks"]
-        ])
+        task_stats.extend(
+            [
+                {
+                    "loop": loop["loop"],
+                    "description": task["description"],
+                    "total_time": sum(int(x) * 60**i for i, x in enumerate(reversed(task["total_time"].split(":")))),
+                    "active_time": sum(int(x) * 60**i for i, x in enumerate(reversed(task["active_time"].split(":")))),
+                    "maintenance_time": sum(
+                        int(x) * 60**i for i, x in enumerate(reversed(task["maintenance_time"].split(":")))
+                    ),
+                }
+                for task in loop["tasks"]
+            ]
+        )
 
     return loops, total_times, active_times, maintenance_times, task_stats
 
@@ -191,16 +195,19 @@ def plot_metrics(loops, total_times, active_times, maintenance_times, aggregate_
     plt.grid()
 
     # Display aggregate metrics as text on the plot
-    metrics_text = "\n".join([
-        f"Avg Total: {format_time(aggregate_metrics['average_total_time'])}",
-        f"Avg Active: {format_time(aggregate_metrics['average_active_time'])}",
-        f"Avg Maintenance: {format_time(aggregate_metrics['average_maintenance_time'])}",
-        f"Max Total: {format_time(aggregate_metrics['max_total_time'])}",
-        f"Min Total: {format_time(aggregate_metrics['min_total_time'])}"
-    ])
+    metrics_text = "\n".join(
+        [
+            f"Avg Total: {format_time(aggregate_metrics['average_total_time'])}",
+            f"Avg Active: {format_time(aggregate_metrics['average_active_time'])}",
+            f"Avg Maintenance: {format_time(aggregate_metrics['average_maintenance_time'])}",
+            f"Max Total: {format_time(aggregate_metrics['max_total_time'])}",
+            f"Min Total: {format_time(aggregate_metrics['min_total_time'])}",
+        ]
+    )
 
-    plt.gcf().text(0.02, 0.5, metrics_text, fontsize=10, va="center",
-                   bbox=dict(boxstyle="round", facecolor="white", alpha=0.5))
+    plt.gcf().text(
+        0.02, 0.5, metrics_text, fontsize=10, va="center", bbox=dict(boxstyle="round", facecolor="white", alpha=0.5)
+    )
 
     # Save the plot to a file
     os.makedirs("images", exist_ok=True)
@@ -243,6 +250,7 @@ def plot_per_task_analysis(task_summaries):
 
 # Main function to process data and visualize
 def main():
+    global active_times, aggregate_metrics, anomalies, loops, maintenance_times, stats, task_stats, task_summaries, total_times
     setup_directories()
     stats = load_stats()
     loops, total_times, active_times, maintenance_times, task_stats = extract_metrics(stats)

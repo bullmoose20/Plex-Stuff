@@ -1,5 +1,5 @@
 import argparse
-import datetime
+
 import gc
 import glob
 import logging
@@ -10,45 +10,50 @@ import re
 import sys
 import time
 from datetime import datetime as dt
-from dotenv import load_dotenv, find_dotenv
+from dotenv import load_dotenv
 from PIL import Image
-from logging.handlers import RotatingFileHandler
-from moviepy.video.io.VideoFileClip import VideoFileClip
 
-try:
-    # Find the .env file
-    dotenv_path = find_dotenv(raise_error_if_not_found=True)
+from moviepy import VideoFileClip
 
-    # Load environment variables from .env file
-    load_dotenv(dotenv_path)
-except OSError:
-    print("Error: The .env file was not found. Please make sure it exists in the script's directory.")
-    exit(1)
 
-# Retrieve Plex server details from environment variables
-# plex_url = os.getenv('PLEX_URL')
-# plex_token = os.getenv('PLEX_TOKEN')
-# timeout_seconds = int(os.getenv('PLEX_TIMEOUT', 60))  # Default timeout: 60 seconds
-max_log_files = int(os.getenv('MAX_LOG_FILES', 10))  # Default number of logs: 10
-log_level = os.getenv('LOG_LEVEL', 'INFO').upper()  # Default logging level: INFO
+max_log_files = int(os.getenv("MAX_LOG_FILES", 10))  # Default number of logs: 10
 
-# Extract the script name without the '.py' extension
+log_level = os.getenv("LOG_LEVEL", "INFO").upper()  # Default logging level: INFO
+
 script_name = os.path.splitext(os.path.basename(sys.argv[0]))[0]
 
-# Define the logs directory
 logs_directory = "logs"
 
-# Ensure the "logs" directory exists
-if not os.path.exists(logs_directory):
-    os.makedirs(logs_directory)
-
-# Generate a unique log filename with timestamp and script name
 timestamp = dt.now().strftime("%Y%m%d_%H%M%S_%f")[:-3]
+
 log_filename = os.path.join(logs_directory, f"{script_name}_{timestamp}.log")
 
-# Set up logging with timestamps and the specified logging level
-log_format = '%(asctime)s - %(levelname)s - %(message)s'
-logging.basicConfig(filename=log_filename, level=getattr(logging, log_level), format=log_format)
+log_format = "%(asctime)s - %(levelname)s - %(message)s"
+
+
+def configure_runtime():
+    """Load optional local configuration and initialize CLI output."""
+    global logs_directory, max_log_files, script_name, timestamp
+    load_dotenv()
+
+    max_log_files = int(os.getenv("MAX_LOG_FILES", 10))  # Default number of logs: 10
+
+    log_level = os.getenv("LOG_LEVEL", "INFO").upper()  # Default logging level: INFO
+
+    script_name = os.path.splitext(os.path.basename(sys.argv[0]))[0]
+
+    logs_directory = "logs"
+
+    if not os.path.exists(logs_directory):
+        os.makedirs(logs_directory)
+
+    timestamp = dt.now().strftime("%Y%m%d_%H%M%S_%f")[:-3]
+
+    log_filename = os.path.join(logs_directory, f"{script_name}_{timestamp}.log")
+
+    log_format = "%(asctime)s - %(levelname)s - %(message)s"
+
+    logging.basicConfig(filename=log_filename, level=getattr(logging, log_level), format=log_format)
 
 
 def clean_up_old_logs():
@@ -68,25 +73,25 @@ def clean_up_old_logs():
 
 
 def get_formatted_duration(seconds):
-    units = [('day', 86400), ('hour', 3600), ('minute', 60), ('second', 1)]
+    units = [("day", 86400), ("hour", 3600), ("minute", 60), ("second", 1)]
     result = []
 
     for unit_name, unit_seconds in units:
         value, seconds = divmod(seconds, unit_seconds)
         if value > 0:
-            unit_name = unit_name if value == 1 else unit_name + 's'
+            unit_name = unit_name if value == 1 else unit_name + "s"
             result.append(f"{int(value):.0f} {unit_name}")
 
     if not result:
         milliseconds = seconds * 1000
-        return "{:.3f} millisecond".format(milliseconds) if milliseconds == 1 else "{:.3f} milliseconds".format(milliseconds)
+        return f"{milliseconds:.3f} millisecond" if milliseconds == 1 else f"{milliseconds:.3f} milliseconds"
 
-    return ' '.join(result)
+    return " ".join(result)
 
 
 def format_file_name(file_name, is_tv_show):
     if is_tv_show:
-        match = re.search(r'S\d+E\d+', file_name)
+        match = re.search(r"S\d+E\d+", file_name)
         episode_info = match.group() if match else ""
         return f"{episode_info}.jpg"
     else:
@@ -100,32 +105,20 @@ def take_screenshots(video_file, output_file, frame_extraction_time):
         logging.info(f"Snapshot already exists. Skipping: {output_file}")
         return
 
-    try:
-        clip = VideoFileClip(video_file)
+    with VideoFileClip(os.fspath(video_file), audio=False) as clip:
+        if not 0 <= frame_extraction_time < clip.duration:
+            raise ValueError("Frame extraction time must be within the video duration")
         frame = clip.get_frame(frame_extraction_time)
-        pil_img = Image.fromarray(np.uint8(frame))
-
-        pil_img.save(output_file)
-    except Exception as e:
-        print(f"Error during frame extraction: {e}")
-        logging.error(f"Error during frame extraction: {e}")
-    finally:
-        try:
-            clip.close()
-            del clip
-        except Exception as e:
-            print(f"Error during cleanup: {e}")
-            logging.warning(f"Error during cleanup: {e}")
+        with Image.fromarray(np.asarray(frame, dtype=np.uint8)) as image:
+            image.save(output_file)
 
 
 def scan_directory(source_path, frame_extraction_time):
-    start_time = time.time()  # Record start time
     script_dir = os.path.dirname(os.path.abspath(__file__))
     output_dir = os.path.join(script_dir, "output")
     os.makedirs(output_dir, exist_ok=True)
 
     video_formats = [".mkv", ".avi", ".mp4", ".mov", ".wmv", ".flv", ".webm", ".m4v"]
-    log_file = os.path.join(script_dir, 'video_frame_extractor.log')
 
     total_added = 0
     total_skipped = 0
@@ -162,8 +155,6 @@ def scan_directory(source_path, frame_extraction_time):
                         logging.info(f"Title card already exists. Skipping Movie: {output_file}")
                         total_skipped += 1
 
-    end_time = time.time()  # Record end time
-    elapsed_time = end_time - start_time
 
     # Log summary
     print(f"Total added: {total_added}")
@@ -184,7 +175,7 @@ def get_output_parent_dir(source_path, dirpath):
     rel_path = get_relative_path(source_path, dirpath)
 
     # Check if the directory name is "Season #" and adjust the relative path accordingly
-    if re.match(r'Season\s\d+', os.path.basename(dirpath)):
+    if re.match(r"Season\s\d+", os.path.basename(dirpath)):
         base_name = os.path.basename(os.path.dirname(dirpath))
     else:
         base_name = os.path.basename(dirpath)
@@ -207,17 +198,17 @@ def get_relative_path(base_path, target_path):
 
 
 def has_season_identifier1(dirnames):
-    return any(re.search(r'Season\s\d+', dir) for dir in dirnames)
+    return any(re.search(r"Season\s\d+", dir) for dir in dirnames)
 
 
 def has_season_identifier(dirpath):
-    return any(re.search(r'Season\s\d+', path) for path in dirpath.split(os.path.sep))
+    return any(re.search(r"Season\s\d+", path) for path in dirpath.split(os.path.sep))
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Extract title card frames from videos.')
-    parser.add_argument('--path', required=True, help='Root directory containing videos.')
-    parser.add_argument('--time', type=int, default=45, help='Frame extraction time in seconds (default: 45).')
+    parser = argparse.ArgumentParser(description="Extract title card frames from videos.")
+    parser.add_argument("--path", required=True, help="Root directory containing videos.")
+    parser.add_argument("--time", type=int, default=45, help="Frame extraction time in seconds (default: 45).")
 
     args = parser.parse_args()
 
@@ -244,9 +235,9 @@ def main():
         script_duration = end_time - start_time
 
         # Log summary
-        print(f"Script completed.")
+        print("Script completed.")
         print(f"Script duration: {get_formatted_duration(script_duration)}")
-        logging.info(f"Script completed.")
+        logging.info("Script completed.")
         logging.info(f"Script duration: {get_formatted_duration(script_duration)}")
 
         # Call the clean_up_old_logs function
@@ -258,4 +249,5 @@ def main():
 
 
 if __name__ == "__main__":
+    configure_runtime()
     main()

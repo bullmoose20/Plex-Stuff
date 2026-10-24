@@ -1,36 +1,72 @@
 import os
 import logging
-import plexapi
+
 import glob
 from logging.handlers import RotatingFileHandler
 from plexapi.server import PlexServer
 from dotenv import load_dotenv
 import time
 
-# Load environment variables
-load_dotenv()
 
 PLEX_URL = os.getenv("PLEX_URL")
+
 PLEX_TOKEN = os.getenv("PLEX_TOKEN")
+
 PLEX_TIMEOUT = int(os.getenv("PLEX_TIMEOUT", 60))
+
 MAX_LOG_FILES = int(os.getenv("MAX_LOG_FILES", 10))
+
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
 
-# Setup Logging
 script_name = os.path.splitext(os.path.basename(__file__))[0]
+
 logs_directory = "logs"
-os.makedirs(logs_directory, exist_ok=True)
 
 timestamp = time.strftime("%Y%m%d_%H%M%S")
-log_filename = os.path.join(logs_directory, f"{script_name}_{timestamp}.log")
-log_format = '%(asctime)s - %(levelname)s - %(message)s'
 
-logging.basicConfig(level=LOG_LEVEL, format=log_format)
-file_handler = RotatingFileHandler(log_filename, maxBytes=5 * 1024 * 1024, backupCount=MAX_LOG_FILES)
-file_handler.setFormatter(logging.Formatter(log_format))
-logging.getLogger().addHandler(file_handler)
+log_filename = os.path.join(logs_directory, f"{script_name}_{timestamp}.log")
+
+log_format = "%(asctime)s - %(levelname)s - %(message)s"
 
 logger = logging.getLogger()
+
+
+def configure_runtime():
+    """Load optional local configuration and initialize CLI output."""
+    global MAX_LOG_FILES, PLEX_TIMEOUT, PLEX_TOKEN, PLEX_URL, logger, logs_directory, script_name, timestamp
+    load_dotenv()
+
+    PLEX_URL = os.getenv("PLEX_URL")
+
+    PLEX_TOKEN = os.getenv("PLEX_TOKEN")
+
+    PLEX_TIMEOUT = int(os.getenv("PLEX_TIMEOUT", 60))
+
+    MAX_LOG_FILES = int(os.getenv("MAX_LOG_FILES", 10))
+
+    LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
+
+    script_name = os.path.splitext(os.path.basename(__file__))[0]
+
+    logs_directory = "logs"
+
+    os.makedirs(logs_directory, exist_ok=True)
+
+    timestamp = time.strftime("%Y%m%d_%H%M%S")
+
+    log_filename = os.path.join(logs_directory, f"{script_name}_{timestamp}.log")
+
+    log_format = "%(asctime)s - %(levelname)s - %(message)s"
+
+    logging.basicConfig(level=LOG_LEVEL, format=log_format)
+
+    file_handler = RotatingFileHandler(log_filename, maxBytes=5 * 1024 * 1024, backupCount=MAX_LOG_FILES)
+
+    file_handler.setFormatter(logging.Formatter(log_format))
+
+    logging.getLogger().addHandler(file_handler)
+
+    logger = logging.getLogger()
 
 
 def connect_to_plex():
@@ -41,7 +77,7 @@ def connect_to_plex():
         logger.info("Connected to Plex server successfully.")
         return plex
     except Exception as e:
-        logger.critical(f"Failed to connect to Plex server: {e}")
+        logger.critical(f"Failed to connect to Plex server: {type(e).__name__}")
         raise
 
 
@@ -52,14 +88,14 @@ def select_show(plex):
         if show_name == "0":
             logger.info("User chose to exit the script from show selection.")
             return None
-        
+
         logger.info(f"Searching for show: {show_name}")
-        shows = plex.library.search(show_name, libtype='show')
-        
+        shows = plex.library.search(show_name, libtype="show")
+
         if not shows:
             print("No matches found. Here is a list of all available shows:")
             logger.warning("No matches found. Displaying all available shows.")
-            all_shows = plex.library.search(libtype='show')
+            all_shows = plex.library.search(libtype="show")
             for i, show in enumerate(all_shows, 1):
                 print(f"{i}: {show.title} ({show.year if show.year else 'Unknown Year'})")
             print("0: Go back to the main menu")
@@ -196,7 +232,9 @@ def manage_labels(item, item_type):
             for attempt in range(3):  # 3 attempts
                 try:
                     # Unlock label field if locked
-                    if "label" in item.fields and item.fields["label"].locked:
+                    label_field = next((field for field in item.fields if field.name == "label"), None)
+                    was_locked = bool(label_field and label_field.locked)
+                    if was_locked:
                         logger.info(f"Unlocking the label field for {item_type} '{item.title}'...")
                         item.editField("label", value="", locked=False)
                         item.reload()
@@ -210,7 +248,7 @@ def manage_labels(item, item_type):
                     logger.info(f"Attempting to delete label '{label_to_delete}' from {item_type} '{item.title}'.")
                     # Remove the label (session timeout applies globally)
                     # item.removeLabel(label_to_delete)
-                    item.removeLabel("Overlay")
+                    item.removeLabel(label_to_delete)
                     item.reload()
 
                     # Check if the label was removed
@@ -220,9 +258,11 @@ def manage_labels(item, item_type):
                         break
 
                 except Exception as e:
-                    logger.warning(f"Attempt {attempt + 1} to delete label '{label_to_delete}' failed: {e}")
+                    logger.warning(
+                        f"Attempt {attempt + 1} to delete label '{label_to_delete}' failed: {type(e).__name__}"
+                    )
                     if attempt < 2:  # Pause before retrying (if not the last attempt)
-                        logger.info(f"Retrying label deletion in 5 seconds...")
+                        logger.info("Retrying label deletion in 5 seconds...")
                         time.sleep(5)
 
             else:
@@ -230,7 +270,7 @@ def manage_labels(item, item_type):
                 print(f"An error occurred while deleting the label '{label_to_delete}'.")
 
             # Relock label field if it was initially locked
-            if "label" in item.fields and not item.fields["label"].locked:
+            if was_locked:
                 logger.info(f"Relocking the label field for {item_type} '{item.title}'...")
                 item.editField("label", value="", locked=True)
                 item.reload()
@@ -245,6 +285,7 @@ def manage_labels(item, item_type):
 
 
 def main():
+    global episode, plex, season, show
     try:
         # Connect to the Plex server
         plex = connect_to_plex()
@@ -284,7 +325,9 @@ def main():
                         if season:
                             episode = select_episode(season)
                             if episode:
-                                print(f"\nManage labels for episode '{episode.title}' in season '{season.title}' of '{show.title}':")
+                                print(
+                                    f"\nManage labels for episode '{episode.title}' in season '{season.title}' of '{show.title}':"
+                                )
                                 manage_labels(episode, "episode")
                     else:
                         print("Invalid choice! Please select 0, 1, 2, or 3.")
@@ -293,12 +336,13 @@ def main():
                     print("Invalid input! Please enter a valid number.")
                     logger.warning("User entered invalid input in the main menu.")
     except Exception as e:
-        print(f"An error occurred: {e}")
-        logger.critical(f"Critical error: {e}")
+        print(f"An error occurred: {type(e).__name__}")
+        logger.critical(f"Critical error: {type(e).__name__}")
     finally:
         clean_up_old_logs()
         logger.info("Script execution completed.")
 
 
 if __name__ == "__main__":
+    configure_runtime()
     main()

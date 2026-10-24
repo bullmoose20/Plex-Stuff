@@ -1,0 +1,5 @@
+pytest>=9.1.1
+pytest-socket>=0.8.1
+ruff>=0.17.2
+pip-audit>=2.10.1
+packaging>=25.0

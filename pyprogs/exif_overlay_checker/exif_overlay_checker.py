@@ -5,44 +5,49 @@ import os
 import sys
 import time
 from datetime import datetime as dt
-from dotenv import load_dotenv, find_dotenv
+from dotenv import load_dotenv
 from PIL import Image
 from PIL.ExifTags import TAGS
 
-try:
-    # Find the .env file
-    dotenv_path = find_dotenv(raise_error_if_not_found=True)
 
-    # Load environment variables from .env file
-    load_dotenv(dotenv_path)
-except OSError:
-    print("Error: The .env file was not found. Please make sure it exists in the script's directory.")
-    exit(1)
+max_log_files = int(os.getenv("MAX_LOG_FILES", 10))  # Default number of logs: 10
 
-# Retrieve Plex server details from environment variables
-# plex_url = os.getenv('PLEX_URL')
-# plex_token = os.getenv('PLEX_TOKEN')
-# timeout_seconds = int(os.getenv('PLEX_TIMEOUT', 60))  # Default timeout: 60 seconds
-max_log_files = int(os.getenv('MAX_LOG_FILES', 10))  # Default number of logs: 10
-log_level = os.getenv('LOG_LEVEL', 'INFO').upper()  # Default logging level: INFO
+log_level = os.getenv("LOG_LEVEL", "INFO").upper()  # Default logging level: INFO
 
-# Extract the script name without the '.py' extension
 script_name = os.path.splitext(os.path.basename(sys.argv[0]))[0]
 
-# Define the logs directory
 logs_directory = "logs"
 
-# Ensure the "logs" directory exists
-if not os.path.exists(logs_directory):
-    os.makedirs(logs_directory)
-
-# Generate a unique log filename with timestamp and script name
 timestamp = dt.now().strftime("%Y%m%d_%H%M%S_%f")[:-3]
+
 log_filename = os.path.join(logs_directory, f"{script_name}_{timestamp}.log")
 
-# Set up logging with timestamps and the specified logging level
-log_format = '%(asctime)s - %(levelname)s - %(message)s'
-logging.basicConfig(filename=log_filename, level=getattr(logging, log_level), format=log_format)
+log_format = "%(asctime)s - %(levelname)s - %(message)s"
+
+
+def configure_runtime():
+    """Load optional local configuration and initialize CLI output."""
+    global logs_directory, max_log_files, script_name, timestamp
+    load_dotenv()
+
+    max_log_files = int(os.getenv("MAX_LOG_FILES", 10))  # Default number of logs: 10
+
+    log_level = os.getenv("LOG_LEVEL", "INFO").upper()  # Default logging level: INFO
+
+    script_name = os.path.splitext(os.path.basename(sys.argv[0]))[0]
+
+    logs_directory = "logs"
+
+    if not os.path.exists(logs_directory):
+        os.makedirs(logs_directory)
+
+    timestamp = dt.now().strftime("%Y%m%d_%H%M%S_%f")[:-3]
+
+    log_filename = os.path.join(logs_directory, f"{script_name}_{timestamp}.log")
+
+    log_format = "%(asctime)s - %(levelname)s - %(message)s"
+
+    logging.basicConfig(filename=log_filename, level=getattr(logging, log_level), format=log_format)
 
 
 def clean_up_old_logs():
@@ -62,29 +67,30 @@ def clean_up_old_logs():
 
 
 def get_formatted_duration(seconds):
-    units = [('day', 86400), ('hour', 3600), ('minute', 60), ('second', 1)]
+    units = [("day", 86400), ("hour", 3600), ("minute", 60), ("second", 1)]
     result = []
 
     for unit_name, unit_seconds in units:
         value, seconds = divmod(seconds, unit_seconds)
         if value > 0:
-            unit_name = unit_name if value == 1 else unit_name + 's'
+            unit_name = unit_name if value == 1 else unit_name + "s"
             result.append(f"{int(value):.0f} {unit_name}")
 
     if not result:
         milliseconds = seconds * 1000
-        return "{:.3f} millisecond".format(milliseconds) if milliseconds == 1 else "{:.3f} milliseconds".format(milliseconds)
+        return f"{milliseconds:.3f} millisecond" if milliseconds == 1 else f"{milliseconds:.3f} milliseconds"
 
-    return ' '.join(result)
+    return " ".join(result)
 
 
 def main(input_folder, verbose):
+    global file, file_path, files, overlay_count, user_comment, without_overlay_count
     overlay_count = 0
     without_overlay_count = 0
 
     # Log the command along with its arguments
     logging.info(f"Command: {' '.join(['python'] + os.sys.argv)}")
-    logging.info(f"Arguments: {args}")
+    logging.info("Scanning image metadata")
 
     # logging.info(f"Command line arguments: {' '.join(sys.argv)}")
     logging.info(f"Input folder: {input_folder}")
@@ -96,7 +102,7 @@ def main(input_folder, verbose):
 
     for root, _, files in os.walk(input_folder):
         for file in files:
-            if file.lower().endswith(('.jpg', '.jpeg', '.png')):
+            if file.lower().endswith((".jpg", ".jpeg", ".png")):
                 file_path = os.path.join(root, file)
                 has_overlay, user_comment = check_overlay_in_exif(file_path)
                 if has_overlay:
@@ -122,8 +128,12 @@ def main(input_folder, verbose):
 
 def check_overlay_in_exif(file_path):
     try:
-        img = Image.open(file_path)
-        exif_data = img._getexif()
+        with Image.open(file_path) as img:
+            exif_data = dict(img.getexif())
+            # UserComment commonly lives in the nested EXIF IFD.
+            if 34665 in exif_data:
+                exif_data.update(img.getexif().get_ifd(34665))
+            exif_data.update(getattr(img, "text", {}))
         user_comment = None
 
         if exif_data is not None:
@@ -135,10 +145,10 @@ def check_overlay_in_exif(file_path):
                 if isinstance(value, bytes):
                     value = value.decode("utf-8", errors="replace")
 
-                if isinstance(value, str) and 'overlay' in value.lower():
+                if isinstance(value, str) and "overlay" in value.lower():
                     return True, user_comment
 
-                if isinstance(value, str) and 'titlecard' in value.lower():
+                if isinstance(value, str) and "titlecard" in value.lower():
                     return True, user_comment
 
         return False, user_comment
@@ -150,8 +160,9 @@ def check_overlay_in_exif(file_path):
 
 
 def count_files(input_folder):
-    return sum(1 for _, _, files in os.walk(input_folder) for file in files if
-               file.lower().endswith(('.jpg', '.jpeg', '.png')))
+    return sum(
+        1 for _, _, files in os.walk(input_folder) for file in files if file.lower().endswith((".jpg", ".jpeg", ".png"))
+    )
 
 
 def print_progress(current, total):
@@ -169,9 +180,10 @@ def print_summary(overlay_count, without_overlay_count):
 
 
 if __name__ == "__main__":
+    configure_runtime()
     parser = argparse.ArgumentParser(description="Scan images for 'overlay' in EXIF data.")
-    parser.add_argument('--input-folder', help='Specify the input folder path.')
-    parser.add_argument('--verbose', action='store_true', help='Enable verbose mode with detailed logging.')
+    parser.add_argument("--input-folder", help="Specify the input folder path.")
+    parser.add_argument("--verbose", action="store_true", help="Enable verbose mode with detailed logging.")
     args = parser.parse_args()
 
     if args.input_folder is None:

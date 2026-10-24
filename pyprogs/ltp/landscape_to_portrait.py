@@ -1,7 +1,8 @@
+import ntpath
 import os
 import logging
 from logging.handlers import RotatingFileHandler
-from dotenv import load_dotenv, find_dotenv
+from dotenv import load_dotenv
 from plexapi.server import PlexServer
 from PIL import Image
 from io import BytesIO
@@ -11,43 +12,86 @@ import glob
 import gc
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-# Load environment variables
-dotenv_path = find_dotenv(raise_error_if_not_found=True)
-load_dotenv(dotenv_path)
 
 PLEX_URL = os.getenv("PLEX_URL")
+
 PLEX_TOKEN = os.getenv("PLEX_TOKEN")
+
 PLEX_TIMEOUT = int(os.getenv("PLEX_TIMEOUT", 60))
+
 MAX_LOG_FILES = int(os.getenv("MAX_LOG_FILES", 10))
+
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
 
-# Persistent HTTP Session
 SESSION = requests.Session()
-SESSION.headers.update({"Accept": "application/json"})
 
-# Logging setup
 script_name = os.path.splitext(os.path.basename(__file__))[0]
+
 logs_directory = "logs"
-if not os.path.exists(logs_directory):
-    os.makedirs(logs_directory)
 
 timestamp = time.strftime("%Y%m%d_%H%M%S")
-log_filename = os.path.join(logs_directory, f"{script_name}_{timestamp}.log")
-log_format = '%(asctime)s - %(levelname)s - %(message)s'
 
-logging.basicConfig(level=LOG_LEVEL, format=log_format)
-file_handler = RotatingFileHandler(log_filename, maxBytes=5 * 1024 * 1024, backupCount=MAX_LOG_FILES)
-file_handler.setFormatter(logging.Formatter(log_format))
-logging.getLogger().addHandler(file_handler)
+log_filename = os.path.join(logs_directory, f"{script_name}_{timestamp}.log")
+
+log_format = "%(asctime)s - %(levelname)s - %(message)s"
 
 logger = logging.getLogger()
 
 ASPECT_RATIO = 16 / 9  # 1.77777778
+
 OUTPUT_FOLDER = "output"
 
-# Ensure the output folder exists
-os.makedirs(OUTPUT_FOLDER, exist_ok=True)
 created_dirs = set()
+
+
+def configure_runtime():
+    """Load optional local configuration and initialize CLI output."""
+    global MAX_LOG_FILES, OUTPUT_FOLDER, PLEX_TIMEOUT, PLEX_TOKEN, PLEX_URL, SESSION, created_dirs, logger, logs_directory, script_name, timestamp
+    load_dotenv()
+
+    PLEX_URL = os.getenv("PLEX_URL")
+
+    PLEX_TOKEN = os.getenv("PLEX_TOKEN")
+
+    PLEX_TIMEOUT = int(os.getenv("PLEX_TIMEOUT", 60))
+
+    MAX_LOG_FILES = int(os.getenv("MAX_LOG_FILES", 10))
+
+    LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
+
+    SESSION = requests.Session()
+
+    SESSION.headers.update({"Accept": "application/json"})
+
+    script_name = os.path.splitext(os.path.basename(__file__))[0]
+
+    logs_directory = "logs"
+
+    if not os.path.exists(logs_directory):
+        os.makedirs(logs_directory)
+
+    timestamp = time.strftime("%Y%m%d_%H%M%S")
+
+    log_filename = os.path.join(logs_directory, f"{script_name}_{timestamp}.log")
+
+    log_format = "%(asctime)s - %(levelname)s - %(message)s"
+
+    logging.basicConfig(level=LOG_LEVEL, format=log_format)
+
+    file_handler = RotatingFileHandler(log_filename, maxBytes=5 * 1024 * 1024, backupCount=MAX_LOG_FILES)
+
+    file_handler.setFormatter(logging.Formatter(log_format))
+
+    logging.getLogger().addHandler(file_handler)
+
+    logger = logging.getLogger()
+
+
+    OUTPUT_FOLDER = "output"
+
+    os.makedirs(OUTPUT_FOLDER, exist_ok=True)
+
+    created_dirs = set()
 
 
 def clean_up_old_logs():
@@ -67,7 +111,7 @@ def process_items_parallel(items, process_function, *args):
             try:
                 future.result()
             except Exception as e:
-                logger.error(f"Error in parallel processing: {e}")
+                logger.error(f"Error in parallel processing: {type(e).__name__}")
 
 
 def build_file_cache(output_folder):
@@ -96,15 +140,15 @@ def get_media_folder(media):
         if media["type"] == "movie":
             # Use the parent folder of the first location for movies
             full_path = media["locations"][0]
-            return os.path.basename(os.path.dirname(full_path))  # Extract folder name
+            return ntpath.basename(ntpath.dirname(full_path))  # Extract folder name
         elif media["type"] == "show" or media["type"] == "episode":
             # Use the root folder for TV shows and episodes
             if "locations" in media and media["locations"]:
-                return os.path.basename(media["locations"][0])  # Show folder name
+                return ntpath.basename(media["locations"][0].rstrip("/\\"))  # Show folder name
         # Fallback for unknown types
         return media.get("title", "Unknown")
     except Exception as e:
-        logger.warning(f"Could not determine folder for media '{media.get('title', 'Unknown')}': {e}")
+        logger.warning(f"Could not determine folder for media '{media.get('title', 'Unknown')}': {type(e).__name__}")
         return media.get("title", "Unknown")
 
 
@@ -128,13 +172,13 @@ def select_from_list(items, prompt, include_all=False):
 
 def resize_and_crop(image, target_width, target_height):
     """Resize and crop an image to the specified dimensions."""
-    width, height = image.size
-    ratio = width / height
+    from PIL import ImageOps
 
-    if abs(ratio - ASPECT_RATIO) < 0.01:
-        image = image.resize((1920, 1080), Image.LANCZOS)
-
-    return image.crop((600, 0, 1320, 1080)).resize((target_width, target_height), Image.LANCZOS)
+    if min(target_width, target_height) <= 0:
+        raise ValueError("Target dimensions must be positive")
+    return ImageOps.fit(
+        image.convert("RGB"), (target_width, target_height), method=Image.Resampling.LANCZOS, centering=(0.5, 0.5)
+    )
 
 
 def get_libraries_from_env():
@@ -205,7 +249,7 @@ def fetch_limited_metadata(library):
             limited_metadata.append(limited_item)
         return limited_metadata
     except Exception as e:
-        logger.error(f"Error fetching limited metadata: {e}")
+        logger.error(f"Error fetching limited metadata: {type(e).__name__}")
         return []
 
 
@@ -227,8 +271,8 @@ def process_movie(movie, library_name, stats, file_cache):
             stats["skipped"] += 1
             return
 
-        art_url = f"{PLEX_URL}{movie['art']}?X-Plex-Token={PLEX_TOKEN}"
-        response = SESSION.get(art_url, timeout=PLEX_TIMEOUT)
+        art_url = f"{PLEX_URL}{movie['art']}"
+        response = SESSION.get(art_url, timeout=PLEX_TIMEOUT, headers={"X-Plex-Token": PLEX_TOKEN})
         response.raise_for_status()
 
         image = Image.open(BytesIO(response.content))
@@ -239,7 +283,7 @@ def process_movie(movie, library_name, stats, file_cache):
         logger.info(f"Saved: {output_path}")
         stats["processed"] += 1
     except Exception as e:
-        logger.error(f"Error processing {movie.get('title', 'Unknown')}: {e}")
+        logger.error(f"Error processing {movie.get('title', 'Unknown')}: {type(e).__name__}")
         stats["errors"] += 1
 
 
@@ -259,8 +303,8 @@ def process_tv_show(show, library_name, stats, file_cache):
                     logger.warning(f"Skipping poster creation for {show.get('title', 'Unknown')}: No background art.")
                     stats["skipped"] += 1
                 else:
-                    art_url = f"{PLEX_URL}{show['art']}?X-Plex-Token={PLEX_TOKEN}"
-                    response = SESSION.get(art_url, timeout=PLEX_TIMEOUT)
+                    art_url = f"{PLEX_URL}{show['art']}"
+                    response = SESSION.get(art_url, timeout=PLEX_TIMEOUT, headers={"X-Plex-Token": PLEX_TOKEN})
                     response.raise_for_status()
 
                     image = Image.open(BytesIO(response.content))
@@ -271,7 +315,7 @@ def process_tv_show(show, library_name, stats, file_cache):
                     logger.info(f"Saved: {poster_path}")
                     stats["processed"] += 1
             except Exception as e:
-                logger.error(f"Error creating poster for show '{show.get('title', 'Unknown')}': {e}")
+                logger.error(f"Error creating poster for show '{show.get('title', 'Unknown')}': {type(e).__name__}")
                 stats["errors"] += 1
         else:
             logger.info(f"File already exists, skipping: {poster_path}")
@@ -284,10 +328,7 @@ def process_tv_show(show, library_name, stats, file_cache):
 
         for episode in episodes:
             # Include season and episode numbers in the filename
-            episode_path = os.path.join(
-                show_folder,
-                f"S{episode.seasonNumber:02}E{episode.index:02}.jpg"
-            )
+            episode_path = os.path.join(show_folder, f"S{episode.seasonNumber:02}E{episode.index:02}.jpg")
             if episode_path in file_cache:
                 logger.info(f"File already exists, skipping: {episode_path}")
                 stats["skipped"] += 1
@@ -295,8 +336,8 @@ def process_tv_show(show, library_name, stats, file_cache):
 
             if episode.thumb:
                 try:
-                    thumb_url = f"{PLEX_URL}{episode.thumb}?X-Plex-Token={PLEX_TOKEN}"
-                    response = SESSION.get(thumb_url, timeout=PLEX_TIMEOUT)
+                    thumb_url = f"{PLEX_URL}{episode.thumb}"
+                    response = SESSION.get(thumb_url, timeout=PLEX_TIMEOUT, headers={"X-Plex-Token": PLEX_TOKEN})
                     response.raise_for_status()
 
                     image = Image.open(BytesIO(response.content))
@@ -307,17 +348,18 @@ def process_tv_show(show, library_name, stats, file_cache):
                     logger.info(f"Saved: {episode_path}")
                     stats["processed"] += 1
                 except Exception as e:
-                    logger.error(f"Error processing episode '{episode.title}': {e}")
+                    logger.error(f"Error processing episode '{episode.title}': {type(e).__name__}")
                     stats["errors"] += 1
             else:
                 logger.warning(f"Skipping episode '{episode.title}': No thumbnail available.")
                 stats["skipped"] += 1
     except Exception as e:
-        logger.error(f"Error processing show '{show.get('title', 'Unknown')}': {e}")
+        logger.error(f"Error processing show '{show.get('title', 'Unknown')}': {type(e).__name__}")
         stats["errors"] += 1
 
 
 def main():
+    global choice, file_cache, idx, lib, libraries, libraries_from_env, library, library_name, movie, plex, show, stats
     start_time = time.time()
 
     # Initialize overall stats for all libraries
@@ -421,8 +463,8 @@ def main():
         logger.info("Processing complete.")
         print("Processing complete.")
     except Exception as e:
-        logger.critical(f"Critical error: {e}")
-        print(f"Critical error: {e}")
+        logger.critical(f"Critical error: {type(e).__name__}")
+        print(f"Critical error: {type(e).__name__}")
     finally:
         end_time = time.time()
         duration = end_time - start_time
@@ -433,4 +475,5 @@ def main():
 
 
 if __name__ == "__main__":
+    configure_runtime()
     main()
