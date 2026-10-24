@@ -4,7 +4,7 @@ SQLAlchemy
 psutil~=5.9.4
 requests~=2.31.0
 tqdm~=4.64.1
-numpy~=1.24.1
+numpy~=2.5.4
 Pillow~=9.4.0
 moviepy~=1.0.3
 py-cpuinfo~=9.0.0
