@@ -1,6 +1,6 @@
 # Python modernization audit and plan
 
-Audit baseline: `11bab30` (main), 2026-10-24. Scope: all 23 active Python files,
+Audit baseline: `11bab30` (main), 2026-10-24. Scope: all 22 active Python files,
 14 per-script manifests and the root manifest. The retired Python file is
 archival, has no active entry point, and is outside the supported runtime.
 
@@ -12,7 +12,8 @@ archival, has no active entry point, and is outside the supported runtime.
 * Root is missing OpenCV, ExifRead, titlecase, matplotlib, PyYAML, Selenium and
   qbittorrent-api. Per-script manifests also omit direct requests imports in
   extract_tracks, fix_added_at and ltp, and qbittorrent-api in orchestrator.
-* SQLAlchemy has no active consumers (only the retired database cleaner).
+* SQLAlchemy has no consumers, including in the retired database cleaner,
+  which uses standard-library sqlite3.
   setuptools is not an application dependency; argparse is standard library.
 * MoviePy 2.2.1 declares Pillow <12. Do not override package metadata or use
   --no-deps. Isolate title-card dependencies if this restriction remains.
@@ -56,4 +57,42 @@ archival, has no active entry point, and is outside the supported runtime.
 * [setup-python releases](https://github.com/actions/setup-python/releases)
 * [checkout releases](https://github.com/actions/checkout/releases)
 
-Implementation results and remaining verification will be recorded below.
+## Implementation decisions and results
+
+The planned MoviePy isolation was rejected after checking security advisories:
+Pillow 11.3 and 12.x have known advisories fixed in later versions. MoviePy
+2.2.1 still requires Pillow <12. Title-card extraction now uses the underlying
+imageio-ffmpeg reader directly, preserves RGB JPEG output and timestamp selection,
+and closes the decoder on success and failure. No dependency metadata overrides,
+vulnerability allowlists or EOL Python workarounds are used. Pillow >=13 is the
+supported security baseline; Pillow 12 and MoviePy 1/2 are intentionally excluded.
+See [MoviePy metadata](https://pypi.org/pypi/moviepy/json) and
+[Pillow advisories](https://pypi.org/pypi/Pillow/11.3.0/json).
+
+All 22 scripts load without configuration, argument parsing, service requests,
+browser startup, prompts or application file creation. Runtime .env loading stays
+at CLI startup; pure image tools can use defaults without a .env. PlexAPI requests
+receive explicit timeouts. Command arguments and exception payloads are omitted
+from service diagnostics. The local Selenium .env is preserved but untracked;
+future .env files are ignored, and a sanitized example is included.
+
+Regression fixes include Unicode collage paths and JPEG encoding, default font
+fallback, exact crop coordinates, center cropping based on actual image size,
+public EXIF/PNG metadata access, selected-label removal with original lock
+restoration, drive/UNC-aware Plex path mapping with traversal rejection, and
+shell-free Python venv execution. Requests queries encode person names correctly.
+Intentional behavior changes and manual checks are in
+[the maintenance guide](python-maintenance.md).
+
+Initial local Windows verification passed installation, pip check and 111 offline
+pytest cases on Python 3.12.15, 3.13.17 and 3.14.9. Ruff passed. The final PR and
+CI runs provide the authoritative Linux/Windows results for the committed code.
+Security scans use the current advisory database and must be repeated on updates.
+
+The [baseline inventory](python-inventory.md) records every original entry point.
+[Current API usage](python-api-usage.md) records current third-party call sites.
+The archived cleaner was also inspected statically: it imports PlexAPI, requests
+and python-dotenv, has unguarded execution and destructive database/filesystem
+operations. It stays retired and is never imported by tests; use the replacement
+linked from the root README. Non-Python wrappers remain platform-specific and
+outside the Python support claim.

@@ -1,4 +1,8 @@
 # Plex-Stuff
+
+Python tools support 3.12–3.14. See [Python setup, tests and maintenance](docs/python-maintenance.md)
+and the [modernization audit](docs/python-modernization.md).
+
 ## Random plex related stuff
 
 ## Requirements
