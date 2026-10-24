@@ -444,7 +444,7 @@ def disable_sonarr_download_clients():
 
     response = requests.get(url, headers=headers, timeout=60)
     if response.status_code != 200:
-        log_and_print(f"Failed to retrieve downloaders: {response.status_code} {response.status_code}", "error")
+        log_and_print(f"Failed to retrieve downloaders: {response.status_code}", "error")
         return
 
     clients = response.json()
@@ -467,9 +467,7 @@ def disable_sonarr_download_clients():
         if update_response.status_code in (200, 202):
             log_and_print(f"Disabled downloaders: {client_name}", "info")
         else:
-            log_and_print(
-                f"Failed to disable {client_name}: {update_response.status_code} {update_response.status_code}", "error"
-            )
+            log_and_print(f"Failed to disable {client_name}: {update_response.status_code}", "error")
 
 
 def enable_sonarr_download_clients():
@@ -480,7 +478,7 @@ def enable_sonarr_download_clients():
 
     response = requests.get(url, headers=headers, timeout=60)
     if response.status_code != 200:
-        log_and_print(f"Failed to retrieve downloaders: {response.status_code} {response.status_code}", "error")
+        log_and_print(f"Failed to retrieve downloaders: {response.status_code}", "error")
         return
 
     clients = response.json()
@@ -503,9 +501,7 @@ def enable_sonarr_download_clients():
         if update_response.status_code in (200, 202):
             log_and_print(f"Enabled downloaders: {client_name}", "info")
         else:
-            log_and_print(
-                f"Failed to enable {client_name}: {update_response.status_code} {update_response.status_code}", "error"
-            )
+            log_and_print(f"Failed to enable {client_name}: {update_response.status_code}", "error")
 
 
 # === Radarr Functions ===
@@ -519,7 +515,7 @@ def disable_radarr_download_clients():
 
     response = requests.get(url, headers=headers, timeout=60)
     if response.status_code != 200:
-        log_and_print(f"Failed to retrieve downloaders: {response.status_code} {response.status_code}", "error")
+        log_and_print(f"Failed to retrieve downloaders: {response.status_code}", "error")
         return
 
     clients = response.json()
@@ -542,9 +538,7 @@ def disable_radarr_download_clients():
         if update_response.status_code in (200, 202):
             log_and_print(f"Disabled downloaders: {client_name}", "info")
         else:
-            log_and_print(
-                f"Failed to disable {client_name}: {update_response.status_code} {update_response.status_code}", "error"
-            )
+            log_and_print(f"Failed to disable {client_name}: {update_response.status_code}", "error")
 
 
 def enable_radarr_download_clients():
@@ -555,7 +549,7 @@ def enable_radarr_download_clients():
 
     response = requests.get(url, headers=headers, timeout=60)
     if response.status_code != 200:
-        log_and_print(f"Failed to retrieve downloaders: {response.status_code} {response.status_code}", "error")
+        log_and_print(f"Failed to retrieve downloaders: {response.status_code}", "error")
         return
 
     clients = response.json()
@@ -578,9 +572,7 @@ def enable_radarr_download_clients():
         if update_response.status_code in (200, 202):
             log_and_print(f"Enabled downloaders: {client_name}", "info")
         else:
-            log_and_print(
-                f"Failed to enable {client_name}: {update_response.status_code} {update_response.status_code}", "error"
-            )
+            log_and_print(f"Failed to enable {client_name}: {update_response.status_code}", "error")
 
 
 # === Lidarr Functions ===
@@ -594,7 +586,7 @@ def disable_lidarr_download_clients():
 
     response = requests.get(url, headers=headers, timeout=60)
     if response.status_code != 200:
-        log_and_print(f"Failed to retrieve downloaders: {response.status_code} {response.status_code}", "error")
+        log_and_print(f"Failed to retrieve downloaders: {response.status_code}", "error")
         return
 
     clients = response.json()
@@ -617,9 +609,7 @@ def disable_lidarr_download_clients():
         if update_response.status_code in (200, 202):
             log_and_print(f"Disabled downloaders: {client_name}", "info")
         else:
-            log_and_print(
-                f"Failed to disable {client_name}: {update_response.status_code} {update_response.status_code}", "error"
-            )
+            log_and_print(f"Failed to disable {client_name}: {update_response.status_code}", "error")
 
 
 def enable_lidarr_download_clients():
@@ -630,7 +620,7 @@ def enable_lidarr_download_clients():
 
     response = requests.get(url, headers=headers, timeout=60)
     if response.status_code != 200:
-        log_and_print(f"Failed to retrieve downloaders: {response.status_code} {response.status_code}", "error")
+        log_and_print(f"Failed to retrieve downloaders: {response.status_code}", "error")
         return
 
     clients = response.json()
@@ -653,9 +643,7 @@ def enable_lidarr_download_clients():
         if update_response.status_code in (200, 202):
             log_and_print(f"Enabled downloaders: {client_name}", "info")
         else:
-            log_and_print(
-                f"Failed to enable {client_name}: {update_response.status_code} {update_response.status_code}", "error"
-            )
+            log_and_print(f"Failed to enable {client_name}: {update_response.status_code}", "error")
 
 
 # === Download Client Functions ===
@@ -1052,11 +1040,15 @@ def main():
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Orchestrator Script")
-    parser.add_argument("--config", help="Path to tasks configuration file", default="tasks.yml")
+    try:
+        parser = argparse.ArgumentParser(description="Orchestrator Script")
+        parser.add_argument("--config", help="Path to tasks configuration file", default="tasks.yml")
 
-    args = parser.parse_args()
+        args = parser.parse_args()
 
-    max_logs = int(os.getenv("MAX_LOGS", "5"))
-    setup_logging(max_logs)
-    main()
+        max_logs = int(os.getenv("MAX_LOGS", "5"))
+        setup_logging(max_logs)
+        main()
+    except Exception as error:
+        print(f"Command failed ({type(error).__name__}). Check configuration and inputs.")
+        raise SystemExit(1) from None

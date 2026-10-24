@@ -64,7 +64,7 @@ def media_path_under(parent_directory, plex_path):
 
 def main():
     """Run the command explicitly; importing never contacts services."""
-    global logs_directory, max_log_files, parent_directory, script_name
+    global max_log_files, script_name, logs_directory
     load_dotenv()
 
     plex_url = os.getenv("PLEX_URL")
@@ -95,10 +95,6 @@ def main():
     log_format = "%(asctime)s - %(levelname)s - %(message)s"
 
     logging.basicConfig(filename=log_filename, level=getattr(logging, log_level), format=log_format)
-
-    logging.info(f"Command: {' '.join(sys.argv)}")
-
-    logging.info(f"Arguments: {sys.argv}")
 
     plex = None
 
@@ -251,4 +247,8 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as error:
+        print(f"Command failed ({type(error).__name__}). Check configuration and inputs.")
+        raise SystemExit(1) from None

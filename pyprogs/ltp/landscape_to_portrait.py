@@ -46,7 +46,18 @@ created_dirs = set()
 
 def configure_runtime():
     """Load optional local configuration and initialize CLI output."""
-    global MAX_LOG_FILES, OUTPUT_FOLDER, PLEX_TIMEOUT, PLEX_TOKEN, PLEX_URL, SESSION, created_dirs, logger, logs_directory, script_name, timestamp
+    global \
+        MAX_LOG_FILES, \
+        OUTPUT_FOLDER, \
+        PLEX_TIMEOUT, \
+        PLEX_TOKEN, \
+        PLEX_URL, \
+        SESSION, \
+        created_dirs, \
+        logger, \
+        logs_directory, \
+        script_name, \
+        timestamp
     load_dotenv()
 
     PLEX_URL = os.getenv("PLEX_URL")
@@ -85,7 +96,6 @@ def configure_runtime():
     logging.getLogger().addHandler(file_handler)
 
     logger = logging.getLogger()
-
 
     OUTPUT_FOLDER = "output"
 
@@ -475,5 +485,9 @@ def main():
 
 
 if __name__ == "__main__":
-    configure_runtime()
-    main()
+    try:
+        configure_runtime()
+        main()
+    except Exception as error:
+        print(f"Command failed ({type(error).__name__}). Check configuration and inputs.")
+        raise SystemExit(1) from None

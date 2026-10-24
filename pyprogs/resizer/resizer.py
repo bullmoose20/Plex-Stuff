@@ -48,7 +48,22 @@ skipped_images = 0
 
 def configure_runtime():
     """Load optional local configuration and initialize CLI output."""
-    global IMAGE_EXTENSIONS, TARGET_RATIO, cropped_sides_images, cropped_top_bottom_images, logs_directory, max_log_files, processed_images, scaled_down_images, scaled_up_images, script_name, skipped_crop_images, skipped_images, skipped_scale_images, timestamp, total_images
+    global \
+        IMAGE_EXTENSIONS, \
+        TARGET_RATIO, \
+        cropped_sides_images, \
+        cropped_top_bottom_images, \
+        logs_directory, \
+        max_log_files, \
+        processed_images, \
+        scaled_down_images, \
+        scaled_up_images, \
+        script_name, \
+        skipped_crop_images, \
+        skipped_images, \
+        skipped_scale_images, \
+        timestamp, \
+        total_images
     load_dotenv()
 
     max_log_files = int(os.getenv("MAX_LOG_FILES", 10))  # Default number of logs: 10
@@ -127,7 +142,13 @@ def get_formatted_duration(seconds):
 
 
 def resize_image(image_path, output_folder, min_width, max_width):
-    global cropped_sides_images, cropped_top_bottom_images, scaled_down_images, scaled_up_images, skipped_crop_images, skipped_scale_images
+    global \
+        cropped_sides_images, \
+        cropped_top_bottom_images, \
+        scaled_down_images, \
+        scaled_up_images, \
+        skipped_crop_images, \
+        skipped_scale_images
 
     if not 0 < min_width <= max_width:
         raise ValueError("Expected 0 < min_width <= max_width")
@@ -242,8 +263,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Log the command along with its arguments
-    logging.info(f"Command: {' '.join(['python'] + os.sys.argv)}")
-    logging.info(f"Arguments: {args}")
 
     try:
         # Record start time

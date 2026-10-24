@@ -205,87 +205,51 @@ def clean_up_old_logs():
 
 
 def manage_labels(item, item_type):
-    """Manage labels for a specific item (show, season, or episode) with retries and enhanced handling."""
+    """Remove the selected label and preserve its original Plex field lock."""
     if not item.labels:
         print(f"No labels found on the {item_type} '{item.title}'.")
-        logger.info(f"No labels found on the {item_type} '{item.title}'.")
         return
-
-    print(f"Labels on the {item_type} '{item.title}':")
-    logger.info(f"Displaying labels for {item_type} '{item.title}':")
-    for i, label in enumerate(item.labels, 1):
-        print(f"{i}: {label.tag}")
-        logger.info(f"Label {i}: {label.tag}")
-
+    for index, label in enumerate(item.labels, 1):
+        print(f"{index}: {label.tag}")
     try:
         choice = int(input("Enter the number of the label to delete (or 0 to cancel): "))
-        if choice == 0:
-            print("No labels were deleted.")
-            logger.info("User chose not to delete any labels.")
-            return
-
-        if 1 <= choice <= len(item.labels):
-            label_to_delete = item.labels[choice - 1].tag
-            logger.info(f"User selected label '{label_to_delete}' for deletion.")
-
-            # Retry logic for label removal
-            for attempt in range(3):  # 3 attempts
-                try:
-                    # Unlock label field if locked
-                    label_field = next((field for field in item.fields if field.name == "label"), None)
-                    was_locked = bool(label_field and label_field.locked)
-                    if was_locked:
-                        logger.info(f"Unlocking the label field for {item_type} '{item.title}'...")
-                        item.editField("label", value="", locked=False)
-                        item.reload()
-
-                    # Pre-check for label existence
-                    if label_to_delete not in [label.tag for label in item.labels]:
-                        logger.info(f"Label '{label_to_delete}' no longer exists on '{item.title}'.")
-                        break
-
-                    # Attempt to remove the label
-                    logger.info(f"Attempting to delete label '{label_to_delete}' from {item_type} '{item.title}'.")
-                    # Remove the label (session timeout applies globally)
-                    # item.removeLabel(label_to_delete)
-                    item.removeLabel(label_to_delete)
-                    item.reload()
-
-                    # Check if the label was removed
-                    if label_to_delete not in [label.tag for label in item.labels]:
-                        print(f"Label '{label_to_delete}' has been deleted from the {item_type} '{item.title}'.")
-                        logger.info(f"Successfully deleted label '{label_to_delete}' from {item_type} '{item.title}'.")
-                        break
-
-                except Exception as e:
-                    logger.warning(
-                        f"Attempt {attempt + 1} to delete label '{label_to_delete}' failed: {type(e).__name__}"
-                    )
-                    if attempt < 2:  # Pause before retrying (if not the last attempt)
-                        logger.info("Retrying label deletion in 5 seconds...")
-                        time.sleep(5)
-
-            else:
-                logger.error(f"Failed to delete label '{label_to_delete}' after 3 attempts.")
-                print(f"An error occurred while deleting the label '{label_to_delete}'.")
-
-            # Relock label field if it was initially locked
-            if was_locked:
-                logger.info(f"Relocking the label field for {item_type} '{item.title}'...")
-                item.editField("label", value="", locked=True)
-                item.reload()
-
-        else:
-            print("Invalid choice!")
-            logger.warning("User made an invalid label selection.")
-
     except ValueError:
         print("Invalid input! Please enter a number.")
-        logger.warning("User entered invalid input for label selection.")
+        return
+    if choice == 0:
+        print("No labels were deleted.")
+        return
+    if not 1 <= choice <= len(item.labels):
+        print("Invalid choice!")
+        return
+    label_to_delete = item.labels[choice - 1].tag
+    label_field = next((field for field in item.fields if field.name == "label"), None)
+    was_locked = bool(label_field and label_field.locked)
+    try:
+        if was_locked:
+            item.editField("label", value="", locked=False)
+            item.reload()
+        for attempt in range(3):
+            try:
+                if label_to_delete not in [label.tag for label in item.labels]:
+                    return
+                item.removeLabel(label_to_delete)
+                item.reload()
+                if label_to_delete not in [label.tag for label in item.labels]:
+                    print(f"Label '{label_to_delete}' has been deleted from the {item_type} '{item.title}'.")
+                    return
+            except Exception as error:
+                logger.warning("Label removal attempt %s failed (%s)", attempt + 1, type(error).__name__)
+            if attempt < 2:
+                time.sleep(5)
+        logger.error("Could not remove selected label after three attempts")
+    finally:
+        if was_locked:
+            item.editField("label", value="", locked=True)
+            item.reload()
 
 
 def main():
-    global episode, plex, season, show
     try:
         # Connect to the Plex server
         plex = connect_to_plex()
@@ -344,5 +308,9 @@ def main():
 
 
 if __name__ == "__main__":
-    configure_runtime()
-    main()
+    try:
+        configure_runtime()
+        main()
+    except Exception as error:
+        print(f"Command failed ({type(error).__name__}). Check configuration and inputs.")
+        raise SystemExit(1) from None

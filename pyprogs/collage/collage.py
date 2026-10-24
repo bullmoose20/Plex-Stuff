@@ -287,8 +287,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Log the command along with its arguments
-    logging.info(f"Command: {' '.join(['python'] + os.sys.argv)}")
-    logging.info(f"Arguments: {args}")
 
     # Encode the folder path to handle non-ASCII characters
     folder_path = args.folder_path

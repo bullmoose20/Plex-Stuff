@@ -1,4 +1,4 @@
-# All active tools except title-card video extraction (install tcc separately).
+# All active Python tools; per-script manifests remain independently usable.
 -r pyprogs/requirements.txt
 -r pyprogs/collage/requirements.txt
 -r pyprogs/exif_overlay_checker/requirements.txt
@@ -13,3 +13,4 @@
 -r pyprogs/sel_remove_bg/requirements.txt
 -r pyprogs/strip_columns/requirements.txt
 -r pyprogs/update_plex_artist_art/requirements.txt
+-r pyprogs/tcc/requirements.txt

@@ -13,7 +13,7 @@ from datetime import datetime as dt
 from dotenv import load_dotenv
 from PIL import Image
 
-from moviepy import VideoFileClip
+from imageio_ffmpeg import read_frames
 
 
 max_log_files = int(os.getenv("MAX_LOG_FILES", 10))  # Default number of logs: 10
@@ -105,12 +105,29 @@ def take_screenshots(video_file, output_file, frame_extraction_time):
         logging.info(f"Snapshot already exists. Skipping: {output_file}")
         return
 
-    with VideoFileClip(os.fspath(video_file), audio=False) as clip:
-        if not 0 <= frame_extraction_time < clip.duration:
+    if not os.path.isfile(video_file):
+        raise FileNotFoundError("Video file not found")
+    if frame_extraction_time < 0:
+        raise ValueError("Frame extraction time must be within the video duration")
+    frames = read_frames(
+        os.fspath(video_file),
+        pix_fmt="rgb24",
+        output_params=["-ss", str(frame_extraction_time), "-frames:v", "1"],
+    )
+    try:
+        metadata = next(frames)
+        if metadata["duration"] and frame_extraction_time >= metadata["duration"]:
             raise ValueError("Frame extraction time must be within the video duration")
-        frame = clip.get_frame(frame_extraction_time)
-        with Image.fromarray(np.asarray(frame, dtype=np.uint8)) as image:
+        try:
+            data = next(frames)
+        except StopIteration:
+            raise ValueError("No video frame at the requested time") from None
+        width, height = metadata["size"]
+        frame = np.frombuffer(data, dtype=np.uint8).reshape(height, width, 3)
+        with Image.fromarray(frame) as image:
             image.save(output_file)
+    finally:
+        frames.close()
 
 
 def scan_directory(source_path, frame_extraction_time):
@@ -154,7 +171,6 @@ def scan_directory(source_path, frame_extraction_time):
                         print(f"Title card already exists. Skipping Movie: {output_file}")
                         logging.info(f"Title card already exists. Skipping Movie: {output_file}")
                         total_skipped += 1
-
 
     # Log summary
     print(f"Total added: {total_added}")
@@ -213,8 +229,6 @@ def main():
     args = parser.parse_args()
 
     # Log the command along with its arguments
-    logging.info(f"Command: {' '.join(['python'] + os.sys.argv)}")
-    logging.info(f"Arguments: {args}")
 
     # Record script start time
     start_time = time.time()
@@ -249,5 +263,9 @@ def main():
 
 
 if __name__ == "__main__":
-    configure_runtime()
-    main()
+    try:
+        configure_runtime()
+        main()
+    except Exception as error:
+        print(f"Command failed ({type(error).__name__}). Check configuration and inputs.")
+        raise SystemExit(1) from None

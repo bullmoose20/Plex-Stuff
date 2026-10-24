@@ -18,8 +18,8 @@ def check_api_key():
 
 def find_person_by_name(name):
     try:
-        url = f"https://api.themoviedb.org/3/search/person?api_key={api_key}&query={name}"
-        response = requests.get(url, timeout=60)
+        url = "https://api.themoviedb.org/3/search/person"
+        response = requests.get(url, params={"api_key": api_key, "query": name}, timeout=60)
         data = response.json()
         if data["total_results"] == 0:
             return "No results found"
@@ -45,7 +45,7 @@ def find_person_by_name(name):
 
 def main():
     """Run the command explicitly; importing never contacts services."""
-    global api_key, name
+    global api_key
     load_dotenv()
 
     api_key = os.getenv("TMDB_KEY")
@@ -63,4 +63,8 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as error:
+        print(f"Command failed ({type(error).__name__}). Check configuration and inputs.")
+        raise SystemExit(1) from None

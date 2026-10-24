@@ -49,7 +49,17 @@ def get_formatted_duration(seconds):
 
 def main():
     """Run the command explicitly; importing never contacts services."""
-    global logs_directory, max_log_files, script_name
+    global max_log_files, script_name, logs_directory
+    parser = argparse.ArgumentParser(description="Update Plex artist art.")
+
+    group = parser.add_mutually_exclusive_group(required=True)
+
+    group.add_argument("--apply", action="store_true", help="Apply changes.")
+
+    group.add_argument("--report", action="store_true", help="Report changes without applying them.")
+
+    args = parser.parse_args()
+
     load_dotenv()
 
     plex_url = os.getenv("PLEX_URL")
@@ -84,7 +94,6 @@ def main():
     plex = None
 
     try:
-        # Set the timeout globally for all requests
         import requests
 
         # Set up Plex server connection
@@ -104,20 +113,6 @@ def main():
 
     if not os.path.exists(subfolder):
         os.makedirs(subfolder)
-
-    parser = argparse.ArgumentParser(description="Update Plex artist art.")
-
-    group = parser.add_mutually_exclusive_group(required=True)
-
-    group.add_argument("--apply", action="store_true", help="Apply changes.")
-
-    group.add_argument("--report", action="store_true", help="Report changes without applying them.")
-
-    args = parser.parse_args()
-
-    logging.info(f"Command: {' '.join(['python'] + sys.argv)}")
-
-    logging.info(f"Arguments: {args}")
 
     libraries = plex.library.sections()
 
@@ -245,4 +240,8 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as error:
+        print(f"Command failed ({type(error).__name__}). Check configuration and inputs.")
+        raise SystemExit(1) from None

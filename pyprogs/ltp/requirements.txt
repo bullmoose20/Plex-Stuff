@@ -1,4 +1,4 @@
 PlexAPI>=4.18.3
 python-dotenv>=1.2.4
 requests>=2.34.2
-Pillow>=12.1.1
+Pillow>=13.0.0

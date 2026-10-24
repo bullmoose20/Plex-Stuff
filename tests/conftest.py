@@ -9,7 +9,6 @@ from uuid import uuid4
 import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
-PROFILE = os.environ.get("PLEX_STUFF_TEST_PROFILE", "core")
 os.environ["PYTHON_DOTENV_DISABLED"] = "1"
 os.environ["MPLBACKEND"] = "Agg"
 
@@ -34,10 +33,9 @@ def isolated_runtime(tmp_path, monkeypatch):
     import requests
 
     monkeypatch.setattr(requests.sessions.Session, "request", forbidden)
-    if PROFILE == "core":
-        from selenium import webdriver
+    from selenium import webdriver
 
-        monkeypatch.setattr(webdriver, "Chrome", forbidden)
+    monkeypatch.setattr(webdriver, "Chrome", forbidden)
 
 
 @pytest.fixture

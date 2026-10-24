@@ -250,7 +250,16 @@ def plot_per_task_analysis(task_summaries):
 
 # Main function to process data and visualize
 def main():
-    global active_times, aggregate_metrics, anomalies, loops, maintenance_times, stats, task_stats, task_summaries, total_times
+    global \
+        active_times, \
+        aggregate_metrics, \
+        anomalies, \
+        loops, \
+        maintenance_times, \
+        stats, \
+        task_stats, \
+        task_summaries, \
+        total_times
     setup_directories()
     stats = load_stats()
     loops, total_times, active_times, maintenance_times, task_stats = extract_metrics(stats)
@@ -277,4 +286,8 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as error:
+        print(f"Command failed ({type(error).__name__}). Check configuration and inputs.")
+        raise SystemExit(1) from None

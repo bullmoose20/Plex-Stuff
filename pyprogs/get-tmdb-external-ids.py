@@ -16,7 +16,6 @@ def test_api_key(api_key):
 
 def main():
     """Run the command explicitly; importing never contacts services."""
-    global api_key, response, url
     load_dotenv()
 
     api_key = os.getenv("TMDB_KEY")
@@ -24,7 +23,6 @@ def main():
     test_api_key(api_key)
 
     page = 1
-
 
     max_pages = 1000  # set the maximum number of pages you want to retrieve
 
@@ -63,4 +61,8 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as error:
+        print(f"Command failed ({type(error).__name__}). Check configuration and inputs.")
+        raise SystemExit(1) from None

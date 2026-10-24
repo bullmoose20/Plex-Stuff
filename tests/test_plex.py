@@ -100,3 +100,69 @@ def test_tmdb_lookup_encodes_query_and_handles_response(load_script, monkeypatch
     monkeypatch.setattr(module.requests, "get", get)
     assert "nm0000042" in module.find_person_by_name("A & B")
     assert get.call_args.kwargs["timeout"] == 60
+    assert get.call_args_list[0].kwargs["params"]["query"] == "A & B"
+
+
+@pytest.mark.parametrize("apply", [False, True])
+def test_artist_art_report_and_apply_with_mocked_plex(load_script, monkeypatch, tmp_path, apply):
+    import datetime
+
+    module = load_script("update_plex_artist_art/update_plex_artist_art.py")
+    album = Mock(title="Album", thumb="/library/album/art", originallyAvailableAt=datetime.datetime(2026, 1, 1))
+    artist = Mock(title="Artist", thumb=None)
+    artist.albums.return_value = [album]
+    library = Mock(type="artist", title="Music")
+    library.all.return_value = [artist]
+    plex = Mock()
+    plex.library.sections.return_value = [library]
+    constructor = Mock(return_value=plex)
+    monkeypatch.setattr(module, "PlexServer", constructor)
+    monkeypatch.setenv("PLEX_URL", "http://plex.invalid")
+    monkeypatch.setenv("PLEX_TOKEN", "mock-test-token")
+    monkeypatch.setattr("sys.argv", ["artist.py", "--apply" if apply else "--report"])
+    response = Mock(status_code=200, content=b"generated-test-art")
+    monkeypatch.setattr(requests, "get", Mock(return_value=response))
+    module.main()
+    assert (tmp_path / "output/Artist_Album_art.jpg").read_bytes() == b"generated-test-art"
+    assert artist.uploadPoster.call_count == int(apply)
+    assert constructor.call_args.kwargs["timeout"] == 60
+
+
+def test_label_lock_restored_after_retries(load_script, monkeypatch, caplog):
+    module = load_script("label_remover/label_remover.py")
+    item = Mock(title="Example")
+    item.fields = [SimpleNamespace(name="label", locked=True)]
+    item.labels = [SimpleNamespace(tag="Selected")]
+    item.removeLabel.side_effect = requests.RequestException("MOCK_SECRET_SENTINEL")
+    monkeypatch.setattr("builtins.input", lambda prompt: "1")
+    monkeypatch.setattr(module.time, "sleep", lambda seconds: None)
+    module.manage_labels(item, "show")
+    assert item.removeLabel.call_count == 3
+    assert item.editField.call_args.kwargs["locked"] is True
+    assert "MOCK_SECRET_SENTINEL" not in caplog.text
+
+
+@pytest.mark.parametrize(
+    "relative",
+    ["extract_tracks/extract_tracks.py", "update_plex_artist_art/update_plex_artist_art.py", "get-plex-labels.py"],
+)
+def test_help_does_not_need_credentials_or_service_access(relative, monkeypatch):
+    import runpy
+    from conftest import ROOT
+
+    path = ROOT / "pyprogs" / relative
+    monkeypatch.setattr("sys.argv", [str(path), "--help"])
+    with pytest.raises(SystemExit) as error:
+        runpy.run_path(str(path), run_name="__main__")
+    assert error.value.code == 0
+
+
+def test_tmdb_cli_failure_never_prints_token(monkeypatch, capsys):
+    import runpy
+    from conftest import ROOT
+
+    monkeypatch.setattr(requests, "get", Mock(side_effect=requests.RequestException("api_key=MOCK_SECRET_SENTINEL")))
+    with pytest.raises(SystemExit) as error:
+        runpy.run_path(str(ROOT / "pyprogs/get-tmdb-external-ids.py"), run_name="__main__")
+    assert error.value.code == 1
+    assert "MOCK_SECRET_SENTINEL" not in capsys.readouterr().out

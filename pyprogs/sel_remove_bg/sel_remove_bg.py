@@ -47,7 +47,21 @@ ENFORCE_SIZE = os.getenv("SEL_ENFORCE_SIZE", "true").lower() in ("1", "true", "y
 
 def configure_runtime():
     """Load optional local configuration and initialize CLI output."""
-    global DL_BTN_TIMEOUT, DOWNLOAD_DIR, ENFORCE_SIZE, EXPECT_H, EXPECT_W, MAX_WAIT_DL_SEC, MAX_WAIT_READY_SEC, ORIG_DIR, PROC_TIMEOUT, PROFILE_DIR, RELOAD_EACH_FILE, SRC_DIR, URL, USER_DATA_DIR
+    global \
+        DL_BTN_TIMEOUT, \
+        DOWNLOAD_DIR, \
+        ENFORCE_SIZE, \
+        EXPECT_H, \
+        EXPECT_W, \
+        MAX_WAIT_DL_SEC, \
+        MAX_WAIT_READY_SEC, \
+        ORIG_DIR, \
+        PROC_TIMEOUT, \
+        PROFILE_DIR, \
+        RELOAD_EACH_FILE, \
+        SRC_DIR, \
+        URL, \
+        USER_DATA_DIR
     load_dotenv()
 
     URL = os.getenv("SEL_URL", "https://new.express.adobe.com/tools/remove-background")
@@ -899,5 +913,9 @@ def main():
 
 # Entrypoint
 if __name__ == "__main__":
-    configure_runtime()
-    main()
+    try:
+        configure_runtime()
+        main()
+    except Exception as error:
+        print(f"Command failed ({type(error).__name__}). Check configuration and inputs.")
+        raise SystemExit(1) from None

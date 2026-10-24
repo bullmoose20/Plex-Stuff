@@ -487,7 +487,17 @@ def get_items_per_second(completed: int, elapsed_seconds: float) -> str:
 
 
 def main() -> int:
-    global args, elapsed_seconds, input_folder, logs_directory, output_path, recursive, script_name, source_names, source_path, stats
+    global \
+        args, \
+        elapsed_seconds, \
+        input_folder, \
+        logs_directory, \
+        output_path, \
+        recursive, \
+        script_name, \
+        source_names, \
+        source_path, \
+        stats
     args = parse_args()
     logs_directory, script_name = configure_logging(args.verbose)
     started_at = dt.now()
@@ -511,7 +521,6 @@ def main() -> int:
     recursive = not args.non_recursive
     stats = Stats()
 
-    logging.info("Command: %s", " ".join(["python"] + sys.argv))
     logging.info("Scanning %s", input_folder)
     print(f"Started: {started_at.strftime('%Y-%m-%d %H:%M:%S')}")
 
@@ -572,4 +581,8 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    try:
+        raise SystemExit(main())
+    except Exception as error:
+        print(f"Command failed ({type(error).__name__}). Check configuration and inputs.")
+        raise SystemExit(1) from None

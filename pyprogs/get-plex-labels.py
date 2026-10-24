@@ -93,7 +93,7 @@ def summary_report(overlay_items, label):
 
 def main():
     """Run the command explicitly; importing never contacts services."""
-    global PLEX_TOKEN, PLEX_URL, overlay_items
+    global PLEX_URL, PLEX_TOKEN
     load_dotenv()
 
     PLEX_URL = os.getenv("PLEX_URL")
@@ -131,4 +131,8 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as error:
+        print(f"Command failed ({type(error).__name__}). Check configuration and inputs.")
+        raise SystemExit(1) from None

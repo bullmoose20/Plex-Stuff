@@ -89,7 +89,6 @@ def main(input_folder, verbose):
     without_overlay_count = 0
 
     # Log the command along with its arguments
-    logging.info(f"Command: {' '.join(['python'] + os.sys.argv)}")
     logging.info("Scanning image metadata")
 
     # logging.info(f"Command line arguments: {' '.join(sys.argv)}")
@@ -180,17 +179,21 @@ def print_summary(overlay_count, without_overlay_count):
 
 
 if __name__ == "__main__":
-    configure_runtime()
-    parser = argparse.ArgumentParser(description="Scan images for 'overlay' in EXIF data.")
-    parser.add_argument("--input-folder", help="Specify the input folder path.")
-    parser.add_argument("--verbose", action="store_true", help="Enable verbose mode with detailed logging.")
-    args = parser.parse_args()
+    try:
+        configure_runtime()
+        parser = argparse.ArgumentParser(description="Scan images for 'overlay' in EXIF data.")
+        parser.add_argument("--input-folder", help="Specify the input folder path.")
+        parser.add_argument("--verbose", action="store_true", help="Enable verbose mode with detailed logging.")
+        args = parser.parse_args()
 
-    if args.input_folder is None:
-        input_folder = input("Enter the path to the input folder: ")
-    else:
-        input_folder = args.input_folder
+        if args.input_folder is None:
+            input_folder = input("Enter the path to the input folder: ")
+        else:
+            input_folder = args.input_folder
 
-    main(input_folder, args.verbose)
-    # Call the clean_up_old_logs function
-    clean_up_old_logs()
+        main(input_folder, args.verbose)
+        # Call the clean_up_old_logs function
+        clean_up_old_logs()
+    except Exception as error:
+        print(f"Command failed ({type(error).__name__}). Check configuration and inputs.")
+        raise SystemExit(1) from None

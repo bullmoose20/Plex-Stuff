@@ -223,7 +223,6 @@ def display_options(options):
 
 
 def main():
-    global imdb_id, media_type, season_data, tmdb_id
     # Record the start time
     start_time = time.time()
 
@@ -240,8 +239,6 @@ def main():
     tmdb_ids = args.tmdbid or input("Enter TMDb ID(s) separated by space: ").split()
 
     # Log the command along with its arguments
-    logging.info(f"Command: {' '.join(['python'] + os.sys.argv)}")
-    logging.info(f"Arguments: {args}")
 
     # Initialize counts
     movie_count = 0
@@ -289,8 +286,12 @@ def main():
 
 
 if __name__ == "__main__":
-    configure_runtime()
-    main()
+    try:
+        configure_runtime()
+        main()
 
-    # Call the clean_up_old_logs function
-    clean_up_old_logs()
+        # Call the clean_up_old_logs function
+        clean_up_old_logs()
+    except Exception as error:
+        print(f"Command failed ({type(error).__name__}). Check configuration and inputs.")
+        raise SystemExit(1) from None

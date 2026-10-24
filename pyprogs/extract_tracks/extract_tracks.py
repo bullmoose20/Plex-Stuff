@@ -24,7 +24,7 @@ class PlexTrackProcessor:
 
     def is_sentence_case(self, s):
         # Check if the string is in sentence case
-        return s[0].isupper() and s[1:].islower()
+        return bool(s) and s[0].isupper() and (len(s) == 1 or s[1:].islower())
 
     def detect_case(self, track_title):
         if self.use_title_case:
@@ -142,7 +142,17 @@ def get_formatted_duration(seconds):
 
 def main():
     """Run the command explicitly; importing never contacts services."""
-    global args, logs_directory, max_log_files, mode, plex, script_duration, script_name
+    global max_log_files, script_name, logs_directory, plex, args
+    parser = argparse.ArgumentParser(description="Update Plex Track Title Case to Sentence-Case or Title-Case")
+
+    parser.add_argument("--apply", action="store_true", help="Apply changes.")
+
+    parser.add_argument("--title-case", action="store_true", help="Use title case for track titles.")
+
+    parser.add_argument("--sentence-case", action="store_true", help="Use sentence case for track titles.")
+
+    args = parser.parse_args()
+
     load_dotenv()
 
     plex_url = os.getenv("PLEX_URL")
@@ -177,8 +187,6 @@ def main():
     plex = None
 
     try:
-        # Set the timeout globally for all requests
-
         # Set up Plex server connection
         plex = PlexServer(plex_url, plex_token, timeout=timeout_seconds)
 
@@ -191,20 +199,6 @@ def main():
         logging.error(f"Details: {type(e).__name__}")
 
         sys.exit(1)
-
-    parser = argparse.ArgumentParser(description="Update Plex Track Title Case to Sentence-Case or Title-Case")
-
-    parser.add_argument("--apply", action="store_true", help="Apply changes.")
-
-    parser.add_argument("--title-case", action="store_true", help="Use title case for track titles.")
-
-    parser.add_argument("--sentence-case", action="store_true", help="Use sentence case for track titles.")
-
-    args = parser.parse_args()
-
-    logging.info(f"Command: {' '.join(['python'] + sys.argv)}")
-
-    logging.info(f"Arguments: {args}")
 
     if args.apply and not (args.title_case or args.sentence_case):
         print("Error: When using --apply, either --title-case or --sentence-case must be specified.")
@@ -245,4 +239,8 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as error:
+        print(f"Command failed ({type(error).__name__}). Check configuration and inputs.")
+        raise SystemExit(1) from None

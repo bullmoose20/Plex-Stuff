@@ -6,8 +6,12 @@
 
 ## Requirements
 
-1. A system that can run Python3
-2. Python3 installed on that system
+1. CPython 3.12, 3.13 or 3.14
+2. An isolated virtual environment with the script's dependencies installed
+
+See [Python setup, offline tests and dependency maintenance](../docs/python-maintenance.md)
+for repository-wide installation, VS Code testing, supported dependency choices,
+and documented behavior changes.
 
 ## Setup
 
