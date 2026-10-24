@@ -12,4 +12,3 @@ extend-exclude = [".venv*"]
 [tool.ruff.lint]
 # Catch broken names, unsafe exception handling, removed APIs and unused imports.
 select = ["E4", "E7", "E9", "F", "UP"]
-
