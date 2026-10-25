@@ -36,6 +36,66 @@ def test_strip_columns_unicode_and_original_preserved(load_script, tmp_path):
     assert source.read_text(encoding="utf-8").startswith("xx")
 
 
+def make_file_link(link, target):
+    try:
+        link.symlink_to(target)
+    except OSError as error:
+        if os.name == "nt" and error.winerror == 1314:
+            pytest.skip("Windows account lacks permission to create symbolic links")
+        raise
+
+
+@pytest.mark.parametrize("side", ["input", "output"])
+def test_strip_columns_rejects_links_escaping_selected_directory(load_script, tmp_path, side):
+    module = load_script("strip_columns/strip_columns.py")
+    selected = tmp_path / "selected"
+    selected.mkdir()
+    outside = tmp_path / "outside.txt"
+    outside.write_text("outside content", encoding="utf-8")
+    source = selected / "input.txt"
+    output = selected / "output.txt"
+    if side == "input":
+        make_file_link(source, outside)
+    else:
+        source.write_text("xxsafe", encoding="utf-8")
+        make_file_link(output, outside)
+    with pytest.raises(ValueError, match="outside"):
+        module.strip_characters(source, 2, output)
+    assert outside.read_text(encoding="utf-8") == "outside content"
+
+
+def test_strip_columns_supports_deliberate_paths_outside_working_directory(load_script, tmp_path, monkeypatch):
+    module = load_script("strip_columns/strip_columns.py")
+    selected = tmp_path / "selected"
+    selected.mkdir()
+    work = tmp_path / "work"
+    work.mkdir()
+    source = selected / "input.txt"
+    source.write_text("xxsafe\n", encoding="utf-8")
+    monkeypatch.chdir(work)
+    module.strip_characters("../selected/input.txt", 2, selected / "custom.txt")
+    assert (selected / "custom.txt").read_text(encoding="utf-8") == "safe\n"
+
+
+def test_metalog_reader_filters_files_and_preserves_unicode(load_script, tmp_path):
+    module = load_script("get_missing_people.py")
+    (tmp_path / "meta-é.log").write_text("海报", encoding="utf-8")
+    (tmp_path / "ignore.log").write_text("ignored", encoding="utf-8")
+    (tmp_path / "meta-directory").mkdir()
+    assert list(module.read_metalogs(tmp_path)) == [("meta-é.log", "海报")]
+
+
+def test_metalog_reader_rejects_link_outside_log_directory(load_script, tmp_path):
+    module = load_script("get_missing_people.py")
+    root = tmp_path / "logs"
+    root.mkdir()
+    outside = tmp_path / "outside.log"
+    outside.write_text("not a selected log", encoding="utf-8")
+    make_file_link(root / "meta.log", outside)
+    with pytest.raises(ValueError, match="outside"):
+        list(module.read_metalogs(root))
+
+
 def test_orchestrator_uses_direct_venv_interpreter_and_preserves_arguments(load_script, tmp_path, monkeypatch):
     module = load_script("orchestrator/orchestrator.py")
     folder = tmp_path / "script folder"

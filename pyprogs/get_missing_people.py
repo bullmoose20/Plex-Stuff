@@ -2,6 +2,7 @@ import os
 import re
 import requests
 import datetime
+from pathlib import Path
 from PIL import Image
 
 
@@ -145,6 +146,21 @@ def download_images(download_urls):
             write_to_download_log(f"Image mode: {image_mode} => Saved to subfolder: {subfolder}")
 
 
+def read_metalogs(directory):
+    """Read regular meta logs confined to the explicitly selected directory."""
+    root = Path(directory).resolve(strict=True)
+    if not root.is_dir():
+        raise ValueError("Logs location must be a directory")
+    for candidate in root.iterdir():
+        if not candidate.name.startswith("meta"):
+            continue
+        resolved = candidate.resolve(strict=True)
+        if not resolved.is_relative_to(root):
+            raise ValueError("Meta log resolves outside the selected logs directory")
+        if resolved.is_file():
+            yield candidate.name, resolved.read_text(encoding="utf-8")
+
+
 if __name__ == "__main__":
     import argparse
 
@@ -175,19 +191,8 @@ if __name__ == "__main__":
 
     os.makedirs(download_dir, exist_ok=True)
 
-    input_files = [
-        file
-        for file in os.listdir(metalog_location)
-        if file.startswith("meta") and os.path.isfile(os.path.join(metalog_location, file))
-    ]
-
-    for item in input_files:
-        item_path = os.path.join(metalog_location, item)
-        the_output = os.path.basename(item)
-        write_to_log_file(f"Working on: {the_output}")
-
-        with open(item_path, encoding="utf-8") as input_file:
-            content = input_file.read()
+    for name, content in read_metalogs(metalog_location):
+        write_to_log_file(f"Working on: {name}")
 
         pattern = r"\[\d\d\d\d-\d\d-\d\d .*\[.*\] *\| Detail: tmdb_person updated poster to \[URL\] (https.*)(\..*g) *\|\n.*\n.*\n.*Finished (.*) Collection"
         matches = re.findall(pattern, content)
