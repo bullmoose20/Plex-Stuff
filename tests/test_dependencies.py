@@ -86,6 +86,7 @@ def test_dependabot_discovers_active_manifests_without_retired_tool():
     manifests = [
         ROOT / "requirements.txt",
         ROOT / "requirements-dev.txt",
+        ROOT / "requirements-ci.txt",
         *(ROOT / "pyprogs").rglob("requirements.txt"),
     ]
     for manifest in manifests:
@@ -93,3 +94,22 @@ def test_dependabot_discovers_active_manifests_without_retired_tool():
         directory = "/" + manifest.parent.relative_to(ROOT).as_posix().strip(".")
         assert any(fnmatchcase(directory, pattern) for pattern in patterns), f"Dependabot misses {manifest}"
     assert all(update["target-branch"] == "main" for update in updates)
+
+
+def test_ci_lock_pins_and_hashes_every_resolved_dependency():
+    locked = set()
+    text = (ROOT / "requirements-ci.txt").read_text(encoding="utf-8").replace("\\\n", " ")
+    for line in text.splitlines():
+        if not line.strip() or line.startswith("#"):
+            continue
+        specification, *hashes = line.split("--hash=")
+        req = Requirement(specification.strip())
+        assert hashes, f"{req.name} has no integrity hashes"
+        assert all(value.strip().startswith("sha256:") for value in hashes)
+        assert len(req.specifier) == 1
+        assert next(iter(req.specifier)).operator == "=="
+        if req.marker is None or req.marker.evaluate():
+            assert req.specifier.contains(version(req.name))
+            locked.add(canonicalize_name(req.name))
+    for path in (ROOT / "requirements.txt", ROOT / "requirements-dev.txt"):
+        assert {canonicalize_name(req.name) for req in requirements(path)} <= locked

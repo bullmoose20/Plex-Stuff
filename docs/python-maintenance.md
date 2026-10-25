@@ -188,3 +188,21 @@ reassess them after adopting #28; future updates should use the active per-tool
 manifests. Dependabot's wildcard directory discovery finds no manifest in the
 retired Selenium directory. An offline regression checks coverage of all active
 manifests and prevents Selenium from returning to the aggregate requirements.
+# Reproducible CI dependency installation
+
+CI installs `requirements-ci.txt` with exact transitive versions and SHA-256
+hashes. The aggregate and per-tool manifests remain the source of supported
+version ranges. Dependabot discovers the root lock alongside those manifests;
+changes to ranges must refresh the lock in the same PR. Regenerate it with:
+
+```sh
+uv pip compile requirements.txt requirements-dev.txt --universal --python-version 3.12 --generate-hashes --no-annotate --output-file requirements-ci.txt
+```
+
+Run the four-job CI matrix after refreshing. Binary distributions are required
+except for `titlecase`, whose publisher currently distributes only source.
+That small pure-Python package is pinned and hash-verified too; its source build
+remains an explicit supply-chain limitation. PyAV always uses binary wheels.
+The tests check that installed lock versions satisfy every active manifest,
+so a manifest update cannot silently leave CI testing an older allowed range.
+
