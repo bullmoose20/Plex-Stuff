@@ -146,7 +146,7 @@ def create_image_grid(
     try:
         font = ImageFont.truetype("arial.ttf", size=font_size)
     except OSError:
-        font = ImageFont.load_default(size=font_size)
+        font = ImageFont.load_default(font_size)
 
     # Loop through each image and add it to the grid
     for i, file in enumerate(files):

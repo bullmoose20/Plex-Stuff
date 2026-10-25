@@ -51,6 +51,27 @@ def test_collage_unicode_paths_font_fallback_and_jpeg(load_script, tmp_path):
     assert len(module.get_image_files(folder)) == 2
 
 
+def test_collage_missing_truetype_font_uses_sized_pillow_fallback(load_script, tmp_path, monkeypatch):
+    module = load_script("collage/collage.py")
+    sample(tmp_path / "poster.png", (20, 30))
+    fallback = module.ImageFont.load_default(12)
+    calls = []
+
+    def unavailable(*args, **kwargs):
+        raise OSError("Test font is unavailable")
+
+    def load_default(size):
+        calls.append(size)
+        return fallback
+
+    monkeypatch.setattr(module.ImageFont, "truetype", unavailable)
+    monkeypatch.setattr(module.ImageFont, "load_default", load_default)
+    image = module.create_image_grid(tmp_path, 1, (40, 40), True, False, False, "PNG", 95)
+    assert calls == [12]
+    assert image.size == (40, 80)
+    assert image.getpixel((20, 40))[0] > 200
+
+
 @pytest.mark.parametrize("extension", ["jpg", "png", "webp"])
 def test_square_regression_and_skip_existing(load_script, tmp_path, extension):
     module = load_script("poster_to_square/poster_to_square.py")
