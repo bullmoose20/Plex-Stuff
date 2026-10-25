@@ -9,6 +9,7 @@ from uuid import uuid4
 import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "pyprogs"))
 os.environ["PYTHON_DOTENV_DISABLED"] = "1"
 os.environ["MPLBACKEND"] = "Agg"
 

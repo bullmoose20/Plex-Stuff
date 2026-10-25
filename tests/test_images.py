@@ -54,20 +54,26 @@ def test_collage_unicode_paths_font_fallback_and_jpeg(load_script, tmp_path):
 def test_collage_missing_truetype_font_uses_sized_pillow_fallback(load_script, tmp_path, monkeypatch):
     module = load_script("collage/collage.py")
     sample(tmp_path / "poster.png", (20, 30))
-    fallback = module.ImageFont.load_default(12)
-    calls = []
+    truetype = module.ImageFont.truetype
 
     def unavailable(*args, **kwargs):
-        raise OSError("Test font is unavailable")
-
-    def load_default(size):
-        calls.append(size)
-        return fallback
+        if args[0] == "arial.ttf":
+            raise OSError("Test font is unavailable")
+        font = truetype(*args, **kwargs)
+        return font
 
     monkeypatch.setattr(module.ImageFont, "truetype", unavailable)
-    monkeypatch.setattr(module.ImageFont, "load_default", load_default)
+    draw_text = module.ImageDraw.ImageDraw.text
+    sizes = []
+
+    def record_text(self, *args, **kwargs):
+        sizes.append(kwargs["font"].size)
+        return draw_text(self, *args, **kwargs)
+
+    monkeypatch.setattr(module.ImageDraw.ImageDraw, "text", record_text)
     image = module.create_image_grid(tmp_path, 1, (40, 40), True, False, False, "PNG", 95)
-    assert calls == [12]
+    assert sizes
+    assert set(sizes) == {12}
     assert image.size == (40, 80)
     assert image.getpixel((20, 40))[0] > 200
 

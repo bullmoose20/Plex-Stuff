@@ -1,21 +1,17 @@
+from plex_stuff_helpers import append_people_log, determine_image_mode, initialize_people_outputs
 import os
 import re
 import requests
-import datetime
 from pathlib import Path
 from PIL import Image
 
 
 def write_to_log_file(message):
-    with open(script_log, "a", encoding="utf-8") as log_file:
-        log_file.write(f"{datetime.datetime.now()} ~ {message}\n")
-    print(f"{datetime.datetime.now()} ~ {message}")
+    append_people_log(script_log, message)
 
 
 def write_to_download_log(message):
-    with open(download_log, "a", encoding="utf-8") as log_file:
-        log_file.write(f"{datetime.datetime.now()} ~ {message}\n")
-    print(f"{datetime.datetime.now()} ~ {message}")
+    append_people_log(download_log, message)
 
 
 def download_file(url, destination):
@@ -36,28 +32,6 @@ def check_existing_file(url, collection_name):
             write_to_log_file(f"{collection_name} already exists in the file.")
             return True
     return False
-
-
-def determine_image_mode(image_path):
-    with Image.open(image_path) as source:
-        image = source.convert("RGB")  # Convert to RGB mode to ensure consistent channel analysis
-    channels = image.split()
-
-    r_values = channels[0].get_flattened_data()
-    g_values = channels[1].get_flattened_data()
-    b_values = channels[2].get_flattened_data()
-
-    color_variation_threshold = 30  # Adjust this threshold based on your requirements
-
-    for r, g, b in zip(r_values, g_values, b_values):
-        if (
-            abs(r - g) > color_variation_threshold
-            or abs(r - b) > color_variation_threshold
-            or abs(g - b) > color_variation_threshold
-        ):
-            return "RGB"
-
-    return "Grayscale"
 
 
 def determine_image_mode3(image_path):
@@ -178,18 +152,7 @@ if __name__ == "__main__":
         print(f'Logs location "{metalog_location}" not found. Exiting now...')
         exit()
 
-    script_path = os.path.dirname(os.path.realpath(__file__))
-    script_name = os.path.basename(__file__)
-    script_log = os.path.join(script_path, f"{script_name}.log")
-    download_log = os.path.join(script_path, f"{script_name}_downloads.log")
-    download_dir = os.path.join(script_path, "Downloads")
-
-    if os.path.exists(script_log):
-        os.remove(script_log)
-
-    write_to_log_file("#### START ####")
-
-    os.makedirs(download_dir, exist_ok=True)
+    script_log, download_log, download_dir = initialize_people_outputs(__file__)
 
     for name, content in read_metalogs(metalog_location):
         write_to_log_file(f"Working on: {name}")

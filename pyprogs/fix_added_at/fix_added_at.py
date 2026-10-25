@@ -1,48 +1,21 @@
+import requests
+import sys
 from pathlib import Path, PurePosixPath, PureWindowsPath
-import glob
 import logging
 import os
 
-import sys
 import time
 from datetime import datetime as dt
 from dotenv import load_dotenv
 from plexapi.server import PlexServer
-from plexapi.exceptions import BadRequest
-from requests.exceptions import RequestException
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from plex_stuff_helpers import configure_logging, get_formatted_duration, prune_logs, connect_plex
 
 
 def clean_up_old_logs():
     global max_log_files
-
-    # Set max_log_files to 1 if it's 0 or negative
-    if max_log_files <= 0:
-        max_log_files = 1
-
-    # Remove old log files from the 'logs' subdirectory if there are more than the allowed number
-    existing_logs = glob.glob(os.path.join(logs_directory, f"{script_name}_*.log"))
-    if len(existing_logs) > max_log_files:
-        logging.info(f"existing_logs: {len(existing_logs)} > max_log_files: {max_log_files}")
-        oldest_logs = sorted(existing_logs)[:-max_log_files]
-        for old_log in oldest_logs:
-            os.remove(old_log)
-
-
-def get_formatted_duration(seconds):
-    units = [("day", 86400), ("hour", 3600), ("minute", 60), ("second", 1)]
-    result = []
-
-    for unit_name, unit_seconds in units:
-        value, seconds = divmod(seconds, unit_seconds)
-        if value > 0:
-            unit_name = unit_name if value == 1 else unit_name + "s"
-            result.append(f"{int(value):.0f} {unit_name}")
-
-    if not result:
-        milliseconds = seconds * 1000
-        return f"{milliseconds:.3f} millisecond" if milliseconds == 1 else f"{milliseconds:.3f} milliseconds"
-
-    return " ".join(result)
+    max_log_files = prune_logs(logs_directory, script_name, max_log_files)
 
 
 def media_path_under(parent_directory, plex_path):
@@ -67,53 +40,10 @@ def main():
     global max_log_files, script_name, logs_directory
     load_dotenv()
 
-    plex_url = os.getenv("PLEX_URL")
+    max_log_files, script_name, logs_directory, timestamp = configure_logging()
 
-    plex_token = os.getenv("PLEX_TOKEN")
-
-    timeout_seconds = int(os.getenv("PLEX_TIMEOUT", 60))  # Default timeout: 60 seconds
-
-    max_log_files = int(os.getenv("MAX_LOG_FILES", 10))  # Default number of logs: 10
-
-    log_level = os.getenv("LOG_LEVEL", "INFO").upper()  # Default logging level: INFO
-
-    if plex_url is None or plex_token is None:
-        print("Error: Plex URL or token not found in .env file.")
-        sys.exit(1)
-
-    script_name = os.path.splitext(os.path.basename(sys.argv[0]))[0]
-
-    logs_directory = "logs"
-
-    if not os.path.exists(logs_directory):
-        os.makedirs(logs_directory)
-
-    timestamp = dt.now().strftime("%Y%m%d_%H%M%S_%f")[:-3]
-
-    log_filename = os.path.join(logs_directory, f"{script_name}_{timestamp}.log")
-
-    log_format = "%(asctime)s - %(levelname)s - %(message)s"
-
-    logging.basicConfig(filename=log_filename, level=getattr(logging, log_level), format=log_format)
-
-    plex = None
-
-    try:
-        # Set the timeout globally for all requests
-        import requests
-
-        # Set up Plex server connection
-        plex = PlexServer(plex_url, plex_token, timeout=timeout_seconds)
-
-    # Inside the except block
-    except RequestException as e:
-        logging.error(f"Error connecting to Plex server: {type(e).__name__}")
-        sys.exit(1)
-    except BadRequest as e:
-        logging.error(f"Plex API Bad Request: {type(e).__name__}")
-        logging.error(f"Details: {type(e).__name__}")
-
-        sys.exit(1)
+    timeout_seconds = int(os.getenv("PLEX_TIMEOUT", 60))
+    plex = connect_plex(PlexServer)
 
     start_time = time.time()
 

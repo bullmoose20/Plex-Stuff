@@ -46,7 +46,8 @@ def test_each_scripts_direct_dependencies_are_declared(path):
         elif isinstance(node, ast.ImportFrom):
             imports.add((node.module or "").split(".")[0])
     declared = {canonicalize_name(req.name) for req in requirements(path.parent / "requirements.txt")}
-    for name in imports - sys.stdlib_module_names:
+    local_modules = {p.stem for p in (ROOT / "pyprogs").glob("*.py")}
+    for name in imports - sys.stdlib_module_names - local_modules:
         distribution = canonicalize_name(IMPORT_DISTRIBUTIONS.get(name, name))
         assert distribution in declared, (
             f"{path.name}: direct import {name} missing from {path.parent.name}/requirements.txt"
