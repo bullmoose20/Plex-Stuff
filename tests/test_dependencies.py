@@ -114,3 +114,13 @@ def test_ci_lock_pins_and_hashes_every_resolved_dependency():
             locked.add(canonicalize_name(req.name))
     for path in (ROOT / "requirements.txt", ROOT / "requirements-dev.txt"):
         assert {canonicalize_name(req.name) for req in requirements(path)} <= locked
+
+
+def test_dependency_workflow_is_valid_yaml_and_installs_verified_lock():
+    import yaml
+
+    workflow = yaml.safe_load((ROOT / ".github/workflows/python-dependencies.yml").read_text(encoding="utf-8"))
+    steps = workflow["jobs"]["validate"]["steps"]
+    install = next(step["run"] for step in steps if step["name"] == "Install application and test dependencies")
+    assert "--require-hashes" in install
+    assert "requirements-ci.txt" in install
