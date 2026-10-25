@@ -10,7 +10,6 @@
 -r pyprogs/orchestrator/requirements.txt
 -r pyprogs/poster_to_square/requirements.txt
 -r pyprogs/resizer/requirements.txt
--r pyprogs/sel_remove_bg/requirements.txt
 -r pyprogs/strip_columns/requirements.txt
 -r pyprogs/update_plex_artist_art/requirements.txt
 -r pyprogs/tcc/requirements.txt

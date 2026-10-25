@@ -102,3 +102,32 @@ and python-dotenv, has unguarded execution and destructive database/filesystem
 operations. It stays retired and is never imported by tests; use the replacement
 linked from the root README. Non-Python wrappers remain platform-specific and
 outside the Python support claim.
+
+## Selenium retirement follow-up
+
+The seven modernization commits through `b38e736` are preserved. The obsolete
+Selenium tool is removed in a separate follow-up commit: implementation,
+exclusive manifest and configuration example, aggregate dependency include and
+Selenium-specific fixture setup. Its local `.env` remains untracked and
+untouched. A retirement notice replaces executable archived code; Git preserves
+the implementation history.
+
+The verified generation source is
+[Kometa-Team/Defaults-Image-Creation/create_people_posters](https://github.com/Kometa-Team/Defaults-Image-Creation/tree/main/create_people_posters),
+whose README and `remove_bg_birefnet.py` identify local BiRefNet Portrait through
+rembg as the default. People-Images and People-Images-transparent publish assets.
+There are now **21 active scripts and 13 per-tool manifests**. The baseline
+inventory above remains historical; the current API inventory excludes Selenium.
+
+PyAV application code is unchanged from `b38e736`; MoviePy remains absent from
+active dependencies, and no Pillow upper bound is restored. Additional offline
+regressions capture the established movie/episode filenames, output layout and
+skip behavior. CI requires a PyAV binary wheel on every Python/platform job.
+
+The missing `origin/modernization/python-dependency-maintenance` reference was
+restored with an explicit fetch and its fetch mapping retained for future pulls.
+No reset, rebase, existing commit modification or history rewrite was performed.
+
+The [configuration-history assessment and Dependabot PR review](python-maintenance.md#historical-configuration-security-assessment)
+record exposure scope, rotation guidance and the six superseded dependency PRs.
+Final retirement validation is recorded in the PR and the validation record.

@@ -45,7 +45,7 @@ even when another installed package happens to provide it transitively.
 | SQLAlchemy | Removed: no consumers; retired cleaner uses sqlite3 and stays unsupported |
 | PlexAPI | Current 4.x API; mocked report/apply, label locks, art, metadata and timeout checks |
 | OpenCV | Headless package: no GUI usage; NumPy 2 binary integration tested with generated templates |
-| Selenium | Dependency/import checks and browser-call blocking; real Adobe/Chrome workflow needs manual testing |
+| Selenium | Retired; no implementation, configuration example or manifest is actively maintained. Use the linked BiRefNet generation source |
 | qbittorrent-api | Explicit dependency; public pause/resume methods with `torrent_hashes` support current server routing |
 | argparse / setuptools | Removed from application manifests; standard library / build tooling respectively |
 
@@ -64,7 +64,7 @@ metadata detection, Windows/UNC/Unicode paths, traversal rejection and process
 arguments. Each active script is imported under an unrelated host argument list.
 
 pytest-socket blocks sockets; the test fixture additionally rejects unmocked
-Requests calls, browser construction and interactive input. .env loading is
+Requests calls and interactive input. No active script imports Selenium. .env loading is
 disabled and service variables are removed. Use fake `.invalid` hosts and mock
 tokens only. Never enable a live-service exception in the default suite.
 
@@ -128,13 +128,63 @@ python -X utf8 tools/audit_python.py
 * Verify representative real photos/posters visually and compare a real local
   video screenshot at a known timestamp, including rotated/variable-frame-rate
   media, before a bulk run. Codec pixel rounding can differ across platforms.
-* Adobe browser automation remains sensitive to website/Chrome changes, existing
-  browser profiles and download timing. Test on copied source images; its
-  established original/archive moves and overwrite behavior are preserved.
-* The local Selenium `.env` is now ignored and untracked, with a sanitized
-  `.env.example`. Keep personal profiles, tokens, API keys and paths out of PRs.
-  No repository-history rewrite or real-service verification was performed.
+* Selenium/Adobe automation in `pyprogs/sel_remove_bg` is retired. Its replacement
+  is the [BiRefNet generation source](https://github.com/Kometa-Team/Defaults-Image-Creation/tree/main/create_people_posters),
+  rather than the published People-Images asset repositories. See the
+  [retirement notice](../pyprogs/sel_remove_bg/README.md). Follow that project's
+  model/environment setup separately; no models are downloaded by this test suite.
+* The local Selenium `.env` and any local browser artifacts remain untouched and
+  ignored. Its former tracked configuration example is removed. Keep personal
+  profiles, tokens, API keys and paths out of PRs. No repository-history rewrite
+  or real-service verification was performed.
 
 These manual checks do not require credentials in CI and are not substitutes
 for the automated matrix. The archived database cleaner and shell wrappers have
 no new Python compatibility guarantee.
+
+## Historical configuration security assessment
+
+On 2026-10-24, the complete fetched Git history was inspected for committed
+`.env` and `.env*` configurations: 30 configuration-change commits and 30 unique
+configuration blobs. Values were classified in memory and never included in
+logs, this report or the PR description. Local personal configuration was not
+read or changed.
+
+The retired Selenium `.env`, introduced in `10e3710` and untracked in `c36ce84`,
+contained 15 path/preference assignments, no credential assignments and no URL
+containing authentication. Its later eight-setting example also contained no
+credentials. No tracked browser profile/cookie store was found. No credential
+rotation is indicated by retiring that file; personal paths in history remain
+visible because history has not been rewritten.
+
+The broader configuration scan found a placeholder identifier for the root
+Plex token, placeholder API credentials, and public default qBittorrent/NZBGet
+passwords in orchestrator examples. These are not evidence of a leaked private
+key. **If those defaults were used in a real deployment, change those service
+passwords.** No credentials were submitted to any service to test validity.
+Unrelated configurations were preserved.
+
+This was a targeted configuration-history assessment, not a claim that every
+arbitrary historical text blob, GitHub secret or local browser profile has been
+audited. Any real secret previously shared elsewhere still requires rotation.
+
+## Existing Dependabot PR review
+
+All six open Dependabot PRs were inspected on 2026-10-24. They target `main` and
+change the original flat root manifest. After PR #28 is merged by a maintainer,
+their existing patches will be obsolete:
+
+| PR | Proposed update | Disposition against modernized manifests |
+| --- | --- | --- |
+| [#22](https://github.com/bullmoose20/Plex-Stuff/pull/22) | python-dotenv 1.2.4 | Already included in active manifests |
+| [#23](https://github.com/bullmoose20/Plex-Stuff/pull/23) | requests 2.34.2 | Already included in active manifests |
+| [#24](https://github.com/bullmoose20/Plex-Stuff/pull/24) | Pillow 13.0.0 | Already included in active manifests |
+| [#25](https://github.com/bullmoose20/Plex-Stuff/pull/25) | NumPy 2.5.4 | Already included in active manifests |
+| [#26](https://github.com/bullmoose20/Plex-Stuff/pull/26) | MoviePy 2.2.1 | Dependency removed; PyAV is the supported replacement |
+| [#27](https://github.com/bullmoose20/Plex-Stuff/pull/27) | psutil 7.2.2 | Already included in active manifests |
+
+None was closed, merged or configured for automatic merging. A maintainer should
+reassess them after adopting #28; future updates should use the active per-tool
+manifests. Dependabot's wildcard directory discovery finds no manifest in the
+retired Selenium directory. An offline regression checks coverage of all active
+manifests and prevents Selenium from returning to the aggregate requirements.

@@ -58,7 +58,7 @@ jobs:
         run: python -m pip install --upgrade pip
 
       - name: Install application and test dependencies
-        run: python -m pip install -r requirements.txt -r requirements-dev.txt
+        run: python -m pip install --only-binary=av -r requirements.txt -r requirements-dev.txt
 
       - name: Check dependency metadata
         run: python -m pip check

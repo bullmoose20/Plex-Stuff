@@ -1,7 +1,7 @@
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-ra --strict-markers --disable-socket"
-markers = ["video: requires the isolated MoviePy environment"]
+markers = ["video: generated-media regressions using PyAV's bundled FFmpeg libraries"]
 filterwarnings = ["error::DeprecationWarning:pyprogs.*"]
 
 [tool.ruff]

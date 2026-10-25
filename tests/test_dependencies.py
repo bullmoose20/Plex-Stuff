@@ -66,7 +66,7 @@ def test_dependency_manifests_are_utf8_and_installed_versions_satisfy_them(path)
 
 def test_no_stdlib_or_retired_dependencies_remain():
     declared = {canonicalize_name(req.name) for req in requirements(ROOT / "requirements.txt")}
-    assert not declared & {"argparse", "sqlalchemy", "setuptools", "moviepy", "imageio-ffmpeg"}
+    assert not declared & {"argparse", "sqlalchemy", "setuptools", "moviepy", "imageio-ffmpeg", "selenium"}
 
 
 def test_aggregate_includes_all_script_manifests():
@@ -74,3 +74,22 @@ def test_aggregate_includes_all_script_manifests():
     for path in (ROOT / "pyprogs").rglob("requirements.txt"):
         names = {canonicalize_name(req.name) for req in requirements(path)}
         assert names <= aggregate, f"Dependencies from {path.relative_to(ROOT)} missing from CI installation"
+
+
+def test_dependabot_discovers_active_manifests_without_retired_tool():
+    from fnmatch import fnmatchcase
+    import yaml
+
+    config = yaml.safe_load((ROOT / ".github/dependabot.yml").read_text(encoding="utf-8"))
+    updates = [update for update in config["updates"] if update["package-ecosystem"] == "pip"]
+    patterns = [directory for update in updates for directory in update.get("directories", [update.get("directory")])]
+    manifests = [
+        ROOT / "requirements.txt",
+        ROOT / "requirements-dev.txt",
+        *(ROOT / "pyprogs").rglob("requirements.txt"),
+    ]
+    for manifest in manifests:
+        assert "sel_remove_bg" not in manifest.parts
+        directory = "/" + manifest.parent.relative_to(ROOT).as_posix().strip(".")
+        assert any(fnmatchcase(directory, pattern) for pattern in patterns), f"Dependabot misses {manifest}"
+    assert all(update["target-branch"] == "main" for update in updates)

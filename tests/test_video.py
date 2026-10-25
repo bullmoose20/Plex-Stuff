@@ -166,3 +166,39 @@ def test_display_rotation_preserves_orientation(load_script, tmp_path, rotation,
         assert image.size == size
         assert image.getpixel(green_point)[1] > 220
         assert image.getpixel(red_point)[0] > 220
+
+
+@pytest.mark.parametrize(
+    "is_show,filename,relative_dir,expected",
+    [
+        (False, "Movie (2026).mp4", "Movie (2026)", "Movie (2026).jpg"),
+        (True, "Show S02E03 episode.mkv", "Show/Season 02", "S02E03.jpg"),
+    ],
+)
+def test_scan_preserves_filenames_output_layout_and_skip(
+    load_script, tmp_path, monkeypatch, is_show, filename, relative_dir, expected
+):
+    from pathlib import Path
+    from unittest.mock import Mock
+
+    module = load_script("tcc/title_card_clips.py")
+    module.__file__ = str(tmp_path / "tool.py")
+    root = tmp_path / "media"
+    folder = root / relative_dir
+    folder.mkdir(parents=True)
+    (folder / filename).touch()
+
+    def extract(source, output, timestamp):
+        assert timestamp == 45
+        Path(output).write_bytes(b"generated-title-card")
+
+    decoder = Mock(side_effect=extract)
+    monkeypatch.setattr(module, "take_screenshots", decoder)
+    module.scan_directory(str(root), 45)
+    # Capture the established layout, including the existing duplicated base folder.
+    base_name = "Show" if is_show else "Movie (2026)"
+    destination = tmp_path / "output" / base_name / relative_dir / expected
+    assert destination.read_bytes() == b"generated-title-card"
+    assert module.format_file_name(filename, is_show) == expected
+    module.scan_directory(str(root), 45)
+    decoder.assert_called_once()

@@ -19,7 +19,7 @@ def isolated_runtime(tmp_path, monkeypatch):
     for name in tuple(os.environ):
         if any(
             word in name.upper()
-            for word in ("PLEX", "TMDB", "SONARR", "RADARR", "LIDARR", "SEL_", "QBITTORRENT", "SABNZBD", "NZBGET")
+            for word in ("PLEX", "TMDB", "SONARR", "RADARR", "LIDARR", "QBITTORRENT", "SABNZBD", "NZBGET")
         ):
             monkeypatch.delenv(name, raising=False)
     monkeypatch.setenv("PYTHON_DOTENV_DISABLED", "1")
@@ -27,15 +27,12 @@ def isolated_runtime(tmp_path, monkeypatch):
     monkeypatch.setenv("MPLCONFIGDIR", str(tmp_path / "matplotlib"))
 
     def forbidden(*args, **kwargs):
-        raise AssertionError("External service, browser or interactive input attempted during offline testing")
+        raise AssertionError("External service or interactive input attempted during offline testing")
 
     monkeypatch.setattr("builtins.input", forbidden)
     import requests
 
     monkeypatch.setattr(requests.sessions.Session, "request", forbidden)
-    from selenium import webdriver
-
-    monkeypatch.setattr(webdriver, "Chrome", forbidden)
 
 
 @pytest.fixture

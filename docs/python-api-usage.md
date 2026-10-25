@@ -22,7 +22,6 @@ Generated with `python tools/audit_python.py`. Active standalone entry points al
 | `pyprogs/pmm-detect-overlays.py` | PIL.Image, cv2, exifread, numpy, tqdm.tqdm | PIL.Image.open, cv2.imdecode, cv2.matchTemplate, exifread.process_file, numpy.fromfile, numpy.where, tqdm.tqdm |
 | `pyprogs/poster_to_square/poster_to_square.py` | PIL.Image, PIL.ImageDraw, PIL.ImageEnhance, PIL.ImageFilter, PIL.ImageOps | none |
 | `pyprogs/resizer/resizer.py` | PIL.Image, dotenv.load_dotenv | PIL.Image.open, dotenv.load_dotenv |
-| `pyprogs/sel_remove_bg/sel_remove_bg.py` | PIL.Image, dotenv.load_dotenv, selenium.webdriver, selenium.webdriver.chrome.options.Options, selenium.webdriver.chrome.service.Service, selenium.webdriver.common.action_chains.ActionChains, selenium.webdriver.support.expected_conditions | PIL.Image.open, dotenv.load_dotenv, selenium.webdriver.Chrome, selenium.webdriver.chrome.options.Options, selenium.webdriver.chrome.service.Service, selenium.webdriver.common.action_chains.ActionChains |
 | `pyprogs/strip_columns/strip_columns.py` | stdlib only | none |
 | `pyprogs/tcc/title_card_clips.py` | av, dotenv.load_dotenv | av.open, dotenv.load_dotenv |
 | `pyprogs/update_plex_artist_art/update_plex_artist_art.py` | dotenv.load_dotenv, plexapi, plexapi.server.PlexServer, requests, requests.exceptions.RequestException | dotenv.load_dotenv, plexapi.server.PlexServer, requests.get |

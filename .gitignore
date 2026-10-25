@@ -18,3 +18,7 @@ htmlcov/
 *.egg-info/
 audit-*.json
 test-results*.xml
+
+# Retired tool: retain only its notice; preserve local profiles/configuration.
+/pyprogs/sel_remove_bg/*
+!/pyprogs/sel_remove_bg/README.md

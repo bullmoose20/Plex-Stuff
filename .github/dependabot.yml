@@ -3,6 +3,7 @@ version: 2
 
 updates:
   # Include every per-script manifest and the aggregate development environment.
+  # Retired tool directories contain notices only and have no dependency manifest.
   - package-ecosystem: "pip"
     directories:
       - "/"
