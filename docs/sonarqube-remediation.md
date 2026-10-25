@@ -86,8 +86,10 @@ Ranges below come directly from `/api/duplications/show` for PR 28. Overlapping 
 
 ## Results
 
-The actual SonarQube Cloud gate passed on refactor commit `b4aaea7` and again on
-workflow-correction commit `a54aea4` (check run `121048203435`). The API reported:
+The actual SonarQube Cloud gate passed on refactor commit `b4aaea7`, workflow
+correction `a54aea4`, and final implementation `e5d1268` (check run
+`121048990771`, analyzed 2026-10-25 at 02:06:36 UTC). The PR API confirmed that
+the analyzed SHA matched `e5d126822996ae9de202dde5e20354f06f8f7219`. The gate API reported:
 
 | Condition | Baseline | Verified result | Requirement |
 |---|---|---|---|
@@ -131,29 +133,29 @@ audit record, rather than a claim that they are all still open.
 
 ### Exact validation evidence
 
-[CI run 40152896982](https://github.com/bullmoose20/Plex-Stuff/actions/runs/40152896982)
-on `a54aea4` completed all four jobs successfully:
+[CI run 40153153472](https://github.com/bullmoose20/Plex-Stuff/actions/runs/40153153472)
+on `e5d1268` completed all four jobs successfully:
 
 | Environment | Job | pytest result |
 |---|---|---|
-| Linux Python 3.12 | 121047962775 | 149 passed in 3.53s |
-| Linux Python 3.13 | 121047962881 | 149 passed in 2.67s |
-| Linux Python 3.14 | 121047962830 | 149 passed in 2.72s |
-| Windows Python 3.14 | 121047962931 | 149 passed in 5.85s |
+| Linux Python 3.12 | 121048736031 | 150 passed in 2.16s |
+| Linux Python 3.13 | 121048736155 | 150 passed in 1.51s |
+| Linux Python 3.14 | 121048736187 | 150 passed in 2.82s |
+| Windows Python 3.14 | 121048736216 | 150 passed in 6.71s |
 
 All four installed the hash-verified lock, passed `pip check` and reported no
 known vulnerabilities in `pip-audit`. The designated Linux 3.14 Ruff job passed.
 All symlink security tests ran successfully on both CI platforms.
 
-One subsequent regression preserves the chosen filename for an allowed
-in-directory link, bringing the final suite to **150 tests**, including all
+The final regression preserves the chosen filename for an allowed
+in-directory link. The suite contains **150 tests**, including all
 123 original tests. Local Windows validation of that suite passed on
 CPython 3.12.15, 3.13.17 and 3.14.9: **146 passed, four skipped** on each.
 The four skips require symlink creation, which this local account cannot do.
 Local `pip check` passed on all three; `pip-audit` found zero vulnerabilities
 across 56, 55 and 55 distributions respectively. Ruff passed.
 
-The final pushed-head CI and Sonar checks are linked in
+The documentation-only follow-up's CI and Sonar checks are linked in
 [PR #28](https://github.com/bullmoose20/Plex-Stuff/pull/28), which remains open
 and unmerged. The inventory generator now distinguishes the 21 entry points
 from their one shared module and does not mislabel local imports as packages.

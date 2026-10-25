@@ -88,3 +88,17 @@ required for this retired tool. pip-audit covers Python distribution advisories,
 not every bundled FFmpeg codec; review upstream security releases separately.
 
 PR #28 remains unmerged and automatic merging remains disabled.
+## SonarQube remediation validation
+
+Final implementation `e5d1268` passed the actual SonarQube Cloud gate (check
+`121048990771`): reliability A, security A, maintainability A, zero bugs, zero
+vulnerabilities and 0.0% duplication on new code. No gate conditions were
+ignored or weakened. [CI run 40153153472](https://github.com/bullmoose20/Plex-Stuff/actions/runs/40153153472)
+passed all four supported platform/interpreter jobs with **150 tests each,
+zero skipped**, hash-verified dependency installation, `pip check`, and zero
+known dependency vulnerabilities. Ruff passed in the designated Linux 3.14 job.
+All 123 pre-existing tests remain included. See the
+[findings, exact job results and limitations](sonarqube-remediation.md).
+The final documentation follow-up is independently checked on
+[PR #28](https://github.com/bullmoose20/Plex-Stuff/pull/28).
+
