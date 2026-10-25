@@ -30,7 +30,7 @@ def strip_characters(input_file, characters_to_remove, output_file=None):
     # Read the file into lines with UTF-8 encoding
     input_path = selected_file(input_file, must_exist=True)
     if not output_file:
-        base_name, file_extension = os.path.splitext(input_path)
+        base_name, file_extension = os.path.splitext(input_file)
         output_file = f"{base_name}_stripped{file_extension}"
     output_path = selected_file(output_file, must_exist=False)
 

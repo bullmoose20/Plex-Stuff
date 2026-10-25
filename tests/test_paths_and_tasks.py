@@ -77,6 +77,17 @@ def test_strip_columns_supports_deliberate_paths_outside_working_directory(load_
     assert (selected / "custom.txt").read_text(encoding="utf-8") == "safe\n"
 
 
+def test_strip_columns_keeps_selected_name_for_links_within_directory(load_script, tmp_path):
+    module = load_script("strip_columns/strip_columns.py")
+    source = tmp_path / "original.txt"
+    source.write_text("xxsafe\n", encoding="utf-8")
+    alias = tmp_path / "alias.txt"
+    make_file_link(alias, source)
+    module.strip_characters(alias, 2)
+    assert (tmp_path / "alias_stripped.txt").read_text(encoding="utf-8") == "safe\n"
+    assert not (tmp_path / "original_stripped.txt").exists()
+
+
 def test_metalog_reader_filters_files_and_preserves_unicode(load_script, tmp_path):
     module = load_script("get_missing_people.py")
     (tmp_path / "meta-é.log").write_text("海报", encoding="utf-8")
