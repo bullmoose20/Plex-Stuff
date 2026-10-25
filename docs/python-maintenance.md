@@ -12,7 +12,7 @@ From the repository root, on Windows:
 ```powershell
 py -3.14 -m venv .venv
 .venv\Scripts\python -m pip install --upgrade pip
-.venv\Scripts\python -m pip install -r requirements.txt -r requirements-dev.txt
+.venv\Scripts\python -m pip install --require-hashes --only-binary=:all: --no-binary=titlecase -r requirements-ci.txt
 .venv\Scripts\python -m pip check
 .venv\Scripts\python -m ruff check pyprogs tests tools
 .venv\Scripts\python -m pytest -q
@@ -33,6 +33,12 @@ its own `pyprogs/<tool>/requirements.txt`; scripts directly under `pyprogs/` use
 `pyprogs/requirements.txt`. `strip_columns` uses only the standard library.
 Every direct third-party import must appear in the appropriate manifest,
 even when another installed package happens to provide it transitively.
+
+Keep the `pyprogs/` directory structure when running or distributing scripts.
+The 21 entry points share `pyprogs/plex_stuff_helpers.py` for logging, duration
+formatting, Plex connection handling and People image classification. Each
+entry point still runs directly from any working directory; the helper imports
+optional dependencies only inside the functions that need them.
 
 ## Supported dependency choices
 
@@ -188,7 +194,7 @@ reassess them after adopting #28; future updates should use the active per-tool
 manifests. Dependabot's wildcard directory discovery finds no manifest in the
 retired Selenium directory. An offline regression checks coverage of all active
 manifests and prevents Selenium from returning to the aggregate requirements.
-# Reproducible CI dependency installation
+## Reproducible CI dependency installation
 
 CI installs `requirements-ci.txt` with exact transitive versions and SHA-256
 hashes. The aggregate and per-tool manifests remain the source of supported

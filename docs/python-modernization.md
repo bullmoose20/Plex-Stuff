@@ -136,3 +136,14 @@ version in fresh local environments and all four Linux/Windows CI jobs, passing
 Ruff/dependency checks and no known Python-package vulnerabilities. The record
 includes exact runtime versions, binary-wheel tags, security-assessment scope
 and remaining manual checks.
+## SonarQube follow-up
+
+The PR's SonarQube gate initially failed despite passing Python CI. The
+[remediation report](sonarqube-remediation.md) records every retrieved rule,
+severity, baseline location and duplicated block, the targeted fixes, and the
+actual passing Sonar evidence. New-code duplication fell from 14.7% to 0.0%;
+reliability and security improved from E/C to A/A without changing the gate or
+excluding code. The final suite has 150 tests, preserving the original 123.
+The 21 entry points now share one inert helper module. A hash-verified CI lock
+adds one manifest to the 16 already active after Selenium retirement.
+

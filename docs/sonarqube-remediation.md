@@ -86,4 +86,89 @@ Ranges below come directly from `/api/duplications/show` for PR 28. Overlapping 
 
 ## Results
 
-Remediation and validation are in progress. The baseline gate is failing; successful Python CI alone does not satisfy this task.
+The actual SonarQube Cloud gate passed on refactor commit `b4aaea7` and again on
+workflow-correction commit `a54aea4` (check run `121048203435`). The API reported:
+
+| Condition | Baseline | Verified result | Requirement |
+|---|---|---|---|
+| New-code reliability | E | A; zero bugs | A |
+| New-code security | C | A; zero vulnerabilities | A |
+| New-code duplication | 14.7% | 0.0% | At most 3% |
+| New-code maintainability | A | A | A |
+| Security hotspots reviewed | 100% | 100% | 100% |
+
+No quality-gate settings, analysis scopes, exclusions, issue acceptance statuses
+or rule suppressions were changed. `ignoredConditions` is false. Findings closed
+through subsequent analysis of the fixes. Baseline findings above remain an
+audit record, rather than a claim that they are all still open.
+
+### Fixes and regression coverage
+
+- `python:S930`: the supported Pillow 13 API accepts a font size, but Sonar's
+  signature model expected zero arguments. Use `load_default()` followed by
+  the public FreeType `font_variant(size=12)` API. A forced missing-Arial
+  regression verifies the actual drawn font size, pixels and output dimensions.
+  The bitmap fallback remains available if FreeType is unavailable.
+- `pythonsecurity:S8707`: canonicalize explicitly selected paths, require
+  regular files, and check containment before reading logs or opening text
+  outputs. Reject links escaping the named directory. Preserve deliberate
+  absolute paths, relative parent paths, custom outputs, and the selected
+  filename for allowed in-directory links. These are local CLI tools, not HTTP
+  services; selecting another directory intentionally remains supported.
+- `githubactions:S8544`: install exact transitive versions from
+  `requirements-ci.txt` with SHA-256 verification. Require wheels, with the
+  documented hash-verified `titlecase` source-distribution exception. Test lock
+  completeness and compatibility with every active manifest. Keep the lock
+  discoverable by Dependabot alongside the original supported-version ranges.
+- Extract only the reported common behavior: logging setup/retention, duration
+  formatting, credential-safe Plex connection handling, People image mode
+  classification/logging, and Arr download-client state changes. Preserve the
+  six existing service entry points, API versions, headers, timeouts, skipped
+  clients, payload fields and success handling. Tests mock every service call.
+- Preserve the Selenium retirement and the PyAV decoder. Title-card timestamp,
+  generated-frame, layout, filename, dimension, rotation, skip and cleanup
+  regressions continue to run. Shared CLI logging is the only title-card change.
+
+### Exact validation evidence
+
+[CI run 40152896982](https://github.com/bullmoose20/Plex-Stuff/actions/runs/40152896982)
+on `a54aea4` completed all four jobs successfully:
+
+| Environment | Job | pytest result |
+|---|---|---|
+| Linux Python 3.12 | 121047962775 | 149 passed in 3.53s |
+| Linux Python 3.13 | 121047962881 | 149 passed in 2.67s |
+| Linux Python 3.14 | 121047962830 | 149 passed in 2.72s |
+| Windows Python 3.14 | 121047962931 | 149 passed in 5.85s |
+
+All four installed the hash-verified lock, passed `pip check` and reported no
+known vulnerabilities in `pip-audit`. The designated Linux 3.14 Ruff job passed.
+All symlink security tests ran successfully on both CI platforms.
+
+One subsequent regression preserves the chosen filename for an allowed
+in-directory link, bringing the final suite to **150 tests**, including all
+123 original tests. Local Windows validation of that suite passed on
+CPython 3.12.15, 3.13.17 and 3.14.9: **146 passed, four skipped** on each.
+The four skips require symlink creation, which this local account cannot do.
+Local `pip check` passed on all three; `pip-audit` found zero vulnerabilities
+across 56, 55 and 55 distributions respectively. Ruff passed.
+
+The final pushed-head CI and Sonar checks are linked in
+[PR #28](https://github.com/bullmoose20/Plex-Stuff/pull/28), which remains open
+and unmerged. The inventory generator now distinguishes the 21 entry points
+from their one shared module and does not mislabel local imports as packages.
+There are 17 active dependency manifests, including the new CI lock.
+
+### Remaining limitations
+
+Sonar still reports maintainability suggestions; its maintainability grade is
+A. A passing gate does not mean the repository has zero code smells. Sonar's
+automatic analysis does not ingest pytest coverage, so its coverage display
+does not measure this suite. No coverage gate was disabled or changed.
+
+The `titlecase` publisher does not provide a wheel; its pinned, hash-verified
+source build uses build tooling. Dependency advisories do not audit every
+bundled FFmpeg codec. Keep the established real-Plex report/apply, representative
+media/visual-output and controlled orchestration manual checks. Tests never
+contact live services or require credentials. No secrets were introduced, no
+history was rewritten, and no PR was merged or closed.
