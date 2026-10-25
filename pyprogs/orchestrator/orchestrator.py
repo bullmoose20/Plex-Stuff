@@ -436,214 +436,60 @@ def resume_process(pid):
 # === Sonarr Functions ===
 
 
-def disable_sonarr_download_clients():
-    """Disable all downloaders in Sonarr."""
-    log_and_print("Disabling Sonarr downloaders...", "info")
-    url = f"{SONARR_URL}/api/v3/downloadclient"
-    headers = {"X-Api-Key": SONARR_API_KEY}
-
+def set_download_clients_enabled(service, base_url, api_key, api_version, enabled):
+    """Update only clients needing a state change, preserving their other fields."""
+    action = "Enabling" if enabled else "Disabling"
+    state = "enabled" if enabled else "disabled"
+    completed = "Enabled" if enabled else "Disabled"
+    verb = "enable" if enabled else "disable"
+    log_and_print(f"{action} {service} downloaders...", "info")
+    url = f"{base_url}/api/{api_version}/downloadclient"
+    headers = {"X-Api-Key": api_key}
     response = requests.get(url, headers=headers, timeout=60)
     if response.status_code != 200:
         log_and_print(f"Failed to retrieve downloaders: {response.status_code}", "error")
         return
-
-    clients = response.json()
-    for client in clients:
-        client_id = client.get("id")
+    for client in response.json():
         client_name = client.get("name")
-
-        if not client.get("enable"):
-            log_and_print(f"Downloader {client_name} is already disabled.", "info")
+        if bool(client.get("enable")) == enabled:
+            log_and_print(f"Downloader {client_name} is already {state}.", "info")
             continue
-
-        # Include all fields in the payload
-        disable_url = f"{url}/{client_id}"
-        payload = {
-            **client,  # Copy all fields from the current client
-            "enable": False,  # Explicitly set enable to False
-        }
-
-        update_response = requests.put(disable_url, json=payload, headers=headers, timeout=60)
+        payload = {**client, "enable": enabled}
+        update_response = requests.put(f"{url}/{client.get('id')}", json=payload, headers=headers, timeout=60)
         if update_response.status_code in (200, 202):
-            log_and_print(f"Disabled downloaders: {client_name}", "info")
+            log_and_print(f"{completed} downloaders: {client_name}", "info")
         else:
-            log_and_print(f"Failed to disable {client_name}: {update_response.status_code}", "error")
+            log_and_print(f"Failed to {verb} {client_name}: {update_response.status_code}", "error")
+
+
+def disable_sonarr_download_clients():
+    return set_download_clients_enabled("Sonarr", SONARR_URL, SONARR_API_KEY, "v3", False)
 
 
 def enable_sonarr_download_clients():
-    """Enable all downloaders in Sonarr."""
-    log_and_print("Enabling Sonarr downloaders...", "info")
-    url = f"{SONARR_URL}/api/v3/downloadclient"
-    headers = {"X-Api-Key": SONARR_API_KEY}
-
-    response = requests.get(url, headers=headers, timeout=60)
-    if response.status_code != 200:
-        log_and_print(f"Failed to retrieve downloaders: {response.status_code}", "error")
-        return
-
-    clients = response.json()
-    for client in clients:
-        client_id = client.get("id")
-        client_name = client.get("name")
-
-        if client.get("enable"):
-            log_and_print(f"Downloader {client_name} is already enabled.", "info")
-            continue
-
-        # Include all fields in the payload
-        enable_url = f"{url}/{client_id}"
-        payload = {
-            **client,  # Copy all fields from the current client
-            "enable": True,  # Explicitly set enable to True
-        }
-
-        update_response = requests.put(enable_url, json=payload, headers=headers, timeout=60)
-        if update_response.status_code in (200, 202):
-            log_and_print(f"Enabled downloaders: {client_name}", "info")
-        else:
-            log_and_print(f"Failed to enable {client_name}: {update_response.status_code}", "error")
+    return set_download_clients_enabled("Sonarr", SONARR_URL, SONARR_API_KEY, "v3", True)
 
 
 # === Radarr Functions ===
 
 
 def disable_radarr_download_clients():
-    """Disable all downloaders in Radarr."""
-    log_and_print("Disabling Radarr downloaders...", "info")
-    url = f"{RADARR_URL}/api/v3/downloadclient"
-    headers = {"X-Api-Key": RADARR_API_KEY}
-
-    response = requests.get(url, headers=headers, timeout=60)
-    if response.status_code != 200:
-        log_and_print(f"Failed to retrieve downloaders: {response.status_code}", "error")
-        return
-
-    clients = response.json()
-    for client in clients:
-        client_id = client.get("id")
-        client_name = client.get("name")
-
-        if not client.get("enable"):
-            log_and_print(f"Downloader {client_name} is already disabled.", "info")
-            continue
-
-        # Include all fields in the payload
-        disable_url = f"{url}/{client_id}"
-        payload = {
-            **client,  # Copy all fields from the current client
-            "enable": False,  # Explicitly set enable to False
-        }
-
-        update_response = requests.put(disable_url, json=payload, headers=headers, timeout=60)
-        if update_response.status_code in (200, 202):
-            log_and_print(f"Disabled downloaders: {client_name}", "info")
-        else:
-            log_and_print(f"Failed to disable {client_name}: {update_response.status_code}", "error")
+    return set_download_clients_enabled("Radarr", RADARR_URL, RADARR_API_KEY, "v3", False)
 
 
 def enable_radarr_download_clients():
-    """Enable all downloaders in Radarr."""
-    log_and_print("Enabling Radarr downloaders...", "info")
-    url = f"{RADARR_URL}/api/v3/downloadclient"
-    headers = {"X-Api-Key": RADARR_API_KEY}
-
-    response = requests.get(url, headers=headers, timeout=60)
-    if response.status_code != 200:
-        log_and_print(f"Failed to retrieve downloaders: {response.status_code}", "error")
-        return
-
-    clients = response.json()
-    for client in clients:
-        client_id = client.get("id")
-        client_name = client.get("name")
-
-        if client.get("enable"):
-            log_and_print(f"Downloader {client_name} is already enabled.", "info")
-            continue
-
-        # Include all fields in the payload
-        enable_url = f"{url}/{client_id}"
-        payload = {
-            **client,  # Copy all fields from the current client
-            "enable": True,  # Explicitly set enable to True
-        }
-
-        update_response = requests.put(enable_url, json=payload, headers=headers, timeout=60)
-        if update_response.status_code in (200, 202):
-            log_and_print(f"Enabled downloaders: {client_name}", "info")
-        else:
-            log_and_print(f"Failed to enable {client_name}: {update_response.status_code}", "error")
+    return set_download_clients_enabled("Radarr", RADARR_URL, RADARR_API_KEY, "v3", True)
 
 
 # === Lidarr Functions ===
 
 
 def disable_lidarr_download_clients():
-    """Disable all downloaders in Lidarr."""
-    log_and_print("Disabling Lidarr downloaders...", "info")
-    url = f"{LIDARR_URL}/api/v1/downloadclient"
-    headers = {"X-Api-Key": LIDARR_API_KEY}
-
-    response = requests.get(url, headers=headers, timeout=60)
-    if response.status_code != 200:
-        log_and_print(f"Failed to retrieve downloaders: {response.status_code}", "error")
-        return
-
-    clients = response.json()
-    for client in clients:
-        client_id = client.get("id")
-        client_name = client.get("name")
-
-        if not client.get("enable"):
-            log_and_print(f"Downloader {client_name} is already disabled.", "info")
-            continue
-
-        # Include all fields in the payload
-        disable_url = f"{url}/{client_id}"
-        payload = {
-            **client,  # Copy all fields from the current client
-            "enable": False,  # Explicitly set enable to False
-        }
-
-        update_response = requests.put(disable_url, json=payload, headers=headers, timeout=60)
-        if update_response.status_code in (200, 202):
-            log_and_print(f"Disabled downloaders: {client_name}", "info")
-        else:
-            log_and_print(f"Failed to disable {client_name}: {update_response.status_code}", "error")
+    return set_download_clients_enabled("Lidarr", LIDARR_URL, LIDARR_API_KEY, "v1", False)
 
 
 def enable_lidarr_download_clients():
-    """Enable all downloaders in Lidarr."""
-    log_and_print("Enabling Lidarr downloaders...", "info")
-    url = f"{LIDARR_URL}/api/v1/downloadclient"
-    headers = {"X-Api-Key": LIDARR_API_KEY}
-
-    response = requests.get(url, headers=headers, timeout=60)
-    if response.status_code != 200:
-        log_and_print(f"Failed to retrieve downloaders: {response.status_code}", "error")
-        return
-
-    clients = response.json()
-    for client in clients:
-        client_id = client.get("id")
-        client_name = client.get("name")
-
-        if client.get("enable"):
-            log_and_print(f"Downloader {client_name} is already enabled.", "info")
-            continue
-
-        # Include all fields in the payload
-        enable_url = f"{url}/{client_id}"
-        payload = {
-            **client,  # Copy all fields from the current client
-            "enable": True,  # Explicitly set enable to True
-        }
-
-        update_response = requests.put(enable_url, json=payload, headers=headers, timeout=60)
-        if update_response.status_code in (200, 202):
-            log_and_print(f"Enabled downloaders: {client_name}", "info")
-        else:
-            log_and_print(f"Failed to enable {client_name}: {update_response.status_code}", "error")
+    return set_download_clients_enabled("Lidarr", LIDARR_URL, LIDARR_API_KEY, "v1", True)
 
 
 # === Download Client Functions ===

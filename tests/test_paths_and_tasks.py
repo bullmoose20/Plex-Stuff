@@ -131,6 +131,40 @@ def test_qbittorrent_public_methods_have_correct_hash_parameter(load_script, mon
     client.torrents_resume.assert_called_once_with(torrent_hashes="all")
 
 
+@pytest.mark.parametrize("service,version", [("sonarr", "v3"), ("radarr", "v3"), ("lidarr", "v1")])
+@pytest.mark.parametrize("enabled", [True, False])
+def test_arr_client_state_changes_preserve_payload_and_skip_unchanged(
+    load_script, monkeypatch, capsys, service, version, enabled
+):
+    module = load_script("orchestrator/orchestrator.py")
+    monkeypatch.setattr(module, service.upper() + "_URL", "http://service.invalid")
+    monkeypatch.setattr(module, service.upper() + "_API_KEY", "mock-service-key")
+    changed = {"id": 1, "name": "Changed", "enable": not enabled, "fields": [{"name": "host", "value": "local"}]}
+    unchanged = {"id": 2, "name": "Unchanged", "enable": enabled}
+    get = Mock(return_value=Mock(status_code=200, json=lambda: [changed, unchanged]))
+    put = Mock(return_value=Mock(status_code=202))
+    monkeypatch.setattr(module.requests, "get", get)
+    monkeypatch.setattr(module.requests, "put", put)
+    action = "enable" if enabled else "disable"
+    getattr(module, f"{action}_{service}_download_clients")()
+    url = f"http://service.invalid/api/{version}/downloadclient"
+    get.assert_called_once_with(url, headers={"X-Api-Key": "mock-service-key"}, timeout=60)
+    put.assert_called_once_with(
+        url + "/1", json={**changed, "enable": enabled}, headers={"X-Api-Key": "mock-service-key"}, timeout=60
+    )
+    assert changed["enable"] is not enabled
+    assert "mock-service-key" not in capsys.readouterr().out
+
+
+def test_arr_failed_list_request_does_not_modify_clients(load_script, monkeypatch):
+    module = load_script("orchestrator/orchestrator.py")
+    monkeypatch.setattr(module.requests, "get", Mock(return_value=Mock(status_code=503)))
+    put = Mock()
+    monkeypatch.setattr(module.requests, "put", put)
+    module.disable_lidarr_download_clients()
+    put.assert_not_called()
+
+
 def test_task_configuration_validation_and_yaml_safe_loading(load_script, tmp_path):
     module = load_script("orchestrator/orchestrator.py")
     config = tmp_path / "tasks.yml"
