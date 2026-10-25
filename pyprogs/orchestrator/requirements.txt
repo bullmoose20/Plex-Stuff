@@ -1,7 +1,8 @@
-plexapi
-python-dotenv
-requests
-psutil
-pyyaml
-matplotlib
-numpy
+PlexAPI>=4.18.3
+python-dotenv>=1.2.4
+requests>=2.34.2
+psutil>=7.2.2
+PyYAML>=6.0.3
+matplotlib>=3.11.2
+numpy>=2.5.4
+qbittorrent-api>=2026.10.1

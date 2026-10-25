@@ -1,4 +1,3 @@
-setuptools
-requests
-PlexAPI
-python-dotenv
+requests>=2.34.2
+PlexAPI>=4.18.3
+python-dotenv>=1.2.4

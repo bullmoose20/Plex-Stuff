@@ -1,1 +1,1 @@
-argparse
+# Standard library only; no pip dependencies.

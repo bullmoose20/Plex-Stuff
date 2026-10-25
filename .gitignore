@@ -5,3 +5,20 @@ venv/
 .idea/*
 .venv/*
 .vscode/*
+
+# Local credentials and generated verification artifacts
+.env
+.env.*
+!.env.example
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.venv*/
+*.egg-info/
+audit-*.json
+test-results*.xml
+
+# Retired tool: retain only its notice; preserve local profiles/configuration.
+/pyprogs/sel_remove_bg/*
+!/pyprogs/sel_remove_bg/README.md

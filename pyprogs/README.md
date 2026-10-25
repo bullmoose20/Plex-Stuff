@@ -6,8 +6,15 @@
 
 ## Requirements
 
-1. A system that can run Python3
-2. Python3 installed on that system
+1. CPython 3.12, 3.13 or 3.14
+2. An isolated virtual environment with the script's dependencies installed
+
+See [Python setup, offline tests and dependency maintenance](../docs/python-maintenance.md)
+for repository-wide installation, VS Code testing, supported dependency choices,
+and documented behavior changes.
+
+The obsolete `sel_remove_bg` Selenium tool is retired. See its
+[retirement notice and verified BiRefNet generation replacement](sel_remove_bg/README.md).
 
 ## Setup
 
@@ -565,7 +572,7 @@ Replace "/path/to/input/folder" with the path to the folder containing the image
 
 [Back to top](#Scripts)
 
-The "title_card_clips.py" script serves the purpose of extracting title card frames from videos, offering flexibility for both TV shows and movies. Utilizing Python libraries such as PIL (Python Imaging Library) and MoviePy, the script extracts frames from specified video files and creates title card images. It provides logging functionality for tracking frame extraction operations.
+The "title_card_clips.py" script extracts title card frames for movies and TV shows using PyAV's FFmpeg bindings and Pillow. It preserves the existing filenames, output layout and skip behavior, and provides logging for frame extraction. No MoviePy installation or external FFmpeg command is required.
 
 Open a powershell prompt and navigate to `pyprogs` folder
 

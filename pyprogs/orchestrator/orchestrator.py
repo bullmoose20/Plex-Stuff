@@ -1,3 +1,5 @@
+import sys
+
 # from multiprocessing import process
 import os
 import time
@@ -16,7 +18,8 @@ import json
 from pathlib import Path
 
 # Load environment variables
-load_dotenv()
+if __name__ == "__main__":
+    load_dotenv()
 
 RUNNING_PROCESSES = set()
 PAUSED_PROCESSES = set()
@@ -52,6 +55,7 @@ NZBGET_PASSWORD = os.getenv("NZBGET_PASSWORD", "tegbzn6789")
 
 # === Helper Functions ===
 
+
 def execute_task(task, start, end, loop_count=None, current_task_idx=None, total_tasks=None, loop_start_mon=None):
     """Execute a task and return its duration and maintenance time."""
     log_and_print(f"Executing task: {task.get('description')}", "info")
@@ -75,7 +79,7 @@ def execute_task(task, start, end, loop_count=None, current_task_idx=None, total
                 raise ValueError(f"Unknown action: {task['action']}")
             return ensure_return_value(action_function)
     except Exception as e:
-        log_and_print(f"Error executing task '{task.get('description')}': {e}", "error")
+        log_and_print(f"Error executing task '{task.get('description')}': {type(e).__name__}", "error")
         return 0, 0  # Return fallback values
 
 
@@ -111,11 +115,7 @@ def setup_logging(max_logs=5):
 
     # Limit the number of log files to max_logs
     log_files = sorted(
-        [
-            os.path.join(log_dir, f)
-            for f in os.listdir(log_dir)
-            if f.startswith(script_name) and f.endswith(".log")
-        ],
+        [os.path.join(log_dir, f) for f in os.listdir(log_dir) if f.startswith(script_name) and f.endswith(".log")],
         key=os.path.getmtime,
     )
 
@@ -164,9 +164,9 @@ def connect_to_plex(retries=3, delay=5):
     for attempt in range(1, retries + 1):
         try:
             log_and_print(f"Attempting to connect to Plex server (Attempt {attempt}/{retries})...", "info")
-            return PlexServer(PLEX_URL, PLEX_TOKEN)
+            return PlexServer(PLEX_URL, PLEX_TOKEN, timeout=60)
         except Exception as e:
-            log_and_print(f"Failed to connect to Plex server: {e}", "error")
+            log_and_print(f"Failed to connect to Plex server: {type(e).__name__}", "error")
             if attempt < retries:
                 log_and_print(f"Retrying in {delay} seconds...", "info")
                 time.sleep(delay)
@@ -182,7 +182,7 @@ def log_and_continue(action_name, func, *args, **kwargs):
     try:
         func(*args, **kwargs)
     except Exception as e:
-        log_and_print(f"Error during {action_name}: {e}", "error")
+        log_and_print(f"Error during {action_name}: {type(e).__name__}", "error")
 
 
 def log_and_print(message, level="info"):
@@ -208,7 +208,9 @@ def log_process_tree_with_delay(parent_pid, delay=2.0):
         log_and_print(f"Parent process {parent_pid} no longer exists.", "warning")
 
 
-def run_task_with_pause_check(command, start, end, loop_count=None, current_task_idx=None, total_tasks=None, loop_start_mon=None):
+def run_task_with_pause_check(
+    command, start, end, loop_count=None, current_task_idx=None, total_tasks=None, loop_start_mon=None
+):
     # Set default values if None
     loop_count = loop_count or "?"
     current_task_idx = current_task_idx or "?"
@@ -222,9 +224,8 @@ def run_task_with_pause_check(command, start, end, loop_count=None, current_task
 
     task_info = f"Loop {loop_count} - Task {current_task_idx} / {total_tasks}"
     log_and_print(
-        f"{task_info} (Loop Elapsed: {loop_elapsed}, Task Elapsed {task_elapsed}): "
-        f"Starting task: {' '.join(command)}",
-        "info"
+        f"{task_info} (Loop Elapsed: {loop_elapsed}, Task Elapsed {task_elapsed}): Starting task: [arguments omitted]",
+        "info",
     )
 
     process = subprocess.Popen(command)
@@ -244,8 +245,8 @@ def run_task_with_pause_check(command, start, end, loop_count=None, current_task
                 log_and_print(
                     f"{task_info} (Loop Elapsed: {loop_elapsed}, Task Elapsed {task_elapsed}): "
                     f"Maintenance detected. Pausing task...",
-                    "info"
-                    )
+                    "info",
+                )
                 pause_start = time.time()
                 pause_process(process.pid)
 
@@ -256,7 +257,7 @@ def run_task_with_pause_check(command, start, end, loop_count=None, current_task
                     log_and_print(
                         f"{task_info} (Loop Elapsed: {loop_elapsed}, Task Elapsed {task_elapsed}): "
                         f"Still within the maintenance window. Waiting...",
-                        "info"
+                        "info",
                     )
                     time.sleep(10)
 
@@ -272,9 +273,8 @@ def run_task_with_pause_check(command, start, end, loop_count=None, current_task
                 loop_elapsed = elapsed_str(loop_start_mon) if loop_start_mon else "??:??:??"
                 task_elapsed = elapsed_str(task_start_mon)
                 log_and_print(
-                    f"{task_info} (Loop Elapsed: {loop_elapsed}, Task Elapsed {task_elapsed}): "
-                    f"Task still running...",
-                    "info"
+                    f"{task_info} (Loop Elapsed: {loop_elapsed}, Task Elapsed {task_elapsed}): Task still running...",
+                    "info",
                 )
 
             time.sleep(5)
@@ -285,7 +285,7 @@ def run_task_with_pause_check(command, start, end, loop_count=None, current_task
         process.wait()
         raise  # Re-raise to propagate exit signal
     except Exception as e:
-        log_and_print(f"Error during task execution: {e}", "error")
+        log_and_print(f"Error during task execution: {type(e).__name__}", "error")
         process.terminate()
         process.wait()
         return 0, maintenance_time  # Provide fallback values
@@ -322,11 +322,11 @@ def get_plex_maintenance_window():
         butler_start = srv_settings.get("butlerStartHour").value
         butler_end = srv_settings.get("butlerEndHour").value
         start_time = f"{int(butler_start):02d}:00"  # Format as HH:MM
-        end_time = f"{int(butler_end):02d}:00"      # Format as HH:MM
+        end_time = f"{int(butler_end):02d}:00"  # Format as HH:MM
         log_and_print(f"Scheduled maintenance: {start_time} to {end_time}", "info")
         return start_time, end_time
     except Exception as e:
-        log_and_print(f"Failed to get maintenance window: {e}", "error")
+        log_and_print(f"Failed to get maintenance window: {type(e).__name__}", "error")
         return None, None
 
 
@@ -371,7 +371,7 @@ def is_maintenance_time(start, end, loop_count=None, current_task_idx=None, tota
             in_maintenance = start_time <= now_time <= end_time
             current_status = "real_maintenance" if in_maintenance else "no_maintenance"
         except Exception as e:
-            log_and_print(f"{task_info}: Error checking maintenance time: {e}", "error")
+            log_and_print(f"{task_info}: Error checking maintenance time: {type(e).__name__}", "error")
             return False
 
     # Log status changes
@@ -413,7 +413,7 @@ def pause_process(pid):
             RUNNING_PROCESSES.discard(child.pid)
             log_and_print(f"Paused child process {child.pid}.", "info")
     except Exception as e:
-        log_and_print(f"Failed to pause process {pid}: {e}", "error")
+        log_and_print(f"Failed to pause process {pid}: {type(e).__name__}", "error")
 
 
 def resume_process(pid):
@@ -430,217 +430,66 @@ def resume_process(pid):
             RUNNING_PROCESSES.add(child.pid)
             log_and_print(f"Resumed child process {child.pid}.", "info")
     except Exception as e:
-        log_and_print(f"Failed to resume process {pid}: {e}", "error")
+        log_and_print(f"Failed to resume process {pid}: {type(e).__name__}", "error")
 
 
 # === Sonarr Functions ===
 
-def disable_sonarr_download_clients():
-    """Disable all downloaders in Sonarr."""
-    log_and_print("Disabling Sonarr downloaders...", "info")
-    url = f"{SONARR_URL}/api/v3/downloadclient"
-    headers = {"X-Api-Key": SONARR_API_KEY}
 
-    response = requests.get(url, headers=headers)
+def set_download_clients_enabled(service, base_url, api_key, api_version, enabled):
+    """Update only clients needing a state change, preserving their other fields."""
+    action = "Enabling" if enabled else "Disabling"
+    state = "enabled" if enabled else "disabled"
+    completed = "Enabled" if enabled else "Disabled"
+    verb = "enable" if enabled else "disable"
+    log_and_print(f"{action} {service} downloaders...", "info")
+    url = f"{base_url}/api/{api_version}/downloadclient"
+    headers = {"X-Api-Key": api_key}
+    response = requests.get(url, headers=headers, timeout=60)
     if response.status_code != 200:
-        log_and_print(f"Failed to retrieve downloaders: {response.status_code} {response.text}", "error")
+        log_and_print(f"Failed to retrieve downloaders: {response.status_code}", "error")
         return
-
-    clients = response.json()
-    for client in clients:
-        client_id = client.get("id")
+    for client in response.json():
         client_name = client.get("name")
-
-        if not client.get("enable"):
-            log_and_print(f"Downloader {client_name} is already disabled.", "info")
+        if bool(client.get("enable")) == enabled:
+            log_and_print(f"Downloader {client_name} is already {state}.", "info")
             continue
-
-        # Include all fields in the payload
-        disable_url = f"{url}/{client_id}"
-        payload = {
-            **client,  # Copy all fields from the current client
-            "enable": False  # Explicitly set enable to False
-        }
-
-        update_response = requests.put(disable_url, json=payload, headers=headers)
+        payload = {**client, "enable": enabled}
+        update_response = requests.put(f"{url}/{client.get('id')}", json=payload, headers=headers, timeout=60)
         if update_response.status_code in (200, 202):
-            log_and_print(f"Disabled downloaders: {client_name}", "info")
+            log_and_print(f"{completed} downloaders: {client_name}", "info")
         else:
-            log_and_print(f"Failed to disable {client_name}: {update_response.status_code} {update_response.text}", "error")
+            log_and_print(f"Failed to {verb} {client_name}: {update_response.status_code}", "error")
+
+
+def disable_sonarr_download_clients():
+    return set_download_clients_enabled("Sonarr", SONARR_URL, SONARR_API_KEY, "v3", False)
 
 
 def enable_sonarr_download_clients():
-    """Enable all downloaders in Sonarr."""
-    log_and_print("Enabling Sonarr downloaders...", "info")
-    url = f"{SONARR_URL}/api/v3/downloadclient"
-    headers = {"X-Api-Key": SONARR_API_KEY}
+    return set_download_clients_enabled("Sonarr", SONARR_URL, SONARR_API_KEY, "v3", True)
 
-    response = requests.get(url, headers=headers)
-    if response.status_code != 200:
-        log_and_print(f"Failed to retrieve downloaders: {response.status_code} {response.text}", "error")
-        return
-
-    clients = response.json()
-    for client in clients:
-        client_id = client.get("id")
-        client_name = client.get("name")
-
-        if client.get("enable"):
-            log_and_print(f"Downloader {client_name} is already enabled.", "info")
-            continue
-
-        # Include all fields in the payload
-        enable_url = f"{url}/{client_id}"
-        payload = {
-            **client,  # Copy all fields from the current client
-            "enable": True  # Explicitly set enable to True
-        }
-
-        update_response = requests.put(enable_url, json=payload, headers=headers)
-        if update_response.status_code in (200, 202):
-            log_and_print(f"Enabled downloaders: {client_name}", "info")
-        else:
-            log_and_print(f"Failed to enable {client_name}: {update_response.status_code} {update_response.text}", "error")
 
 # === Radarr Functions ===
 
 
 def disable_radarr_download_clients():
-    """Disable all downloaders in Radarr."""
-    log_and_print("Disabling Radarr downloaders...", "info")
-    url = f"{RADARR_URL}/api/v3/downloadclient"
-    headers = {"X-Api-Key": RADARR_API_KEY}
-
-    response = requests.get(url, headers=headers)
-    if response.status_code != 200:
-        log_and_print(f"Failed to retrieve downloaders: {response.status_code} {response.text}", "error")
-        return
-
-    clients = response.json()
-    for client in clients:
-        client_id = client.get("id")
-        client_name = client.get("name")
-
-        if not client.get("enable"):
-            log_and_print(f"Downloader {client_name} is already disabled.", "info")
-            continue
-
-        # Include all fields in the payload
-        disable_url = f"{url}/{client_id}"
-        payload = {
-            **client,  # Copy all fields from the current client
-            "enable": False  # Explicitly set enable to False
-        }
-
-        update_response = requests.put(disable_url, json=payload, headers=headers)
-        if update_response.status_code in (200, 202):
-            log_and_print(f"Disabled downloaders: {client_name}", "info")
-        else:
-            log_and_print(f"Failed to disable {client_name}: {update_response.status_code} {update_response.text}", "error")
+    return set_download_clients_enabled("Radarr", RADARR_URL, RADARR_API_KEY, "v3", False)
 
 
 def enable_radarr_download_clients():
-    """Enable all downloaders in Radarr."""
-    log_and_print("Enabling Radarr downloaders...", "info")
-    url = f"{RADARR_URL}/api/v3/downloadclient"
-    headers = {"X-Api-Key": RADARR_API_KEY}
-
-    response = requests.get(url, headers=headers)
-    if response.status_code != 200:
-        log_and_print(f"Failed to retrieve downloaders: {response.status_code} {response.text}", "error")
-        return
-
-    clients = response.json()
-    for client in clients:
-        client_id = client.get("id")
-        client_name = client.get("name")
-
-        if client.get("enable"):
-            log_and_print(f"Downloader {client_name} is already enabled.", "info")
-            continue
-
-        # Include all fields in the payload
-        enable_url = f"{url}/{client_id}"
-        payload = {
-            **client,  # Copy all fields from the current client
-            "enable": True  # Explicitly set enable to True
-        }
-
-        update_response = requests.put(enable_url, json=payload, headers=headers)
-        if update_response.status_code in (200, 202):
-            log_and_print(f"Enabled downloaders: {client_name}", "info")
-        else:
-            log_and_print(f"Failed to enable {client_name}: {update_response.status_code} {update_response.text}", "error")
+    return set_download_clients_enabled("Radarr", RADARR_URL, RADARR_API_KEY, "v3", True)
 
 
 # === Lidarr Functions ===
 
+
 def disable_lidarr_download_clients():
-    """Disable all downloaders in Lidarr."""
-    log_and_print("Disabling Lidarr downloaders...", "info")
-    url = f"{LIDARR_URL}/api/v1/downloadclient"
-    headers = {"X-Api-Key": LIDARR_API_KEY}
-
-    response = requests.get(url, headers=headers)
-    if response.status_code != 200:
-        log_and_print(f"Failed to retrieve downloaders: {response.status_code} {response.text}", "error")
-        return
-
-    clients = response.json()
-    for client in clients:
-        client_id = client.get("id")
-        client_name = client.get("name")
-
-        if not client.get("enable"):
-            log_and_print(f"Downloader {client_name} is already disabled.", "info")
-            continue
-
-        # Include all fields in the payload
-        disable_url = f"{url}/{client_id}"
-        payload = {
-            **client,  # Copy all fields from the current client
-            "enable": False  # Explicitly set enable to False
-        }
-
-        update_response = requests.put(disable_url, json=payload, headers=headers)
-        if update_response.status_code in (200, 202):
-            log_and_print(f"Disabled downloaders: {client_name}", "info")
-        else:
-            log_and_print(f"Failed to disable {client_name}: {update_response.status_code} {update_response.text}", "error")
+    return set_download_clients_enabled("Lidarr", LIDARR_URL, LIDARR_API_KEY, "v1", False)
 
 
 def enable_lidarr_download_clients():
-    """Enable all downloaders in Lidarr."""
-    log_and_print("Enabling Lidarr downloaders...", "info")
-    url = f"{LIDARR_URL}/api/v1/downloadclient"
-    headers = {"X-Api-Key": LIDARR_API_KEY}
-
-    response = requests.get(url, headers=headers)
-    if response.status_code != 200:
-        log_and_print(f"Failed to retrieve downloaders: {response.status_code} {response.text}", "error")
-        return
-
-    clients = response.json()
-    for client in clients:
-        client_id = client.get("id")
-        client_name = client.get("name")
-
-        if client.get("enable"):
-            log_and_print(f"Downloader {client_name} is already enabled.", "info")
-            continue
-
-        # Include all fields in the payload
-        enable_url = f"{url}/{client_id}"
-        payload = {
-            **client,  # Copy all fields from the current client
-            "enable": True  # Explicitly set enable to True
-        }
-
-        update_response = requests.put(enable_url, json=payload, headers=headers)
-        if update_response.status_code in (200, 202):
-            log_and_print(f"Enabled downloaders: {client_name}", "info")
-        else:
-            log_and_print(f"Failed to enable {client_name}: {update_response.status_code} {update_response.text}", "error")
+    return set_download_clients_enabled("Lidarr", LIDARR_URL, LIDARR_API_KEY, "v1", True)
 
 
 # === Download Client Functions ===
@@ -649,11 +498,7 @@ def enable_lidarr_download_clients():
 def connect_to_qbittorrent():
     """Connect to the qBittorrent API using the provided environment variables."""
     try:
-        client = Client(
-            host=QBITTORRENT_URL,
-            username=QBITTORRENT_USERNAME,
-            password=QBITTORRENT_PASSWORD
-        )
+        client = Client(host=QBITTORRENT_URL, username=QBITTORRENT_USERNAME, password=QBITTORRENT_PASSWORD)
         logging.info("Connected to qBittorrent successfully.")
         return client
     except LoginFailed:
@@ -663,95 +508,98 @@ def connect_to_qbittorrent():
         logging.error("Unable to connect to qBittorrent. Check URL/API availability.")
         raise
     except Exception as e:
-        logging.error(f"Unexpected error connecting to qBittorrent: {e}")
+        logging.error(f"Unexpected error connecting to qBittorrent: {type(e).__name__}")
         raise
 
 
 def pause_qbittorrent_downloads():
     """Pause all active downloads in qBittorrent using qbittorrent-api."""
-    log_and_continue(
-        "Pausing qBittorrent downloads",
-        _pause_qbittorrent_torrents
-    )
+    log_and_continue("Pausing qBittorrent downloads", _pause_qbittorrent_torrents)
 
 
 def resume_qbittorrent_downloads():
     """Resume all paused downloads in qBittorrent using qbittorrent-api."""
-    log_and_continue(
-        "Resuming qBittorrent downloads",
-        _resume_qbittorrent_torrents
-    )
+    log_and_continue("Resuming qBittorrent downloads", _resume_qbittorrent_torrents)
 
 
 def _pause_qbittorrent_torrents():
     """Helper function to perform the pause operation."""
     client = connect_to_qbittorrent()
-    client.torrents.pause(hashes="all")  # Pause all torrents
+    client.torrents_pause(torrent_hashes="all")  # Pause all torrents
     logging.info("Successfully paused all torrents in qBittorrent.")
 
 
 def _resume_qbittorrent_torrents():
     """Helper function to perform the resume operation."""
     client = connect_to_qbittorrent()
-    client.torrents.resume(hashes="all")  # Resume all torrents
+    client.torrents_resume(torrent_hashes="all")  # Resume all torrents
     logging.info("Successfully resumed all torrents in qBittorrent.")
 
 
 def pause_sabnzbd_downloads():
     """Pause all active downloads in SABnzbd."""
     log_and_print("Pausing SABnzbd downloads...", "info")
-    pause_response = requests.get(f"{SABNZBD_URL}/api?mode=pause&apikey={SABNZBD_API_KEY}")
+    pause_response = requests.get(f"{SABNZBD_URL}/api?mode=pause&apikey={SABNZBD_API_KEY}", timeout=60)
     if pause_response.status_code != 200:
-        raise Exception(f"Failed to pause SABnzbd downloads: {pause_response.text}")
+        raise Exception(f"Failed to pause SABnzbd downloads: {pause_response.status_code}")
 
 
 def resume_sabnzbd_downloads():
     """Resume all paused downloads in SABnzbd."""
     log_and_print("Resuming SABnzbd downloads...", "info")
-    resume_response = requests.get(f"{SABNZBD_URL}/api?mode=resume&apikey={SABNZBD_API_KEY}")
+    resume_response = requests.get(f"{SABNZBD_URL}/api?mode=resume&apikey={SABNZBD_API_KEY}", timeout=60)
     if resume_response.status_code != 200:
-        raise Exception(f"Failed to resume SABnzbd downloads: {resume_response.text}")
+        raise Exception(f"Failed to resume SABnzbd downloads: {resume_response.status_code}")
 
 
 def pause_nzbget_downloads():
     """Pause all active downloads in NZBGet."""
     log_and_print("Pausing NZBGet downloads...", "info")
     pause_response = requests.get(
-        f"{NZBGET_URL}/jsonrpc",
-        auth=(NZBGET_USERNAME, NZBGET_PASSWORD),
-        json={"method": "pausedownload"}
+        f"{NZBGET_URL}/jsonrpc", auth=(NZBGET_USERNAME, NZBGET_PASSWORD), json={"method": "pausedownload"}, timeout=60
     )
     if pause_response.status_code != 200:
-        raise Exception(f"Failed to pause NZBGet downloads: {pause_response.text}")
+        raise Exception(f"Failed to pause NZBGet downloads: {pause_response.status_code}")
 
 
 def resume_nzbget_downloads():
     """Resume all paused downloads in NZBGet."""
     log_and_print("Resuming NZBGet downloads...", "info")
     resume_response = requests.get(
-        f"{NZBGET_URL}/jsonrpc",
-        auth=(NZBGET_USERNAME, NZBGET_PASSWORD),
-        json={"method": "resumedownload"}
+        f"{NZBGET_URL}/jsonrpc", auth=(NZBGET_USERNAME, NZBGET_PASSWORD), json={"method": "resumedownload"}, timeout=60
     )
     if resume_response.status_code != 200:
-        raise Exception(f"Failed to resume NZBGet downloads: {resume_response.text}")
+        raise Exception(f"Failed to resume NZBGet downloads: {resume_response.status_code}")
 
 
-def run_script_with_context(script_path, args, start, end, use_venv=None,
-                            loop_count=None, current_task_idx=None, total_tasks=None,
-                            loop_start_mon=None):
+def run_script_with_context(
+    script_path,
+    args,
+    start,
+    end,
+    use_venv=None,
+    loop_count=None,
+    current_task_idx=None,
+    total_tasks=None,
+    loop_start_mon=None,
+):
     loop_count = loop_count or "?"
     current_task_idx = current_task_idx or "?"
     total_tasks = total_tasks or "?"
 
     task_info = f"Loop {loop_count} - Task {current_task_idx} / {total_tasks}"
-    log_and_print(f"{task_info}: Running script '{script_path}' with arguments {args}", "info")
+    log_and_print(f"{task_info}: Running script '{script_path}' with arguments [arguments omitted]", "info")
 
     # Change to the script's directory
+    script_path = os.path.abspath(script_path)
+    if use_venv:
+        use_venv = os.path.abspath(use_venv)
     script_dir = os.path.dirname(script_path)
     script_name = os.path.basename(script_path)
     log_and_print(TASK_DIVIDER, "info")
-    log_and_print(f"Running script '{script_name}' from directory '{script_dir}' with arguments {args}", "info")
+    log_and_print(
+        f"Running script '{script_name}' from directory '{script_dir}' with arguments [arguments omitted]", "info"
+    )
 
     original_dir = os.getcwd()
     os.chdir(script_dir)
@@ -759,30 +607,23 @@ def run_script_with_context(script_path, args, start, end, use_venv=None,
     try:
         # Construct the command based on script type
         if script_name.endswith(".py"):
-            command = ["python", script_name] + args
+            command = [sys.executable, script_name] + args
             if use_venv:
-                activate_venv = os.path.join(use_venv, "Scripts", "activate.bat")
-                command = [
-                    "cmd.exe",
-                    "/c",
-                    f"{activate_venv} && python {script_name} {' '.join(args)}"
-                ]
+                interpreter = Path(use_venv).resolve() / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
+                if not interpreter.is_file():
+                    raise FileNotFoundError("Virtual environment interpreter not found")
+                command = [str(interpreter), script_name] + args
         elif script_name.endswith(".ps1"):
             pwsh = shutil.which("pwsh")
             ps = pwsh if pwsh else "powershell"
 
-            command = [
-                ps,
-                "-NoProfile",
-                "-ExecutionPolicy", "Bypass",
-                "-File", script_name
-            ] + args
+            command = [ps, "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", script_name] + args
 
         else:
             raise ValueError(f"Unsupported script type: {script_name}. Only .py and .ps1 are supported.")
 
         log_and_print(TASK_DIVIDER, "info")
-        log_and_print(f"Starting task with command: {' '.join(command)}", "info")
+        log_and_print("Starting task with command: [arguments omitted]", "info")
 
         # Run the task and return the results
         return run_task_with_pause_check(
@@ -795,13 +636,14 @@ def run_script_with_context(script_path, args, start, end, use_venv=None,
             loop_start_mon=loop_start_mon,
         )
     except Exception as e:
-        log_and_print(f"Error while running script '{script_name}': {e}", "error")
+        log_and_print(f"Error while running script '{script_name}': {type(e).__name__}", "error")
         return 0, 0  # Return fallback values in case of an exception
     finally:
         os.chdir(original_dir)
 
 
 # === Main Orchestration ===
+
 
 def monitor_maintenance_and_tasks(config_file):
     """Orchestrate maintenance and tasks based on configuration."""
@@ -833,22 +675,24 @@ def monitor_maintenance_and_tasks(config_file):
                         loop_count=loop_count,
                         current_task_idx=idx,
                         total_tasks=len(tasks),
-                        loop_start_mon=loop_start_mon
+                        loop_start_mon=loop_start_mon,
                     )
                     active_time = task_duration - maintenance_time
                     total_maintenance_time += maintenance_time
                     total_active_time += active_time
                     total_task_time += task_duration
 
-                    task_summaries.append({
-                        "index": idx,
-                        "description": task.get("description"),
-                        "total_time": format_time(task_duration),
-                        "active_time": format_time(active_time),
-                        "maintenance_time": format_time(maintenance_time),
-                    })
+                    task_summaries.append(
+                        {
+                            "index": idx,
+                            "description": task.get("description"),
+                            "total_time": format_time(task_duration),
+                            "active_time": format_time(active_time),
+                            "maintenance_time": format_time(maintenance_time),
+                        }
+                    )
                 except Exception as e:
-                    log_and_print(f"Error during Task {idx}: {e}", "error")
+                    log_and_print(f"Error during Task {idx}: {type(e).__name__}", "error")
                     task_duration, maintenance_time = 0, 0
 
             # Log detailed task summaries
@@ -860,7 +704,7 @@ def monitor_maintenance_and_tasks(config_file):
                     f"Total Time: {task_summary['total_time']}, "
                     f"Active Time: {task_summary['active_time']}, "
                     f"Maintenance Time: {task_summary['maintenance_time']}",
-                    "info"
+                    "info",
                 )
 
             # Log overall summary
@@ -870,13 +714,7 @@ def monitor_maintenance_and_tasks(config_file):
             log_and_print(f"  Total Loop Time (excluding maintenance): {format_time(total_active_time)}", "info")
             log_and_print(f"  Total Maintenance Time: {format_time(total_maintenance_time)}", "info")
             log_and_print(LOG_DIVIDER, "info")
-            save_loop_stats(
-                loop_count,
-                task_summaries,
-                total_task_time,
-                total_active_time,
-                total_maintenance_time
-            )
+            save_loop_stats(loop_count, task_summaries, total_task_time, total_active_time, total_maintenance_time)
 
             # Delay before next loop
             log_and_print(f"Loop {loop_count} - All tasks completed. Restarting the loop after a delay...", "info")
@@ -900,10 +738,7 @@ def delete_temp_files(config_file):
             script_dirs.append(script_dir)
 
     # Define the temp file paths to check
-    temp_files = [
-        os.path.join(script_dir, "temp", "Posterizarr.Running")
-        for script_dir in script_dirs
-    ]
+    temp_files = [os.path.join(script_dir, "temp", "Posterizarr.Running") for script_dir in script_dirs]
 
     # Check and delete temp files
     for file_path in temp_files:
@@ -914,7 +749,7 @@ def delete_temp_files(config_file):
             else:
                 log_and_print(f"Temporary file not found, skipping: {file_path}", "info")
         except Exception as e:
-            log_and_print(f"Error deleting file {file_path}: {e}", "error")
+            log_and_print(f"Error deleting file {file_path}: {type(e).__name__}", "error")
 
 
 def terminate_all_processes():
@@ -929,7 +764,7 @@ def terminate_all_processes():
         except psutil.NoSuchProcess:
             log_and_print(f"Process {pid} already terminated.", "info")
         except Exception as e:
-            log_and_print(f"Error terminating process {pid}: {e}", "error")
+            log_and_print(f"Error terminating process {pid}: {type(e).__name__}", "error")
     # Clear the sets
     RUNNING_PROCESSES.clear()
     PAUSED_PROCESSES.clear()
@@ -940,13 +775,13 @@ def load_config(file_path):
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"Configuration file not found: {file_path}")
     try:
-        with open(file_path, "r") as file:
+        with open(file_path) as file:
             config = yaml.safe_load(file)
             if not config:
                 raise ValueError("Configuration file is empty or invalid.")
             return config
     except yaml.YAMLError as e:
-        raise ValueError(f"Failed to parse YAML file: {file_path}. Error: {e}")
+        raise ValueError(f"Failed to parse YAML file: {file_path}. Error: {type(e).__name__}")
 
 
 def validate_and_load_config(config_file=None):
@@ -966,7 +801,7 @@ def validate_and_load_config(config_file=None):
         validate_tasks_config(tasks)  # Validate the structure of tasks
         return config
     except Exception as e:
-        raise ValueError(f"Error in configuration file {config_file}: {e}")
+        raise ValueError(f"Error in configuration file {config_file}: {type(e).__name__}")
 
 
 def validate_tasks_config(tasks):
@@ -1001,7 +836,7 @@ def save_loop_stats(loop_count, task_summaries, total_task_time, total_active_ti
     # Append to stats file
     stats_path = Path(stats_file)
     if stats_path.exists():
-        with open(stats_file, "r") as file:
+        with open(stats_file) as file:
             existing_data = json.load(file)
             existing_data.append(data)
     else:
@@ -1013,6 +848,7 @@ def save_loop_stats(loop_count, task_summaries, total_task_time, total_active_ti
 
 
 def main():
+    global plex
     try:
         setup_directories()
         log_and_print(LOG_DIVIDER, "info")
@@ -1031,7 +867,7 @@ def main():
     except KeyboardInterrupt:
         log_and_print("Ctrl-C detected. Exiting script and cleaning up...", "warning")
     except Exception as e:
-        log_and_print(f"Unhandled exception: {e}", "error")
+        log_and_print(f"Unhandled exception: {type(e).__name__}", "error")
     finally:
         log_and_print("Performing cleanup: Resuming all paused services and downloads.", "info")
         try:
@@ -1045,16 +881,20 @@ def main():
             log_and_continue("resume SABnzbd", resume_sabnzbd_downloads)
             log_and_continue("resume NZBGet", resume_nzbget_downloads)
         except Exception as e:
-            log_and_print(f"Error during cleanup: {e}", "error")
+            log_and_print(f"Error during cleanup: {type(e).__name__}", "error")
         log_and_print(LOG_DIVIDER, "info")
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Orchestrator Script")
-    parser.add_argument("--config", help="Path to tasks configuration file", default="tasks.yml")
+    try:
+        parser = argparse.ArgumentParser(description="Orchestrator Script")
+        parser.add_argument("--config", help="Path to tasks configuration file", default="tasks.yml")
 
-    args = parser.parse_args()
+        args = parser.parse_args()
 
-    max_logs = int(os.getenv("MAX_LOGS", "5"))
-    setup_logging(max_logs)
-    main()
+        max_logs = int(os.getenv("MAX_LOGS", "5"))
+        setup_logging(max_logs)
+        main()
+    except Exception as error:
+        print(f"Command failed ({type(error).__name__}). Check configuration and inputs.")
+        raise SystemExit(1) from None

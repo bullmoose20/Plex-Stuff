@@ -1,4 +1,11 @@
 # Plex-Stuff
+
+Python tools support 3.12–3.14. See [Python setup, tests and maintenance](docs/python-maintenance.md)
+and the [modernization audit](docs/python-modernization.md).
+
+The Selenium background-removal tool is [retired](pyprogs/sel_remove_bg/README.md);
+use the linked Kometa People-Images generation source with BiRefNet.
+
 ## Random plex related stuff
 
 ## Requirements

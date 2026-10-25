@@ -1,2 +1,3 @@
-plexapi
-python-dotenv
+PlexAPI>=4.18.3
+python-dotenv>=1.2.4
+requests>=2.34.2

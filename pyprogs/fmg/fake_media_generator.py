@@ -1,95 +1,45 @@
 import argparse
-import glob
 import logging
 import os
 import requests
 import shutil
 import sys
 import time
-from datetime import datetime as dt
-from dotenv import load_dotenv, find_dotenv
+from dotenv import load_dotenv
+from pathlib import Path
 
-try:
-    # Find the .env file
-    dotenv_path = find_dotenv(raise_error_if_not_found=True)
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from plex_stuff_helpers import configure_logging, get_formatted_duration, prune_logs, log_configuration
 
-    # Load environment variables from .env file
-    load_dotenv(dotenv_path)
-except OSError:
-    print("Error: The .env file was not found. Please make sure it exists in the script's directory.")
-    exit(1)
 
-# Retrieve Plex server details from environment variables
-# plex_url = os.getenv('PLEX_URL')
-# plex_token = os.getenv('PLEX_TOKEN')
-# timeout_seconds = int(os.getenv('PLEX_TIMEOUT', 60))  # Default timeout: 60 seconds
-max_log_files = int(os.getenv('MAX_LOG_FILES', 10))  # Default number of logs: 10
-log_level = os.getenv('LOG_LEVEL', 'INFO').upper()  # Default logging level: INFO
+max_log_files, script_name, logs_directory, timestamp = log_configuration()
 
-# Extract the script name without the '.py' extension
-script_name = os.path.splitext(os.path.basename(sys.argv[0]))[0]
-
-# Define the logs directory
-logs_directory = "logs"
-
-# Ensure the "logs" directory exists
-if not os.path.exists(logs_directory):
-    os.makedirs(logs_directory)
-
-# Generate a unique log filename with timestamp and script name
-timestamp = dt.now().strftime("%Y%m%d_%H%M%S_%f")[:-3]
-log_filename = os.path.join(logs_directory, f"{script_name}_{timestamp}.log")
-
-# Set up logging with timestamps and the specified logging level
-log_format = '%(asctime)s - %(levelname)s - %(message)s'
-logging.basicConfig(filename=log_filename, level=getattr(logging, log_level), format=log_format)
-
-# Retrieve TMDB API key from environment variable
 TMDB_API_KEY = os.getenv("TMDB_API_KEY")
 
-# Check if TMDB API key is present and not empty
-if not TMDB_API_KEY:
-    print("TMDB_API_KEY is missing or empty in the .env file. Please provide a valid API key.")
-    logging.error("TMDB_API_KEY is missing or empty in the .env file. Please provide a valid API key.")
-    exit()
+
+def configure_runtime():
+    """Load optional local configuration and initialize CLI output."""
+    global TMDB_API_KEY, logs_directory, max_log_files, script_name, timestamp
+    load_dotenv()
+
+    max_log_files, script_name, logs_directory, timestamp = configure_logging()
+
+    TMDB_API_KEY = os.getenv("TMDB_API_KEY")
+
+    if not TMDB_API_KEY:
+        print("TMDB_API_KEY is missing or empty in the .env file. Please provide a valid API key.")
+        logging.error("TMDB_API_KEY is missing or empty in the .env file. Please provide a valid API key.")
+        exit()
 
 
 def clean_up_old_logs():
     global max_log_files
-
-    # Set max_log_files to 1 if it's 0 or negative
-    if max_log_files <= 0:
-        max_log_files = 1
-
-    # Remove old log files from the 'logs' subdirectory if there are more than the allowed number
-    existing_logs = glob.glob(os.path.join(logs_directory, f"{script_name}_*.log"))
-    if len(existing_logs) > max_log_files:
-        logging.info(f"existing_logs: {len(existing_logs)} > max_log_files: {max_log_files}")
-        oldest_logs = sorted(existing_logs)[:-max_log_files]
-        for old_log in oldest_logs:
-            os.remove(old_log)
-
-
-def get_formatted_duration(seconds):
-    units = [('day', 86400), ('hour', 3600), ('minute', 60), ('second', 1)]
-    result = []
-
-    for unit_name, unit_seconds in units:
-        value, seconds = divmod(seconds, unit_seconds)
-        if value > 0:
-            unit_name = unit_name if value == 1 else unit_name + 's'
-            result.append(f"{int(value):.0f} {unit_name}")
-
-    if not result:
-        milliseconds = seconds * 1000
-        return "{:.3f} millisecond".format(milliseconds) if milliseconds == 1 else "{:.3f} milliseconds".format(milliseconds)
-
-    return ' '.join(result)
+    max_log_files = prune_logs(logs_directory, script_name, max_log_files)
 
 
 def fetch_movie_details(tmdb_id):
     url = f"https://api.themoviedb.org/3/movie/{tmdb_id}?api_key={TMDB_API_KEY}&language=en-US"
-    response = requests.get(url)
+    response = requests.get(url, timeout=60)
 
     # Check for a 404 status code
     if response.status_code == 404:
@@ -100,7 +50,7 @@ def fetch_movie_details(tmdb_id):
     data = response.json()
 
     # Fetch IMDb ID separately
-    imdb_id = fetch_imdb_id(tmdb_id, 'movie')
+    imdb_id = fetch_imdb_id(tmdb_id, "movie")
 
     # Include IMDb ID in the details
     data["imdb_id"] = imdb_id
@@ -109,7 +59,7 @@ def fetch_movie_details(tmdb_id):
 
 def fetch_tv_details(tmdb_id):
     url = f"https://api.themoviedb.org/3/tv/{tmdb_id}?api_key={TMDB_API_KEY}&language=en-US"
-    response = requests.get(url)
+    response = requests.get(url, timeout=60)
 
     # Check for a 404 status code
     if response.status_code == 404:
@@ -120,7 +70,7 @@ def fetch_tv_details(tmdb_id):
     data = response.json()
 
     # Fetch IMDb ID separately
-    imdb_id = fetch_imdb_id(tmdb_id, 'tv')
+    imdb_id = fetch_imdb_id(tmdb_id, "tv")
 
     # Include IMDb ID in the details
     data["imdb_id"] = imdb_id
@@ -128,13 +78,13 @@ def fetch_tv_details(tmdb_id):
 
 
 def fetch_imdb_id(tmdb_id, media_type):
-    if media_type == 'tv':
+    if media_type == "tv":
         url = f"https://api.themoviedb.org/3/tv/{tmdb_id}/external_ids?api_key={TMDB_API_KEY}"
     else:
         # For movies, use a different technique to get IMDb ID
         url = f"https://api.themoviedb.org/3/movie/{tmdb_id}?api_key={TMDB_API_KEY}"
 
-    response = requests.get(url)
+    response = requests.get(url, timeout=60)
 
     # Check for a 404 status code
     if response.status_code == 404:
@@ -145,27 +95,36 @@ def fetch_imdb_id(tmdb_id, media_type):
     data = response.json()
 
     # Extract IMDb ID from the response
-    imdb_id = data.get('imdb_id', '')
+    imdb_id = data.get("imdb_id", "")
 
     return imdb_id
 
 
 def create_folders_and_files(details, media_type, imdb_id, season_data=None):
-    output_directory = 'output'
-    base_directory = 'movies' if media_type == 'movie' else 'shows'
+    output_directory = "output"
+    base_directory = "movies" if media_type == "movie" else "shows"
 
     # Create folder path within the output directory
-    title = details["title"] if media_type == 'movie' else details["name"]
+    title = details["title"] if media_type == "movie" else details["name"]
 
     # Replace invalid characters in the title with underscores
-    title = title.replace(':', '_').replace('/', '_').replace('\\', '_').replace('?', '_').replace('"', '_').replace(
-        '<', '_').replace('>', '_').replace('|', '_').replace('*', '_')
+    title = (
+        title.replace(":", "_")
+        .replace("/", "_")
+        .replace("\\", "_")
+        .replace("?", "_")
+        .replace('"', "_")
+        .replace("<", "_")
+        .replace(">", "_")
+        .replace("|", "_")
+        .replace("*", "_")
+    )
 
     folder_path = f"{title} [imdb-{imdb_id}]"
     base_folder_path = os.path.join(output_directory, base_directory, folder_path)
     os.makedirs(base_folder_path, exist_ok=True)
 
-    if media_type == 'tv':
+    if media_type == "tv":
         for season in season_data:
             season_number = season["season_number"]
             episodes = season["episode_count"]
@@ -178,8 +137,8 @@ def create_folders_and_files(details, media_type, imdb_id, season_data=None):
                 os.makedirs(season_folder_path, exist_ok=True)
 
                 # Create file path and copy sample.avi
-                filepath = os.path.join(season_folder_path, episode_name.replace('.mkv', '.avi'))
-                shutil.copy('sample.avi', filepath)
+                filepath = os.path.join(season_folder_path, episode_name.replace(".mkv", ".avi"))
+                shutil.copy("sample.avi", filepath)
 
                 # Log and print details
                 logging.info(f"Created file: {filepath}")
@@ -188,7 +147,7 @@ def create_folders_and_files(details, media_type, imdb_id, season_data=None):
     else:
         # For movies, create file path and copy sample.avi
         filepath = os.path.join(base_folder_path, f"{title} [WEBDL-1080p][HDR][10bit][h265][EAC3 Atmos 5.1]-FLUX.avi")
-        shutil.copy('sample.avi', filepath)
+        shutil.copy("sample.avi", filepath)
 
         # Log and print details
         logging.info(f"Created file: {filepath}")
@@ -202,8 +161,8 @@ def create_folders_and_files(details, media_type, imdb_id, season_data=None):
 def display_options(options):
     print("Multiple entries found. Please choose one:")
     for index, entry in enumerate(options, 1):
-        media_type = 'Movie' if 'title' in entry else 'TV Show'
-        title = entry.get('title') if 'title' in entry else entry.get('name', 'Unknown Title')
+        media_type = "Movie" if "title" in entry else "TV Show"
+        title = entry.get("title") if "title" in entry else entry.get("name", "Unknown Title")
         print(f"{index}. {title} ({media_type} - ID: {entry['id']})")
         logging.info(f"{index}. {title} ({media_type} - ID: {entry['id']})")
 
@@ -213,10 +172,11 @@ def main():
     start_time = time.time()
 
     parser = argparse.ArgumentParser(
-        description="Fetch and organize details about movies or TV shows using the TMDb API.")
+        description="Fetch and organize details about movies or TV shows using the TMDb API."
+    )
 
-    parser.add_argument("--tmdbid", nargs='+', type=int, help="TMDb ID(s) for the movie or TV show")
-    parser.add_argument("--media-type", choices=['movie', 'tv'], help="Type of media to fetch (movie or tv)")
+    parser.add_argument("--tmdbid", nargs="+", type=int, help="TMDb ID(s) for the movie or TV show")
+    parser.add_argument("--media-type", choices=["movie", "tv"], help="Type of media to fetch (movie or tv)")
 
     args = parser.parse_args()
 
@@ -224,8 +184,6 @@ def main():
     tmdb_ids = args.tmdbid or input("Enter TMDb ID(s) separated by space: ").split()
 
     # Log the command along with its arguments
-    logging.info(f"Command: {' '.join(['python'] + os.sys.argv)}")
-    logging.info(f"Arguments: {args}")
 
     # Initialize counts
     movie_count = 0
@@ -234,18 +192,18 @@ def main():
     for tmdb_id in tmdb_ids:
         print(f"Working on TMDb ID {tmdb_id}.")
 
-        if args.media_type == 'movie' or not args.media_type:
+        if args.media_type == "movie" or not args.media_type:
             movie_details = fetch_movie_details(tmdb_id)
             if movie_details:
-                media_type = 'movie'
+                media_type = "movie"
                 imdb_id = movie_details.get("imdb_id", "")
                 create_folders_and_files(movie_details, media_type, imdb_id)
                 movie_count += 1
 
-        if args.media_type == 'tv' or not args.media_type:
+        if args.media_type == "tv" or not args.media_type:
             tv_details = fetch_tv_details(tmdb_id)
             if tv_details:
-                media_type = 'tv'
+                media_type = "tv"
                 imdb_id = tv_details.get("imdb_id", "")
                 season_data = tv_details.get("seasons", [])
                 create_folders_and_files(tv_details, media_type, imdb_id, season_data)
@@ -273,7 +231,12 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        configure_runtime()
+        main()
 
-    # Call the clean_up_old_logs function
-    clean_up_old_logs()
+        # Call the clean_up_old_logs function
+        clean_up_old_logs()
+    except Exception as error:
+        print(f"Command failed ({type(error).__name__}). Check configuration and inputs.")
+        raise SystemExit(1) from None
