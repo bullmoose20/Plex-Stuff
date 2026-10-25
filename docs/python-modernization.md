@@ -130,4 +130,9 @@ No reset, rebase, existing commit modification or history rewrite was performed.
 
 The [configuration-history assessment and Dependabot PR review](python-maintenance.md#historical-configuration-security-assessment)
 record exposure scope, rotation guidance and the six superseded dependency PRs.
-Final retirement validation is recorded in the PR and the validation record.
+Final retirement validation is recorded in the PR and the
+[exact validation record](python-validation.md): 123 tests per supported Python
+version in fresh local environments and all four Linux/Windows CI jobs, passing
+Ruff/dependency checks and no known Python-package vulnerabilities. The record
+includes exact runtime versions, binary-wheel tags, security-assessment scope
+and remaining manual checks.
